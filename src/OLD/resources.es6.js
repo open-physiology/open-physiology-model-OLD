@@ -1,4 +1,4 @@
-import {distributionSchema, polaritySchema, uriSchema} from '../simple-data-types.es6';
+import {distributionSchema, polaritySchema, uriSchema} from './simple-data-types.es6';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

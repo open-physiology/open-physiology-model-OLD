@@ -1,234 +1,288 @@
-import {RESOURCE, RELATIONSHIP, MANY, minusPlusSchema} from "./util";
+import {minusPlusSchema} from "./util";
+import module, {MANY} from './typed-module';
 
-import {Resource, Typed} from "./resources";
+import resources from "./resources";
+const {Resource} = resources;
 
+import typed from './typed';
+const {Typed} = typed;
 
-///////////////////////////////////////////////////////////
-export const Material = RESOURCE('Material', {
 
-    extends: Typed,
+export default new module()
 
-    singular: "material"
 
-});
-////////////////////////////////////////////////////////////
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
+		name: 'Material',
 
-export const r_MaterialMaterial = RELATIONSHIP('r_MaterialMaterial', {
+		extends: Typed,
 
-    1: [Material, [0, MANY], { key: 'materials', covariant : true }],
-    2: [Material, [0, MANY]                                        ],
+		singular: "material"
 
-    noCycles: true,
+	})//////////////////////////////////////////////////////////////////////////
 
-});
 
+	.RELATIONSHIP(({Material}) => ({
 
-////////////////////////////////////////////////////////////
-export const Lyph = RESOURCE('Lyph', {
+		name: 'ContainsMaterial',
 
-    extends: Material,
+		1: [Material.Type, [0, MANY], { key: 'materials', anchors: true }],
+		2: [Material.Type, [0, MANY]                                     ],
 
-    singular: "lyph",
+		noCycles: true,
 
-    properties: {
-        'species': { type: 'string' }
-    },
+	}))
 
-});
-////////////////////////////////////////////////////////////
 
+	.RESOURCE(({Material}) => ({////////////////////////////////////////////////
 
-export const r_LyphLayer = RELATIONSHIP('r_LyphLayer', {
+		name: 'Lyph',
 
-    1: [Lyph,                      [0, MANY], { key: 'layers', covariant : true  }],
-    2: [Lyph, { template: true  }, [0, MANY]                                      ],
+		extends: Material,
 
-    noCycles: true,
+		singular: "lyph",
 
-});
-export const r_LyphLayerInheritance = RELATIONSHIP('r_LyphLayerInheritance', {
+		properties: {
+			'species': { type: 'string' }
+		},
 
-	1: [Lyph, [0, MANY], {key: 'inheritsLayers' }],
-	2: [Lyph, [0, MANY]                          ],
+	}))/////////////////////////////////////////////////////////////////////////
 
-	noCycles: true,
 
-});
+	.RELATIONSHIP(({Lyph}) => ({
 
+		name: 'HasPart',
 
-export const r_LyphPatch = RELATIONSHIP('r_LyphPatch', {
+		1: [Lyph.Type,     [0, MANY], { key: 'parts', anchors: true }],
+		2: [Lyph.Template, [0, MANY], {                             }],
 
-    1: [Lyph,                      [0, MANY], { key: 'patches', covariant : true }],
-    2: [Lyph, { template: true  }, [0, MANY]                                      ],
+		noCycles: true,
 
-    noCycles: true,
+	}))
 
-});
-export const r_LyphPatchInheritance = RELATIONSHIP('r_LyphPatchInheritance', {
+	.RELATIONSHIP(({HasPart, Lyph}) => ({
 
-	1: [Lyph, [0, MANY], {key: 'inheritsPatches' }],
-	2: [Lyph, [0, MANY]                           ],
+		name: 'HasLayer',
 
-	noCycles: true,
+		extends: HasPart,
 
-});
+		1: [Lyph.Type,     [0, MANY], { key: 'layers', anchors: true }],
+		2: [Lyph.Template, [0, MANY]                                  ],
 
+		noCycles: true,
 
-export const r_LyphPart = RELATIONSHIP('r_LyphPart', {
+	}))
 
-    1: [Lyph,                      [0, MANY], { key: 'parts', covariant : true }],
-    2: [Lyph, { template: true  }, [0, MANY]                                    ],
+	.RELATIONSHIP(({HasPart, Lyph}) => ({
 
-    noCycles: true,
+		name: 'HasPatch',
 
-});
-export const r_LyphPartInheritance = RELATIONSHIP('r_LyphPartInheritance', {
+		extends: HasPart,
 
-    1: [Lyph, [0, MANY], {key: 'inheritsParts' }],
-    2: [Lyph, [0, MANY]                         ],
+		1: [Lyph.Type,     [0, MANY], { key: 'patches', anchors: true }],
+		2: [Lyph.Template, [0, MANY]                                   ],
 
-    noCycles: true,
+		properties: {
+			'patchMap': { type: 'string' }
+		},
 
-});
+		noCycles: true,
 
+	}))
 
-////////////////////////////////////////////////////////////
-export const CylindricalLyph = RESOURCE('CylindricalLyph', {
 
-    extends: Lyph,
+	.RELATIONSHIP(({Lyph}) => ({
 
-    singular: "cylindrical lyph",
+		name: 'InheritsAllPatchesFrom',
 
-    properties: {
-        closedAt: {
-            type       : 'array',
-            items      : minusPlusSchema,
-            uniqueItems: true,
-            maxItems   : 2
-        }
-    }
+		1: [Lyph.Type, [0, MANY], { key: 'patchProviders', anchors: true }],
+		2: [Lyph.Type, [0, MANY]                                          ],
 
-});
-////////////////////////////////////////////////////////////
+		noCycles: true,
 
+	})).RELATIONSHIP(({Lyph}) => ({
 
-export const r_CylindricalLyphSegment = RELATIONSHIP('r_CylindricalLyphSegment', {
+		name: 'InheritsAllLayersFrom',
 
-    1: [CylindricalLyph,                      [0, MANY], { key: 'segments', covariant : true }],
-    2: [CylindricalLyph, { template: true  }, [0, MANY]                                       ],
+		1: [Lyph.Type, [0, MANY], { key: 'layerProviders', anchors: true }],
+		2: [Lyph.Type, [0, MANY]                                          ],
 
-    noCycles: true
+		noCycles: true,
 
-});
-export const r_CylindricalLyphSegmentInheritance = RELATIONSHIP('r_CylindricalLyphSegmentInheritance', {
+	})).RELATIONSHIP(({Lyph}) => ({
 
-    1: [CylindricalLyph, [0, MANY], { key: 'inheritsSegments' }],
-    2: [CylindricalLyph, [0, MANY],                            ],
+		name: 'InheritsAllPartsFrom',
 
-    noCycles: true,
+		1: [Lyph.Type, [0, MANY], { key: 'partProviders', anchors: true }],
+		2: [Lyph.Type, [0, MANY]                                         ],
 
-});
+		noCycles: true,
 
+	})).RELATIONSHIP(({InheritsAllPatchesFrom}) => ({
 
-////////////////////////////////////////////////////////////
-export const Border = RESOURCE('Border', {
+		name: 'InheritsAllPartsFrom',
+		extends: InheritsAllPatchesFrom
 
-    extends: Typed,
+	})).RELATIONSHIP(({InheritsAllLayersFrom}) => ({
 
-    singular: "border",
+		name: 'InheritsAllPartsFrom',
+		extends: InheritsAllLayersFrom
 
-    // TODO: position: { min: number, max: number };
+	}))
 
-    // TODO?: static readOnly = true; // four borders are added automatically to all lyphs
-    // TODO: Add readOnly and autoCreate to the actual relationship class
-});
-////////////////////////////////////////////////////////////
 
+	.RESOURCE(({Lyph}) => ({////////////////////////////////////////////////////
 
-const borderRELATIONSHIP = (rel, LyphClass, key) => RELATIONSHIP(rel, {
+		name: 'CylindricalLyph',
 
-    1: [LyphClass, {sustains: true, anchors: true,}, [1, 1], { key: key, covariant : true, implicit: true }],
-    2: [Border,                                      [1, 1]                                                ],
+		extends: Lyph,
 
-    // TODO: make up flag that states that the border object should by default be 'expand'ed in a requested lyph object
+		singular: "cylindrical lyph",
 
-});
-export const r_InnerBorder = borderRELATIONSHIP('r_InnerBorder', Lyph           , 'innerBorder');
-export const r_OuterBorder = borderRELATIONSHIP('r_OuterBorder', Lyph           , 'outerBorder');
-export const r_MinusBorder = borderRELATIONSHIP('r_MinusBorder', CylindricalLyph, 'minusBorder');
-export const r_PlusBorder  = borderRELATIONSHIP('r_PlusBorder' , CylindricalLyph, 'plusBorder' );
+		properties: {
+			closedAt: {
+				type       : 'array',
+				items      : minusPlusSchema,
+				uniqueItems: true,
+				maxItems   : 2
+			}
+		}
 
+	}))/////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////
-export const Node = RESOURCE('Node', {
 
-	extends: Typed,
+	.RELATIONSHIP(({HasPatch, CylindricalLyph}) => ({
 
-	singular: "node",
+		name: 'HasSegment',
 
-});
-////////////////////////////////////////////////////////////
+		extends: HasPatch,
 
+		1: [CylindricalLyph.Type,     [0, MANY], { key: 'segments', anchors: true }],
+		2: [CylindricalLyph.Template, [0, MANY]                                    ],
 
-export const r_LyphNode = RELATIONSHIP('r_LyphNode', {
+		noCycles: true
 
-	1: [Lyph, [0, MANY], { key: 'nodes', anchors: true }],
-	2: [Node, [0, MANY], {                             }],
+	})).RELATIONSHIP(({CylindricalLyph}) => ({
 
-});
+		name: 'InheritsAllSegmentsFrom',
 
-export const r_BorderNode = RELATIONSHIP('r_BorderNode', {
+		1: [CylindricalLyph.Type, [0, MANY], { key: 'segmentProviders', anchors: true }],
+		2: [CylindricalLyph.Type, [0, MANY],                                           ],
 
-	1: [Border,                     [0, MANY], { key: 'nodes', anchors: true }],
-	2: [Node,   { template: true }, [0, MANY], {                             }],
+		noCycles: true,
 
-});
+	})).RELATIONSHIP(({InheritsAllSegmentsFrom}) => ({
 
-export const r_NodeChannel = RELATIONSHIP('r_NodeChannel', {
+		name: 'InheritsAllPartsFrom',
+		extends: InheritsAllSegmentsFrom,
 
-	1: [Node,                     [0, MANY], { key: 'channels', anchors: true }],
-	2: [Node, { template: true }, [0, MANY], {                                }],
+	}))
 
-});
 
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////
-export const Coalescence = RESOURCE('Coalescence', {
+		name: 'Border',
 
-    extends: Resource,
+		extends: Typed,
 
-    singular: "coalescence"
+		singular: "border",
 
-	// coalescence between two or more lyph templates means
-	// that at least one lyph from each participating lyph template
-	// shares its outer layer with the other participating lyphs
+		// TODO: position: { min: number, max: number };
 
-});
-////////////////////////////////////////////////////////////
+		// TODO?: static readOnly = true; // four borders are added automatically to all lyphs
+		// TODO: Add readOnly and autoCreate to the actual relationship class
 
+	})//////////////////////////////////////////////////////////////////////////
 
-export const r_CoalescenceLyphs = RELATIONSHIP('r_CoalescenceLyphs', {
 
-	1: [Coalescence, { template: true }, [0, MANY], { key: 'lyphs'        }],
-	2: [Lyph,        { template: true }, [2, MANY], { key: 'coalescences' }],
+	.RELATIONSHIP(({Border, Lyph, CylindricalLyph}) => [
+		['HasInnerBorder', Lyph           , 'innerBorder'],
+		['HasOuterBorder', Lyph           , 'outerBorder'],
+		['HasMinusBorder', CylindricalLyph, 'minusBorder'],
+		['HasPlusBorder' , CylindricalLyph, 'plusBorder' ],
+	].map(([name, LyphClass, key]) => ({
 
-	// TODO: CONSTRAINT: The outer layers of the lyphs in a coalescence
-	//     : must all be type-wise compatible, e.g., there must exist a
-	//     : LyphType that is a subtype of each of those outer layers.
-	//     : If that common subtype is actually one of them, that's fine.
-	//     : If not, a witness must have been provided in the form of
-	//     : a r_CoalescenceInterface
+		name,
 
-});
+		1: [LyphClass.Type,  [1, 1], { key, implicit: true, sustains: true, anchors: true }],
+		2: [Border.Template, [1, 1]                                                        ],
 
+		// TODO: make up flag that states that the border object should by default be 'expand'ed in a requested lyph object
 
-export const r_CoalescenceInterface = RELATIONSHIP('r_CoalescenceInterface', {
+	})))
 
-    1: [Coalescence, { template: true }, [0, MANY], { key: 'interfaces' }],
-    2: [Lyph,                            [1, MANY], {                   }],
 
-	// TODO: CONSTRAINT: The given interface lyph type must be a subtype of
-	//     : each of the outer layers of the lyphs of the given coalescence.
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
-});
+		name: 'Node',
+
+		extends: Typed,
+
+		singular: "node",
+
+	})//////////////////////////////////////////////////////////////////////////
+
+
+	.RELATIONSHIP(({Lyph, Node}) => ({
+
+		name: 'HasNode',
+
+		1: [Lyph.Type,     [0, MANY], { key: 'nodes', anchors: true }],
+		2: [Node.Template, [0, MANY],                                ],
+
+	}))
+
+
+	.RELATIONSHIP(({Border, Node}) => ({
+
+		name: 'HasNode',
+
+		1: [Border.Type,   [0, MANY], { key: 'nodes', anchors: true }],
+		2: [Node.Template, [0, MANY],                                ],
+
+	}))
+
+
+	.RESOURCE({/////////////////////////////////////////////////////////////////
+
+		name: 'Coalescence',
+
+		extends: Resource,
+
+		singular: "coalescence"
+
+		// coalescence between two or more lyph templates means
+		// that at least one lyph from each participating lyph template
+		// shares its outer layer with the other participating lyphs
+
+	})//////////////////////////////////////////////////////////////////////////
+
+
+	.RELATIONSHIP(({Coalescence, Lyph}) => ({
+
+		name: 'CoalescesWith',
+
+		1: [Lyph.Template, [2, MANY], { key: 'coalescences'         }],
+		2: [Coalescence,   [0, MANY], { key: 'lyphs', anchors: true }],
+
+		// TODO: CONSTRAINT: The outer layers of the lyphs in a coalescence
+		//     : must all be type-wise compatible, e.g., there must exist a
+		//     : LyphType that is a subtype of each of those outer layers.
+		//     : If that common subtype is actually one of them, that's fine.
+		//     : If not, a witness must have been provided in the form of
+		//     : a CoalescenceInterface
+
+	}))
+
+
+	.RELATIONSHIP(({Coalescence, Lyph}) => ({
+
+		name: 'CoalescesThroughLayer',
+
+		1: [Coalescence, [0, MANY], { key: 'interfaceLayers', anchors: true }],
+		2: [Lyph.Type,   [0, MANY],                                          ],
+
+		// TODO: CONSTRAINT: The given interface lyph type must be a subtype of
+		//     : each of the outer layers of the lyphs of the given coalescence.
+
+	}));

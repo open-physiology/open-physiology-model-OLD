@@ -1,298 +1,414 @@
-import {
-	RESOURCE,
-	RELATIONSHIP,
-	MANY,
-	identifierRegex,
-	rationalNumberSchema,
-	angleSchema
-} from "./util";
+import {identifierRegex, rationalNumberSchema, angleSchema} from "./util";
 
-import {Resource, Typed} from "./resources";
+import module, {MANY} from './typed-module';
 
+import resources from "./resources";
+const {Resource} = resources;
 
-////////////////////////////////////////////////////////////
-export const Theme = RESOURCE('Theme', {
+import lyphs from "./lyphs";
+const {Material, Lyph, CylindricalLyph, Border, Coalescence, Node} = lyphs;
 
-    extends: Resource,
+import typed from "./typed";
+const {Type} = typed;
 
-    singular: "theme",
+import processes from './processes';
+const {Process} = processes;
 
-});
-////////////////////////////////////////////////////////////
+import measurables from './measurables';
+const {Measurable, Causality} = measurables;
 
+export default new module()
 
-export const r_ThemeStyle = RELATIONSHIP('r_ThemeStyle', {
 
-    1: [Theme,    [0, MANY], {}],
-    2: [Resource, [0, MANY], {}],
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
-	patternProperties: {
-		[identifierRegex]: { type: 'string', minLength: 1 }
-	}
+		name: 'Theme',
 
-});
+		extends: Resource,
 
+		singular: "theme",
 
-////////////////////////////////////////////////////////////
-export const Artefact = RESOURCE('Artefact', {
+	})//////////////////////////////////////////////////////////////////////////
 
-    extends: Resource,
-    
-    singular: "artefact",
 
-});
-////////////////////////////////////////////////////////////
+	.RELATIONSHIP(({Theme}) => ({
 
+		name: 'PrescribesStyleFor',
 
-export const r_ArtefactModel = RELATIONSHIP('r_ArtefactModel', {
+		1: [Theme,    [0, MANY], { key: 'resources' }],
+		2: [Resource, [0, MANY], { key: 'themes'    }],
 
-    1: [Artefact,     [1, 1   ], { key: 'model', anchors: true }],
-    2: [Typed, [0, MANY], {                             }],
+		patternProperties: {
+			[identifierRegex]: { type: 'string', minLength: 1 }
+		}
 
-});
+	}))
 
 
-////////////////////////////////////////////////////////////
-export const Dim2Artefact = RESOURCE('Dim2Artefact', {
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
-	extends: Artefact,
+		name: 'Artefact',
 
-	singular: "2-dimensional artefact",
+		extends:  Resource,
+		abstract: true,
 
-	properties: {
-		'x':        { ...rationalNumberSchema,    required: true },
-		'y':        { ...rationalNumberSchema,    required: true },
-		'width':    { ...rationalNumberSchema,    required: true },
-		'height':   { ...rationalNumberSchema,    required: true },
-		'rotation': { ...angleSchema, default: 0, required: true }
-	}
+		singular: "artefact",
 
-});
-////////////////////////////////////////////////////////////
+	})//////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////
-export const Dim2Container = RESOURCE('Dim2Container', {
+	.RELATIONSHIP(({Artefact}) => ({
 
-    extends: Dim2Artefact,
+		name: 'PresentsModel',
 
-    singular: "2-dimensional container",
+		1: [Artefact, [1, 1   ], { key: 'model', anchors: true }],
+		2: [Type,     [0, MANY],                                ],
 
-    properties: {}
+	}))
 
-});
-////////////////////////////////////////////////////////////
 
+	.RESOURCE(({Artefact}) => ({////////////////////////////////////////////////
 
-export const r_Dim2ContainerChild = RELATIONSHIP('r_Dim2ContainerChild', {
+		name: 'Dim2Artefact',
 
-    1: [Dim2Container, [0, MANY], { key: 'children' }],
-    2: [Dim2Artefact,  [0, 1   ], {                 }],
+		extends:  Artefact,
+		abstract: true,
 
-});
+		singular: "2-dimensional artefact",
 
+		properties: {
+			'width':  { ...rationalNumberSchema, required: true },
+			'height': { ...rationalNumberSchema, required: true }
+		}
 
-////////////////////////////////////////////////////////////
-export const Dim1Artefact = RESOURCE('Dim1Artefact', {
+	})).RESOURCE(({Dim2Artefact}) => ({/////////////////////////////////////////
 
-    extends: Dim2Artefact,
+		name: 'Dim1Artefact',
 
-    singular: "1-dimensional artefact",
+		extends:  Dim2Artefact,
+		abstract: true,
 
-    properties: {
-	    'height': { constant: 0 }
-    }
+		singular: "1-dimensional artefact",
 
-});
-////////////////////////////////////////////////////////////
+		properties: {
+			'height': { value: { n: 0 } }
+		}
 
+	})).RESOURCE(({Dim1Artefact}) => ({/////////////////////////////////////////
 
-////////////////////////////////////////////////////////////
-export const Dim1Container = RESOURCE('Dim1Container', {
+		name: 'Dim0Artefact',
 
-    extends: Dim1Artefact,
+		extends:  Dim1Artefact,
+		abstract: true,
 
-    singular: "1-dimensional container",
+		singular: "0-dimensional artefact",
 
-    properties: {}
+		properties: {
+			'width': { value: { n: 0 } }
+		}
 
-});
-////////////////////////////////////////////////////////////
+	}))/////////////////////////////////////////////////////////////////////////
 
 
-export const r_Dim1ContainerChild = RELATIONSHIP('r_Dim1ContainerChild', {
+	.RESOURCE(({Dim2Artefact}) => ({////////////////////////////////////////////
 
-	1: [Dim1Container, [0, MANY], { key: 'children' }],
-	2: [Dim1Artefact,  [0, 1   ], {                 }],
+		name: 'Dim2Container',
 
-});
+		extends:  Dim2Artefact,
+		abstract: true,
 
+		singular: "2-dimensional container",
 
-////////////////////////////////////////////////////////////
-export const Dim0Artefact = RESOURCE('Dim0Artefact', {
+	})).RESOURCE(({Dim1Artefact}) => ({/////////////////////////////////////////
 
-	extends: Dim1Artefact,
+		name: 'Dim1Container',
 
-	singular: "0-dimensional artefact",
+		extends:  Dim1Artefact,
+		abstract: true,
 
-	properties: {
-		'width': { constant: 0 }
-	}
+		singular: "1-dimensional container"
 
-});
-////////////////////////////////////////////////////////////
+	})).RESOURCE(({Dim0Artefact}) => ({/////////////////////////////////////////
 
+		name: 'Dim0Container',
 
-////////////////////////////////////////////////////////////
-export const Dim0Container = RESOURCE('Dim0Container', {
+		extends:  Dim0Artefact,
+		abstract: true,
 
-    extends: Dim0Artefact,
+		singular: "0-dimensional container"
 
-    singular: "0-dimensional container",
+	}))/////////////////////////////////////////////////////////////////////////
 
-    properties: {}
 
-});
-////////////////////////////////////////////////////////////
+	.RELATIONSHIP(({Dim2Container, Dim2Artefact}) => ({
 
+		name: 'Contains',
 
-export const r_Dim0ContainerChild = RELATIONSHIP('r_Dim0ContainerChild', {
+		1: [Dim2Container, [0, MANY], { key: 'children', anchors: true }],
+		2: [Dim2Artefact,  [0, 1   ], { key: 'parent'                  }],
 
-	1: [Dim0Container, [0, MANY], { key: 'children' }],
-	2: [Dim0Artefact,  [0, 1   ], {                 }],
+		properties: {
+			'x':        { ...rationalNumberSchema,    required: true },
+			'y':        { ...rationalNumberSchema,    required: true },
+			'rotation': { ...angleSchema, default: 0, required: true }
+		}
 
-});
+		// TODO: CONSTRAINT: a relationship like this requires
+		//     : a corresponding parent/child relationship on the associated models
 
+	})).RELATIONSHIP(({Dim1Container, Dim1Artefact}) => ({
 
-////////////////////////////////////////////////////////////
-export const LyphCanvas = RESOURCE('LyphCanvas', {
+		name: 'Contains',
+
+		1: [Dim1Container, [0, MANY], { key: 'children', anchors: true }],
+		2: [Dim1Artefact,  [0, 1   ], { key: 'parent'                  }],
+
+		properties: {
+			'x': { ...rationalNumberSchema, required: true }
+		}
+
+		// TODO: CONSTRAINT: a relationship like this requires
+		//     : a corresponding parent/child relationship on the associated models
+
+	})).RELATIONSHIP(({Dim0Container, Dim0Artefact}) => ({
+
+		name: 'Contains',
+
+		1: [Dim0Container, [0, MANY], { key: 'children', anchors: true }],
+		2: [Dim0Artefact,  [0, 1   ], { key: 'parent'                  }],
+
+		// TODO: CONSTRAINT: a relationship like this requires
+		//     : a corresponding parent/child relationship on the associated models
+
+	}))
+
+
+	.RESOURCE(({Dim2Container}) => ({///////////////////////////////////////////
+
+		name: 'LyphCanvas',
+
+		extends: Dim2Container,
+
+		singular: "lyph canvas",
+		plural:   "lyph canvases"
+
+	}))/////////////////////////////////////////////////////////////////////////
+
+
+	.RELATIONSHIP(({ArtefactModel, LyphCanvas}) => [{
 	
-	extends: Dim2Container,
+	    name: 'PresentsModel',
+
+		extends: ArtefactModel,
 	
-	singular: "lyph canvas",
-	
-	properties: {
-		'x': { constant: 0 },
-		'y': { constant: 0 }
-	}
-	
-});
-////////////////////////////////////////////////////////////
+	    1: [LyphCanvas, [1, 1   ]],
+	    2: [Lyph.Type,  [0, MANY]],
+	    
+	}])
 
 
-////////////////////////////////////////////////////////////
-export const MaterialGlyph = RESOURCE('MaterialGlyph', {
+	.RESOURCE(({Dim0Artefact}) => ({////////////////////////////////////////////
 
-    extends: Dim0Artefact,
+		name: 'MaterialGlyph',
 
-    singular: "material glyph",
+		extends: Dim0Artefact,
 
-    properties: {}
+		singular: "material glyph"
 
-});
-////////////////////////////////////////////////////////////
+	}))/////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////
-export const LyphRectangle = RESOURCE('LyphRectangle', {
-	
-	extends: Dim2Container,
-	
-	singular: "lyph rectangle",
-	
-	properties: {}
-	
-});
-////////////////////////////////////////////////////////////
+	.RELATIONSHIP(({ArtefactModel, MaterialGlyph}) => [{
+
+		name: 'PresentsModel',
+
+		extends: ArtefactModel,
+
+		1: [MaterialGlyph, [1, 1   ]],
+		2: [Material.Type, [0, MANY]],
+
+	}])
 
 
-////////////////////////////////////////////////////////////
-export const CylindricalLyphRectangle = RESOURCE('CylindricalLyphRectangle', {
+	.RESOURCE(({Dim2Container}) => ({///////////////////////////////////////////
 
-    extends: LyphRectangle,
+		name: 'LyphRectangle',
 
-    singular: "cylindrical lyph rectangle",
+		extends: Dim2Container,
 
-    properties: {}
+		singular: "lyph rectangle"
 
-});
-////////////////////////////////////////////////////////////
+	}))/////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////
-export const BorderLine = RESOURCE('BorderLine', {
+	.RELATIONSHIP(({ArtefactModel, LyphRectangle}) => [{
 
-    extends: Dim1Container,
+		name: 'PresentsModel',
 
-    singular: "border line",
+		extends: ArtefactModel,
 
-    properties: {}
+		1: [LyphRectangle, [1, 1   ]],
+		2: [Lyph.Type,     [0, MANY]],
 
-});
-////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////
-export const CoalescenceRectangle = RESOURCE('CoalescenceRectangle', {
-
-    extends: Dim2Container,
-
-    singular: "coalescence rectangle",
-
-    properties: {}
-
-});
-////////////////////////////////////////////////////////////
+	}])
 
 
+	.RESOURCE(({LyphRectangle}) => ({
 
-////////////////////////////////////////////////////////////
-export const NodeGlyph = RESOURCE('NodeGlyph', {
+		name: 'CylindricalLyphRectangle',
 
-	extends: Dim0Container,
+		extends: LyphRectangle,
 
-	singular: "node glyph",
+		singular: "cylindrical lyph rectangle"
 
-	properties: {}
-
-});
-////////////////////////////////////////////////////////////
+	}))
 
 
-////////////////////////////////////////////////////////////
-export const ProcessEdge = RESOURCE('ProcessEdge', {
+	.RELATIONSHIP(({ArtefactModel, CylindricalLyphRectangle}) => [{
 
-	extends: Dim1Container,
+		name: 'PresentsModel',
 
-	singular: "process edge",
+		extends: ArtefactModel,
 
-	properties: {}
+		1: [CylindricalLyphRectangle, [1, 1   ]],
+		2: [CylindricalLyph.Type,     [0, MANY]],
 
-});
-////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////
-export const MeasurableGlyph = RESOURCE('MeasurableGlyph', {
-
-    extends: Dim0Artefact,
-
-    singular: "measurable glyph",
-
-    properties: {}
-
-});
-////////////////////////////////////////////////////////////
+	}])
 
 
-////////////////////////////////////////////////////////////
-export const CausalityArrow = RESOURCE('CausalityArrow', {
+	.RESOURCE(({Dim1Container}) => ({
 
-    extends: Dim1Artefact,
+		name: 'BorderLine',
 
-    singular: "causality arrow",
+		extends: Dim1Container,
 
-    properties: {}
+		singular: "border line"
 
-});
-////////////////////////////////////////////////////////////
+	}))
+
+
+	.RELATIONSHIP(({ArtefactModel, BorderLine}) => [{
+
+		name: 'PresentsModel',
+
+		extends: ArtefactModel,
+
+		1: [BorderLine,  [1, 1   ]],
+		2: [Border.Type, [0, MANY]],
+
+	}])
+
+
+	.RESOURCE(({Dim2Container}) => ({
+
+		name: 'CoalescenceRectangle',
+
+		extends: Dim2Container,
+
+		singular: "coalescence rectangle"
+
+	}))
+
+
+	.RELATIONSHIP(({ArtefactModel, CoalescenceRectangle}) => [{
+
+		name: 'PresentsModel',
+
+		extends: ArtefactModel,
+
+		1: [CoalescenceRectangle, [1, 1   ]],
+		2: [Coalescence.Type,     [0, MANY]],
+
+	}])
+
+
+	.RESOURCE(({Dim0Container}) => ({
+
+		name: 'NodeGlyph',
+
+		extends: Dim0Container,
+
+		singular: "node glyph"
+
+	}))
+
+
+	.RELATIONSHIP(({ArtefactModel, NodeGlyph}) => [{
+
+		name: 'PresentsModel',
+
+		extends: ArtefactModel,
+
+		1: [NodeGlyph, [1, 1   ]],
+		2: [Node.Type, [0, MANY]],
+
+	}])
+
+
+	.RESOURCE(({Dim1Container}) => ({
+
+		name: 'ProcessEdge',
+
+		extends: Dim1Container,
+
+		singular: "process edge"
+
+	}))
+
+
+	.RELATIONSHIP(({ArtefactModel, ProcessEdge}) => [{
+
+		name: 'PresentsModel',
+
+		extends: ArtefactModel,
+
+		1: [ProcessEdge,  [1, 1   ]],
+		2: [Process.Type, [0, MANY]],
+
+	}])
+
+
+	.RESOURCE(({Dim0Artefact}) => ({
+
+		name: 'MeasurableGlyph',
+
+		extends: Dim0Artefact,
+
+		singular: "measurable glyph"
+
+	}))
+
+
+	.RELATIONSHIP(({ArtefactModel, MeasurableGlyph}) => [{
+
+		name: 'PresentsModel',
+
+		extends: ArtefactModel,
+
+		1: [MeasurableGlyph, [1, 1   ]],
+		2: [Measurable.Type, [0, MANY]],
+
+	}])
+
+
+	.RESOURCE(({Dim1Artefact}) => ({
+
+		name: 'CausalityArrow',
+
+		extends: Dim1Artefact,
+
+		singular: "causality arrow"
+
+	}))
+
+
+	.RELATIONSHIP(({ArtefactModel, CausalityArrow}) => [{
+
+		name: 'PresentsModel',
+
+		extends: ArtefactModel,
+
+		1: [CausalityArrow, [1, 1   ]],
+		2: [Causality.Type, [0, MANY]],
+
+	}]);

@@ -1,101 +1,61 @@
-import {
-	RESOURCE,
-	RELATIONSHIP,
-	MANY,
-	idSchema,
-	uriSchema,
-	identifierSchema
-} from './util';
+import {idSchema, uriSchema, identifierSchema} from './util';
+
+import module, {MANY} from './module';
 
 
-////////////////////////////////////////////////////////////
-export const Resource = RESOURCE('Resource', {
+export default new module()
 
-	abstract: true,
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
-	properties: {
-		'id':    { ...idSchema,         readonly: true },
-		'href':  { ...uriSchema,        readonly: true },
-		'class': { ...identifierSchema, readonly: true }
-	}
+		name: 'Resource',
 
-});
-////////////////////////////////////////////////////////////
+		abstract: true,
 
+		properties: {
+			'id':    { ...idSchema,         readonly: true },
+			'href':  { ...uriSchema,        readonly: true },
+			'class': { ...identifierSchema, readonly: true }
+		}
 
-////////////////////////////////////////////////////////////
-export const Typed = RESOURCE('Typed', {
-
-    extends:  Resource,
-    abstract: true,
-
-    properties: {
-	    'name': { ...identifierSchema }
-    }
-
-});
-////////////////////////////////////////////////////////////
-
-export const r_Supertype = RELATIONSHIP('r_Supertype', {
-
-    1: [Typed, [0, MANY], { key: 'supertypes' }],
-    2: [Typed, [0, MANY], { key: 'subtypes'   }],
-
-	noCycles: true
-
-});
+	})//////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////
-export const Group = RESOURCE('Group', {
+	.RESOURCE(({Resource}) => ({////////////////////////////////////////////////
 
-	extends: Typed,
+		name: 'ExternalResource',
 
-	singular: "group"
+		extends: Resource,
 
-});
-////////////////////////////////////////////////////////////
+		singular: "external resource",
 
+		properties: {
+			'uri': { ...uriSchema }
+		}
 
-export const r_GroupElements = RELATIONSHIP('r_GroupElements', {
-
-	1: [Group, [0, MANY], { key: 'elements', anchors: true }],
-	2: [Typed, [0, MANY], {                                }],
-
-});
+	}))/////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////
-export const ExternalResource = RESOURCE('ExternalResource', {
+	.RELATIONSHIP(({ExternalResource}) => ({
 
-    extends: Resource,
+		name: 'RelatedTo',
 
-    singular: "external resource",
+		1: [ExternalResource, [0, MANY], { key: 1 }],
+		2: [ExternalResource, [0, MANY], { key: 2 }],
 
-    properties: {
-	    uri: { ...uriSchema, required: true }
-    }
+		// TODO: figure out how external relationships will work, and rewrite this class
 
-});
-////////////////////////////////////////////////////////////
+		properties: {
+			'type': { type: 'string' }
+		}
+
+	}))
 
 
-export const r_ExternalRelationship = RELATIONSHIP('r_ExternalRelationship', {
+	.RELATIONSHIP(({Resource, ExternalResource}) => ({
 
-    1: [ExternalResource, [0, MANY], { key: 1 }],
-    2: [ExternalResource, [0, MANY], { key: 2 }],
+		name: 'CorrespondsTo',
 
-	// TODO: figure out how external relationships will work, and rewrite this class
+		1: [Resource,         [0, MANY], { key: 'externals' }],
+		2: [ExternalResource, [0, MANY], { key: 'locals'    }],
 
-	properties: {
-		name: { type: 'string' }
-	}
-
-});
-
-export const r_ResourceExternal = RELATIONSHIP('r_ResourceExternal', {
-
-    1: [Resource,         [0, MANY], { key: 'externals' }],
-	2: [ExternalResource, [0, MANY], { key: 'locals'    }],
-
-});
+	}));

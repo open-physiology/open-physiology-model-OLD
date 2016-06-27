@@ -1,104 +1,158 @@
-import {RESOURCE, RELATIONSHIP, MANY} from './util';
+import module, {MANY}  from './typed-module';
 
-import {Typed} from "./resources";
-import {Material}     from "./lyphs";
+import typed from "./typed";
+const {Typed} = typed;
 
-
-////////////////////////////////////////////////////////////
-export const Process = RESOURCE('Process', {
-
-    extends: Typed,
-
-    singular: "process",
-	plural:   "processes",
-
-    properties: {
-	    'transportPhenomenon': { type: 'string', enum: ['advection', 'diffusion'], required: true },
-	    'species':             { type: 'string'                                                   }
-    }
-
-	// TODO: have type class automatically contain superclass properties
-	//     : for specific types of properties in the template class
-
-});
-////////////////////////////////////////////////////////////
+import lyphs from "./lyphs";
+const {Material, Lyph, Node} = lyphs;
 
 
-export const r_NodeToProcess = RELATIONSHIP('r_NodeToProcess', {
-
-	1: [Node,    { template: true }, [0, MANY], { key: 'outgoingProcesses' }],
-	2: [Process, { template: true }, [1, 1   ], { key: 'source'            }],
-
-});
+export default new module()
 
 
-export const r_ProcessToNode = RELATIONSHIP('r_ProcessToNode', {
+	.RESOURCE({///////////////////////////////////////////////////////////
 
-	1: [Process, { template: true }, [1, 1   ], { key: 'target'            }],
-	2: [Node,    { template: true }, [0, MANY], { key: 'incomingProcesses' }],
+		name: 'Process',
 
-});
+		extends: Typed,
 
+		singular: "process",
+		plural:   "processes",
 
-export const r_ProcessMaterial = RELATIONSHIP('r_ProcessMaterial', {
+		properties: {
+			'transportPhenomenon': { type: 'string', enum: ['advection', 'diffusion'], required: true },
+			'species':             { type: 'string'                                                   }
+		}
 
-    1: [Process,  [0, MANY], { key: 'materials', covariant: true }],
-    2: [Material, [0, MANY], {                                   }],
+		// TODO: have type class automatically contain superclass properties
+		//     : for specific types of properties in the template class
 
-});
-
-
-export const r_ProcessMaterialInheritance = RELATIONSHIP('r_ProcessMaterialInheritance', {
-
-    1: [Process, [0, MANY], { key: 'inheritsMaterials' }],
-    2: [Process, [0, MANY], {                          }],
-
-});
+	})//////////////////////////////////////////////////////////////////////////
 
 
-export const r_ProcessSegment = RELATIONSHIP('r_ProcessSegment', {
+	.RELATIONSHIP(({Process}) => ({
 
-    1: [Process, [0, MANY], { key: 'segments', covariant: true }],
-    2: [Process, [0, MANY], {                                  }],
+		name: 'FlowsTo',
 
-	// TODO: CONSTRAINT: segments are connected in a straight line
-	//     : through nodes, starting and ending with the same nodes
-	//     : as this process; all of those nodes have to be children
-	//     : of this process too
+		1: [Node.Template,    [0, MANY], { key: 'outgoingProcesses'     }],
+		2: [Process.Template, [1, 1   ], { key: 'source', anchors: true }],
 
-});
+	})).RELATIONSHIP(({Process}) => ({
 
+		name: 'FlowsTo',
 
-export const r_ProcessSegmentInheritance = RELATIONSHIP('r_ProcessSegmentInheritance', {
+		1: [Process.Template, [1, 1   ], { key: 'target', anchors: true }],
+		2: [Node.Template,    [0, MANY], { key: 'incomingProcesses'     }],
 
-	1: [Process, [0, MANY], { key: 'inheritsSegments' }],
-	2: [Process, [0, MANY], {                         }],
-
-});
+	}))
 
 
-export const r_ProcessChannel = RELATIONSHIP('r_ProcessChannel', {
-
-    1: [Process, [0, MANY], { key: 'channels', covariant: true }],
-    2: [Process, [0, MANY], {                                  }],
-
-	// TODO: CONSTRAINT: channels must have the same start / end node
-	//     : as this process, and they must have a strict subset
-
-});
+	// TODO: CONSTRAINT: the two nodes from a process may not both be
+	//     : on the same lyph border; it's confusing, and we don't want
+	//     : to allow a process to run 'along a border', which would
+	//     : require a BorderProcess relationship, and would also
+	//     : mess with the LyphProcess relationship constraint below
 
 
-export const r_ProcessChannelInheritance = RELATIONSHIP('r_ProcessChannelInheritance', {
+	.RELATIONSHIP(({Process}) => ({
 
-	1: [Process, [0, MANY], { key: 'inheritsParallels' }],
-	2: [Process, [0, MANY], {                          }],
+		name: 'ConveysProcess',
 
-});
+		1: [Lyph.Type,        [0, MANY], { key: 'processes' }],
+		2: [Process.Template, [0, 1   ], { key: 'lyph'      }],
 
-// TODO: all Inheritance relationships are almost identical, so
-//     : create a shorthand for them in the original relationship,
-//     : so they can be auto-generated (like: 'inheritable: true')
+		// TODO: CONSTRAINT: source and target nodes have to be inside
+		//     : the same lyph (possibly indirectly, like on its borders)
 
-// TODO?: there are many kinds of children/parents types of relationships;
-//      : can we unify them somehow?
+		// TODO: either remove this relationship entirely,
+		//     : or implicitly create it when the nodes are present
+
+	}))
+
+
+	.RELATIONSHIP(({Process}) => ({
+
+		name: 'TransportsMaterial',
+
+		1: [Process.Type,  [0, MANY], { key: 'materials', anchors: true }],
+		2: [Material.Type, [0, MANY],                                    ],
+
+	}))
+
+
+	.RELATIONSHIP(({Process}) => ({
+
+		name: 'InheritsAllMaterialsFrom',
+
+		1: [Process.Type, [0, MANY], { key: 'materialProviders', anchors: true }],
+		2: [Process.Type, [0, MANY],                                            ],
+
+	}))
+
+
+	.RELATIONSHIP(({Process}) => ({
+
+		name: 'HasSegment',
+
+		1: [Process.Type,     [0, MANY], { key: 'segments' }],
+		2: [Process.Template, [0, MANY],                    ],
+
+		// TODO: CONSTRAINT: segments are connected in a straight line
+		//     : through nodes, starting and ending with the same nodes
+		//     : as this process; all of those nodes have to be children
+		//     : of this process too
+
+	})).RELATIONSHIP(({Process}) => ({
+
+		name: 'InheritsAllSegmentsFrom',
+
+		1: [Process.Type, [0, MANY], { key: 'segmentProviders' }],
+		2: [Process.Type, [0, MANY],                            ],
+
+	}))
+
+
+	.RELATIONSHIP(({Process}) => ({
+
+		name: 'HasChannel',
+
+		1: [Process.Type,     [0, MANY], { key: 'channels', anchors: true }],
+		2: [Process.Template, [0, MANY],                                   ],
+
+		// TODO: CONSTRAINT: channels must have the same start / end node
+		//     : as this process, and they must have a strict subset
+
+	}))
+	.RELATIONSHIP(({Process}) => ({
+
+		name: 'InheritsAllChannelsFrom',
+
+		1: [Process.Type, [0, MANY], { key: 'channelProviders', anchors: true }],
+		2: [Process.Type, [0, MANY],                                           ],
+
+	}))
+	.RELATIONSHIP(({Node}) => ({
+
+		name: 'HasChannel',
+
+		1: [Node.Type,     [0, MANY], { key: 'channels', anchors: true }],
+		2: [Node.Template, [0, MANY],                                   ],
+
+	}))
+	.RELATIONSHIP(({Node}) => ({
+
+		name: 'InheritsAllChannelsFrom',
+
+		1: [Node.Type, [0, MANY], { key: 'channelProviders', anchors: true }],
+		2: [Node.Type, [0, MANY],                                           ],
+
+	}))
+
+
+	// TODO: all Inheritance relationships are almost identical, so
+	//     : create a shorthand for them in the original relationship,
+	//     : so they can be auto-generated (like: 'inheritable: true')
+
+	// TODO?: there are many kinds of children/parents types of relationships;
+	//      : can we unify them somehow?
 

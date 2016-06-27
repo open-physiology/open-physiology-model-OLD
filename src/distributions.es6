@@ -1,56 +1,61 @@
-import {RESOURCE} from './util';
+import module from './module';
 
-import {Resource} from './resources';
-
-
-///////////////////////////////////////////////////////////
-export const ValueDistribution = RESOURCE('ValueDistribution', {
-
-    extends: Resource,
-    abstract: true
-
-});
-////////////////////////////////////////////////////////////
+// import resources from './resources';
+import resources from './resources';
+const {Resource} = resources;
 
 
-////////////////////////////////////////////////////////////
-export const Constant = RESOURCE('Constant', {
-
-    extends: ValueDistribution,
-
-    properties: {
-        'value': { required: true }
-    }
-
-});
-////////////////////////////////////////////////////////////
+export default new module()
 
 
-////////////////////////////////////////////////////////////
-export const BoundedNormalDistribution = RESOURCE('BoundedNormalDistribution', {
+    .RESOURCE({
 
-    extends: ValueDistribution,
+        name: 'ValueDistribution',
 
-    properties: {
-        'mean': { type: 'number', required: true },
-        'std':  { type: 'number', required: true },
-        'min':  { type: 'number', required: true },
-        'max':  { type: 'number', required: true }
-    }
+        extends: Resource,
+        abstract: true
 
-});
-////////////////////////////////////////////////////////////
+    })
 
 
-////////////////////////////////////////////////////////////
-export const UniformDistribution = RESOURCE('UniformDistribution', {
+    .RESOURCE(({ValueDistribution}) => [{
 
-    extends: ValueDistribution,
+        name: 'Constant',
 
-    properties: {
-        'min':  { type: 'number', required: true },
-        'max':  { type: 'number', required: true }
-    }
+        extends: ValueDistribution,
 
-});
-////////////////////////////////////////////////////////////
+        properties: {
+            'value': { required: true }
+        }
+
+    }])
+
+
+    .RESOURCE(({ValueDistribution}) => [{
+
+        name: 'BoundedNormalDistribution',
+
+        extends: ValueDistribution,
+
+        properties: {
+            'mean': { type: 'number', required: true },
+            'std':  { type: 'number', required: true },
+            'min':  { type: 'number', required: true },
+            'max':  { type: 'number', required: true }
+        }
+
+    }])
+
+
+    .RESOURCE(({ValueDistribution}) => [{
+
+        name: 'UniformDistribution',
+
+        extends: ValueDistribution,
+
+        properties: {
+            'min':  { type: 'number', required: true },
+            'max':  { type: 'number', required: true }
+        }
+
+    }]);

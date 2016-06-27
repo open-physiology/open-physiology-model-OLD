@@ -1,87 +1,92 @@
-import {RESOURCE, RELATIONSHIP, MANY} from "./util";
+import module, {MANY} from "./module";
 
-import {Resource}   from "./resources";
-import {Measurable} from "./measurables";
-
-
-////////////////////////////////////////////////////////////
-export const Correlation = RESOURCE('Correlation', {
-
-    extends: Resource,
-
-    singular: "correlation",
-
-    properties: {
-	    comment: { type: 'string' }
-    }
-
-});
-////////////////////////////////////////////////////////////
+import resources   from "./resources";
+import measurables from "./measurables";
+const {Resource}   = resources;
+const {Measurable} = measurables;
 
 
-export const r_CorrelationMeasurable = RELATIONSHIP('r_CorrelationMeasurable', {
-
-    1: [Correlation, [0, MANY], { key: 'measurables' }],
-    2: [Measurable,  [0, MANY], {                    }],
-
-});
+export default new module()
 
 
-////////////////////////////////////////////////////////////
-export const ClinicalIndex = RESOURCE('ClinicalIndex', {
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
-    extends: Resource,
+		name: 'Correlation',
 
-    singular: "clinical index",
-	plural:   "clinical indices",
+		extends: Resource,
 
-	properties: {
-		// title = name
-	}
+		singular: "correlation",
 
-});
-////////////////////////////////////////////////////////////
+		properties: {
+			'comment': { type: 'string' }
+		}
 
-
-export const r_SubClinicalIndex = RELATIONSHIP('r_SubClinicalIndex', {
-
-    1: [ClinicalIndex, [0, MANY], { key: 'children' }],
-    2: [ClinicalIndex, [0, 1   ], { key: 'parent'   }],
-
-	noCycles: true,
-
-});
+	})//////////////////////////////////////////////////////////////////////////
 
 
-export const r_CorrelationClinicalIndex = RELATIONSHIP('r_CorrelationClinicalIndex', {
+	.RELATIONSHIP(({Correlation}) => ({
 
-    1: [Correlation,   [0, MANY], { key: 'clinicalIndices' }],
-    2: [ClinicalIndex, [0, MANY], {                        }],
+		name: 'InvolvesMeasurable',
 
-});
+		1: [Correlation,         [0, MANY], { key: 'measurables', anchors: true }],
+		2: [Measurable.Template, [0, MANY],                                      ],
 
-
-////////////////////////////////////////////////////////////
-export const Publication = RESOURCE('Publication', {
-
-    extends: Resource,
-
-    singular: "publication",
-
-    properties: {
-	    // title = name
-    }
-
-	// TODO?: Formalize that a publication needs a
-	//      : pub.externals reference to, e.g., a pubmed?
-
-});
-////////////////////////////////////////////////////////////
+	}))
 
 
-export const r_CorrelationPublication = RELATIONSHIP('r_CorrelationPublication', {
+	.RESOURCE({/////////////////////////////////////////////////////////////////
 
-    1: [Correlation, [0, 1   ], {}],
-    2: [Publication, [0, MANY], {}],
+		name: 'ClinicalIndex',
 
-});
+		extends: Resource,
+
+		singular: "clinical index",
+		plural:   "clinical indices"
+
+	})//////////////////////////////////////////////////////////////////////////
+
+
+	.RELATIONSHIP(({ClinicalIndex}) => ({
+
+		name: 'EncompassesClinicalIndex',
+
+		1: [ClinicalIndex, [0, MANY], { key: 'children' }],
+		2: [ClinicalIndex, [0, 1   ], { key: 'parent'   }],
+
+		noCycles: true,
+
+	}))
+
+
+	.RELATIONSHIP(({Correlation, ClinicalIndex}) => ({
+
+		name: 'InvolvesClinicalIndex',
+
+		1: [Correlation,   [0, MANY], { key: 'clinicalIndices', anchors: true }],
+		2: [ClinicalIndex, [0, MANY],                                          ],
+
+	}))
+
+
+	.RESOURCE({/////////////////////////////////////////////////////////////////
+
+		name: 'Publication',
+
+		extends: Resource,
+
+		singular: "publication"
+
+		// TODO?: Formalize that a publication needs a
+		//      : pub.externals reference to, e.g., a pubmed?
+
+	})//////////////////////////////////////////////////////////////////////////
+
+
+	.RELATIONSHIP(({Correlation, Publication}) => ({
+
+		name: 'InvolvesPublication',
+
+		1: [Correlation, [0, 1   ], { key: 'publication', anchors: true }],
+		2: [Publication, [0, MANY],                                      ],
+
+	}));
