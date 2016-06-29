@@ -33,6 +33,17 @@ export default new module()
 
 	}))
 
+	.RELATIONSHIP(({Material}) => ({
+
+		name: 'InheritsAllMaterialsFrom',
+
+		1: [Material.Type, [0, MANY], { key: 'materialProviders', anchors: true }],
+		2: [Material.Type, [0, MANY]                                             ],
+
+		noCycles: true,
+
+	}))
+
 
 	.RESOURCE(({Material}) => ({////////////////////////////////////////////////
 
@@ -100,7 +111,8 @@ export default new module()
 
 		noCycles: true,
 
-	})).RELATIONSHIP(({Lyph}) => ({
+	}))
+	.RELATIONSHIP(({Lyph}) => ({
 
 		name: 'InheritsAllLayersFrom',
 
@@ -109,7 +121,8 @@ export default new module()
 
 		noCycles: true,
 
-	})).RELATIONSHIP(({Lyph}) => ({
+	}))
+	.RELATIONSHIP(({Lyph}) => ({
 
 		name: 'InheritsAllPartsFrom',
 
@@ -118,12 +131,14 @@ export default new module()
 
 		noCycles: true,
 
-	})).RELATIONSHIP(({InheritsAllPatchesFrom}) => ({
+	}))
+	.RELATIONSHIP(({InheritsAllPatchesFrom}) => ({
 
 		name: 'InheritsAllPartsFrom',
 		extends: InheritsAllPatchesFrom
 
-	})).RELATIONSHIP(({InheritsAllLayersFrom}) => ({
+	}))
+	.RELATIONSHIP(({InheritsAllLayersFrom}) => ({
 
 		name: 'InheritsAllPartsFrom',
 		extends: InheritsAllLayersFrom
