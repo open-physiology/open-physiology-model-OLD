@@ -1,8 +1,8 @@
-import {minusPlusSchema} from "./util";
+import {enumArraySchema, enumSchema, arrayContainsValue} from "./util";
 import module, {MANY} from './typed-module';
 
 import resources from "./resources";
-const {Resource} = resources;
+const {Resource, IsRelatedTo} = resources;
 
 import typed from './typed';
 const {Typed} = typed;
@@ -26,6 +26,8 @@ export default new module()
 
 		name: 'ContainsMaterial',
 
+		extends: IsRelatedTo,
+
 		1: [Material.Type, [0, MANY], { key: 'materials', anchors: true }],
 		2: [Material.Type, [0, MANY]                                     ],
 
@@ -36,6 +38,8 @@ export default new module()
 	.RELATIONSHIP(({Material}) => ({
 
 		name: 'InheritsAllMaterialsFrom',
+
+		extends: IsRelatedTo,
 
 		1: [Material.Type, [0, MANY], { key: 'materialProviders', anchors: true }],
 		2: [Material.Type, [0, MANY]                                             ],
@@ -63,6 +67,8 @@ export default new module()
 	.RELATIONSHIP(({Lyph}) => ({
 
 		name: 'HasPart',
+
+		extends: IsRelatedTo,
 
 		1: [Lyph.Type,     [0, MANY], { key: 'parts', anchors: true }],
 		2: [Lyph.Template, [0, MANY], {                             }],
@@ -106,6 +112,8 @@ export default new module()
 
 		name: 'InheritsAllPatchesFrom',
 
+		extends: IsRelatedTo,
+
 		1: [Lyph.Type, [0, MANY], { key: 'patchProviders', anchors: true }],
 		2: [Lyph.Type, [0, MANY]                                          ],
 
@@ -116,6 +124,8 @@ export default new module()
 
 		name: 'InheritsAllLayersFrom',
 
+		extends: IsRelatedTo,
+
 		1: [Lyph.Type, [0, MANY], { key: 'layerProviders', anchors: true }],
 		2: [Lyph.Type, [0, MANY]                                          ],
 
@@ -125,6 +135,8 @@ export default new module()
 	.RELATIONSHIP(({Lyph}) => ({
 
 		name: 'InheritsAllPartsFrom',
+
+		extends: IsRelatedTo,
 
 		1: [Lyph.Type, [0, MANY], { key: 'partProviders', anchors: true }],
 		2: [Lyph.Type, [0, MANY]                                         ],
@@ -155,11 +167,15 @@ export default new module()
 		singular: "cylindrical lyph",
 
 		properties: {
-			closedAt: {
-				type       : 'array',
-				items      : minusPlusSchema,
-				uniqueItems: true,
-				maxItems   : 2
+			'minusSide': {
+				Template: { ...enumSchema     ('open', 'closed'), required: true              },
+				Type:     { ...enumArraySchema('open', 'closed'), default: ['open', 'closed'] },
+				typeCheck: arrayContainsValue
+			},
+			'plusSide': {
+				Template: { ...enumSchema     ('open', 'closed'), required: true               },
+				Type:     { ...enumArraySchema('open', 'closed'), default: ['open', 'closed']  },
+				typeCheck: arrayContainsValue
 			}
 		}
 
@@ -177,16 +193,20 @@ export default new module()
 
 		noCycles: true
 
-	})).RELATIONSHIP(({CylindricalLyph}) => ({
+	}))
+	.RELATIONSHIP(({CylindricalLyph}) => ({
 
 		name: 'InheritsAllSegmentsFrom',
+
+		extends: IsRelatedTo,
 
 		1: [CylindricalLyph.Type, [0, MANY], { key: 'segmentProviders', anchors: true }],
 		2: [CylindricalLyph.Type, [0, MANY],                                           ],
 
 		noCycles: true,
 
-	})).RELATIONSHIP(({InheritsAllSegmentsFrom}) => ({
+	}))
+	.RELATIONSHIP(({InheritsAllSegmentsFrom}) => ({
 
 		name: 'InheritsAllPartsFrom',
 		extends: InheritsAllSegmentsFrom,
@@ -219,7 +239,9 @@ export default new module()
 
 		name,
 
-		1: [LyphClass.Type,  [1, 1], { key, implicit: true, sustains: true, anchors: true }],
+		extends: IsRelatedTo,
+
+		1: [LyphClass.Type,  [1, 1], { key, readonly: true, sustains: true, anchors: true }],
 		2: [Border.Template, [1, 1]                                                        ],
 
 		// TODO: make up flag that states that the border object should by default be 'expand'ed in a requested lyph object
@@ -242,6 +264,8 @@ export default new module()
 
 		name: 'HasNode',
 
+		extends: IsRelatedTo,
+
 		1: [Lyph.Type,     [0, MANY], { key: 'nodes', anchors: true }],
 		2: [Node.Template, [0, MANY],                                ],
 
@@ -251,6 +275,8 @@ export default new module()
 	.RELATIONSHIP(({Border, Node}) => ({
 
 		name: 'HasNode',
+
+		extends: IsRelatedTo,
 
 		1: [Border.Type,   [0, MANY], { key: 'nodes', anchors: true }],
 		2: [Node.Template, [0, MANY],                                ],
@@ -277,6 +303,8 @@ export default new module()
 
 		name: 'CoalescesWith',
 
+		extends: IsRelatedTo,
+
 		1: [Lyph.Template, [2, MANY], { key: 'coalescences'         }],
 		2: [Coalescence,   [0, MANY], { key: 'lyphs', anchors: true }],
 
@@ -293,6 +321,8 @@ export default new module()
 	.RELATIONSHIP(({Coalescence, Lyph}) => ({
 
 		name: 'CoalescesThroughLayer',
+
+		extends: IsRelatedTo,
 
 		1: [Coalescence, [0, MANY], { key: 'interfaceLayers', anchors: true }],
 		2: [Lyph.Type,   [0, MANY],                                          ],

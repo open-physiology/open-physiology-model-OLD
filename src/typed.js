@@ -1,7 +1,7 @@
 import module, {MANY} from './module';
 
 import resources from "./resources";
-const {Resource} = resources;
+const {Resource, IsRelatedTo} = resources;
 
 import distributions from './distributions';
 const {ValueDistribution} = distributions;
@@ -25,7 +25,9 @@ export default new module()
 
 	.RELATIONSHIP(({Type}) => ({
 
-		name: 'Extends',
+		name: 'IsSubtypeOf',
+
+		extends: IsRelatedTo,
 
 		1: [Type, [0, MANY], { key: 'subtypes'                  }],
 		2: [Type, [0, MANY], { key: 'supertypes', anchors: true }],
@@ -43,19 +45,17 @@ export default new module()
 
 		singular: "template",
 
-		// properties: {
-		// 	'cardinalityBase': { type: 'integer', required: true, default: 1 }
-		// }
-
 	})//////////////////////////////////////////////////////////////////////////
 
 
 	.RELATIONSHIP(({Template}) => [{
 
-	    name: 'CardinalityBase',
+	    name: 'HasCardinalityBaseOf',
 
-	    1: [Template, [1, 1], {}],
-	    2: [ValueDistribution, [0, MANY], {}],
+		extends: IsRelatedTo,
+
+	    1: [Template,          [1, 1   ], { anchors: true, sustains: true , key: 'cardinalityBase'}], // TODO: reorder option fields like this everywhere, for better intuitive meaning
+	    2: [ValueDistribution, [0, MANY]                                                           ],
 
 	}])
 
@@ -63,10 +63,12 @@ export default new module()
 
 	.RELATIONSHIP(({Template}) => [{
 
-	    name: 'CardinalityMultipliedByThatOf',
+	    name: 'HasCardinalityMultipliedByThatOf',
 
-	    1: [Template, [0, MANY], { key: 'cardinalityMultipliers' }],
-	    2: [Template, [0, MANY],                                  ],
+		extends: IsRelatedTo,
+
+	    1: [Template, [0, MANY], { anchors: true, key: 'cardinalityMultipliers' }],
+	    2: [Template, [0, MANY],                                                 ],
 
 		noCycles: true
 
@@ -92,7 +94,9 @@ export default new module()
 
 		name: 'HasType',
 
-		1: [Typed.Template, [1, 1   ], { key: 'type' }], // TODO: covariance
-		2: [Typed.Type,     [0, MANY],                ]
+		extends: IsRelatedTo,
+
+		1: [Typed.Template, [1, 1   ], { anchors: true, key: 'type' }], // TODO: covariance
+		2: [Typed.Type,     [0, MANY],                               ]
 
 	}]);

@@ -22,20 +22,25 @@ export const idSchema = {
 	type: 'integer'
 };
 
-export const minusPlusSchema = {
+export const enumSchema = (...candidates) => ({
 	type: 'string',
-	enum: ['minus', 'plus']
-};
+	enum: candidates
+});
 
-export const innerOuterSchema = {
-	type: 'string',
-	enum: ['inner', 'outer']
-};
+export const enumArraySchema = (...candidates) => ({
+	type       : 'array',
+	items      : { ...enumSchema(...candidates) },
+	uniqueItems: true,
+	maxItems   : candidates.length
+});
 
-export const lyphDirectionSchema = {
-	type: minusPlusSchema.type,
-	enum: [...minusPlusSchema.enum, ...innerOuterSchema.enum]
-};
+export const arrayContainsValue = (array, value) => array.includes(value);
+
+export const minusPlusSchema = enumSchema('minus', 'plus');
+
+export const innerOuterSchema = enumSchema('inner', 'outer');
+
+export const lyphDirectionSchema = enumSchema(...minusPlusSchema.enum, ...innerOuterSchema.enum);
 
 export const rationalNumberSchema = {
 	type: 'object',
@@ -51,3 +56,12 @@ export const angleSchema = {
 	minimum: 0,   exclusiveMinimum: false,
 	maximum: 360, exclusiveMaximum: true
 };
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Other useful stuff                                                         //
+////////////////////////////////////////////////////////////////////////////////
+
+export function isObject(val) {
+	return val !== null && typeof val === 'object';
+}

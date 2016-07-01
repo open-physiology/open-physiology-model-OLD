@@ -1,7 +1,10 @@
 import basicModule, {MANY} from './module';
 
 import resources from "./resources";
-const {Resource} = resources;
+const {Resource, IsRelatedTo} = resources;
+
+import typed from './typed';
+const {Typed} = typed;
 
 
 export {MANY} from './module';
@@ -11,11 +14,11 @@ export default class module extends basicModule {
 	
 	RESOURCE(config) {
 		let baseClass = this;
-		do { baseClass = baseClass.extends } while (baseClass === classes.Typed || baseClass === Resource);
+		do { baseClass = baseClass.extends } while (baseClass === Typed || baseClass === Resource);
 		if (baseClass === Resource) { return super.RESOURCE(config) }
 		
 		for (let conf of this.normalizeConfig(config)) {
-			const SuperClass = conf.extends || classes.Typed;
+			const SuperClass = conf.extends || Typed;
 			const typeName       = `${conf.name}Type`,
 			      templateName   = `${conf.name}Template`,
 			      templateTypeId = `${conf.name}TemplateHasType`;
@@ -53,6 +56,8 @@ export default class module extends basicModule {
 			}) => ({
 				
 				name: 'HasType',
+
+				extends: IsRelatedTo,
 				
 				id: templateTypeId,
 				

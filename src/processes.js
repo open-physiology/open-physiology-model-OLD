@@ -1,4 +1,8 @@
 import module, {MANY}  from './typed-module';
+import {enumArraySchema, enumSchema, arrayContainsValue} from "./util";
+
+import resources from './resources';
+const {IsRelatedTo} = resources;
 
 import typed from "./typed";
 const {Typed} = typed;
@@ -20,12 +24,13 @@ export default new module()
 		plural:   "processes",
 
 		properties: {
-			'transportPhenomenon': { type: 'string', enum: ['advection', 'diffusion'], required: true },
-			'species':             { type: 'string'                                                   }
+			'transportPhenomenon': {
+				Template: { ...enumSchema     ('advection', 'diffusion'), required: true                      },
+				Type:     { ...enumArraySchema('advection', 'diffusion'), default: ['advection', 'diffusion'] },
+				typeCheck: arrayContainsValue
+			},
+			'species': { Type: { type: 'string' } }
 		}
-
-		// TODO: have type class automatically contain superclass properties
-		//     : for specific types of properties in the template class
 
 	})//////////////////////////////////////////////////////////////////////////
 
@@ -34,12 +39,17 @@ export default new module()
 
 		name: 'FlowsTo',
 
+		extends: IsRelatedTo,
+
 		1: [Node.Template,    [0, MANY], { key: 'outgoingProcesses'     }],
 		2: [Process.Template, [1, 1   ], { key: 'source', anchors: true }],
 
-	})).RELATIONSHIP(({Process}) => ({
+	}))
+	.RELATIONSHIP(({Process}) => ({
 
 		name: 'FlowsTo',
+
+		extends: IsRelatedTo,
 
 		1: [Process.Template, [1, 1   ], { key: 'target', anchors: true }],
 		2: [Node.Template,    [0, MANY], { key: 'incomingProcesses'     }],
@@ -58,8 +68,10 @@ export default new module()
 
 		name: 'ConveysProcess',
 
-		1: [Lyph.Type,        [0, MANY], { key: 'processes' }],
-		2: [Process.Template, [0, 1   ], { key: 'lyph'      }],
+		extends: IsRelatedTo,
+
+		1: [Lyph.Type,        [0, MANY], { key: 'processes'     }],
+		2: [Process.Template, [0, 1   ], { key: 'conveyingLyph' }],
 
 		// TODO: CONSTRAINT: source and target nodes have to be inside
 		//     : the same lyph (possibly indirectly, like on its borders)
@@ -74,6 +86,8 @@ export default new module()
 
 		name: 'TransportsMaterial',
 
+		extends: IsRelatedTo,
+
 		1: [Process.Type,  [0, MANY], { key: 'materials', anchors: true }],
 		2: [Material.Type, [0, MANY],                                    ],
 
@@ -83,6 +97,8 @@ export default new module()
 	.RELATIONSHIP(({Process}) => ({
 
 		name: 'InheritsAllMaterialsFrom',
+
+		extends: IsRelatedTo,
 
 		1: [Process.Type, [0, MANY], { key: 'materialProviders', anchors: true }],
 		2: [Process.Type, [0, MANY],                                            ],
@@ -94,6 +110,8 @@ export default new module()
 
 		name: 'HasSegment',
 
+		extends: IsRelatedTo,
+
 		1: [Process.Type,     [0, MANY], { key: 'segments' }],
 		2: [Process.Template, [0, MANY],                    ],
 
@@ -102,9 +120,12 @@ export default new module()
 		//     : as this process; all of those nodes have to be children
 		//     : of this process too
 
-	})).RELATIONSHIP(({Process}) => ({
+	}))
+	.RELATIONSHIP(({Process}) => ({
 
 		name: 'InheritsAllSegmentsFrom',
+
+		extends: IsRelatedTo,
 
 		1: [Process.Type, [0, MANY], { key: 'segmentProviders' }],
 		2: [Process.Type, [0, MANY],                            ],
@@ -115,6 +136,8 @@ export default new module()
 	.RELATIONSHIP(({Process}) => ({
 
 		name: 'HasChannel',
+
+		extends: IsRelatedTo,
 
 		1: [Process.Type,     [0, MANY], { key: 'channels', anchors: true }],
 		2: [Process.Template, [0, MANY],                                   ],
@@ -127,6 +150,8 @@ export default new module()
 
 		name: 'InheritsAllChannelsFrom',
 
+		extends: IsRelatedTo,
+
 		1: [Process.Type, [0, MANY], { key: 'channelProviders', anchors: true }],
 		2: [Process.Type, [0, MANY],                                           ],
 
@@ -135,6 +160,8 @@ export default new module()
 
 		name: 'HasChannel',
 
+		extends: IsRelatedTo,
+
 		1: [Node.Type,     [0, MANY], { key: 'channels', anchors: true }],
 		2: [Node.Template, [0, MANY],                                   ],
 
@@ -142,6 +169,8 @@ export default new module()
 	.RELATIONSHIP(({Node}) => ({
 
 		name: 'InheritsAllChannelsFrom',
+
+		extends: IsRelatedTo,
 
 		1: [Node.Type, [0, MANY], { key: 'channelProviders', anchors: true }],
 		2: [Node.Type, [0, MANY],                                           ],

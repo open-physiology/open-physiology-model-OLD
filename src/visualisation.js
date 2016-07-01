@@ -3,7 +3,7 @@ import {identifierRegex, rationalNumberSchema, angleSchema} from "./util";
 import module, {MANY} from './typed-module';
 
 import resources from "./resources";
-const {Resource} = resources;
+const {Resource, IsRelatedTo} = resources;
 
 import lyphs from "./lyphs";
 const {Material, Lyph, CylindricalLyph, Border, Coalescence, Node} = lyphs;
@@ -35,6 +35,8 @@ export default new module()
 
 		name: 'PrescribesStyleFor',
 
+		extends: IsRelatedTo,
+
 		1: [Theme,    [0, MANY], { key: 'resources' }],
 		2: [Resource, [0, MANY], { key: 'themes'    }],
 
@@ -61,7 +63,9 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		1: [Artefact, [1, 1   ], { key: 'model', anchors: true }],
+		extends: IsRelatedTo,
+
+		1: [Artefact, [1, 1   ], { anchors: true, key: 'model' }],
 		2: [Type,     [0, MANY],                                ],
 
 	}))
@@ -144,6 +148,8 @@ export default new module()
 
 		name: 'Contains',
 
+		extends: IsRelatedTo,
+
 		1: [Dim2Container, [0, MANY], { key: 'children', anchors: true }],
 		2: [Dim2Artefact,  [0, 1   ], { key: 'parent'                  }],
 
@@ -160,8 +166,10 @@ export default new module()
 
 		name: 'Contains',
 
-		1: [Dim1Container, [0, MANY], { key: 'children', anchors: true }],
-		2: [Dim1Artefact,  [0, 1   ], { key: 'parent'                  }],
+		extends: IsRelatedTo,
+
+		1: [Dim1Container, [0, MANY], { anchors: true, key: 'children' }],
+		2: [Dim1Artefact,  [0, 1   ], {                key: 'parent'   }],
 
 		properties: {
 			'x': { ...rationalNumberSchema, required: true }
@@ -170,12 +178,15 @@ export default new module()
 		// TODO: CONSTRAINT: a relationship like this requires
 		//     : a corresponding parent/child relationship on the associated models
 
-	})).RELATIONSHIP(({Dim0Container, Dim0Artefact}) => ({
+	}))
+	.RELATIONSHIP(({Dim0Container, Dim0Artefact}) => ({
 
 		name: 'Contains',
 
-		1: [Dim0Container, [0, MANY], { key: 'children', anchors: true }],
-		2: [Dim0Artefact,  [0, 1   ], { key: 'parent'                  }],
+		extends: IsRelatedTo,
+
+		1: [Dim0Container, [0, MANY], { anchors: true, key: 'children' }],
+		2: [Dim0Artefact,  [0, 1   ], {                key: 'parent'   }],
 
 		// TODO: CONSTRAINT: a relationship like this requires
 		//     : a corresponding parent/child relationship on the associated models
@@ -199,10 +210,10 @@ export default new module()
 	
 	    name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 	
-	    1: [LyphCanvas, [1, 1   ]],
-	    2: [Lyph.Type,  [0, MANY]],
+	    1: [LyphCanvas, [1, 1   ], { anchors: true, key: 'model' }],
+	    2: [Lyph.Type,  [0, MANY],                                ],
 	    
 	}])
 
@@ -222,10 +233,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [MaterialGlyph, [1, 1   ]],
-		2: [Material.Type, [0, MANY]],
+		1: [MaterialGlyph, [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Material.Type, [0, MANY],                                ],
 
 	}])
 
@@ -245,10 +256,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [LyphRectangle, [1, 1   ]],
-		2: [Lyph.Type,     [0, MANY]],
+		1: [LyphRectangle, [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Lyph.Type,     [0, MANY],                                ],
 
 	}])
 
@@ -268,10 +279,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [CylindricalLyphRectangle, [1, 1   ]],
-		2: [CylindricalLyph.Type,     [0, MANY]],
+		1: [CylindricalLyphRectangle, [1, 1   ], { anchors: true, key: 'model' }],
+		2: [CylindricalLyph.Type,     [0, MANY],                                ],
 
 	}])
 
@@ -291,10 +302,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [BorderLine,  [1, 1   ]],
-		2: [Border.Type, [0, MANY]],
+		1: [BorderLine,  [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Border.Type, [0, MANY],                                ],
 
 	}])
 
@@ -314,10 +325,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [CoalescenceRectangle, [1, 1   ]],
-		2: [Coalescence.Type,     [0, MANY]],
+		1: [CoalescenceRectangle, [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Coalescence.Type,     [0, MANY],                                ],
 
 	}])
 
@@ -337,10 +348,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [NodeGlyph, [1, 1   ]],
-		2: [Node.Type, [0, MANY]],
+		1: [NodeGlyph, [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Node.Type, [0, MANY],                                ],
 
 	}])
 
@@ -360,10 +371,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [ProcessEdge,  [1, 1   ]],
-		2: [Process.Type, [0, MANY]],
+		1: [ProcessEdge,  [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Process.Type, [0, MANY],                                ],
 
 	}])
 
@@ -383,10 +394,10 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [MeasurableGlyph, [1, 1   ]],
-		2: [Measurable.Type, [0, MANY]],
+		1: [MeasurableGlyph, [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Measurable.Type, [0, MANY],                                ],
 
 	}])
 
@@ -406,9 +417,9 @@ export default new module()
 
 		name: 'PresentsModel',
 
-		extends: ArtefactModel,
+		extends: IsRelatedTo,
 
-		1: [CausalityArrow, [1, 1   ]],
-		2: [Causality.Type, [0, MANY]],
+		1: [CausalityArrow, [1, 1   ], { anchors: true, key: 'model' }],
+		2: [Causality.Type, [0, MANY],                                ],
 
 	}]);

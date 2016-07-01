@@ -1,8 +1,8 @@
 import module, {MANY} from "./module";
 
-import resources   from "./resources";
+import resources from './resources';
+const {Resource, IsRelatedTo} = resources;
 import measurables from "./measurables";
-const {Resource}   = resources;
 const {Measurable} = measurables;
 
 
@@ -28,7 +28,9 @@ export default new module()
 
 		name: 'InvolvesMeasurable',
 
-		1: [Correlation,         [0, MANY], { key: 'measurables', anchors: true }],
+		extends: IsRelatedTo,
+
+		1: [Correlation,         [0, MANY], { anchors: true, key: 'measurables' }],
 		2: [Measurable.Template, [0, MANY],                                      ],
 
 	}))
@@ -50,6 +52,8 @@ export default new module()
 
 		name: 'EncompassesClinicalIndex',
 
+		extends: IsRelatedTo,
+
 		1: [ClinicalIndex, [0, MANY], { key: 'children' }],
 		2: [ClinicalIndex, [0, 1   ], { key: 'parent'   }],
 
@@ -61,6 +65,8 @@ export default new module()
 	.RELATIONSHIP(({Correlation, ClinicalIndex}) => ({
 
 		name: 'InvolvesClinicalIndex',
+
+		extends: IsRelatedTo,
 
 		1: [Correlation,   [0, MANY], { key: 'clinicalIndices', anchors: true }],
 		2: [ClinicalIndex, [0, MANY],                                          ],
@@ -85,6 +91,8 @@ export default new module()
 	.RELATIONSHIP(({Correlation, Publication}) => ({
 
 		name: 'InvolvesPublication',
+
+		extends: IsRelatedTo,
 
 		1: [Correlation, [0, 1   ], { key: 'publication', anchors: true }],
 		2: [Publication, [0, MANY],                                      ],

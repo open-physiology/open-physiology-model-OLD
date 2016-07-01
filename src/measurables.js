@@ -1,14 +1,17 @@
 import {qualitySchema} from './util';
 import module, {MANY}  from './typed-module';
 
+import resources from './resources';
+const {IsRelatedTo} = resources;
+
 import typed from './typed';
 const {Typed} = typed;
 
-
 import lyphs     from "./lyphs";
-import processes from "./processes";
 const {Material, Lyph, Border} = lyphs;
-const {Process}                = processes;
+
+import processes from "./processes";
+const {Process} = processes;
 
 
 export default new module()
@@ -22,7 +25,7 @@ export default new module()
 		singular: "measurable",
 
 		properties: {
-			quality: { ...qualitySchema }
+			quality: { Type: { ...qualitySchema } }
 		}
 
 	})
@@ -30,6 +33,8 @@ export default new module()
 	.RELATIONSHIP(({Measurable}) => ({
 
 		name: 'MeasuresMaterial',
+
+		extends: IsRelatedTo,
 
 		1: [Measurable.Type, [0, MANY], { key: 'materials', anchors: true }],
 		2: [Material.Type,   [0, MANY],                                    ],
@@ -43,6 +48,8 @@ export default new module()
 
 		name: 'HasMeasurable',
 
+		extends: IsRelatedTo,
+
 		1: [Class.Type,          [0, MANY], { key: 'measurables', anchors: true }],
 		2: [Measurable.Template, [1, 1   ],                                      ],
 
@@ -51,6 +58,8 @@ export default new module()
 	.RELATIONSHIP(({Measurable}) => [Lyph, Border, Node, Process].map((Class) => ({
 
 		name: 'InheritsAllMeasurablesFrom',
+
+		extends: IsRelatedTo,
 
 		1: [Class.Type, [0, MANY], { key: 'inheritsMeasurables', anchors: true }],
 		2: [Class.Type, [0, MANY],                                              ],
@@ -74,6 +83,8 @@ export default new module()
 
 		name: 'Causes',
 
+		extends: IsRelatedTo,
+
 		1: [Measurable.Template, [0, MANY], { key: 'effects'              }],
 		2: [Causality.Template,  [1, 1   ], { key: 'cause', anchors: true }],
 
@@ -82,6 +93,8 @@ export default new module()
 	.RELATIONSHIP(({Measurable, Causality}) => ({
 
 		name: 'Causes',
+
+		extends: IsRelatedTo,
 
 		1: [Causality.Template,  [1, 1   ], { key: 'effect', anchors: true }],
 		2: [Measurable.Template, [0, MANY], { key: 'causes'                }],
