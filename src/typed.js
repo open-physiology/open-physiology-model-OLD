@@ -3,8 +3,7 @@ import module, {MANY} from './module';
 import resources from "./resources";
 const {Resource, IsRelatedTo} = resources;
 
-import distributions from './distributions';
-const {ValueDistribution} = distributions;
+import {distributionSchemaOr} from "./util";
 
 
 export default new module()
@@ -45,21 +44,16 @@ export default new module()
 
 		singular: "template",
 
+		properties: {
+			'cardinalityBase': {
+				...distributionSchemaOr({
+					type:   'integer',
+					minimum: 1
+				})
+			}
+		}
+
 	})//////////////////////////////////////////////////////////////////////////
-
-
-	.RELATIONSHIP(({Template}) => [{
-
-	    name: 'HasCardinalityBaseOf',
-
-		extends: IsRelatedTo,
-
-	    1: [Template,          [1, 1   ], { anchors: true, sustains: true , key: 'cardinalityBase'}], // TODO: reorder option fields like this everywhere, for better intuitive meaning
-	    2: [ValueDistribution, [0, MANY]                                                           ],
-
-	}])
-
-
 
 	.RELATIONSHIP(({Template}) => [{
 
@@ -74,8 +68,18 @@ export default new module()
 
 	}])
 
+	.RELATIONSHIP(({Template, Type}) => [{
 
-	.RESOURCE(({Type, Template}) => ({//////////////////////////////////////////
+		name: 'HasType',
+
+		extends: IsRelatedTo,
+
+		1: [Template, [1, 1   ], { anchors: true, key: 'type' }], // TODO: covariance
+		2: [Type,     [0, MANY],                               ]
+
+	}])
+
+	.RESOURCE(({Type, Template, HasType}) => ({//////////////////////////////////////////
 
 		name: 'Typed',
 
@@ -85,18 +89,9 @@ export default new module()
 		singular: "typed resource",
 
 		Type,
-		Template
+		Template,
+		HasType
 
 	}))/////////////////////////////////////////////////////////////////////////
 
-
-	.RELATIONSHIP(({Typed}) => [{
-
-		name: 'HasType',
-
-		extends: IsRelatedTo,
-
-		1: [Typed.Template, [1, 1   ], { anchors: true, key: 'type' }], // TODO: covariance
-		2: [Typed.Type,     [0, MANY],                               ]
-
-	}]);
+;

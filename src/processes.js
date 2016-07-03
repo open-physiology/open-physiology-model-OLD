@@ -156,7 +156,7 @@ export default new module()
 		2: [Process.Type, [0, MANY],                                           ],
 
 	}))
-	.RELATIONSHIP(({Node}) => ({
+	.RELATIONSHIP({
 
 		name: 'HasChannel',
 
@@ -165,8 +165,8 @@ export default new module()
 		1: [Node.Type,     [0, MANY], { key: 'channels', anchors: true }],
 		2: [Node.Template, [0, MANY],                                   ],
 
-	}))
-	.RELATIONSHIP(({Node}) => ({
+	})
+	.RELATIONSHIP({
 
 		name: 'InheritsAllChannelsFrom',
 
@@ -175,7 +175,7 @@ export default new module()
 		1: [Node.Type, [0, MANY], { key: 'channelProviders', anchors: true }],
 		2: [Node.Type, [0, MANY],                                           ],
 
-	}))
+	})
 
 
 	// TODO: all Inheritance relationships are almost identical, so

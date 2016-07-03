@@ -8,7 +8,7 @@ import typed from './typed';
 const {Typed} = typed;
 
 import lyphs     from "./lyphs";
-const {Material, Lyph, Border} = lyphs;
+const {Material, Lyph, Border, Node} = lyphs;
 
 import processes from "./processes";
 const {Process} = processes;

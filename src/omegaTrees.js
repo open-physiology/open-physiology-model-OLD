@@ -6,6 +6,8 @@ const {IsRelatedTo} = resources;
 import groups from "./groups";
 const {Group} = groups;
 
+import lyphs from './lyphs';
+const {Node} = lyphs;
 
 export default new module()
 

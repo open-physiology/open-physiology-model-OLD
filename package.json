@@ -19,10 +19,11 @@
   "devDependencies": {
     "babel": "6",
     "babel-core": "6",
+    "babel-plugin-transform-object-rest-spread": "6",
     "babel-polyfill": "6",
     "babel-preset-es2015": "6",
-    "babel-plugin-transform-object-rest-spread": "6",
     "chai": "3",
+    "chai-subset": "^1.2.2",
     "mocha": "2"
   }
 }

@@ -13,17 +13,18 @@ export {MANY} from './module';
 export default class module extends basicModule {
 	
 	RESOURCE(config) {
-		let baseClass = this;
-		do { baseClass = baseClass.extends } while (baseClass === Typed || baseClass === Resource);
-		if (baseClass === Resource) { return super.RESOURCE(config) }
-		
 		for (let conf of this.normalizeConfig(config)) {
-			const SuperClass = conf.extends || Typed;
+
+			let baseClass = conf;
+			do { baseClass = baseClass.extends } while (baseClass !== Typed && baseClass !== Resource);
+			if (baseClass === Resource) { return super.RESOURCE(conf) }
+
+			const SuperClass = conf.extends;
 			const typeName       = `${conf.name}Type`,
 			      templateName   = `${conf.name}Template`,
-			      templateTypeId = `${conf.name}TemplateHasType`;
+			      templateTypeId = `HasType`;
 			
-			this.RESOURCE({
+			super.RESOURCE({
 				
 				name: typeName,
 				
@@ -37,7 +38,8 @@ export default class module extends basicModule {
 				// TODO: properties, etc.
 				//     : - create superset schema (array, no duplicates, at least one element)
 				
-			}).RESOURCE({
+			});
+			super.RESOURCE({
 				
 				name: templateName,
 				
@@ -50,32 +52,38 @@ export default class module extends basicModule {
 				
 				// TODO: properties, etc.
 				
-			}).RELATIONSHIP(({
+			});
+			super.RELATIONSHIP(({
 				[typeName]:     NewType,
 				[templateName]: NewTemplate
 			}) => ({
 				
 				name: 'HasType',
 
-				extends: IsRelatedTo,
+				extends: SuperClass.HasType || IsRelatedTo,
 				
 				id: templateTypeId,
+
+				singular: 'has type', // TODO: singular property in all relationship classes
 				
 				1: [NewTemplate, [1, 1   ], { key: 'type' }], // TODO: covariance
 				2: [NewType,     [0, MANY],                ]
 				
 				// TODO: properties, etc.
 				
-			})).RESOURCE(({
-				[typeName]:       NewType,
-				[templateName]:   NewTemplate,
-				[templateTypeId]: NewTemplateType
-			}) => ({
-				...conf,
-				[typeName]:       NewType,
-				[templateName]:   NewTemplate,
-				[templateTypeId]: NewTemplateType
 			}));
+			super.RESOURCE(({
+				[typeName]:       NewType,
+				[templateName]:   NewTemplate,
+				[templateTypeId]: NewHasType
+			}) => {
+				return [{
+					...conf,
+					Type:     NewType,
+					Template: NewTemplate,
+					HasType:  NewHasType
+				}];
+			});
 		}
 		
 		return this;

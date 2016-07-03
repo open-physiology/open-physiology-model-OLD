@@ -7,7 +7,7 @@ import {isObject} from './util';
 
 const PROCESSED = Symbol('PROCESSED');
 function normalizeConfig(config) {
-	console.log(`Processing the '${config.name}' class.`);
+	// console.log(`Processing the '${config.name}' class.`);
 	console.assert(!config[PROCESSED],
 		`The ${config.name} class is being processed multiple times.`);
 
@@ -95,18 +95,23 @@ function jsonSchemaConfig(config) {
 
 function relationshipSidesConfig(config) {
 
+	/* only do this step if 1 and 2 sides are present */
+	if (!config[1] && !config[2]) { return {...config} }
+
 	// generally speaking:
 	// - 1 is left-hand side, and
 	// - 2 is right-hand side
 
+	/* initialize result config */
 	let result = {
 		...config,
 		1: {},
 		2: {}
 	};
 
+	/* create objects for both sides 1 and 2 */
 	for (let side of [1, 2]) {
-		console.assert(Array.isArray(config[side]));
+		console.assert(Array.isArray(config[side]), "Relationship sides 1, 2 need to be arrays.");
 		let thisSide  = result[side];
 		let otherSide = result[3-side]; // {1↦2, 2↦1}
 		Object.assign(thisSide, {
@@ -133,9 +138,7 @@ export default class module {
 		if (!Array.isArray(config))       { config = [config]     }
 		return config;
 	}
-
-
-
+	
 	RESOURCE(config) {
 		for (let conf of this.normalizeConfig(config)) {
 			conf.isResource = true;
