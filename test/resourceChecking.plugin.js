@@ -1,16 +1,17 @@
 "use strict";
 
 import propertiesPlugin from './properties.plugin';
+import genericPlugin    from './generic.plugin';
 
-module.exports = function (chai, utils) {
+
+export default function resourceCheckingPlugin(chai/*, utils*/) {
 	chai.use(propertiesPlugin);
+	chai.use(genericPlugin);
 
 	var Assertion = chai.Assertion;
 
 	Assertion.addMethod('resource', function (name) {
-		let assertion = new Assertion(this._obj);
-		utils.transferFlags(this, assertion, false);
-		assertion.contains.properties({
+		this.branch().contains.properties({
 			isResource: true,
 			name:       name
 		});
@@ -18,48 +19,35 @@ module.exports = function (chai, utils) {
 
 	Assertion.addMethod('resources', function (...classes) {
 		for (let cls of classes) {
-			let assertion = new Assertion(this._obj);
-			utils.transferFlags(this, assertion, false);
-			assertion.property(cls).that.is.a.resource(cls);
+			this.branch().property(cls).that.is.a.resource(cls);
 		}
 	});
 
 	Assertion.addMethod('relationship', function (name) {
-		let assertion = new Assertion(this._obj);
-		utils.transferFlags(this, assertion, false);
-		assertion.contains.properties({
+		this.branch().contains.properties({
 			isRelationship: true,
-			name:           name,
-			// [1]:            undefined,
-			// [2]:            undefined
+			name          : name,
+			1             : undefined,
+			2             : undefined
 		});
 	});
 
-	Assertion.addMethod('relationships', function (...classes) {
-		for (let cls of classes) {
-			let assertion = new Assertion(this._obj);
-			utils.transferFlags(this, assertion, false);
-			assertion.property(cls).that.is.a.relationship(cls);
+	Assertion.addMethod('relationships', function (...names) {
+		for (let name of names) {
+			this.branch().contains.property(name).that.is.a.relationship(name);
 		}
 	});
 
 	Assertion.addMethod('typedResource', function (name) {
-		let assertion = new Assertion(this._obj);
-		utils.transferFlags(this, assertion, false);
-		assertion.contains.properties({
-			isResource: true,
-			name:       name,
-			Type:       undefined,
-			Template:   undefined,
-			HasType:    undefined
-		});
+		this.branch().contains.property('name', name);
+		this.branch().contains.property('Type')    .that.is.a.resource();
+		this.branch().contains.property('Template').that.is.a.resource();
+		this.branch().contains.property('HasType') .that.is.a.relationship();
 	});
 
-	Assertion.addMethod('typedResources', function (...classes) {
-		for (let cls of classes) {
-			let assertion = new Assertion(this._obj);
-			utils.transferFlags(this, assertion, false);
-			assertion.property(cls).that.is.a.typedResource(cls);
+	Assertion.addMethod('typedResources', function (...names) {
+		for (let name of names) {
+			this.branch().contains.property(name).that.is.a.typedResource(name);
 		}
 	});
 

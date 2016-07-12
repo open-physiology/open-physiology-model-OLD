@@ -1,15 +1,16 @@
 import {describe, it, expect} from './test.helper';
 
-import groups from '../src/groups';
+import * as exports from '../src/groups';
+const { default: module, ...exportedClasses } = exports;
 
-describe("'groups' module", () => {
+describe("'groups' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(groups).to.contain.typedResources(
+		expect(exportedClasses).to.contain.typedResources(
 			'Group'
 		);
-		expect(groups).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'HasElement'
 		);
 

@@ -1,12 +1,13 @@
 import {describe, it, expect} from './test.helper';
 
-import visualisation from '../src/visualisation';
+import * as exports from '../src/visualisation';
+const { default: module, ...exportedClasses } = exports;
 
-describe("'visualisation' module", () => {
+describe("'visualisation' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(visualisation).to.contain.resources(
+		expect(exportedClasses).to.contain.resources(
 			'Theme',
 			'Artefact',
 			'Dim2Artefact',
@@ -26,10 +27,10 @@ describe("'visualisation' module", () => {
 			'MeasurableGlyph',
 			'CausalityArrow'
 		);
-		expect(visualisation).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'PrescribesStyleFor',
 			'PresentsModel',
-			'Contains'
+			'ContainsArtefact'
 		);
 
 	});

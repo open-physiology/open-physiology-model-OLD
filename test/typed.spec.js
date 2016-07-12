@@ -1,19 +1,20 @@
 import {describe, it, expect} from './test.helper';
 
-import typed from '../src/typed';
+import * as exports from '../src/typed';
+const { default: module, ...exportedClasses } = exports;
 
-describe("'typed' module", () => {
+describe("'typed' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(typed).to.contain.resources(
+		expect(exportedClasses).to.contain.resources(
 			'Type',
 			'Template'
 		);
-		expect(typed).to.contain.typedResources(
+		expect(exportedClasses).to.contain.typedResources(
 			'Typed'
 		);
-		expect(typed).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'IsSubtypeOf',
 			'HasCardinalityMultipliedByThatOf',
 			'HasType'

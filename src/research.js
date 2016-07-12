@@ -1,100 +1,107 @@
-import module, {MANY} from "./module";
+import module, {MANY} from './module';
 
-import resources from './resources';
-const {Resource, IsRelatedTo} = resources;
-import measurables from "./measurables";
-const {Measurable} = measurables;
+import resources,   {Resource, IsRelatedTo} from './resources';
+import measurables, {Measurable}            from './measurables';
 
 
-export default new module()
+const m = new module([resources, measurables]);
+export default m;
 
 
-	.RESOURCE({/////////////////////////////////////////////////////////////////
+export const Correlation = m.RESOURCE({/////////////////////////////////////////////////////////////////
 
-		name: 'Correlation',
+	name: 'Correlation',
 
-		extends: Resource,
+	extends: Resource,
 
-		singular: "correlation",
+	singular: "correlation",
 
-		properties: {
-			'comment': { type: 'string' }
-		}
+	properties: {
+		'comment': { type: 'string' }
+	}
 
-	})//////////////////////////////////////////////////////////////////////////
-
-
-	.RELATIONSHIP(({Correlation}) => ({
-
-		name: 'InvolvesMeasurable',
-
-		extends: IsRelatedTo,
-
-		1: [Correlation,         [0, MANY], { anchors: true, key: 'measurables' }],
-		2: [Measurable.Template, [0, MANY],                                      ],
-
-	}))
+});//////////////////////////////////////////////////////////////////////////
 
 
-	.RESOURCE({/////////////////////////////////////////////////////////////////
+export const InvolvesMeasurable = m.RELATIONSHIP({
 
-		name: 'ClinicalIndex',
+	name: 'InvolvesMeasurable',
 
-		extends: Resource,
+	extends: IsRelatedTo,
 
-		singular: "clinical index",
-		plural:   "clinical indices"
+	singular: "involves measurable",
 
-	})//////////////////////////////////////////////////////////////////////////
+	1: [Correlation,         [0, MANY], { anchors: true, key: 'measurables' }],
+	2: [Measurable.Template, [0, MANY],                                      ],
 
-
-	.RELATIONSHIP(({ClinicalIndex}) => ({
-
-		name: 'EncompassesClinicalIndex',
-
-		extends: IsRelatedTo,
-
-		1: [ClinicalIndex, [0, MANY], { key: 'children' }],
-		2: [ClinicalIndex, [0, 1   ], { key: 'parent'   }],
-
-		noCycles: true,
-
-	}))
+});
 
 
-	.RELATIONSHIP(({Correlation, ClinicalIndex}) => ({
+export const ClinicalIndex= m.RESOURCE({/////////////////////////////////////////////////////////////////
 
-		name: 'InvolvesClinicalIndex',
+	name: 'ClinicalIndex',
 
-		extends: IsRelatedTo,
+	extends: Resource,
 
-		1: [Correlation,   [0, MANY], { key: 'clinicalIndices', anchors: true }],
-		2: [ClinicalIndex, [0, MANY],                                          ],
+	singular: "clinical index",
+	plural:   "clinical indices"
 
-	}))
-
-
-	.RESOURCE({/////////////////////////////////////////////////////////////////
-
-		name: 'Publication',
-
-		extends: Resource,
-
-		singular: "publication"
-
-		// TODO?: Formalize that a publication needs a
-		//      : pub.externals reference to, e.g., a pubmed?
-
-	})//////////////////////////////////////////////////////////////////////////
+});//////////////////////////////////////////////////////////////////////////
 
 
-	.RELATIONSHIP(({Correlation, Publication}) => ({
+export const EncompassesClinicalIndex = m.RELATIONSHIP({
 
-		name: 'InvolvesPublication',
+	name: 'EncompassesClinicalIndex',
 
-		extends: IsRelatedTo,
+	extends: IsRelatedTo,
 
-		1: [Correlation, [0, 1   ], { key: 'publication', anchors: true }],
-		2: [Publication, [0, MANY],                                      ],
+	singular: "encompasses clinical index",
 
-	}));
+	1: [ClinicalIndex, [0, MANY], { anchors: true, key: 'children' }],
+	2: [ClinicalIndex, [0, 1   ], {                key: 'parent'   }],
+
+	noCycles: true,
+
+});
+
+
+export const InvolvesClinicalIndex = m.RELATIONSHIP({
+
+	name: 'InvolvesClinicalIndex',
+
+	extends: IsRelatedTo,
+
+	singular: "involves clinical index",
+
+	1: [Correlation,   [0, MANY], { anchors: true, key: 'clinicalIndices' }],
+	2: [ClinicalIndex, [0, MANY],                                          ],
+
+});
+
+
+export const Publication = m.RESOURCE({/////////////////////////////////////////////////////////////////
+
+	name: 'Publication',
+
+	extends: Resource,
+
+	singular: "publication"
+
+	// TODO?: Formalize that a publication needs a
+	//      : pub.externals reference to, e.g., a pubmed?
+
+});//////////////////////////////////////////////////////////////////////////
+
+
+export const InvolvesPublication = m.RELATIONSHIP({
+
+	name: 'InvolvesPublication',
+
+	extends: IsRelatedTo,
+
+	singular: "involves publication",
+
+	1: [Correlation, [0, 1   ], { anchors: true, key: 'publication' }],
+	2: [Publication, [0, MANY],                                      ],
+
+});

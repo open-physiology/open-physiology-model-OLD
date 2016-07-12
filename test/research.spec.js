@@ -1,17 +1,18 @@
 import {describe, it, expect} from './test.helper';
 
-import research from '../src/research';
+import * as exports from '../src/research';
+const { default: module, ...exportedClasses } = exports;
 
-describe("'research' module", () => {
+describe("'research' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(research).to.contain.resources(
+		expect(exportedClasses).to.contain.resources(
 			'Correlation',
 			'ClinicalIndex',
 			'Publication'
 		);
-		expect(research).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'InvolvesMeasurable',
 			'EncompassesClinicalIndex',
 			'InvolvesClinicalIndex',

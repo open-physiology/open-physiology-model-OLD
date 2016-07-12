@@ -1,97 +1,106 @@
-import module, {MANY} from './module';
+import {distributionSchema} from "./util";
+import Module, {MANY} from './module';
 
-import resources from "./resources";
-const {Resource, IsRelatedTo} = resources;
-
-import {distributionSchemaOr} from "./util";
+import resources, {Resource, IsRelatedTo} from './resources';
 
 
-export default new module()
+////////////////////////////////////////////////////////////////////////////////
+// Type / Template classes                                                    //
+////////////////////////////////////////////////////////////////////////////////
 
 
-	.RESOURCE({/////////////////////////////////////////////////////////////////
-
-		name: 'Type',
-
-		extends: Resource,
-
-		singular: "type",
-
-		properties: {}
-
-	})//////////////////////////////////////////////////////////////////////////
+const M = new Module([resources]);
+export default M;
 
 
-	.RELATIONSHIP(({Type}) => ({
+export const Type = M.RESOURCE({////////////////////////////////////////////////
 
-		name: 'IsSubtypeOf',
+	name: 'Type',
 
-		extends: IsRelatedTo,
+	extends: Resource,
 
-		1: [Type, [0, MANY], { key: 'subtypes'                  }],
-		2: [Type, [0, MANY], { key: 'supertypes', anchors: true }],
+	singular: "type"
 
-		noCycles: true
-
-	}))
+});/////////////////////////////////////////////////////////////////////////////
 
 
-	.RESOURCE({/////////////////////////////////////////////////////////////////
+export const IsSubtypeOf = M.RELATIONSHIP({
 
-		name: 'Template',
+	name: 'IsSubtypeOf',
 
-		extends: Resource,
+	extends: IsRelatedTo,
+	
+	singular: "is subtype of",
 
-		singular: "template",
+	1: [Type, [0, MANY], {                key: 'subtypes'   }],
+	2: [Type, [0, MANY], { anchors: true, key: 'supertypes' }],
 
-		properties: {
-			'cardinalityBase': {
-				...distributionSchemaOr({
-					type:   'integer',
-					minimum: 1
-				})
-			}
+	noCycles: true
+
+});
+
+
+export const Template = M.RESOURCE({////////////////////////////////////////////
+
+	name: 'Template',
+
+	extends: Resource,
+
+	singular: "template",
+
+	properties: {
+		'cardinalityBase': {
+			oneOf: [
+				distributionSchema,
+				{ type: 'integer', minimum: 1 }
+			],
+			default: 1
 		}
+	}
 
-	})//////////////////////////////////////////////////////////////////////////
+});/////////////////////////////////////////////////////////////////////////////
 
-	.RELATIONSHIP(({Template}) => [{
 
-	    name: 'HasCardinalityMultipliedByThatOf',
+export const HasCardinalityMultipliedByThatOf = M.RELATIONSHIP({
 
-		extends: IsRelatedTo,
+    name: 'HasCardinalityMultipliedByThatOf',
 
-	    1: [Template, [0, MANY], { anchors: true, key: 'cardinalityMultipliers' }],
-	    2: [Template, [0, MANY],                                                 ],
+	extends: IsRelatedTo,
+	
+	singular: "has cardinality multiplied by that of",
 
-		noCycles: true
+    1: [Template, [0, MANY], { anchors: true, key: 'cardinalityMultipliers' }],
+    2: [Template, [0, MANY],                                                 ],
 
-	}])
+	noCycles: true
 
-	.RELATIONSHIP(({Template, Type}) => [{
+});
 
-		name: 'HasType',
 
-		extends: IsRelatedTo,
+export const HasType = M.RELATIONSHIP({
 
-		1: [Template, [1, 1   ], { anchors: true, key: 'type' }], // TODO: covariance
-		2: [Type,     [0, MANY],                               ]
+	name: 'HasType',
 
-	}])
+	extends: IsRelatedTo,
+	
+	singular: "has type",
 
-	.RESOURCE(({Type, Template, HasType}) => ({//////////////////////////////////////////
+	1: [Template, [1, 1   ], { anchors: true, key: 'type' }],
+	2: [Type,     [0, MANY],                               ]
 
-		name: 'Typed',
+});
 
-		extends:  Resource,
-		abstract: true,
 
-		singular: "typed resource",
+export const Typed = M.OBJECT({/////////////////////////////////////////////////
 
-		Type,
-		Template,
-		HasType
+	name: 'Typed',
 
-	}))/////////////////////////////////////////////////////////////////////////
+	abstract: true,
 
-;
+	singular: "typed resource",
+
+	Type,
+	Template,
+	HasType
+
+});/////////////////////////////////////////////////////////////////////////////

@@ -1,102 +1,109 @@
 import {qualitySchema} from './util';
 import module, {MANY}  from './typed-module';
 
-import resources from './resources';
-const {IsRelatedTo} = resources;
-
-import typed from './typed';
-const {Typed} = typed;
-
-import lyphs     from "./lyphs";
-const {Material, Lyph, Border, Node} = lyphs;
-
-import processes from "./processes";
-const {Process} = processes;
+import resources, {IsRelatedTo}                  from './resources';
+import typed,     {Typed}                        from './typed';
+import lyphs,     {Material, Lyph, Border, Node} from "./lyphs";
+import processes, {Process}                      from "./processes";
 
 
-export default new module()
+const M = new module([resources, typed, lyphs, processes]);
+export default M;
 
-	.RESOURCE({
 
-		name: 'Measurable',
+export const Measurable = M.TYPED_RESOURCE({/////////////////////////////////////////////////////////////////
 
-		extends: Typed,
+	name: 'Measurable',
+	
+	extends: Typed,
 
-		singular: "measurable",
+	singular: "measurable",
 
-		properties: {
-			quality: { Type: { ...qualitySchema } }
+	properties: {
+		'quality': {
+			Type: { ...qualitySchema }
 		}
+	}
 
-	})
+});//////////////////////////////////////////////////////////////////////////
 
-	.RELATIONSHIP(({Measurable}) => ({
 
-		name: 'MeasuresMaterial',
+export const MeasuresMaterial = M.RELATIONSHIP({
 
-		extends: IsRelatedTo,
+	name: 'MeasuresMaterial',
 
-		1: [Measurable.Type, [0, MANY], { key: 'materials', anchors: true }],
-		2: [Material.Type,   [0, MANY],                                    ],
+	extends: IsRelatedTo,
+	
+	singular: "measures material",
 
-		// TODO: CONSTRAINT: such a measurable must be
-		//     : in a place where such a material exists
+	1: [Measurable.Type, [0, MANY], { anchors: true, covariant: true, key: 'materials' }],
+	2: [Material.Type,   [0, MANY],                                                     ],
 
-	}))
+	// TODO: CONSTRAINT: such a measurable must be
+	//     : in a place where such a material exists
 
-	.RELATIONSHIP(({Measurable}) => [Lyph, Border, Node, Process].map((Class) => ({
+});
 
-		name: 'HasMeasurable',
 
-		extends: IsRelatedTo,
+export const [HasMeasurable] = M.RELATIONSHIP([Lyph, Border, Node, Process].map((Class) => ({
 
-		1: [Class.Type,          [0, MANY], { key: 'measurables', anchors: true }],
-		2: [Measurable.Template, [1, 1   ],                                      ],
+	name: 'HasMeasurable',
 
-	})))
+	extends: IsRelatedTo,
+	
+	singular: "has measurable",
 
-	.RELATIONSHIP(({Measurable}) => [Lyph, Border, Node, Process].map((Class) => ({
+	1: [Class.Type,          [0, MANY], { anchors: true, covariant: true, key: 'measurables' }],
+	2: [Measurable.Template, [1, 1   ],                                                       ],
 
-		name: 'InheritsAllMeasurablesFrom',
+})));
 
-		extends: IsRelatedTo,
+export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Lyph, Border, Node, Process].map((Class) => ({
 
-		1: [Class.Type, [0, MANY], { key: 'inheritsMeasurables', anchors: true }],
-		2: [Class.Type, [0, MANY],                                              ],
+	name: 'InheritsAllMeasurablesFrom',
 
-		noCycles: true
+	extends: IsRelatedTo,
+	
+	singular: "inherits all measurables from",
 
-	})))
+	1: [Class.Type, [0, MANY], { anchors: true, covariant: true, key: 'inheritsMeasurables' }],
+	2: [Class.Type, [0, MANY],                                                               ],
 
-	.RESOURCE({
+	noCycles: true
 
-		name: 'Causality',
+})));
 
-		extends: Typed,
 
-		singular: "causality",
-		plural:   "causalities",
+export const Causality = M.TYPED_RESOURCE({/////////////////////////////////////////////////////////////////
 
-	})
+	name: 'Causality',
+	
+	extends: Typed,
 
-	.RELATIONSHIP(({Measurable, Causality}) => ({
+	singular: "causality",
+	plural:   "causalities",
 
-		name: 'Causes',
+});//////////////////////////////////////////////////////////////////////////
 
-		extends: IsRelatedTo,
 
-		1: [Measurable.Template, [0, MANY], { key: 'effects'              }],
-		2: [Causality.Template,  [1, 1   ], { key: 'cause', anchors: true }],
+export const [Causes] = M.RELATIONSHIP([{
 
-	}))
+	name: 'Causes',
 
-	.RELATIONSHIP(({Measurable, Causality}) => ({
+	extends: IsRelatedTo,
+	
+	singular: "causes",
 
-		name: 'Causes',
+	1: [Measurable.Template, [0, MANY], {                key: 'effects' }],
+	2: [Causality.Template,  [1, 1   ], { anchors: true, key: 'cause'   }],
 
-		extends: IsRelatedTo,
+}, {
 
-		1: [Causality.Template,  [1, 1   ], { key: 'effect', anchors: true }],
-		2: [Measurable.Template, [0, MANY], { key: 'causes'                }],
+	name: 'Causes',
 
-	}));
+	extends: IsRelatedTo,
+
+	1: [Causality.Template,  [1, 1   ], { anchors: true, key: 'effect' }],
+	2: [Measurable.Template, [0, MANY], {                key: 'causes' }],
+
+}]);

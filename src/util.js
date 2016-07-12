@@ -57,6 +57,16 @@ export const angleSchema = {
 	maximum: 360, exclusiveMaximum: true
 };
 
+export const oneOf = (...schemas) => ({ oneOf: schemas });
+
+export const rangeSchema = {
+	type: 'object',
+	properties: {
+		'min':  { type: 'number', required: true },
+		'max':  { type: 'number', required: true }
+	}
+};
+
 export const boundedNormalDistributionSchema = {
 	type: 'object',
 	properties: {
@@ -97,4 +107,8 @@ export const distributionSchemaOr = (otherSchema) => ({
 
 export function isObject(val) {
 	return val !== null && typeof val === 'object';
+}
+
+export function isFunction(val) {
+	return val !== null && typeof val === 'function';
 }

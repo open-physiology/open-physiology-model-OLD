@@ -1,39 +1,38 @@
-import {isObject} from './util';
+import isFunction from 'lodash/isFunction';
+import isInteger  from 'lodash/isInteger';
+import isString   from 'lodash/isString';
+
+import Entity from './Entity';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Module / Resource / Relationship Factory                                   //
 ////////////////////////////////////////////////////////////////////////////////
 
-
 const PROCESSED = Symbol('PROCESSED');
-function normalizeConfig(config) {
-	// console.log(`Processing the '${config.name}' class.`);
-	console.assert(!config[PROCESSED],
-		`The ${config.name} class is being processed multiple times.`);
 
-	/* set 'id' */
-	config.id = config.id || config.name;
+function normalizeConfig(config) {
 
 	/* check 'extends' */
-	if (isObject(config.extends)) {
+	if (!['Resource', 'IsRelatedTo'].includes(config.name)) {
+		console.assert(config.extends, `
+				The '${config.name}' class is being processed,
+				but it does not extend another class, which it should.
+		`);
 		console.assert(config.extends[PROCESSED], `
 			The '${config.name}' class is being processed,
-			but it extends the '${config.extends.name}',
+			but it extends the '${config.extends.name}' class,
 			which has not yet been processed.
-		`);
-	} else {
-		console.assert(['Resource', 'IsRelatedTo'].includes(config.name), `
-			The '${config.name}' class is being processed,
-			but it does not extend another class, which it should.
 		`);
 	}
 
+	/* check plural */
+	config.plural = config.plural || `${config.singular}s`;
+
 	/* return modified object */
 	return {
+		properties:        {},
+		patternProperties: {},
 		...config,
-		properties: config.properties || {},
-		patternProperties: config.patternProperties || {},
-		[PROCESSED]: true
 	};
 }
 
@@ -44,7 +43,7 @@ function jsonSchemaConfig(config) {
 		allProperties: { ...config.properties }
 	};
 
-	if (isObject(config.extends)) {
+	if (isFunction(config.extends)) {
 		/* merge each property with properties of the same name in the superclass */
 		for (let key of Object.keys(config.extends.allProperties)) {
 			// TODO: check for conflicts
@@ -56,14 +55,8 @@ function jsonSchemaConfig(config) {
 		}
 	}
 
-
 	/* folding superclass properties into one object */
 	Object.assign(result.allProperties, config.extends && config.extends.allProperties);
-
-
-
-
-
 
 	return result;
 
@@ -85,18 +78,10 @@ function jsonSchemaConfig(config) {
 	// 		//     : - fold property flags into each other
 	// 	}
 	// };
-
-
-	// TODO: for each property, allow for a division into '{ Template: {}, Type: {}, typeCheck(type, value) {} }'
-	//     : and normalize to that if this division is not given
-	//     : -
 }
 
 
 function relationshipSidesConfig(config) {
-
-	/* only do this step if 1 and 2 sides are present */
-	if (!config[1] && !config[2]) { return {...config} }
 
 	// generally speaking:
 	// - 1 is left-hand side, and
@@ -105,19 +90,20 @@ function relationshipSidesConfig(config) {
 	/* initialize result config */
 	let result = {
 		...config,
-		1: {},
-		2: {}
+		1: { key: `-[:${config.name}]->` },
+		2: { key: `<-[:${config.name}]-` }
 	};
 
 	/* create objects for both sides 1 and 2 */
 	for (let side of [1, 2]) {
-		console.assert(Array.isArray(config[side]), "Relationship sides 1, 2 need to be arrays.");
+		console.assert(Array.isArray(config[side]), `
+			Relationship sides 1, 2 need to be arrays.
+		`);
 		let thisSide  = result[side];
 		let otherSide = result[3-side]; // {1↦2, 2↦1}
 		Object.assign(thisSide, {
 			normalized: result,
 			other: otherSide,
-			key: side === 1 ? `-[${config.name}]->` : `<-[${config.name}]-`,
 			class: config[side][0],
 			cardinality: { // NOTE: this is the cardinality of outgoing connections
 				min: config[side][1][0],
@@ -130,38 +116,168 @@ function relationshipSidesConfig(config) {
 	return result;
 }
 
+// TODO: disallow duplicate names for resource classes
+// TODO: folding same-name relationship classes
 
-export default class module {
+function createConstructorFromConfig(config) {
+	/* create the class with the right name, constructor  and static content */
+	const {name, ...rest} = config;
+	const NewClass = class extends (config.extends || Entity) {
+		constructor(givenProperties = {}) {
+			
+			super(givenProperties);
+			
+			/* normalize into object */
+			if (isInteger(givenProperties)) { givenProperties = { id:   givenProperties } }
+			if (isString (givenProperties)) { givenProperties = { href: givenProperties } }
 
-	normalizeConfig(config) {
-		if (typeof config === 'function') { config = config(this) }
-		if (!Array.isArray(config))       { config = [config]     }
+			/* distinguish between a new object and a reference to an existing one */
+			const {id, href} = givenProperties;
+			if ('href' in givenProperties) {
+				/* reference to existing entity by href */
+				if (!isString(givenProperties.href)) {
+					throw new TypeError(`
+						The 'href' property on a
+						resource construction object
+						must be a string.
+					`);
+				}
+				if (Object.keys(givenProperties).length > 1) {
+					throw new TypeError(`
+						If a resource construction object contains
+						an 'href' or 'id' property, it shouldn't 
+						any other properties.
+					`);
+				}
+				// TODO: assert that the entity exists
+				// TODO: assert that the entity is a subclass of NewClass
+				// TODO: return a reference to the locally stored entity (from this constructor)
+			} else if ('id' in givenProperties) {
+				/* reference to existing entity by id  */
+				if (!isInteger(givenProperties.id) && givenProperties.id > 0) {
+					throw new TypeError(`
+						The 'id' property on a
+						resource construction object
+						must be a positive integer.
+					`);
+				}
+				if (Object.keys(givenProperties).length > 1) {
+					throw new TypeError(`
+						If a resource construction object contains an
+						'id' property, it shouldn't any other properties.
+					`);
+				}
+				// TODO: assert that the entity exists
+				// TODO: assert that the entity is a subclass of NewClass
+				// TODO: return a reference to the locally stored entity (from this constructor)
+			} else {
+				/* description of new entity */
+
+			}
+
+
+			// TODO: initialization stuff?
+
+			/* storing values */
+			this._values = {};
+
+			/* initializing */
+			for (let [key, desc] of Object.entries(NewClass.properties)) {
+				if (key in givenProperties) {
+					// TODO: if (!validate(this, key, givenProperties[key])) { throw Error }
+					this._values[key] = givenProperties[key];
+				}
+			}
+
+
+		}
+	};
+	Object.defineProperty(NewClass, 'name', { value: name });
+	Object.assign(NewClass, rest);
+
+	/* getters / setters for the properties */
+	for (let [key, desc] of Object.entries(NewClass.properties)) {
+		Object.defineProperty(NewClass.prototype, key, {
+			get() {
+				if (key in this._values) {
+					return this._values[key];
+				} else if ('default' in desc) {
+					return desc.default;
+				} else if (desc.type === 'array') {
+					return [];
+				} // TODO: is this it?
+			},
+			set(newValue) {
+				// TODO: if (!validate(this, key, newValue)) { throw Error }
+				this._values[key] = newValue;
+			}
+		});
+	}
+
+	return NewClass;
+}
+
+function mapOptionalArray(config, fn) {
+	let isArray = Array.isArray(config);
+	config = (isArray ? config : [config]).map(fn);
+	return isArray ? config : config[0];
+}
+
+export default class Module {
+
+	classes      = {};
+	dependencies = [];
+
+	constructor(dependencies = []) {
+		this.dependencies.push(...dependencies);
+	}
+
+	preProcessingConfig(config) {
+		console.assert(!config[PROCESSED],
+			`The ${config.name} class is being processed multiple times. That's no good.`);
+
+		// console.log(`Processing the '${config.name}' class.`);
+
 		return config;
 	}
-	
+
+	postProcessingConfig(config) {
+		config[PROCESSED] = true;
+		this.classes[config.name] = config;
+		return config;
+	}
+
+	OBJECT(config) {
+		return mapOptionalArray(config, (conf) => {
+			conf = this.preProcessingConfig (conf);
+			conf = this.postProcessingConfig(conf);
+			return conf;
+		});
+	}
+
 	RESOURCE(config) {
-		for (let conf of this.normalizeConfig(config)) {
+		return mapOptionalArray(config, (conf) => {
 			conf.isResource = true;
-			conf = [
-				normalizeConfig,
-				jsonSchemaConfig
-			].reduce((c, t) => t(c), conf);
-			this.constructor[conf.id] = this[conf.id] = conf;
-		}
-		return this;
+			conf = this.preProcessingConfig   (conf);
+			conf = normalizeConfig            (conf);
+			conf = jsonSchemaConfig           (conf);
+			conf = createConstructorFromConfig(conf);
+			conf = this.postProcessingConfig  (conf);
+			return conf;
+		});
 	}
 
 	RELATIONSHIP(config) {
-		for (let conf of this.normalizeConfig(config)) {
+		return mapOptionalArray(config, (conf) => {
 			conf.isRelationship = true;
-			conf = [
-				normalizeConfig,
-				jsonSchemaConfig,
-				relationshipSidesConfig
-			].reduce((c, t) => t(c), conf);
-			this.constructor[conf.id] = this[conf.id] = conf;
-		}
-		return this;
+			conf = this.preProcessingConfig   (conf);
+			conf = normalizeConfig            (conf);
+			conf = jsonSchemaConfig           (conf);
+			conf = relationshipSidesConfig    (conf);
+			conf = createConstructorFromConfig(conf);
+			conf = this.postProcessingConfig  (conf);
+			return conf;
+		});
 	}
 
 }
@@ -192,8 +308,11 @@ export default class module {
 //
 //     name: 'RelationshipName',
 //
-//     1: [ ResourceType1, [c1min, c1max], { ...options1to2 },
-//     2: [ ResourceType2, [c2min, c2max], { ...options2to1 },
+//     extends: <superclass>,
+//     abstract: <true/false>,
+//
+//     1: [ ResourceType1, [c1min, c1max], { ...options1to2 } ],
+//     2: [ ResourceType2, [c2min, c2max], { ...options2to1 } ],
 //
 //     properties: {
 //         ...properties
@@ -214,7 +333,7 @@ export default class module {
 //                             the ResourceType2 instance that is being sustained by it is deleted automatically
 // - options1to2.anchors:      a ResourceType2 instance cannot be deleted
 //                             while there are still ResourceType1 instances related with it
-// - options1to2.implicit:     (only when c2min > 0) a new ResourceType2 instance, plus this kind of relationship,
+// - options1to2.implicit:     (only when c1min > 0) a new ResourceType2 instance, plus this kind of relationship,
 //                             is automatically created for a new ResourceType1 instance;
 // - options1to2.getSummary:   a human-readable explanation of the corresponding REST endpoint for HTTP GET
 // - options1to2.putSummary:   a human-readable explanation of the corresponding REST endpoint for HTTP PUT

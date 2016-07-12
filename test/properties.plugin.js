@@ -1,16 +1,18 @@
 "use strict";
 
-module.exports = function (chai, utils) {
+import genericPlugin from './generic.plugin';
+
+export default function propertiesPlugin(chai/*, utils*/) {
+	chai.use(genericPlugin);
+
 	var Assertion = chai.Assertion;
 
 	Assertion.addMethod('properties', function (props) {
 		for (let key of Object.keys(props)) {
-			let assertion = new Assertion(this._obj);
-			utils.transferFlags(this, assertion, false);
 			if (typeof props[key] === 'undefined') {
-				assertion.property(key);
+				this.branch().property(key);
 			} else {
-				assertion.property(key, props[key]);
+				this.branch().property(key, props[key]);
 			}
 		}
 	});

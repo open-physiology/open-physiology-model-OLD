@@ -1,32 +1,33 @@
-import module, {MANY} from "./typed-module";
+import Module, {MANY} from './typed-module';
 
-import resources from './resources';
-const {IsRelatedTo} = resources;
-import typed from "./typed";
-const {Typed, Template} = typed;
+import resources, {IsRelatedTo}     from './resources';
+import typed,     {Typed, Template} from './typed';
 
 
-export default new module()
+const M = new Module([resources, typed]);
+export default M;
 
 
-	.RESOURCE({/////////////////////////////////////////////////////////////////
+export const Group = M.TYPED_RESOURCE({/////////////////////////////////////////
 
-		name: 'Group',
+	name: 'Group',
 
-		extends: Typed,
+	extends: Typed,
 
-		singular: "group"
+	singular: "group"
 
-	})//////////////////////////////////////////////////////////////////////////
+});/////////////////////////////////////////////////////////////////////////////
 
 
-	.RELATIONSHIP(({Group}) => ({
+export const HasElement = M.RELATIONSHIP({
 
-		name: 'HasElement',
+	name: 'HasElement',
 
-		extends: IsRelatedTo,
+	extends: IsRelatedTo,
+	
+	singular: "has element",
 
-		1: [Group.Type, [0, MANY], { key: 'elements', anchors: true }],
-		2: [Template,   [0, MANY],                                   ],
+	1: [Group.Type, [0, MANY], { anchors: true, key: 'elements' }],
+	2: [Template,   [0, MANY],                                   ],
 
-	}));
+});

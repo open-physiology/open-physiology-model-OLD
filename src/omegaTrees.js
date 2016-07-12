@@ -1,37 +1,36 @@
 import module, {MANY}  from './typed-module';
 
-import resources from './resources';
-const {IsRelatedTo} = resources;
-
-import groups from "./groups";
-const {Group} = groups;
-
-import lyphs from './lyphs';
-const {Node} = lyphs;
-
-export default new module()
+import resources, {IsRelatedTo} from './resources';
+import groups,    {Group}       from './groups';
+import lyphs,     {Node}        from './lyphs';
 
 
-	.RESOURCE({///////////////////////////////////////////////////////////
-
-		name: 'OmegaTree',
-
-		extends: Group,
-
-		singular: "omega tree",
-
-	})//////////////////////////////////////////////////////////////////////////
+const M = new module([resources, groups, lyphs]);
+export default M;
 
 
-	.RELATIONSHIP(({OmegaTree}) => ({
+export const OmegaTree = M.TYPED_RESOURCE({///////////////////////////////////////////////////////////
 
-		name: 'HasAsRoot',
+	name: 'OmegaTree',
 
-		extends: IsRelatedTo,
+	extends: Group,
 
-		1: [OmegaTree.Type, [1, 1   ], { key: 'root', anchors: true }],
-		2: [Node.Template,  [0, MANY],                               ],
+	singular: "omega tree",
 
-		// TODO: CONSTRAINT: tree.root is in (<Group>tree).elements
+});//////////////////////////////////////////////////////////////////////////
 
-	}));
+
+export const HasAsRoot = M.RELATIONSHIP({
+
+	name: 'HasAsRoot',
+
+	extends: IsRelatedTo,
+	
+	singular: "has as root",
+
+	1: [OmegaTree.Type, [1, 1   ], { anchors: true, covariant: true, key: 'root' }],
+	2: [Node.Template,  [0, MANY],                                                ],
+
+	// TODO: CONSTRAINT: tree.root is in (<Group>tree).elements
+
+});

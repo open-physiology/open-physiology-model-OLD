@@ -1,86 +1,92 @@
 import {idSchema, uriSchema, identifierSchema} from './util';
-
-import module, {MANY} from './module';
-
-
-export default new module()
+import Module, {MANY}                          from './module';
 
 
-	.RESOURCE({/////////////////////////////////////////////////////////////////
-
-		name: 'Resource',
-
-		abstract: true,
-
-		properties: {
-			'id':    { ...idSchema,         readonly: true },
-			'href':  { ...uriSchema,        readonly: true },
-			'class': { ...identifierSchema, readonly: true },
-			'name':  { type: 'string' }
-		}
-
-	})//////////////////////////////////////////////////////////////////////////
+const M = new Module();
+export default M;
 
 
-	.RELATIONSHIP(({Resource}) => ({
+export const Resource = M.RESOURCE({/////////////////////////////////////////////////////////////////
 
-		name: 'IsRelatedTo',
+	name: 'Resource',
 
-		abstract: true,
+	abstract: true,
 
-		1: [Resource, [0, MANY]],
-		2: [Resource, [0, MANY]],
+	properties: {
+		'id':    { ...idSchema,         readonly: true },
+		'href':  { ...uriSchema,        readonly: true },
+		'class': { ...identifierSchema, readonly: true },
+		'name':  { type: 'string' }
+	}
 
-		properties: {
-			'id':    { ...idSchema,         readonly: true },
-			'href':  { ...uriSchema,        readonly: true },
-			'class': { ...identifierSchema, readonly: true }
-		}
-
-	}))
+});//////////////////////////////////////////////////////////////////////////
 
 
-	.RESOURCE(({Resource}) => ({////////////////////////////////////////////////
+export const IsRelatedTo = M.RELATIONSHIP({
 
-		name: 'ExternalResource',
+	name: 'IsRelatedTo',
 
-		extends: Resource,
+	abstract: true,
 
-		singular: "external resource",
+	singular: "is related to",
 
-		properties: {
-			'uri':  { ...uriSchema, required: true },
-			'type': { type: 'string'               } // "fma" or "cocomac", etc.
-		}
+	1: [Resource, [0, MANY]],
+	2: [Resource, [0, MANY]],
 
-	}))/////////////////////////////////////////////////////////////////////////
+	properties: {
+		'id':    { ...idSchema,         readonly: true },
+		'href':  { ...uriSchema,        readonly: true },
+		'class': { ...identifierSchema, readonly: true }
+	}
 
-
-	.RELATIONSHIP(({ExternalResource, IsRelatedTo}) => ({
-
-		name: 'IsExternallyRelatedTo',
-
-		extends: IsRelatedTo,
-
-		1: [ExternalResource, [0, MANY], { key: 1 }],
-		2: [ExternalResource, [0, MANY], { key: 2 }],
-
-		// TODO: figure out how external relationships will work, and perhaps modify this class
-
-		properties: {
-			'type': { type: 'string', required: true }
-		}
-
-	}))
+});
 
 
-	.RELATIONSHIP(({Resource, ExternalResource, IsRelatedTo}) => ({
+export const ExternalResource = M.RESOURCE({////////////////////////////////////////////////
 
-		name: 'CorrespondsTo',
+	name: 'ExternalResource',
 
-		extends: IsRelatedTo,
+	extends: Resource,
 
-		1: [Resource,         [0, MANY], { anchors: true, key: 'externals' }],
-		2: [ExternalResource, [0, MANY], {                key: 'locals'    }],
+	singular: "external resource",
 
-	}));
+	properties: {
+		'uri':  { ...uriSchema, required: true },
+		'type': { type: 'string'               } // "fma" or "cocomac", etc.
+	}
+
+});/////////////////////////////////////////////////////////////////////////
+
+
+export const IsExternallyRelatedTo = M.RELATIONSHIP({
+
+	name: 'IsExternallyRelatedTo',
+
+	extends: IsRelatedTo,
+
+	singular: "is externally related to",
+
+	1: [ExternalResource, [0, MANY]],
+	2: [ExternalResource, [0, MANY]],
+
+	// TODO: figure out how external relationships will work, and perhaps modify this class
+
+	properties: {
+		'type': { type: 'string', required: true }
+	}
+
+});
+
+
+export const CorrespondsTo = M.RELATIONSHIP({
+
+	name: 'CorrespondsTo',
+
+	extends: IsRelatedTo,
+
+	singular: "corresponds to",
+
+	1: [Resource,         [0, MANY], { anchors: true, key: 'externals' }],
+	2: [ExternalResource, [0, MANY], {                key: 'locals'    }],
+
+});

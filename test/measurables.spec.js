@@ -1,18 +1,19 @@
 import {describe, it, expect} from './test.helper';
 
-import measurables from '../src/measurables';
+import * as exports from '../src/measurables';
+const { default: module, ...exportedClasses } = exports;
 
-describe("'measurables' module", () => {
+describe("'measurables' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(measurables).to.contain.typedResources(
+		expect(exportedClasses).to.contain.typedResources(
 			'Measurable',
 			'Causality'
 		);
-		expect(measurables).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'MeasuresMaterial',
-			'HasMeasurable',
+			'HasMeasurable', // TODO: put back
 			'InheritsAllMeasurablesFrom',
 			'Causes'
 		);

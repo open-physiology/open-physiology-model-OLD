@@ -1,15 +1,16 @@
 import {describe, it, expect} from './test.helper';
 
-import processes from '../src/processes';
+import * as exports from '../src/processes';
+const { default: module, ...exportedClasses } = exports;
 
-describe("'processes' module", () => {
+describe("'processes' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(processes).to.contain.typedResources(
+		expect(exportedClasses).to.contain.typedResources(
 			'Process'
 		);
-		expect(processes).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'FlowsTo',
 			'ConveysProcess',
 			'TransportsMaterial',

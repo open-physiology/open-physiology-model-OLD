@@ -1,17 +1,17 @@
 import {describe, it, expect} from './test.helper';
 
-import resources from '../src/resources';
+import * as exports from '../src/resources';
+const { default: module, ...exportedClasses } = exports;
 
-
-describe("'resources' module", () => {
+describe("'resources' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(resources).to.contain.resources(
+		expect(exportedClasses).to.contain.resources(
 			'Resource',
 			'ExternalResource'
 		);
-		expect(resources).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'IsRelatedTo',
 			'IsExternallyRelatedTo',
 			'CorrespondsTo'

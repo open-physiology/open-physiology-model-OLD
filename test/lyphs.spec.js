@@ -1,28 +1,26 @@
 import {describe, it, expect} from './test.helper';
 
-import lyphs from '../src/lyphs';
+import {Resource, IsRelatedTo} from '../src/resources';
+import {Type, Template}        from '../src/typed';
 
+import * as exports from '../src/lyphs';
+const { default: module, ...exportedClasses } = exports;
 
-describe("'lyphs' module", () => {
+describe("'lyphs' Module", () => {
 
 	it("exports the expected classes", () => {
 
-		expect(lyphs).to.contain.resources(
-			'Coalescence',
+		expect(exportedClasses).to.contain.typedResources(
 			'Material',
 			'Lyph',
 			'CylindricalLyph',
 			'Border',
 			'Node'
 		);
-		expect(lyphs).to.contain.typedResources(
-			'Material',
-			'Lyph',
-			'CylindricalLyph',
-			'Border',
-			'Node'
+		expect(exportedClasses).to.contain.resources(
+			'Coalescence'
 		);
-		expect(lyphs).to.contain.relationships(
+		expect(exportedClasses).to.contain.relationships(
 			'ContainsMaterial',
 			'InheritsAllMaterialsFrom',
 			'HasPart',
@@ -33,7 +31,6 @@ describe("'lyphs' module", () => {
 			'InheritsAllPartsFrom',
 			'HasSegment',
 			'InheritsAllSegmentsFrom',
-			'InheritsAllPartsFrom',
 			'HasInnerBorder',
 			'HasOuterBorder',
 			'HasMinusBorder',
@@ -42,20 +39,34 @@ describe("'lyphs' module", () => {
 			'CoalescesWith',
 			'CoalescesThroughLayer'
 		);
-		
-		// for (let cls of [
-		// 	'Material',
-		// 	'Lyph',
-		// 	'CylindricalLyph',
-		// 	'Border',
-		// 	'Node'
-		// ]) {
-		// 	expect(lyphs).to.have.property(cls).that.contains.properties({
-		// 		Type:     lyphs[`${cls}Type`],
-		// 		Template: lyphs[`${cls}Template`],
-		// 		HasType:  undefined
-		// 	});
-		// }
+
+	});
+
+	it("exports classes that can be instantiated", () => {
+
+		for (let cls of Object.values(exportedClasses)) {
+			if (cls.isResource) {
+				expect(new cls()).to.be.an.instanceof(cls, Resource);
+			} else if (cls.isRelationship) {
+				expect(new cls()).to.be.an.instanceof(cls, IsRelatedTo);
+			} else if (cls.isTypedResource) {
+				expect(new cls.Type()).to.be.an.instanceof    (cls.Type,     Type,     Resource);
+				expect(new cls.Template()).to.be.an.instanceof(cls.Template, Template, Resource);
+			}
+		}
+
+		const {
+			Material,
+			Lyph,
+			CylindricalLyph
+		} = exportedClasses;
+
+		expect(new Material.Type()           ).to.be.an.instanceof(                                         Material.Type    );
+		expect(new Material.Template()       ).to.be.an.instanceof(                                         Material.Template);
+		expect(new Lyph.Type()               ).to.be.an.instanceof(                          Lyph.Type    , Material.Type    );
+		expect(new Lyph.Template()           ).to.be.an.instanceof(                          Lyph.Template, Material.Template);
+		expect(new CylindricalLyph.Type()    ).to.be.an.instanceof(CylindricalLyph.Type    , Lyph.Type    , Material.Type    );
+		expect(new CylindricalLyph.Template()).to.be.an.instanceof(CylindricalLyph.Template, Lyph.Template, Material.Template);
 
 	});
 
