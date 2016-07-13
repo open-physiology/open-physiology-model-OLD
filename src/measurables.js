@@ -45,7 +45,7 @@ export const MeasuresMaterial = M.RELATIONSHIP({
 });
 
 
-export const [HasMeasurable] = M.RELATIONSHIP([Lyph, Border, Node, Process].map((Class) => ({
+export const [HasMeasurable] = M.RELATIONSHIP([Material, Border, Node, Process].map((Class) => ({
 
 	name: 'HasMeasurable',
 
@@ -58,7 +58,7 @@ export const [HasMeasurable] = M.RELATIONSHIP([Lyph, Border, Node, Process].map(
 
 })));
 
-export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Lyph, Border, Node, Process].map((Class) => ({
+export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Material, Border, Node, Process].map((Class) => ({
 
 	name: 'InheritsAllMeasurablesFrom',
 
