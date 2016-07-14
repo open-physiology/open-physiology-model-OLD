@@ -1,10 +1,10 @@
-import Module, {MANY} from './typed-module';
+import TypedModule, {MANY} from '../TypedModule';
 
 import resources, {IsRelatedTo}     from './resources';
 import typed,     {Typed, Template} from './typed';
 
 
-const M = new Module([resources, typed]);
+const M = new TypedModule([resources, typed]);
 export default M;
 
 

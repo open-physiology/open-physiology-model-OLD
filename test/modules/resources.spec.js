@@ -1,6 +1,6 @@
-import {describe, it, expect} from './test.helper';
+import {describe, it, expect} from '../test.helper';
 
-import * as exports from '../src/resources';
+import * as exports from '../../src/modules/resources';
 const { default: module, ...exportedClasses } = exports;
 
 describe("'resources' Module", () => {

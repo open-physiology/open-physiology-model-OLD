@@ -1,9 +1,9 @@
-import BasicModule, {MANY} from './module';
-import {Typed}             from './typed';
+import Module, {MANY} from './Module';
+import {Typed}        from './modules/typed';
 
 export {MANY};
 
-export default class Module extends BasicModule {
+export default class TypedModule extends Module {
 
 	TYPED_RESOURCE(config) {
 
@@ -42,7 +42,7 @@ export default class Module extends BasicModule {
 
 			extends: SuperClass.HasType,
 
-			singular: 'has type', // TODO: singular property in all relationship classes
+			singular: 'has type',
 
 			1: [NewTemplate, [1, 1   ], { anchors: true, key: 'type' }], // TODO: covariance?
 			2: [NewType,     [0, MANY],                               ]

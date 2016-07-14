@@ -1,5 +1,5 @@
-import {identifierRegex, rationalNumberSchema, angleSchema} from './util';
-import Module, {MANY}                                       from './typed-module';
+import TypedModule, {MANY}                                  from '../TypedModule';
+import {identifierRegex, rationalNumberSchema, angleSchema} from '../util';
 
 import resources,   {Resource, IsRelatedTo}                                      from './resources';
 import lyphs,       {Material, Lyph, CylindricalLyph, Border, Coalescence, Node} from './lyphs';
@@ -8,7 +8,7 @@ import processes,   {Process}                                                   
 import measurables, {Measurable, Causality}                                      from './measurables';
 
 
-const M = new Module([resources, lyphs, typed, processes, measurables]);
+const M = new TypedModule([resources, lyphs, typed, processes, measurables]);
 export default M;
 
 

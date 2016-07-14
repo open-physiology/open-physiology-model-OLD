@@ -1,9 +1,9 @@
-import {describe, it, expect} from './test.helper';
+import {describe, it, expect} from '../test.helper';
 
-import {Resource, IsRelatedTo} from '../src/resources';
-import {Type, Template}        from '../src/typed';
+import {Resource, IsRelatedTo} from '../../src/modules/resources';
+import {Type, Template}        from '../../src/modules/typed';
 
-import * as exports from '../src/lyphs';
+import * as exports from '../../src/modules/lyphs';
 const { default: module, ...exportedClasses } = exports;
 
 describe("'lyphs' Module", () => {

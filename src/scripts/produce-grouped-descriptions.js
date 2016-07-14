@@ -1,13 +1,13 @@
-import resources      from '../resources';
-import typed          from '../typed';
-import lyphs          from '../lyphs';
-import processes      from '../processes';
-import measurables    from '../measurables';
-import groups         from '../groups';
-import omegaTrees     from '../omegaTrees';
-import research       from '../research';
-import visualizations from '../visualisations';
-import Module from '../module';
+import resources      from '../modules/resources';
+import typed          from '../modules/typed';
+import lyphs          from '../modules/lyphs';
+import processes      from '../modules/processes';
+import measurables    from '../modules/measurables';
+import groups         from '../modules/groups';
+import omegaTrees     from '../modules/omegaTrees';
+import research       from '../modules/research';
+import visualizations from '../modules/visualisations';
+import Module from '../Module';
 
 import padEnd   from 'lodash/padEnd';
 

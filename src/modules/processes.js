@@ -1,12 +1,12 @@
-import module, {MANY}                                    from './typed-module';
-import {enumArraySchema, enumSchema, arrayContainsValue} from './util';
+import TypedModule, {MANY}                               from '../TypedModule';
+import {enumArraySchema, enumSchema, arrayContainsValue} from '../util';
 
 import resources, {IsRelatedTo}          from './resources';
 import typed,     {Typed}                from './typed';
 import lyphs,     {Material, Lyph, Node} from './lyphs';
 
 
-const M = new module([resources, typed, lyphs]);
+const M = new TypedModule([resources, typed, lyphs]);
 export default M;
 
 

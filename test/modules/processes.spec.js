@@ -1,6 +1,6 @@
-import {describe, it, expect} from './test.helper';
+import {describe, it, expect} from '../test.helper';
 
-import * as exports from '../src/processes';
+import * as exports from '../../src/modules/processes';
 const { default: module, ...exportedClasses } = exports;
 
 describe("'processes' Module", () => {

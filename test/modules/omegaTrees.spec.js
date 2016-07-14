@@ -1,17 +1,17 @@
-import {describe, it, expect} from './test.helper';
+import {describe, it, expect} from '../test.helper';
 
-import * as exports from '../src/groups';
+import * as exports from '../../src/modules/omegaTrees';
 const { default: module, ...exportedClasses } = exports;
 
-describe("'groups' Module", () => {
+describe("'omegaTrees' Module", () => {
 
 	it("exports the expected classes", () => {
 
 		expect(exportedClasses).to.contain.typedResources(
-			'Group'
+			'OmegaTree'
 		);
 		expect(exportedClasses).to.contain.relationships(
-			'HasElement'
+			'HasAsRoot'
 		);
 
 	});

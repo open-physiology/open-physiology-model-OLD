@@ -1,11 +1,11 @@
-import module, {MANY}  from './typed-module';
+import TypedModule, {MANY}  from '../TypedModule';
 
 import resources, {IsRelatedTo} from './resources';
 import groups,    {Group}       from './groups';
 import lyphs,     {Node}        from './lyphs';
 
 
-const M = new module([resources, groups, lyphs]);
+const M = new TypedModule([resources, groups, lyphs]);
 export default M;
 
 

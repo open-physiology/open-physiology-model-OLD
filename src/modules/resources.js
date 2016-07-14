@@ -1,5 +1,5 @@
-import {idSchema, uriSchema, identifierSchema} from './util';
-import Module, {MANY}                          from './module';
+import {idSchema, uriSchema, identifierSchema} from '../util';
+import Module, {MANY}                          from '../Module';
 
 
 const M = new Module();

@@ -1,6 +1,6 @@
-import {describe, it, expect} from './test.helper';
+import {describe, it, expect} from '../test.helper';
 
-import * as exports from '../src/measurables';
+import * as exports from '../../src/modules/measurables';
 const { default: module, ...exportedClasses } = exports;
 
 describe("'measurables' Module", () => {

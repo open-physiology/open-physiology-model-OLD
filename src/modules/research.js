@@ -1,4 +1,4 @@
-import module, {MANY} from './module';
+import module, {MANY} from '../Module';
 
 import resources,   {Resource, IsRelatedTo} from './resources';
 import measurables, {Measurable}            from './measurables';

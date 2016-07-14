@@ -1,5 +1,5 @@
-import {qualitySchema} from './util';
-import Module, {MANY}  from './typed-module';
+import {qualitySchema} from '../util';
+import TypedModule, {MANY}  from '../TypedModule';
 
 import resources, {Resource, IsRelatedTo}  from './resources';
 import typed,     {Typed}                  from './typed';
@@ -7,7 +7,7 @@ import lyphs,     {Material, Border, Node} from './lyphs';
 import processes, {Process}                from './processes';
 
 
-const M = new Module([resources, typed, lyphs, processes]);
+const M = new TypedModule([resources, typed, lyphs, processes]);
 export default M;
 
 

@@ -1,3 +1,4 @@
+import TypedModule, {MANY} from '../TypedModule';
 import {
 	enumArraySchema,
 	enumSchema,
@@ -5,14 +6,13 @@ import {
 	rangeSchema,
 	oneOf,
 	distributionSchema
-} from './util';
-import module, {MANY} from './typed-module';
+} from '../util';
 
 import resources, {Resource, IsRelatedTo} from './resources';
 import typed,     {Typed}                 from './typed';
 
 
-const M = new module([resources, typed]);
+const M = new TypedModule([resources, typed]);
 export default M;
 
 

@@ -1,6 +1,6 @@
-import {describe, it, expect} from './test.helper';
+import {describe, it, expect} from '../test.helper';
 
-import * as exports from '../src/research';
+import * as exports from '../../src/modules/research';
 const { default: module, ...exportedClasses } = exports;
 
 describe("'research' Module", () => {

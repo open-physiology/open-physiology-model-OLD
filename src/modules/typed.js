@@ -1,5 +1,5 @@
-import {distributionSchema} from "./util";
-import Module, {MANY} from './module';
+import {distributionSchema} from "../util";
+import Module, {MANY} from '../Module';
 
 import resources, {Resource, IsRelatedTo} from './resources';
 
