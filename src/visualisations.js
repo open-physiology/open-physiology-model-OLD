@@ -300,18 +300,18 @@ export const CausalityArrow = M.RESOURCE({//////////////////////////////////////
 
 
 export const [PresentsModel] = M.RELATIONSHIP([
-	[Artefact,                 Typed          ],
-	[LyphCanvas,               Lyph           ],
-	[MaterialGlyph,            Material       ],
-	[LyphRectangle,            Lyph           ],
-	[CylindricalLyphRectangle, CylindricalLyph],
-	[BorderLine,               Border         ],
-	[CoalescenceRectangle,     Coalescence    ],
-	[NodeGlyph,                Node           ],
-	[ProcessEdge,              Process        ],
-	[MeasurableGlyph,          Measurable     ],
-	[CausalityArrow,           Causality      ]
-].map(([ArtefactClass, TypedClass]) => ({
+	[Artefact,                 Typed          .Type],
+	[LyphCanvas,               Lyph           .Type],
+	[MaterialGlyph,            Material       .Type],
+	[LyphRectangle,            Lyph           .Type],
+	[CylindricalLyphRectangle, CylindricalLyph.Type],
+	[BorderLine,               Border         .Type],
+	[CoalescenceRectangle,     Coalescence         ],
+	[NodeGlyph,                Node           .Type],
+	[ProcessEdge,              Process        .Type],
+	[MeasurableGlyph,          Measurable     .Type],
+	[CausalityArrow,           Causality      .Type]
+].map(([ArtefactClass, ModelClass]) => ({
 
 	name: 'PresentsModel',
 
@@ -319,7 +319,7 @@ export const [PresentsModel] = M.RELATIONSHIP([
 
 	singular: "presents model",
 
-	1: [ArtefactClass,   [1, 1   ], { anchors: true, key: 'model' }],
-	2: [TypedClass.Type, [0, MANY],                                ],
+	1: [ArtefactClass, [1, 1   ], { anchors: true, key: 'model' }],
+	2: [ModelClass,    [0, MANY],                                ],
 
 })));

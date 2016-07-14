@@ -2,9 +2,10 @@ module.exports = function (wallaby) {
   return {
 
     files: [
-      'src/**/*.js',
+      { pattern: 'src/**/*.js'         },
       { pattern: 'test/**/*.plugin.js' },
       { pattern: 'test/**/*.helper.js' },
+      // { pattern: 'node_modules/graph.js/dist/graph.es6.js', instrument }, // TODO: why does 'instrument: false' not work?
     ],
 
     tests: [

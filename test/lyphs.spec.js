@@ -50,7 +50,7 @@ describe("'lyphs' Module", () => {
 			} else if (cls.isRelationship) {
 				expect(new cls()).to.be.an.instanceof(cls, IsRelatedTo);
 			} else if (cls.isTypedResource) {
-				expect(new cls.Type()).to.be.an.instanceof    (cls.Type,     Type,     Resource);
+				expect(new cls.Type()    ).to.be.an.instanceof(cls.Type,     Type,     Resource);
 				expect(new cls.Template()).to.be.an.instanceof(cls.Template, Template, Resource);
 			}
 		}

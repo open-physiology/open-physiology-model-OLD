@@ -2,6 +2,11 @@
 // Schema Data Types                                                          //
 ////////////////////////////////////////////////////////////////////////////////
 
+import _    from 'lodash';
+import trim from 'lodash/trim';
+
+////////////////////////////////////////////////////////////////////////////////
+
 export const identifierRegex = `^[a-zA-Z_][a-zA-Z0-9_]*$`;
 
 export const qualitySchema = {
@@ -112,3 +117,20 @@ export function isObject(val) {
 export function isFunction(val) {
 	return val !== null && typeof val === 'function';
 }
+
+export const simpleSpaced = (str) => str.replace(/\s+/mg, ' ');
+
+export const humanMsg = (strings, ...values) => {
+	let result = strings[0];
+	for (let [val, str] of _(values).zip(strings.slice(1))) {
+		result += val + simpleSpaced(str);
+	}
+	return trim(result);
+};
+
+export const inspect = (obj, options = {}) => {
+	console.log(util.inspect(obj, Object.assign({
+		colors: true,
+		depth:  2
+	}, options)));
+};

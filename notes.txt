@@ -1,0 +1,110 @@
+    * Merging multiple class declarations of the same name
+    * Merge multiple class key declarations of the same name
+    * Template class has to do the cardinality thing
+    * spread fields across relationship supertype hierarchy
+    * Multiple relationships with the same 'name': create unique 'id'
+      - ids have to be unique, name does not have to be
+      - use name as default id
+      - (name is used as Neo4j type)
+    * Write quick documentation about relationship hierarchy
+    * Set 'covariant'
+
+* Use nodes to connect lyph borders, even for layers and segments
+  - Any or all of those borders may have its location set to a probability
+    distribution, but when connected with a node, it is assumed that all
+    borders coincide. So a constraint is: if there is more than one
+    location property at play (probability distribution or not), they
+    all have to be identical. Some of them may also be undefined, letting
+    the location of connected borders decide for them.
+
+* We have "multiple inheritance" for the classes we define here.
+  Both the 'extends' and 'extendedBy' keys can take a single class or
+  an array. An inheritance graph is generated from this.
+
+* Multiple relationship class declarations of the same name
+  can be declared, and this can indicate a widening of the type
+  by adding additional 1-->2 pairs. Together, they form a single
+  unified relationship class; initial grouping has no semantic
+  significance. Options will also be grouped together, and may not
+  be in conflict.
+  ---
+  If multiple declarations overlap, in the set of relationship pairs
+  they allow (implying that both the 1 and 2 classes are related),
+  these should be intelligently merged so that the constraints specified
+  in each individual declaration remain true.
+  - for identical type-pairs, use the intersection of cardinality ranges (error if intersection is empty)
+  - multiple keys are allowed and are all used (or maybe make that an error for now?)
+  - ...
+
+* [API, client lib] Relationships can be set by explicitly
+  creating a new relationship, but also by setting the corresponding
+  field of a resource object. Existing resources can be referenced
+  by href or id, or { href } or { id } object.
+  Also accepted would be full objects of the expected class.
+  If it does not contain id or href, that implies that the
+  resource is to be created on the fly.
+  ---
+  This 'setting the field' approach also goes when first creating
+  the main resource. If the field is absent, there are the following
+  possibilities:
+  - (min cardinality = 0) create no relationships and
+    * (max cardinality = 1) set field to `null`
+    * (max cardinality > 1) set field to `[]`
+  - (min cardinality > 0)
+    * (a `default` or `value` exists) create relationship, create other
+      resource on the fly with given default value, and set field to
+      that value
+    * (no `default` or `value` exists) error
+
+
+* a strict subtype of a resource may not use a strict superclass
+  (e.g., a specific LyphType which is not a CylindricalLyphType
+         may not be a subtype of a CylindricalLyphType)
+
+* CHECK for [min, max] that min <= max
+
+* if relationship superclass and subclass both maintain cardinality-ranges,
+  both ranges stay in effect, and one does not overwrite the other.
+  E.g., if relationship superclass AND subclass both have cardinality [1, 1]
+  for a covariant side, this indicates that the resource on the other side
+  MUST be of the more specific class, because the relationship subclass
+  enforces at least one, and that one immediately takes the care of the
+  superclass cardinality requirement, and occupies its full allowance.
+  A more general example: if the relationship class `rA` has cardinality [6, 8] for
+  resource class `A` and subclass `rB extends rA` has cardinality [3, 4]
+  for resource class `B extends A`, then a specific instance of `B` must have
+  at least 3 `rB` relationships and at least 6-4=2 `rA not rB` relationships.
+  If it has 8 `rA` relationships, then 3 or 4 of those must be of class `rB`.
+
+* CHECK that relationship flag (boolean) options are the same throughout the class hierarchy
+  of same-name relationships. Eventually, we might allow completely disjoint
+  same-name relationship classes (i.e., that have no resource-pairs in common)
+  to have different options, but that's not needed at the moment.
+* The `key` option is handled differently. If it is the same in a
+  relationship subclass as in the superclass, or if it is absent,
+  then nothing extra is done. But if it is different, an additional
+  field is created in the API which holds only the more specific
+  relationship references. Therefore it could be contained in the
+  array field of the superclass, or be the first point in the hierarchy
+  where a field is introduced altogether.
+  Siblings in the class hierarchy, which describe disjoint sets of
+  relationships, can have different keys while still having the same
+  relationship name.
+
+* In order to model multiple-class resources in Neo4j, while still
+  allowing queries to specify any valid class, we simply use multiple tags.
+* In order to similarly model multiple-class relationships in Neo4j,
+  we need to create a neo4j-relationship for each relevant class, because
+  Neo4j does not support multiple tags on relationships.
+  To allow intuitive Cypher queries, we will duplicate all superclass
+  properties in subclass relationships. Property updates will have to be
+  performed in the neo4j relationship that specifies the property,
+  and at the same time in every co-identified relationship of a more
+  specific class.
+  Note that the neo4j-rel-type for each neo4j-rel will be that of its own
+  level in our class hierarchy, but the `class` property will always be
+  the name of the most specific class the relationship has.
+
+
+
+  // TODO: base class Relationship

@@ -1,13 +1,13 @@
 import {qualitySchema} from './util';
-import module, {MANY}  from './typed-module';
+import Module, {MANY}  from './typed-module';
 
-import resources, {IsRelatedTo}                  from './resources';
-import typed,     {Typed}                        from './typed';
-import lyphs,     {Material, Lyph, Border, Node} from "./lyphs";
-import processes, {Process}                      from "./processes";
+import resources, {Resource, IsRelatedTo}  from './resources';
+import typed,     {Typed}                  from './typed';
+import lyphs,     {Material, Border, Node} from './lyphs';
+import processes, {Process}                from './processes';
 
 
-const M = new module([resources, typed, lyphs, processes]);
+const M = new Module([resources, typed, lyphs, processes]);
 export default M;
 
 
@@ -45,7 +45,20 @@ export const MeasuresMaterial = M.RELATIONSHIP({
 });
 
 
-export const [HasMeasurable] = M.RELATIONSHIP([Material, Border, Node, Process].map((Class) => ({
+export const MeasurableLocation = M.TYPED_RESOURCE({
+	
+	name: 'MeasurableLocation',
+	
+	abstract: true,
+	
+	extends: Resource,
+	
+	extendedBy: [Material, Border, Node, Process]
+	
+});
+
+
+export const HasMeasurable = M.RELATIONSHIP(((...Classes) => ({
 
 	name: 'HasMeasurable',
 
@@ -53,10 +66,10 @@ export const [HasMeasurable] = M.RELATIONSHIP([Material, Border, Node, Process].
 	
 	singular: "has measurable",
 
-	1: [Class.Type,          [0, MANY], { anchors: true, covariant: true, key: 'measurables' }],
-	2: [Measurable.Template, [1, 1   ],                                                       ],
+	1: [Classes,             [0, MANY], { anchors: true, sustains: true, covariant: true, key: 'measurables' }],
+	2: [Measurable.Template, [1, 1   ], {                                                 key: 'location'    }],
 
-})));
+}))([Material, Border, Node, Process].map(C=>C.Type)));
 
 export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Material, Border, Node, Process].map((Class) => ({
 

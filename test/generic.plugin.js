@@ -11,7 +11,11 @@ export default function propertiesPlugin(chai, utils) {
 
 	Assertion.addMethod('instanceof', function (...classes) {
 		for (let cls of classes) {
-			this.branch().is.instanceOf(cls);
+			this.assert(
+				this._obj instanceof cls
+				, 'expected #{this} to be an instance of ' + cls.name
+				, 'expected #{this} to not be an instance of ' + cls.name
+			);
 		}
 	});
 
