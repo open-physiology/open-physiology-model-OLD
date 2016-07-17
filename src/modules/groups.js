@@ -1,10 +1,10 @@
-import TypedModule, {MANY} from '../TypedModule';
+import TypedModule from '../TypedModule';
 
 import resources, {IsRelatedTo}     from './resources';
 import typed,     {Typed, Template} from './typed';
 
 
-const M = new TypedModule([resources, typed]);
+const M = new TypedModule('groups', [resources, typed]);
 export default M;
 
 
@@ -27,7 +27,7 @@ export const HasElement = M.RELATIONSHIP({
 	
 	singular: "has element",
 
-	1: [Group.Type, [0, MANY], { anchors: true, key: 'elements' }],
-	2: [Template,   [0, MANY],                                   ],
+	1: [Group.Type, '0..*', { anchors: true, key: 'elements' }],
+	2: [Template,   '0..*',                                   ],
 
 });

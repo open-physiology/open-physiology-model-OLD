@@ -107,4 +107,78 @@
 
 
 
-  // TODO: base class Relationship
+
+
+
+	// TODO: (MeasuresMaterial) CONSTRAINT: such a measurable must be
+	//     : in a place where such a material exists
+
+
+
+	// TODO: (CoalescesWith) CONSTRAINT: The outer layers of the lyphs in a coalescence
+	//     : must all be type-wise compatible, e.g., there must exist a
+	//     : LyphType that is a subtype of each of those outer layers.
+	//     : If that common subtype is actually one of them, that's fine.
+	//     : If not, a witness must have been provided in the form of
+	//     : a CoalescenceInterface
+
+
+	// TODO: (CoalescesThroughLayer) CONSTRAINT:
+	//     : The given interface lyph type of must be a subtype of
+	//     : each of the outer layers of the lyphs of the given coalescence.
+
+
+
+    // TODO: CONSTRAINT: the two nodes from a process may not both be
+    //     : on the same lyph border; it's confusing, and we don't want
+    //     : to allow a process to run 'along a border', which would
+    //     : require a BorderProcess relationship, and would also
+    //     : mess with the LyphProcess relationship constraint below
+
+
+	// TODO: (ConveysProcess) CONSTRAINT: source and target nodes have to be inside
+	//     : the same lyph (possibly indirectly, like on its borders)
+
+
+	// TODO: (ConveysProcess) either remove this relationship entirely,
+	//     : or implicitly create it when the nodes are present
+
+
+	// TODO: (HasChannel) CONSTRAINT: channels must have the same start / end node
+	//     : as this process, and they must have a strict subset
+
+
+	// TODO: (HasAsRoot) CONSTRAINT: tree.root is in (<Group>tree).elements
+
+
+    // TODO: all Inheritance relationships are almost identical, so
+    //     : create a shorthand for them in the original relationship,
+    //     : so they can be auto-generated (like: 'inheritable: true')
+
+	// TODO: (IsExternallyRelatedTo) figure out how external relationships will work, and perhaps modify this class
+
+	// TODO: (ContainsArtefact) CONSTRAINT: a relationship like this requires
+	//     : a corresponding parent/child relationship on the associated models
+    //     : This will probably be created when the ContainsArtefact thing is created.
+
+
+
+    // TODO?: there are many kinds of children/parents types of relationships;
+    //      : can we unify them somehow?
+
+	// TODO?: Formalize that a publication needs a
+	//      : pub.externals reference to, e.g., a pubmed?
+
+
+
+// Possible relationship subclassings:
+// - InheritsAllPartsFrom extends InheritsAllPatchesFrom
+// - InheritsAllPartsFrom extends InheritsAllLayersFrom
+// correspond (in reverse) to the subclassing between
+// HasPart, HasPatch and HasLayer. They would recognize that,
+// e.g., if I inherit all parts, I also inherit all patches and all layers.
+//     : this may be valid and useful, but it also introduces
+//     : multiple inheritance, relationship objects without explicit 1/2 pair,
+//     : and other complications, so for now we're not doing this
+//     : (2) Multiple inheritance is now actually part of the system,
+//     :     so maybe we'll put this back.

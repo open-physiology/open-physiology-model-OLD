@@ -1,5 +1,5 @@
-import {qualitySchema} from '../util';
-import TypedModule, {MANY}  from '../TypedModule';
+import {qualitySchema} from '../util/schemas';
+import TypedModule     from '../TypedModule';
 
 import resources, {Resource, IsRelatedTo}  from './resources';
 import typed,     {Typed}                  from './typed';
@@ -7,7 +7,7 @@ import lyphs,     {Material, Border, Node} from './lyphs';
 import processes, {Process}                from './processes';
 
 
-const M = new TypedModule([resources, typed, lyphs, processes]);
+const M = new TypedModule('measurables', [resources, typed, lyphs, processes]);
 export default M;
 
 
@@ -36,11 +36,8 @@ export const MeasuresMaterial = M.RELATIONSHIP({
 	
 	singular: "measures material",
 
-	1: [Measurable.Type, [0, MANY], { anchors: true, covariant: true, key: 'materials' }],
-	2: [Material.Type,   [0, MANY],                                                     ],
-
-	// TODO: CONSTRAINT: such a measurable must be
-	//     : in a place where such a material exists
+	1: [Measurable.Type, '0..*', { anchors: true, covariant: true, key: 'materials' }],
+	2: [Material.Type,   '0..*',                                                     ],
 
 });
 
@@ -66,8 +63,8 @@ export const HasMeasurable = M.RELATIONSHIP(((...Classes) => ({
 	
 	singular: "has measurable",
 
-	1: [Classes,             [0, MANY], { anchors: true, sustains: true, covariant: true, key: 'measurables' }],
-	2: [Measurable.Template, [1, 1   ], {                                                 key: 'location'    }],
+	1: [Classes,             '0..*', { anchors: true, sustains: true, covariant: true, key: 'measurables' }],
+	2: [Measurable.Template, '1..1', {                                                 key: 'location'    }],
 
 }))([Material, Border, Node, Process].map(C=>C.Type)));
 
@@ -79,8 +76,8 @@ export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Material, Border, No
 	
 	singular: "inherits all measurables from",
 
-	1: [Class.Type, [0, MANY], { anchors: true, covariant: true, key: 'inheritsMeasurables' }],
-	2: [Class.Type, [0, MANY],                                                               ],
+	1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'inheritsMeasurables' }],
+	2: [Class.Type, '0..*',                                                               ],
 
 	noCycles: true
 
@@ -107,8 +104,8 @@ export const [Causes] = M.RELATIONSHIP([{
 	
 	singular: "causes",
 
-	1: [Measurable.Template, [0, MANY], {                key: 'effects' }],
-	2: [Causality.Template,  [1, 1   ], { anchors: true, key: 'cause'   }],
+	1: [Measurable.Template, '0..*', {                key: 'effects' }],
+	2: [Causality.Template,  '1..1', { anchors: true, key: 'cause'   }],
 
 }, {
 
@@ -116,7 +113,7 @@ export const [Causes] = M.RELATIONSHIP([{
 
 	extends: IsRelatedTo,
 
-	1: [Causality.Template,  [1, 1   ], { anchors: true, key: 'effect' }],
-	2: [Measurable.Template, [0, MANY], {                key: 'causes' }],
+	1: [Causality.Template,  '1..1', { anchors: true, key: 'effect' }],
+	2: [Measurable.Template, '0..*', {                key: 'causes' }],
 
 }]);

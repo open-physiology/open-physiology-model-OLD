@@ -1,10 +1,10 @@
-import module, {MANY} from '../Module';
+import module from '../Module';
 
 import resources,   {Resource, IsRelatedTo} from './resources';
 import measurables, {Measurable}            from './measurables';
 
 
-const m = new module([resources, measurables]);
+const m = new module('research', [resources, measurables]);
 export default m;
 
 
@@ -31,8 +31,8 @@ export const InvolvesMeasurable = m.RELATIONSHIP({
 
 	singular: "involves measurable",
 
-	1: [Correlation,         [0, MANY], { anchors: true, key: 'measurables' }],
-	2: [Measurable.Template, [0, MANY],                                      ],
+	1: [Correlation,         '0..*', { anchors: true, key: 'measurables' }],
+	2: [Measurable.Template, '0..*',                                      ],
 
 });
 
@@ -57,8 +57,8 @@ export const EncompassesClinicalIndex = m.RELATIONSHIP({
 
 	singular: "encompasses clinical index",
 
-	1: [ClinicalIndex, [0, MANY], { anchors: true, key: 'children' }],
-	2: [ClinicalIndex, [0, 1   ], {                key: 'parent'   }],
+	1: [ClinicalIndex, '0..*', { anchors: true, key: 'children' }],
+	2: [ClinicalIndex, '0..1', {                key: 'parent'   }],
 
 	noCycles: true,
 
@@ -73,8 +73,8 @@ export const InvolvesClinicalIndex = m.RELATIONSHIP({
 
 	singular: "involves clinical index",
 
-	1: [Correlation,   [0, MANY], { anchors: true, key: 'clinicalIndices' }],
-	2: [ClinicalIndex, [0, MANY],                                          ],
+	1: [Correlation,   '0..*', { anchors: true, key: 'clinicalIndices' }],
+	2: [ClinicalIndex, '0..*',                                          ],
 
 });
 
@@ -87,9 +87,6 @@ export const Publication = m.RESOURCE({/////////////////////////////////////////
 
 	singular: "publication"
 
-	// TODO?: Formalize that a publication needs a
-	//      : pub.externals reference to, e.g., a pubmed?
-
 });//////////////////////////////////////////////////////////////////////////
 
 
@@ -101,7 +98,7 @@ export const InvolvesPublication = m.RELATIONSHIP({
 
 	singular: "involves publication",
 
-	1: [Correlation, [0, 1   ], { anchors: true, key: 'publication' }],
-	2: [Publication, [0, MANY],                                      ],
+	1: [Correlation, '0..1', { anchors: true, key: 'publication' }],
+	2: [Publication, '0..*',                                      ],
 
 });

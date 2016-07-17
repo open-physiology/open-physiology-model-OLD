@@ -1,18 +1,18 @@
-import TypedModule, {MANY} from '../TypedModule';
+import TypedModule          from '../TypedModule';
+import {arrayContainsValue} from '../util/misc';
 import {
 	enumArraySchema,
 	enumSchema,
-	arrayContainsValue,
 	rangeSchema,
 	oneOf,
 	distributionSchema
-} from '../util';
+} from '../util/schemas';
 
 import resources, {Resource, IsRelatedTo} from './resources';
 import typed,     {Typed}                 from './typed';
 
 
-const M = new TypedModule([resources, typed]);
+const M = new TypedModule('lyphs', [resources, typed]);
 export default M;
 
 
@@ -27,6 +27,7 @@ export const Material = M.TYPED_RESOURCE({//////////////////////////////////////
 });/////////////////////////////////////////////////////////////////////////////
 
 
+
 export const ContainsMaterial = M.RELATIONSHIP({
 
 	name: 'ContainsMaterial',
@@ -35,8 +36,8 @@ export const ContainsMaterial = M.RELATIONSHIP({
 
 	singular: "contains material",
 
-	1: [Material.Type, [0, MANY], { anchors: true, key: 'materials' }],
-	2: [Material.Type, [0, MANY]                                     ],
+	1: [Material.Type, '0..*', { anchors: true, key: 'materials' }],
+	2: [Material.Type, '0..*'                                     ],
 
 	noCycles: true,
 
@@ -50,8 +51,8 @@ export const InheritsAllMaterialsFrom = M.RELATIONSHIP({
 
 	extends: IsRelatedTo,
 
-	1: [Material.Type, [0, MANY], { anchors: true, key: 'materialProviders' }],
-	2: [Material.Type, [0, MANY]                                             ],
+	1: [Material.Type, '0..*', { anchors: true, key: 'materialProviders' }],
+	2: [Material.Type, '0..*'                                             ],
 
 	noCycles: true,
 
@@ -83,8 +84,8 @@ export const HasPart = M.RELATIONSHIP({
 
 	singular: "has part",
 
-	1: [Lyph.Type,     [0, MANY], { anchors: true, covariant: true, key: 'parts' }],
-	2: [Lyph.Template, [0, MANY],                                                 ],
+	1: [Lyph.Type,     '0..*', { anchors: true, covariant: true, key: 'parts' }],
+	2: [Lyph.Template, '0..*',                                                 ],
 
 	noCycles: true,
 
@@ -98,8 +99,8 @@ export const HasLayer = M.RELATIONSHIP({
 
 	singular: "has layer",
 
-	1: [Lyph.Type,     [0, MANY], { anchors: true, covariant: true, key: 'layers' }],
-	2: [Lyph.Template, [0, MANY]                                                   ],
+	1: [Lyph.Type,     '0..*', { anchors: true, covariant: true, key: 'layers' }],
+	2: [Lyph.Template, '0..*'                                                   ],
 
 	noCycles: true,
 
@@ -113,8 +114,8 @@ export const HasPatch = M.RELATIONSHIP({
 
 	singular: "has part",
 
-	1: [Lyph.Type,     [0, MANY], { anchors: true, covariant: true, key: 'patches' }],
-	2: [Lyph.Template, [0, MANY]                                                    ],
+	1: [Lyph.Type,     '0..*', { anchors: true, covariant: true, key: 'patches' }],
+	2: [Lyph.Template, '0..*'                                                    ],
 
 	properties: {
 		'patchMap': { type: 'string' }
@@ -133,8 +134,8 @@ export const InheritsAllPatchesFrom = M.RELATIONSHIP({
 
 	singular: "inherits all patches from",
 
-	1: [Lyph.Type, [0, MANY], { anchors: true, covariant: true, key: 'patchProviders' }],
-	2: [Lyph.Type, [0, MANY]                                                           ],
+	1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'patchProviders' }],
+	2: [Lyph.Type, '0..*'                                                           ],
 
 	noCycles: true,
 
@@ -149,8 +150,8 @@ export const InheritsAllLayersFrom = M.RELATIONSHIP({
 
 	singular: "inherits all layers from",
 
-	1: [Lyph.Type, [0, MANY], { anchors: true, covariant: true, key: 'layerProviders' }],
-	2: [Lyph.Type, [0, MANY]                                                           ],
+	1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'layerProviders' }],
+	2: [Lyph.Type, '0..*'                                                           ],
 
 	noCycles: true,
 
@@ -165,23 +166,12 @@ export const InheritsAllPartsFrom = M.RELATIONSHIP({
 
 	singular: "inherits all parts from",
 
-	1: [Lyph.Type, [0, MANY], { anchors: true, covariant: true, key: 'partProviders' }],
-	2: [Lyph.Type, [0, MANY]                                                          ],
+	1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'partProviders' }],
+	2: [Lyph.Type, '0..*'                                                          ],
 
 	noCycles: true,
 
 });
-
-
-// Possible relationship subclassings:
-// - InheritsAllPartsFrom extends InheritsAllPatchesFrom
-// - InheritsAllPartsFrom extends InheritsAllLayersFrom
-// correspond (in reverse) to the subclassing between
-// HasPart, HasPatch and HasLayer. They would recognize that,
-// e.g., if I inherit all parts, I also inherit all patches and all layers.
-// TODO: this may be valid and useful, but it also introduces
-//     : multiple inheritance, relationship objects without explicit 1/2 pair,
-//     : and other complications, so for now we're not doing this
 
 
 export const CylindricalLyph = M.TYPED_RESOURCE({///////////////////////////////
@@ -216,8 +206,8 @@ export const HasSegment = M.RELATIONSHIP({
 
 	singular: "has segment",
 
-	1: [CylindricalLyph.Type,     [0, MANY], { anchors: true, covariant: true, key: 'segments' }],
-	2: [CylindricalLyph.Template, [0, MANY]                                                     ],
+	1: [CylindricalLyph.Type,     '0..*', { anchors: true, covariant: true, key: 'segments' }],
+	2: [CylindricalLyph.Template, '0..*'                                                     ],
 
 	noCycles: true
 
@@ -232,8 +222,8 @@ export const InheritsAllSegmentsFrom = M.RELATIONSHIP({
 
 	singular: "inherits all segments from",
 
-	1: [CylindricalLyph.Type, [0, MANY], { anchors: true, covariant: true, key: 'segmentProviders' }],
-	2: [CylindricalLyph.Type, [0, MANY],                                                            ],
+	1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'segmentProviders' }],
+	2: [CylindricalLyph.Type, '0..*',                                                            ],
 
 	noCycles: true,
 
@@ -278,8 +268,8 @@ export const [
 
 	singular,
 
-	1: [LyphClass.Type,  [1, 1], { readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key }],
-	2: [Border.Template, [1, 1]                                                                                       ],
+	1: [LyphClass.Type,  '1..1', { readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key }],
+	2: [Border.Template, '1..1'                                                                                       ],
 
 	// The 'readonly' flag above implies that when a lyph is created,
 	// its borders are also automatically created.
@@ -331,15 +321,8 @@ export const CoalescesWith = M.RELATIONSHIP({
 
 	singular: "coalesces with",
 
-	1: [Lyph.Template, [2, MANY], {                key: 'coalescences' }],
-	2: [Coalescence,   [0, MANY], { anchors: true, key: 'lyphs'        }],
-
-	// TODO: CONSTRAINT: The outer layers of the lyphs in a coalescence
-	//     : must all be type-wise compatible, e.g., there must exist a
-	//     : LyphType that is a subtype of each of those outer layers.
-	//     : If that common subtype is actually one of them, that's fine.
-	//     : If not, a witness must have been provided in the form of
-	//     : a CoalescenceInterface
+	1: [Lyph.Template, '2..*', {                key: 'coalescences' }],
+	2: [Coalescence,   '0..*', { anchors: true, key: 'lyphs'        }],
 
 });
 
@@ -352,11 +335,8 @@ export const CoalescesThroughLayer = M.RELATIONSHIP({
 
 	singular: "coalesces through layer",
 
-	1: [Coalescence, [0, MANY], { anchors: true, key: 'interfaceLayers' }],
-	2: [Lyph.Type,   [0, MANY],                                          ],
-
-	// TODO: CONSTRAINT: The given interface lyph type must be a subtype of
-	//     : each of the outer layers of the lyphs of the given coalescence.
+	1: [Coalescence, '0..*', { anchors: true, key: 'interfaceLayers' }],
+	2: [Lyph.Type,   '0..*',                                          ],
 
 });
 
@@ -380,7 +360,7 @@ export const [HasNode] = M.RELATIONSHIP([Lyph, Border].map(Class => ({
 
 	extends: IsRelatedTo,
 
-	1: [Class.Type,    [0, MANY], { anchors: true, covariant: true, key: 'nodes' }],
-	2: [Node.Template, [0, MANY],                                                 ],
+	1: [Class.Type,    '0..*', { anchors: true, covariant: true, key: 'nodes' }],
+	2: [Node.Template, '0..*',                                                 ],
 
 })));

@@ -1,5 +1,5 @@
-import {distributionSchema} from "../util";
-import Module, {MANY} from '../Module';
+import {distributionSchema} from "../util/schemas";
+import Module               from '../Module';
 
 import resources, {Resource, IsRelatedTo} from './resources';
 
@@ -9,7 +9,7 @@ import resources, {Resource, IsRelatedTo} from './resources';
 ////////////////////////////////////////////////////////////////////////////////
 
 
-const M = new Module([resources]);
+const M = new Module('typed', [resources]);
 export default M;
 
 
@@ -32,8 +32,8 @@ export const IsSubtypeOf = M.RELATIONSHIP({
 	
 	singular: "is subtype of",
 
-	1: [Type, [0, MANY], {                key: 'subtypes'   }],
-	2: [Type, [0, MANY], { anchors: true, key: 'supertypes' }],
+	1: [Type, '0..*', {                key: 'subtypes'   }],
+	2: [Type, '0..*', { anchors: true, key: 'supertypes' }],
 
 	noCycles: true
 
@@ -69,8 +69,8 @@ export const HasCardinalityMultipliedByThatOf = M.RELATIONSHIP({
 	
 	singular: "has cardinality multiplied by that of",
 
-    1: [Template, [0, MANY], { anchors: true, key: 'cardinalityMultipliers' }],
-    2: [Template, [0, MANY],                                                 ],
+    1: [Template, '0..*', { anchors: true, key: 'cardinalityMultipliers' }],
+    2: [Template, '0..*',                                                 ],
 
 	noCycles: true
 
@@ -85,8 +85,8 @@ export const HasType = M.RELATIONSHIP({
 	
 	singular: "has type",
 
-	1: [Template, [1, 1   ], { anchors: true, key: 'type' }],
-	2: [Type,     [0, MANY],                               ]
+	1: [Template, '1..1', { anchors: true, key: 'type' }],
+	2: [Type,     '0..*',                               ]
 
 });
 

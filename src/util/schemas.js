@@ -1,12 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
-// Schema Data Types                                                          //
-////////////////////////////////////////////////////////////////////////////////
-
-import _    from 'lodash';
-import trim from 'lodash/trim';
-
-////////////////////////////////////////////////////////////////////////////////
-
 export const identifierRegex = `^[a-zA-Z_][a-zA-Z0-9_]*$`;
 
 export const qualitySchema = {
@@ -39,30 +30,33 @@ export const enumArraySchema = (...candidates) => ({
 	maxItems   : candidates.length
 });
 
-export const arrayContainsValue = (array, value) => array.includes(value);
-
 export const minusPlusSchema = enumSchema('minus', 'plus');
 
 export const innerOuterSchema = enumSchema('inner', 'outer');
 
 export const lyphDirectionSchema = enumSchema(...minusPlusSchema.enum, ...innerOuterSchema.enum);
 
-export const rationalNumberSchema = {
+export const oneOf = (...schemas) => ({ oneOf: schemas });
+
+export const rationalNumberSchema = oneOf({
 	type: 'object',
 	properties: {
 		'n': { type: 'integer', minimum: 0,                required: true }, // numerator
 		'd': { type: 'integer', minimum: 1,    default: 1, required: true }, // denominator
 		's': { type: 'integer', enum: [-1, 1], default: 1, required: true }  // sign
 	}
-};
+}, {
+	type: 'number'
+}, {
+	type: 'string'
+	// TODO: specify format (https://github.com/infusion/Fraction.js)
+});
 
 export const angleSchema = {
 	type: 'number',
 	minimum: 0,   exclusiveMinimum: false,
 	maximum: 360, exclusiveMaximum: true
 };
-
-export const oneOf = (...schemas) => ({ oneOf: schemas });
 
 export const rangeSchema = {
 	type: 'object',
@@ -101,36 +95,6 @@ export const distributionSchemaOr = (otherSchema) => ({
 	oneOf: [
 		boundedNormalDistributionSchema,
 		uniformDistributionSchema,
-	    otherSchema
+		otherSchema
 	]
 });
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Other useful stuff                                                         //
-////////////////////////////////////////////////////////////////////////////////
-
-export function isObject(val) {
-	return val !== null && typeof val === 'object';
-}
-
-export function isFunction(val) {
-	return val !== null && typeof val === 'function';
-}
-
-export const simpleSpaced = (str) => str.replace(/\s+/mg, ' ');
-
-export const humanMsg = (strings, ...values) => {
-	let result = strings[0];
-	for (let [val, str] of _(values).zip(strings.slice(1))) {
-		result += val + simpleSpaced(str);
-	}
-	return trim(result);
-};
-
-export const inspect = (obj, options = {}) => {
-	console.log(util.inspect(obj, Object.assign({
-		colors: true,
-		depth:  2
-	}, options)));
-};

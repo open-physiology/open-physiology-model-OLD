@@ -1,8 +1,8 @@
-import {idSchema, uriSchema, identifierSchema} from '../util';
-import Module, {MANY}                          from '../Module';
+import {idSchema, uriSchema, identifierSchema} from '../util/schemas';
+import Module                                  from '../Module';
 
 
-const M = new Module();
+const M = new Module('resources');
 export default M;
 
 
@@ -30,8 +30,8 @@ export const IsRelatedTo = M.RELATIONSHIP({
 
 	singular: "is related to",
 
-	1: [Resource, [0, MANY]],
-	2: [Resource, [0, MANY]],
+	1: [Resource, '0..*'],
+	2: [Resource, '0..*'],
 
 	properties: {
 		'id':    { ...idSchema,         readonly: true },
@@ -66,10 +66,8 @@ export const IsExternallyRelatedTo = M.RELATIONSHIP({
 
 	singular: "is externally related to",
 
-	1: [ExternalResource, [0, MANY]],
-	2: [ExternalResource, [0, MANY]],
-
-	// TODO: figure out how external relationships will work, and perhaps modify this class
+	1: [ExternalResource, '0..*'],
+	2: [ExternalResource, '0..*'],
 
 	properties: {
 		'type': { type: 'string', required: true }
@@ -86,7 +84,7 @@ export const CorrespondsTo = M.RELATIONSHIP({
 
 	singular: "corresponds to",
 
-	1: [Resource,         [0, MANY], { anchors: true, key: 'externals' }],
-	2: [ExternalResource, [0, MANY], {                key: 'locals'    }],
+	1: [Resource,         '0..*', { anchors: true, key: 'externals' }],
+	2: [ExternalResource, '0..*', {                key: 'locals'    }],
 
 });

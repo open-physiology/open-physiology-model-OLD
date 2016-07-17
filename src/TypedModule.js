@@ -1,60 +1,71 @@
-import Module, {MANY} from './Module';
-import {Typed}        from './modules/typed';
+import Module                       from './Module';
+import {Typed}                      from './modules/typed';
+import {humanMsg, mapOptionalArray} from './util/misc';
 
-export {MANY};
-
+/**
+ * Typed Modules allow to more easily create related
+ * Type, Template and HasType classes. For example,
+ * to create LyphType and LyphTemplate resources and
+ * their HasType relationship from one description.
+ **/
 export default class TypedModule extends Module {
 
 	TYPED_RESOURCE(config) {
-
-		const SuperClass = config.extends || Typed;
-
-		// TODO: Handle { Template: {}, Type: {}, typeCheck(type, value) {} }
-		//     : for each property
-
-		const NewType = this.RESOURCE({
-
-			name: `${config.name}Type`,
-
-			extends: SuperClass.Type,
-
-			instanceSingular: config.singular,
-			instancePlural:   config.plural || `${config.singular}s`,
-
-			singular: `${config.singular} type`
-
+		return mapOptionalArray(config, (conf) => {
+			
+			const SuperClass = conf.extends || Typed;
+			
+			// TODO: Handle { Template: {}, Type: {}, typeCheck(type, value) {} }
+			//     : for each property
+			
+			const NewType = this.RESOURCE({
+				
+				name: `${conf.name}Type`,
+				
+				extends: SuperClass.Type,
+				
+				instanceSingular: conf.singular,
+				instancePlural:   conf.plural || `${conf.singular}s`,
+				
+				singular: `${conf.singular} type`
+				
+			});
+			
+			const NewTemplate = this.RESOURCE({
+				
+				name: `${conf.name}Template`,
+				
+				extends: SuperClass.Template,
+				
+				instanceSingular: conf.singular,
+				instancePlural:   conf.plural || `${conf.singular}s`,
+				
+				singular: `${conf.singular} template`
+				
+			});
+			
+			const NewHasType = this.RELATIONSHIP({
+				
+				name: 'HasType',
+				
+				extends: SuperClass.HasType,
+				
+				singular: 'has type',
+				
+				1: [NewTemplate, '1..1', { anchors: true, key: 'type' }],
+				2: [NewType,     '0..*',                               ]
+				
+			});
+			
+			return {
+				...conf,
+				isTypedResource: true,
+				Type:            NewType,
+				Template:        NewTemplate,
+				HasType:         NewHasType
+			};
 		});
-		const NewTemplate = this.RESOURCE({
 
-			name: `${config.name}Template`,
-
-			extends: SuperClass.Template,
-
-			instanceSingular: config.singular,
-			instancePlural:   config.plural || `${config.singular}s`,
-
-			singular: `${config.singular} template`
-
-		});
-		const NewHasType = this.RELATIONSHIP({
-
-			name: 'HasType',
-
-			extends: SuperClass.HasType,
-
-			singular: 'has type',
-
-			1: [NewTemplate, [1, 1   ], { anchors: true, key: 'type' }], // TODO: covariance?
-			2: [NewType,     [0, MANY],                               ]
-
-		});
-		return {
-			...config,
-			isTypedResource: true,
-			Type:            NewType,
-			Template:        NewTemplate,
-			HasType:         NewHasType
-		};
 	}
 
 }

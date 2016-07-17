@@ -1,12 +1,13 @@
-import TypedModule, {MANY}                               from '../TypedModule';
-import {enumArraySchema, enumSchema, arrayContainsValue} from '../util';
+import TypedModule                   from '../TypedModule';
+import {arrayContainsValue}          from '../util/misc';
+import {enumArraySchema, enumSchema} from '../util/schemas';
 
 import resources, {IsRelatedTo}          from './resources';
 import typed,     {Typed}                from './typed';
 import lyphs,     {Material, Lyph, Node} from './lyphs';
 
 
-const M = new TypedModule([resources, typed, lyphs]);
+const M = new TypedModule('processes', [resources, typed, lyphs]);
 export default M;
 
 
@@ -41,8 +42,8 @@ export const [FlowsTo] = M.RELATIONSHIP([{
 
 	singular: "flows to",
 
-	1: [Node.Template,    [0, MANY], {                key: 'outgoingProcesses' }],
-	2: [Process.Template, [1, 1   ], { anchors: true, key: 'source'            }],
+	1: [Node.Template,    '0..*', {                key: 'outgoingProcesses' }],
+	2: [Process.Template, '1..1', { anchors: true, key: 'source'            }],
 
 }, {
 
@@ -52,17 +53,10 @@ export const [FlowsTo] = M.RELATIONSHIP([{
 
 	singular: "flows to",
 
-	1: [Process.Template, [1, 1   ], { anchors: true, key: 'target'            }],
-	2: [Node.Template,    [0, MANY], {                key: 'incomingProcesses' }],
+	1: [Process.Template, '1..1', { anchors: true, key: 'target'            }],
+	2: [Node.Template,    '0..*', {                key: 'incomingProcesses' }],
 
 }]);
-
-
-// TODO: CONSTRAINT: the two nodes from a process may not both be
-//     : on the same lyph border; it's confusing, and we don't want
-//     : to allow a process to run 'along a border', which would
-//     : require a BorderProcess relationship, and would also
-//     : mess with the LyphProcess relationship constraint below
 
 
 export const ConveysProcess = M.RELATIONSHIP({
@@ -73,14 +67,8 @@ export const ConveysProcess = M.RELATIONSHIP({
 
 	singular: "conveys process",
 
-	1: [Lyph.Type,        [0, MANY], { anchors: true, covariant: true, key: 'processes'     }],
-	2: [Process.Template, [0, 1   ], {                                 key: 'conveyingLyph' }],
-
-	// TODO: CONSTRAINT: source and target nodes have to be inside
-	//     : the same lyph (possibly indirectly, like on its borders)
-
-	// TODO: either remove this relationship entirely,
-	//     : or implicitly create it when the nodes are present
+	1: [Lyph.Type,        '0..*', { anchors: true, covariant: true, key: 'processes'     }],
+	2: [Process.Template, '0..1', {                                 key: 'conveyingLyph' }],
 
 });
 
@@ -93,8 +81,8 @@ export const TransportsMaterial = M.RELATIONSHIP({
 
 	singular: "transports material",
 
-	1: [Process.Type,  [0, MANY], { anchors: true, covariant: true, key: 'materials' }],
-	2: [Material.Type, [0, MANY],                                                     ],
+	1: [Process.Type,  '0..*', { anchors: true, covariant: true, key: 'materials' }],
+	2: [Material.Type, '0..*',                                                     ],
 
 });
 
@@ -106,8 +94,8 @@ export const InheritsAllMaterialsFrom = M.RELATIONSHIP({
 
 	singular: "inherits all materials from",
 
-	1: [Process.Type, [0, MANY], { anchors: true, covariant: true, key: 'materialProviders' }],
-	2: [Process.Type, [0, MANY],                                                             ],
+	1: [Process.Type, '0..*', { anchors: true, covariant: true, key: 'materialProviders' }],
+	2: [Process.Type, '0..*',                                                             ],
 
 });
 
@@ -120,8 +108,8 @@ export const HasSegment = M.RELATIONSHIP({
 
 	singular: "has segment",
 
-	1: [Process.Type,     [0, MANY], { anchors: true, covariant: true, key: 'segments' }],
-	2: [Process.Template, [0, MANY],                                                    ],
+	1: [Process.Type,     '0..*', { anchors: true, covariant: true, key: 'segments' }],
+	2: [Process.Template, '0..*',                                                    ],
 
 	// TODO: CONSTRAINT: segments are connected in a straight line
 	//     : through nodes, starting and ending with the same nodes
@@ -138,8 +126,8 @@ export const InheritsAllSegmentsFrom = M.RELATIONSHIP({
 
 	singular: "inherits all segments from",
 
-	1: [Process.Type, [0, MANY], { anchors: true, covariant: true, key: 'segmentProviders' }],
-	2: [Process.Type, [0, MANY],                                                            ],
+	1: [Process.Type, '0..*', { anchors: true, covariant: true, key: 'segmentProviders' }],
+	2: [Process.Type, '0..*',                                                            ],
 
 });
 
@@ -152,11 +140,8 @@ export const [HasChannel] = M.RELATIONSHIP([Process, Node].map(Class => ({
 
 	singular: "has channel",
 
-	1: [Class.Type,     [0, MANY], { anchors: true, covariant: true, key: 'channels' }],
-	2: [Class.Template, [0, MANY],                                                    ],
-
-	// TODO: CONSTRAINT: channels must have the same start / end node
-	//     : as this process, and they must have a strict subset
+	1: [Class.Type,     '0..*', { anchors: true, covariant: true, key: 'channels' }],
+	2: [Class.Template, '0..*',                                                    ],
 
 })));
 
@@ -169,15 +154,7 @@ export const [InheritsAllChannelsFrom] = M.RELATIONSHIP([Process, Node].map(Clas
 
 	singular: "inherits all channels from",
 
-	1: [Class.Type, [0, MANY], { anchors: true, covariant: true, key: 'channelProviders' }],
-	2: [Class.Type, [0, MANY],                                                            ],
+	1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'channelProviders' }],
+	2: [Class.Type, '0..*',                                                            ],
 
 })));
-
-
-// TODO: all Inheritance relationships are almost identical, so
-//     : create a shorthand for them in the original relationship,
-//     : so they can be auto-generated (like: 'inheritable: true')
-
-// TODO?: there are many kinds of children/parents types of relationships;
-//      : can we unify them somehow?

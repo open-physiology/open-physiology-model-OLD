@@ -27,7 +27,7 @@ const M = new Module([
 
 let output = "";
 const o = (...t) => { for (let t1 of t) { output += t1 } };
-for (let [cls] of M.classes) {
+for (let [,cls] of M.classes) {
 	if (cls.isResource) {
 		let entries = [];
 		entries.largestKeySize = 0;
@@ -56,7 +56,7 @@ for (let [cls] of M.classes) {
 			
 			let cardinality = (desc) => (desc.cardinality.min === desc.cardinality.max
 				? `   ${desc.cardinality.min}`
-				: `${desc.cardinality.min}..${desc.cardinality.max === Infinity ? '∞' : desc.cardinality.max}`);
+				: `${desc.cardinality.min}..${desc.cardinality.max === Infinity ? '*' : desc.cardinality.max}`);
 			let arrow = (desc === desc.relationship[1] ? '-->' : '<--');
 			
 			entry.desc = `(${cardinality(desc.other)})${arrow}(${cardinality(desc)})  ${desc.class.name}`;
@@ -91,7 +91,7 @@ for (let [cls] of M.classes) {
 		o('========================================\n');
 		o(cls.name);
 		if (cls.abstract) { o(' [abstract]') }
-		let aClassesIn = [...M.classes.verticesTo(cls)].map(pair=>pair[1]);
+		let aClassesIn = [...M.classes.verticesTo(cls.name)].map(pair=>pair[1]);
 		if (aClassesIn.length > 0) { o(` [extends ${aClassesIn.map(c=>c.name).join(', ')}]`) }
 		o('\n');
 		o('----------------------------------------\n');
