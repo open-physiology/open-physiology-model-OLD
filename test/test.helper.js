@@ -10,6 +10,6 @@ chai.use(propertiesPlugin);
 chai.use(resourceCheckingPlugin);
 chai.use(matchPatternPlugin);
 
-export {describe, it} from 'mocha';
+export {describe, it, xdescribe, xit} from 'mocha';
 export const expect = chai.expect;
-export const _ = matchPatternPlugin.getLodashModule();
+export const _      = matchPatternPlugin.getLodashModule();

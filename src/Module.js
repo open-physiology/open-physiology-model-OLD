@@ -1,6 +1,10 @@
-import isArray  from 'lodash/isArray';
-import defaults from 'lodash/defaults';
-import Graph    from 'graph.js/dist/graph.js';
+import isArray     from 'lodash/isArray';
+import isInteger   from 'lodash/isInteger';
+import defaults    from 'lodash/defaults';
+import isUndefined from 'lodash/isUndefined';
+import isEqual     from 'lodash/isEqual';
+import assert      from 'power-assert';
+import Graph       from 'graph.js/dist/graph.js';
 
 import {humanMsg, mapOptionalArray, parseCardinality, arrayify} from './util/misc';
 
@@ -56,10 +60,12 @@ export default class Module {
 		return mapOptionalArray(config, (conf) => {
 			conf.isResource = true;
 			this.basicNormalization                  (conf);
-			let constructor = this.createConstructor (conf);
-			// jsonSchemaConfig                      (constructor); // TODO
+			let constructor = Entity.createClass     (conf);
 			constructor = this.mergeSameNameResources(constructor);
 			this.register                            (constructor);
+			this.mergeSuperclassProperties           (constructor);
+			// jsonSchemaConfig                      (constructor); // TODO
+			Entity.createGetterSetters               (constructor);
 			return constructor;
 		});
 	}
@@ -68,45 +74,56 @@ export default class Module {
 		return mapOptionalArray(config, (conf) => {
 			conf.isRelationship = true;
 			this.basicNormalization                      (conf);
-			let constructor = this.createConstructor     (conf);
-			// jsonSchemaConfig                          (constructor); // TODO
-			this.relationshipSidesConfig                 (constructor);
+			let constructor = Entity.createClass         (conf);
+			this.normalizeRelationshipSides              (constructor);
 			constructor = this.mergeSameNameRelationships(constructor);
 			this.register                                (constructor);
+			this.mergeSuperclassProperties               (constructor);
+			// jsonSchemaConfig                          (constructor); // TODO
+			Entity.createGetterSetters                   (constructor);
 			return constructor;
 		});
 	}
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	basicNormalization(config) {
-		/* defaulting certain properties that may be missing */
-		defaults(config, {
-			properties:        {},
-			patternProperties: {},
-			extends:           [],
-			extendedBy:        [],
-		});
-		
+	basicNormalization(config) : void {
 		/* normalizing grammar stuff */
 		config.plural = config.plural || `${config.singular}s`;
 		
-		/* normalizing sub/superclass data to sets */
+		
+		if (config.isResource) {
+			defaults(config, {
+				relationships: {}
+			});
+		}
+		
+		/* normalizing extends/extendedBy */
 		for (let key of ['extends', 'extendedBy']) {
-			config[key] = new Set(
-				arrayify(config[key])
-			);
+			defaults(config, { [key]: [] });
+			config[key] = new Set( arrayify(config[key]) );
+		}
+		
+		/* normalize properties */
+		for (let [pKey, kKey] of [
+			['properties',        'key'    ],
+			['patternProperties', 'pattern']
+		]) {
+			defaults(config, { [pKey]: {} });
+			for (let [k, desc] of Object.entries(config[pKey])) {
+				desc[kKey] = k;
+			}
 		}
 		
 		/* sanity checks */
 		for (let key of ['extends', 'extendedBy']) {
 			for (let other of config[key]) {
-				console.assert(this.classes.hasVertex(other.name), humanMsg`
+				assert(this.classes.hasVertex(other.name), humanMsg`
 					The '${config.name}' class is being processed
 					by module '${this.name}', but it extends a '${other.name}'
-					class that has not yet been processed.
+					class that has not yet been processed. How can that be?
 				`);
-				console.assert(this.classes.vertexValue(other.name) === other, humanMsg`
+				assert(this.classes.vertexValue(other.name) === other, humanMsg`
 					The '${config.name}' class is being processed
 					by module '${this.name}', but it extends an '${other.name}'
 					class that is in conflict with another class known
@@ -116,53 +133,49 @@ export default class Module {
 		}
 	}
 	
-	createConstructor(config) {
-		
-		let NewClass = Entity.createClass(config);
-		
-		/* store meta-data */
-		NewClass.module = this;
-		
-		return NewClass;
-	}
-	
-	relationshipSidesConfig(cls) {
+	normalizeRelationshipSides(cls) : void {
 		// - 1 is left-hand side, and
 		// - 2 is right-hand side of the relationship;
 		// these can be given directly, or multiple
 		// can be grouped in a 'domains' object
 		
-		console.assert(!cls[1] & !cls[2] || !cls.domains, humanMsg`
+		assert(!cls[1] & !cls[2] || !cls.domains, humanMsg`
 			A relationship can specify [1] and [2] domains directly,
 			or group multiple pairs in a 'domains' object, but not both.
 		`);
 		
-		cls.domains = (cls.domains || [{
+		cls.domains = (cls.domains || (!(cls[1] && cls[2]) ? [] : [{
 			[1]: cls[1],
 			[2]: cls[2]
-		}]).map((domainPair) => {
+		}])).map((domainPair) => {
 			let newDomain = {
-				[1]: { key: `-[:${cls.name}]->` },
-				[2]: { key: `<-[:${cls.name}]-` }
+				[1]: { key: `-->${cls.name}` },
+				[2]: { key: `<--${cls.name}` }
 			};
 			for (let side of [1, 2]) {
-				console.assert(isArray(domainPair[side]), humanMsg`
+				assert(isArray(domainPair[side]), humanMsg`
 					Relationship sides 1, 2 need to be arrays.
 				`);
 				let thisSide  = newDomain[side  ];
 				let otherSide = newDomain[3-side]; // {1↦2, 2↦1}
 				Object.assign(thisSide, {
-					other: otherSide,
-					relationship: cls,
-					class: domainPair[side][0],
-					cardinality: parseCardinality(domainPair[side][1]),
-					options: domainPair[side][2] || {},
-					properties: cls.properties
+					side:              side,
+					other:             otherSide,
+					relationshipClass: cls,
+					class:             domainPair[side][0],
+					cardinality:       parseCardinality(domainPair[side][1]),
+					options:           domainPair[side][2] || {},
+					properties:        cls.properties
 				});
 				
 				/* put back-reference in classes */
-				if (!thisSide.class.relationships) { thisSide.class.relationships = {} }
 				thisSide.class.relationships[thisSide.key] = thisSide;
+				
+				Entity.createGetterSetters(thisSide.class);
+				
+				// TODO: this 'side' should somehow be mixed from
+				//     : all relevant domains; not just be the 'last'
+				//     : to be assigned in this domains.map()
 			}
 			return newDomain;
 		});
@@ -170,23 +183,10 @@ export default class Module {
 		delete cls[2];
 	}
 	
-	mergeSameNameResources(cls) {
-		if (!this.classes.hasVertex(cls.name)) { return cls }
-		console.log(this.name, cls.name);
-		// TODO: fold into each other, maybe raise some errors
-		return this.classes.vertexValue(cls.name);
-	}
-	
-	mergeSameNameRelationships(cls) {
-		if (!this.classes.hasVertex(cls.name)) { return cls }
-		// TODO: fold into each other, maybe raise some errors
-		return this.classes.vertexValue(cls.name);
-	}
-	
-	register(cls) {
+	register(cls) : void {
 		/* register the class in this module */
 		this.classes.ensureVertex(cls.name, cls);
-		/*  */
+		/* add subclassing edges and cross-register sub/superclasses */
 		for (let extendee of cls.extends || []) {
 			this.classes.addEdge(extendee.name, cls.name);
 			extendee.extendedBy.add(cls);
@@ -195,6 +195,59 @@ export default class Module {
 			this.classes.addEdge(cls.name, extender.name);
 			extender.extends.add(cls);
 		}
+	}
+	
+	mergeSuperclassProperties(cls) : void {
+		for (let [,supercls] of this.classes.verticesTo(cls.name)) {
+			for (let [key, superDesc] of Object.entries(supercls.properties)) {
+				let subDesc = cls.properties[key];
+				if (isUndefined(subDesc)) {
+					cls.properties[key] = superDesc;
+				} else if (isEqual(subDesc, superDesc)) {
+					continue;
+				} else {
+					
+					assert(isUndefined(subDesc.type) || subDesc.type === superDesc.type);
+					
+					// We're assuming that the only kind of non-trivial merging
+					// right now is to give a property a specific constant value
+					// in the subclass, which has to be checked in the superclass.
+					// TODO: use actual json-schema validation to validate value
+					let singleSuperDesc;
+					if (isUndefined(superDesc.type) && superDesc.oneOf) {
+						for (let disjunct of superDesc.oneOf) {
+							if (typeof subDesc.value === disjunct.type                  ||
+							    isInteger(subDesc.value) && disjunct.type === 'integer' ||
+							    isEqual(subDesc.value, disjunct.value)
+							) {
+								singleSuperDesc = { ...superDesc, ...disjunct };
+								delete singleSuperDesc.oneOf;
+								delete singleSuperDesc.default;
+							}
+						}
+					} else {
+						singleSuperDesc = { ...superDesc };
+					}
+					
+					assert(singleSuperDesc);
+					
+					Object.assign(subDesc, singleSuperDesc);
+					
+				}
+			}
+		}
+	}
+	
+	mergeSameNameResources(cls) : Class<Entity> {
+		if (!this.classes.hasVertex(cls.name)) { return cls }
+		// TODO: fold into each other, maybe raise some errors
+		return this.classes.vertexValue(cls.name);
+	}
+	
+	mergeSameNameRelationships(cls) : Class<Entity> {
+		if (!this.classes.hasVertex(cls.name)) { return cls }
+		// TODO: fold into each other, maybe raise some errors
+		return this.classes.vertexValue(cls.name);
 	}
 	
 }

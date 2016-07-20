@@ -7,6 +7,9 @@ import trim        from 'lodash/trim';
 import isString    from 'lodash/isString';
 import isArray     from 'lodash/isArray';
 import isUndefined from 'lodash/isUndefined';
+import isNumber    from 'lodash/isNumber';
+import isObject    from 'lodash/isObject';
+import assert     from 'power-assert';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -43,12 +46,12 @@ export function arrayify(val) {
 }
 
 export function parseCardinality(val) {
-	console.assert(isString(val), `
+	assert(isString(val), `
 		A cardinality range has to be a string,
 		but a value ${JSON.stringify(val)} was given.
 	`);
 	let match = val.match(/^(\d+)\.\.(\d+|\*)$/);
-	console.assert(match && match.length === 3, `
+	assert(match && match.length === 3, `
 		A cardinality range has to be in the form "min..max",
 		but a value ${JSON.stringify(val)} was given.
 	`);
@@ -58,3 +61,12 @@ export function parseCardinality(val) {
 	min = parseInt(min, 10);
 	return {min, max};
 }
+
+export function normalizeToRange(val) {
+	if (isNumber(val))       { val = {min: val, max: val} }
+	else if (!isObject(val)) { val = {}                   }
+	if (!isNumber(val.min)) { val.min = -Infinity }
+	if (!isNumber(val.max)) { val.max =  Infinity }
+	return val;
+}
+

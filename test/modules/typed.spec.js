@@ -1,9 +1,9 @@
-import {describe, it, expect} from '../test.helper';
+import {xdescribe, describe, it, expect} from '../test.helper';
 
 import * as exports from '../../src/modules/typed';
 const { default: module, ...exportedClasses } = exports;
 
-describe("'typed' Module", () => {
+xdescribe("'typed' Module", () => {
 
 	it("exports the expected classes", () => {
 

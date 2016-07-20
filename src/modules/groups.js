@@ -17,6 +17,8 @@ export const Group = M.TYPED_RESOURCE({/////////////////////////////////////////
 	singular: "group"
 
 });/////////////////////////////////////////////////////////////////////////////
+export const GroupType     = Group.Type;
+export const GroupTemplate = Group.Template;
 
 
 export const HasElement = M.RELATIONSHIP({

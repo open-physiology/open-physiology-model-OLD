@@ -1,4 +1,4 @@
-import {describe, it, expect} from '../test.helper';
+import {xdescribe, describe, it, expect} from '../test.helper';
 
 import {Resource, IsRelatedTo} from '../../src/modules/resources';
 import {Type, Template}        from '../../src/modules/typed';
@@ -6,7 +6,7 @@ import {Type, Template}        from '../../src/modules/typed';
 import * as exports from '../../src/modules/lyphs';
 const { default: module, ...exportedClasses } = exports;
 
-describe("'lyphs' Module", () => {
+xdescribe("'lyphs' Module", () => {
 
 	it("exports the expected classes", () => {
 

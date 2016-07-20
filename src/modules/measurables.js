@@ -26,6 +26,8 @@ export const Measurable = M.TYPED_RESOURCE({////////////////////////////////////
 	}
 
 });//////////////////////////////////////////////////////////////////////////
+export const MeasurableType     = Measurable.Type;
+export const MeasurableTemplate = Measurable.Template;
 
 
 export const MeasuresMaterial = M.RELATIONSHIP({
@@ -55,7 +57,7 @@ export const MeasurableLocation = M.TYPED_RESOURCE({
 });
 
 
-export const HasMeasurable = M.RELATIONSHIP(((...Classes) => ({
+export const HasMeasurable = M.RELATIONSHIP({
 
 	name: 'HasMeasurable',
 
@@ -63,10 +65,10 @@ export const HasMeasurable = M.RELATIONSHIP(((...Classes) => ({
 	
 	singular: "has measurable",
 
-	1: [Classes,             '0..*', { anchors: true, sustains: true, covariant: true, key: 'measurables' }],
-	2: [Measurable.Template, '1..1', {                                                 key: 'location'    }],
+	1: [MeasurableLocation.Type, '0..*', { anchors: true, sustains: true, covariant: true, key: 'measurables' }],
+	2: [Measurable.Template,     '1..1', {                                                 key: 'location'    }],
 
-}))([Material, Border, Node, Process].map(C=>C.Type)));
+});
 
 export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Material, Border, Node, Process].map((Class) => ({
 
@@ -94,6 +96,8 @@ export const Causality = M.TYPED_RESOURCE({/////////////////////////////////////
 	plural:   "causalities",
 
 });//////////////////////////////////////////////////////////////////////////
+export const CausalityType     = Causality.Type;
+export const CausalityTemplate = Causality.Template;
 
 
 export const [Causes] = M.RELATIONSHIP([{

@@ -39,18 +39,14 @@ export const lyphDirectionSchema = enumSchema(...minusPlusSchema.enum, ...innerO
 export const oneOf = (...schemas) => ({ oneOf: schemas });
 
 export const rationalNumberSchema = oneOf({
+	// TODO: specify format (https://github.com/infusion/Fraction.js)
 	type: 'object',
 	properties: {
 		'n': { type: 'integer', minimum: 0,                required: true }, // numerator
 		'd': { type: 'integer', minimum: 1,    default: 1, required: true }, // denominator
 		's': { type: 'integer', enum: [-1, 1], default: 1, required: true }  // sign
 	}
-}, {
-	type: 'number'
-}, {
-	type: 'string'
-	// TODO: specify format (https://github.com/infusion/Fraction.js)
-});
+}, { type: 'number' }, { type: 'string' });
 
 export const angleSchema = {
 	type: 'number',

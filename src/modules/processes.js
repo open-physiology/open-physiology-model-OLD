@@ -32,6 +32,8 @@ export const Process = M.TYPED_RESOURCE({///////////////////////////////////////
 	}
 
 });/////////////////////////////////////////////////////////////////////////////
+export const ProcessType     = Process.Type;
+export const ProcessTemplate = Process.Template;
 
 
 export const [FlowsTo] = M.RELATIONSHIP([{

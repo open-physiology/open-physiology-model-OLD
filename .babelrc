@@ -3,6 +3,22 @@
   "plugins": [
     "babel-plugin-transform-object-rest-spread",
     "babel-plugin-transform-class-properties",
-    "babel-plugin-transform-es2015-instanceof"
-  ]
+    "babel-plugin-transform-es2015-instanceof",
+    "babel-plugin-transform-async-to-generator",
+    "babel-plugin-syntax-flow",
+    "babel-plugin-transform-flow-strip-types"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "babel-plugin-typecheck",
+        "babel-plugin-espower"
+      ]
+    },
+    "production": {
+      "plugins": [
+        "babel-plugin-unassert"
+      ]
+    }
+  }
 }

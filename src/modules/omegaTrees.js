@@ -18,6 +18,8 @@ export const OmegaTree = M.TYPED_RESOURCE({/////////////////////////////////////
 	singular: "omega tree",
 
 });//////////////////////////////////////////////////////////////////////////
+export const OmegaTreeType     = OmegaTree.Type;
+export const OmegaTreeTemplate = OmegaTree.Template;
 
 
 export const HasAsRoot = M.RELATIONSHIP({

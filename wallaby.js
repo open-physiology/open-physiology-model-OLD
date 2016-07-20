@@ -5,7 +5,6 @@ module.exports = function (wallaby) {
       { pattern: 'src/**/*.js'         },
       { pattern: 'test/**/*.plugin.js' },
       { pattern: 'test/**/*.helper.js' },
-      // { pattern: 'node_modules/graph.js/dist/graph.es6.js', instrument }, // TODO: why does 'instrument: false' not work?
     ],
 
     tests: [
@@ -27,8 +26,10 @@ module.exports = function (wallaby) {
         modulePrototype.require = function (filePath) {
           var exports = modulePrototype._originalRequire.call(this, filePath);
           if (filePath === 'mocha') {
-            exports.describe = global.describe;
-            exports.it = global.it;
+            exports.describe  = global.describe;
+            exports.it        = global.it;
+            exports.xdescribe = global.xdescribe;
+            exports.xit       = global.xit;
           }
           return exports;
         };
