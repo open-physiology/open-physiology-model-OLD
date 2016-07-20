@@ -63,7 +63,6 @@ export default class Entity {
 					return this._sides[side];
 				},
 				set(newObj) {
-					console.log('?');
 					// TODO: validate newObj as fitting this relationship class
 					let old = this._sides[side];
 					let clsSide = cls.domains[0][side]; // TODO: adapt to multiple domains
@@ -140,7 +139,11 @@ export default class Entity {
 						entries() { return set.entries() },
 						keys   () { return set.keys   () },
 						values () { return set.values () },
-						[Symbol.iterator]() { return this.values() }
+						forEach(fn) {
+							for (let x of this) { fn(x, x, this) }
+						},
+						[Symbol.iterator]() { return this.values() },
+						[Symbol.toStringTag]: 'set'
 					};
 					if (isString(desc.options.key)) {
 						let shortcutInterface = this._relationshipShortcutInterfaces[desc.options.key] = {
@@ -188,7 +191,11 @@ export default class Entity {
 									yield rel[desc.other.side];
 								}
 							},
-							[Symbol.iterator]() { return this.values() }
+							forEach(fn) {
+								for (let x of this) { fn(x, x, this) }
+							},
+							[Symbol.iterator]() { return this.values() },
+							[Symbol.toStringTag]: 'set'
 						};
 					}
 				}
@@ -222,27 +229,15 @@ export default class Entity {
 	static new(
 		values  : Object = {},
 	    options : Object = {}
-	): this {
-		
-		// if (this.name === 'ContainsMaterial') {
-		//
-		// }
-		// console.log('(1)');
-		//
-		// let x = { ...values, href: null, id: null };
-		// console.log(values[1]);
-		// console.log(x[1]);
-		
-		
-		
-		let result = new this(
-			{ ...values, href: null, id: null, class: this.name },
-			{ ...options, new: true }
-		);
-		
-		// console.log('(2)');
-		
-		return result;
+	): Promise<this> {
+		return new Promise((resolve, reject) => {
+			setTimeout(() => {
+				resolve(new this(
+					{ ...values, href: null, id: null, class: this.name },
+					{ ...options, new: true }
+				));
+			});
+		});
 	}
 	
 	static get(
@@ -294,11 +289,7 @@ export default class Entity {
 		values:  Object = {},
 		options: Object = {}
 	) {
-		
-		if (this.constructor.name === 'ContainsMaterial') {
-			console.log('---', this.constructor.name, values, options);
-		}
-		
+		/* properties (of resources and relationships) */
 		for (let key of Object.keys(this.constructor.properties)) {
 			if (key in values) {
 				// TODO: CHECK CONSTRAINT: given property value conforms to JSON schema
@@ -311,6 +302,8 @@ export default class Entity {
 				//     : Otherwise: REGISTER CONSTRAINT VIOLATION: required property not present
 			}
 		}
+		
+		/* relationships (of resources) */
 		if (this.constructor.isResource) {
 			for (let key of Object.keys(this.constructor.relationships)) {
 				if (key in values) {
@@ -319,6 +312,8 @@ export default class Entity {
 				}
 			}
 		}
+		
+		/* sides (of relationships) */
 		if (this.constructor.isRelationship) {
 			for (let key of [1, 2]) {
 				if (key in values) {
@@ -327,10 +322,8 @@ export default class Entity {
 				}
 			}
 		}
-		// if (this.constructor.name === 'ContainsMaterial') {
-		// 	console.log(Object.keys(this.constructor.properties)); // TODO
-		// }
-		// TODO: CHECK ADDITIONAL (CROSS-PROPERTY) CONSTRAINTS
+		
+		// TODO: CHECK ADDITIONAL (CROSS-PROPERTY) CONSTRAINTS?
 	}
 	
 	commit(): Promise<this> {

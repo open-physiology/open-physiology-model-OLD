@@ -21,12 +21,13 @@ export default function propertiesPlugin(chai, utils) {
 		}
 	});
 	
-	Assertion.addMethod('element', function (value) {
-		this.assert(
-			[...this._obj].includes(value)
-			, `expected #{this} to have a value ${stringify(value)}`
-			, `expected #{this} to not have a value ${stringify(value)}`
-		);
-	});
+	
+	// Assertion.addMethod('element', function (value) {
+	// 	this.assert(
+	// 		[...this._obj].includes(value)
+	// 		, `expected #{this} to have a value ${stringify(value)}`
+	// 		, `expected #{this} to not have a value ${stringify(value)}`
+	// 	);
+	// });
 
 };

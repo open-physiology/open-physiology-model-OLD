@@ -6,6 +6,9 @@ import {Material, MaterialType, MaterialTemplate, ContainsMaterial} from '../src
 
 
 
+import type from 'type-detect';
+
+
 describe("integrated workflow", () => {
 	
 	it("guarantees that X.Type === XType", () => {
@@ -18,14 +21,14 @@ describe("integrated workflow", () => {
 	
 	it("can create new 'Material.Type's and link them", async () => {
 		
-		let blood = Material.Type.new({
+		let blood = await Material.Type.new({
 			name: "blood"
 		});
 		
 		expect(blood).to.be.an.instanceof(Material.Type);
 		expect(blood).to.have.a.property('name', "blood");
 		
-		let water = Material.Type.new({
+		let water = await Material.Type.new({
 			name: "waiter"
 		});
 		
@@ -47,7 +50,7 @@ describe("integrated workflow", () => {
 		
 		expect(water).to.have.a.property('name', "water");
 		
-		let bloodHasWater = ContainsMaterial.new({
+		let bloodHasWater = await ContainsMaterial.new({
 			1: blood,
 			2: water
 		});
@@ -55,8 +58,10 @@ describe("integrated workflow", () => {
 		expect(bloodHasWater).to.have.property(1, blood);
 		expect(bloodHasWater).to.have.property(2, water);
 		
-		expect(blood['-->ContainsMaterial']).to.have.element(bloodHasWater);
-		expect(blood.materials             ).to.have.element(water        );
+		// console.log(Array.from(blood['-->ContainsMaterial']));
+		
+		expect(blood['-->ContainsMaterial']).to.have.key(bloodHasWater);
+		expect(blood.materials             ).to.have.key(water        );
 		
 	});
 	

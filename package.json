@@ -31,7 +31,7 @@
     "babel-plugin-typecheck": "^3.9.0",
     "babel-polyfill": "6",
     "babel-preset-es2015": "6",
-    "chai": "3",
+    "chai": "https://github.com/chaijs/chai#43a64c4a1dd7a853ee48096f284171fb64ee4465",
     "chai-match-pattern": "0.2",
     "json-stringify-safe": "^5.0.1",
     "mocha": "2"
