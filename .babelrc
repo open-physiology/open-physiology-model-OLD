@@ -1,23 +1,25 @@
 {
-  "presets": ["es2015"],
+  "presets": [
+    "es2015"
+  ],
   "plugins": [
-    "babel-plugin-transform-object-rest-spread",
-    "babel-plugin-transform-class-properties",
-    "babel-plugin-transform-es2015-instanceof",
-    "babel-plugin-transform-async-to-generator",
-    "babel-plugin-syntax-flow",
-    "babel-plugin-transform-flow-strip-types"
+    "transform-object-rest-spread",
+    "transform-class-properties",
+    "transform-es2015-instanceof",
+    "transform-async-to-generator",
+    "syntax-flow",
+    "transform-flow-strip-types"
   ],
   "env": {
     "development": {
       "plugins": [
-        "babel-plugin-typecheck",
-        "babel-plugin-espower"
+        "typecheck",
+        "espower"
       ]
     },
     "production": {
       "plugins": [
-        "babel-plugin-unassert"
+        "unassert"
       ]
     }
   }
