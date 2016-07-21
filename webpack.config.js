@@ -13,7 +13,15 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.es6\.js$/, loader: 'babel?compact=false' }
+			{
+				test: /\.js$/,
+				exclude: /node\_modules/,
+				loader: 'babel'
+			},
+			{
+				test: /\.json$/,
+				loader: 'json'
+			}
 		]
 	},
 	plugins: [
