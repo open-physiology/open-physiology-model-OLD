@@ -3593,7 +3593,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					_this2.register(constructor);
 					_this2.mergeSuperclassProperties(constructor);
 					// jsonSchemaConfig                      (constructor); // TODO
-					_Entity2.default.createGetterSetters(constructor);
+					_Entity2.default.createFieldInterfaces(constructor);
 					return constructor;
 				});
 			}
@@ -3611,7 +3611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					_this3.register(constructor);
 					_this3.mergeSuperclassProperties(constructor);
 					// jsonSchemaConfig                          (constructor); // TODO
-					_Entity2.default.createGetterSetters(constructor);
+					_Entity2.default.createFieldInterfaces(constructor);
 					return constructor;
 				});
 			}
@@ -3873,7 +3873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							/* put back-reference in classes */
 							thisSide.class.relationships[thisSide.key] = thisSide;
 	
-							_Entity2.default.createGetterSetters(thisSide.class);
+							_Entity2.default.createFieldInterfaces(thisSide.class);
 	
 							// TODO: this 'side' should somehow be mixed from
 							//     : all relevant domains; not just be the 'last'
@@ -12165,7 +12165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				return _ref(NewClass);
 			}
 		}, {
-			key: 'createGetterSetters',
+			key: 'createFieldInterfaces',
 			value: function createGetterSetters(cls) {
 				_Object$values = Object.values(cls.properties || {});
 	
@@ -12184,7 +12184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						var _desc = _step2.value;
 	
-						Entity.createPropertyInterface(cls, _desc);
+						Entity._createPropertyInterface(cls, _desc);
 					}
 					/* getters / setters for relationships starting in this resource */
 				} catch (err) {
@@ -12238,11 +12238,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 				/* getters / setters for [1] and [2] in a relationship */
 				if (cls.isRelationship) {
-					Entity.create12Interface(cls);
+					Entity._createSidesInterface(cls);
 				}
 			}
 		}, {
-			key: 'create12Interface',
+			key: '_createSidesInterface',
 			value: function create12Interface(cls) {
 				if (cls.prototype.hasOwnProperty(1)) {
 					return;
@@ -12309,7 +12309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 			}
 		}, {
-			key: 'createPropertyInterface',
+			key: '_createPropertyInterface',
 			value: function createPropertyInterface(cls, desc) {
 				if (cls.prototype.hasOwnProperty(desc.key)) {
 					return;
@@ -12873,7 +12873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					throw new TypeError('Value of argument "options" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(options));
 				}
 	
-				_ref7 = [['id', _isInteger2.default, '_cacheByHref'], ['href', _isString2.default, '_cacheById']];
+				_ref7 = [['id', _isInteger2.default, '_cache'], ['href', _isString2.default, '_cacheById']];
 	
 				if (!(_ref7 && (typeof _ref7[Symbol.iterator] === 'function' || Array.isArray(_ref7)))) {
 					throw new TypeError('Expected _ref7 to be iterable, got ' + _inspect(_ref7));
@@ -13149,7 +13149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 	
 	Entity._cacheById = {};
-	Entity._cacheByHref = {};
+	Entity._cache = {};
 	exports.default = Entity;
 	
 	function _inspect(input, depth) {

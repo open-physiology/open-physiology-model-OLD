@@ -3,7 +3,7 @@ import {xdescribe, describe, it, expect} from '../test.helper';
 import * as exports from '../../src/modules/visualisations';
 const { default: module, ...exportedClasses } = exports;
 
-xdescribe("'visualisation' Module", () => {
+describe("'visualisation' Module", () => {
 
 	it("exports the expected classes", () => {
 

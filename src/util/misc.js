@@ -70,3 +70,8 @@ export function normalizeToRange(val) {
 	return val;
 }
 
+export function setDefault(obj, key, val) {
+	if (isUndefined(obj[key])) {
+		obj[key] = val;
+	}
+}

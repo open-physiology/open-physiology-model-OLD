@@ -196,6 +196,21 @@ export const CylindricalLyphType     = CylindricalLyph.Type;
 export const CylindricalLyphTemplate = CylindricalLyph.Template;
 
 
+M.RELATIONSHIP({
+	
+	name: 'HasLayer',
+	
+	extends: HasPart,
+	
+	singular: "has layer",
+	
+	1: [CylindricalLyph.Type,     '0..*', { anchors: true, covariant: true, key: 'layers' }],
+	2: [CylindricalLyph.Template, '0..*'                                                   ],
+	
+	noCycles: true,
+	
+});
+
 export const HasSegment = M.RELATIONSHIP({
 
 	name: 'HasSegment',
@@ -239,8 +254,8 @@ export const Border = M.TYPED_RESOURCE({////////////////////////////////////////
 	
 	properties: {
 		nature: {
-			Template: { ...enumSchema     ('open', 'closed'), required: true              },
-			Type:     { ...enumArraySchema('open', 'closed'), default: ['open', 'closed'] },
+			Template: { ...enumSchema     ('open', 'closed'), default: 'open', required: true },
+			Type:     { ...enumArraySchema('open', 'closed'), default: ['open', 'closed']     },
 			typeCheck: arrayContainsValue
 		}
 	}
@@ -268,8 +283,8 @@ export const [
 
 	singular,
 
-	1: [LyphClass.Type,  '1..1', { readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key }],
-	2: [Border.Template, '1..1'                                                                                       ],
+	1: [LyphClass.Type,  '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key }],
+	2: [Border.Template, '1..1'                                                                                                   ],
 
 	// The 'readonly' flag above implies that when a lyph is created,
 	// its borders are also automatically created.
@@ -324,8 +339,8 @@ export const CoalescesWith = M.RELATIONSHIP({
 
 	singular: "coalesces with",
 
-	1: [Lyph.Template, '2..*', {                key: 'coalescences' }],
-	2: [Coalescence,   '0..*', { anchors: true, key: 'lyphs'        }],
+	1: [Lyph.Template, '0..*', {                key: 'coalescences' }],
+	2: [Coalescence,   '2..*', { anchors: true, key: 'lyphs'        }],
 
 });
 

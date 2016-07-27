@@ -1,3 +1,6 @@
+import { install } from 'source-map-support';
+install();
+
 import 'babel-polyfill';
 import chai                   from 'chai';
 import genericPlugin          from './generic.plugin';
@@ -10,6 +13,11 @@ chai.use(propertiesPlugin);
 chai.use(resourceCheckingPlugin);
 chai.use(matchPatternPlugin);
 
-export {describe, it, xdescribe, xit} from 'mocha';
+import mocha from 'mocha';
+export const describe  = mocha.describe  || (global || window).describe;
+export const it        = mocha.it        || (global || window).it;
+export const xdescribe = mocha.xdescribe || (global || window).xdescribe;
+export const xit       = mocha.xit       || (global || window).xit;
+
 export const expect = chai.expect;
 export const _      = matchPatternPlugin.getLodashModule();

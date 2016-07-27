@@ -9,7 +9,7 @@ const M = new TypedModule('omegaTrees', [resources, groups, lyphs]);
 export default M;
 
 
-export const OmegaTree = M.TYPED_RESOURCE({///////////////////////////////////////////////////////////
+export const OmegaTree = M.TYPED_RESOURCE({/////////////////////////////////////
 
 	name: 'OmegaTree',
 
@@ -17,7 +17,7 @@ export const OmegaTree = M.TYPED_RESOURCE({/////////////////////////////////////
 
 	singular: "omega tree",
 
-});//////////////////////////////////////////////////////////////////////////
+});/////////////////////////////////////////////////////////////////////////////
 export const OmegaTreeType     = OmegaTree.Type;
 export const OmegaTreeTemplate = OmegaTree.Template;
 
@@ -30,7 +30,9 @@ export const HasAsRoot = M.RELATIONSHIP({
 	
 	singular: "has as root",
 
-	1: [OmegaTree.Type, '1..1', { anchors: true, covariant: true, key: 'root' }],
+	1: [OmegaTree.Type, '1..*', { anchors: true, covariant: true, key: 'root' }],
 	2: [Node.Template,  '0..*',                                                ],
 
+	// TODO: CONSTRAINT: all root nodes must be on a plus-border or minus-border
+	
 });

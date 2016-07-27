@@ -78,7 +78,7 @@ export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Material, Border, No
 	
 	singular: "inherits all measurables from",
 
-	1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'inheritsMeasurables' }],
+	1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'measurableProviders' }],
 	2: [Class.Type, '0..*',                                                               ],
 
 	noCycles: true

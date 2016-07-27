@@ -3,7 +3,7 @@ import {xdescribe, describe, it, expect} from '../test.helper';
 import * as exports from '../../src/modules/omegaTrees';
 const { default: module, ...exportedClasses } = exports;
 
-xdescribe("'omegaTrees' Module", () => {
+describe("'omegaTrees' Module", () => {
 
 	it("exports the expected classes", () => {
 

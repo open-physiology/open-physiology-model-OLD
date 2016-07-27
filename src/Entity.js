@@ -1,9 +1,26 @@
-import isInteger  from 'lodash/isInteger';
 import isString   from 'lodash/isString';
+import defer      from 'lodash/defer';
+import isObject   from 'lodash/isObject';
 import assert     from 'power-assert';
-import {humanMsg} from "./util/misc";
 
-export default class Entity {
+import {Subject}         from 'rxjs/Subject';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {map}             from 'rxjs/operator/map';
+
+import {humanMsg} from "./util/misc";
+import {setDefault}  from "./util/misc";
+import ObservableSet from "./util/ObservableSet";
+import {Field} from "./Field";
+import ValueTracker, {event, property} from "./util/ValueTracker";
+
+const $$cache         = Symbol('$$cache'      );
+const $$createSubject = Symbol('$$createSubject');
+const $$subjects      = Symbol('$$subjects'   );
+const $$observables   = Symbol('$$observables');
+
+////////////////////////////////////////////////////////////////
+
+export default class Entity extends ValueTracker {
 	
 	////////////////////////////////////////////////////////////
 	////////// STATIC (building Entity-based classes) //////////
@@ -37,327 +54,98 @@ export default class Entity {
 		
 		return NewClass;
 	}
-	
-	static createGetterSetters(cls) {
-		/* getters / setters for the properties */
-		for (let desc of Object.values(cls.properties || {})) {
-			Entity.createPropertyInterface(cls, desc);
-		}
-		/* getters / setters for relationships starting in this resource */
-		if (cls.isResource) {
-			for (let desc of Object.values(cls.relationships || {})) {
-				Entity.createRelationshipInterface(cls, desc);
-			}
-		}
-		/* getters / setters for [1] and [2] in a relationship */
-		if (cls.isRelationship) {
-			Entity.create12Interface(cls);
-		}
-	}
-	
-	static create12Interface(cls) {
-		if (cls.prototype.hasOwnProperty(1)) { return }
-		for (let side of [1, 2]) {
-			Object.defineProperty(cls.prototype, side, {
-				get() {
-					return this._sides[side];
-				},
-				set(newObj) {
-					// TODO: validate newObj as fitting this relationship class
-					let old = this._sides[side];
-					let clsSide = cls.domains[0][side]; // TODO: adapt to multiple domains
-					this._sides[side] = newObj;
-					if (clsSide.cardinality.max > 1) {
-						if (old) { old[clsSide.key].delete(this) }
-						newObj[clsSide.key].add(this);
-					} else {
-						if (old) { old[clsSide.key] = undefined }
-						newObj[clsSide.key] = this;
-					}
-				},
-				enumerable:   true,
-				configurable: false
-			});
-		}
-	}
-	
-	static createPropertyInterface(cls, desc) {
-		if (cls.prototype.hasOwnProperty(desc.key)) { return }
-		Object.defineProperty(cls.prototype, desc.key, {
-			get() {
-				if ('value' in desc) {
-					return desc.value;
-				} else if (desc.key in this._properties) {
-					return this._properties[desc.key];
-				} else if ('default' in desc) {
-					return desc.default;
-				}
-			},
-			set(newValue) {
-				// TODO: if (!validate(this, key, newValue)) { throw Error }
-				this._properties[desc.key] = newValue;
-			},
-			enumerable:   true,
-			configurable: false
-		});
-	}
-	
-	static createRelationshipInterface(cls, desc) {
-		if (cls.prototype.hasOwnProperty(desc.key)) { return }
-		if (desc.cardinality.max === 1) {
-			Object.defineProperty(cls.prototype, desc.key, {
-				get() {
-					return this._relationships[desc.key];
-				},
-				set(newValue) {
-					// TODO: this can be a new one or an existing one;
-					//     : if it's a new one, add it
-					this._relationships[desc.key] = newValue;
-				},
-				enumerable:   true,
-				configurable: false
-			});
-			if (isString(desc.options.key)) {
-				Object.defineProperty(cls.prototype, desc.options.key, {
-					get()         { return this[desc.key][desc.side]     },
-					set(newValue) { this[desc.key][desc.side] = newValue }
-				});
-			}
-		} else if (desc.cardinality.max > 1) {
-			function init() {
-				if (!this._relationships[desc.key]) {
-					let set          = this._relationships[desc.key]          = new Set;
-					const relInterface = this._relationshipInterfaces[desc.key] = {
-						add(obj) {
-							set.add(obj);
-							return relInterface;
-						},
-						delete(obj) {
-							return set.delete(obj);
-						},
-						has:     set.has    .bind(set),
-						entries() { return set.entries() },
-						keys   () { return set.keys   () },
-						values () { return set.values () },
-						forEach(fn) {
-							for (let x of this) { fn(x, x, this) }
-						},
-						[Symbol.iterator]() { return this.values() },
-						[Symbol.toStringTag]: 'set'
-					};
-					if (isString(desc.options.key)) {
-						let shortcutInterface = this._relationshipShortcutInterfaces[desc.options.key] = {
-							add: (obj) => {
-								// TODO: validate obj to be inserted here for a new relationship
-								set.add(new desc.relationshipClass({
-									[desc.side]:       this,
-									[desc.other.side]: obj
-								}));
-								return shortcutInterface;
-							},
-							delete: (obj) => {
-								for (let rel of set) {
-									if (rel[desc.other.side] === obj) {
-										return set.delete(rel);
-									}
-								}
-								return false;
-							},
-							clear: () => {
-								assert(desc.cardinality.min === 0);
-								set.clear();
-								return shortcutInterface;
-							},
-							has: (obj) => {
-								for (let rel of set) {
-									if (rel[desc.other.side] === obj) {
-										return true;
-									}
-								}
-								return false;
-							},
-							*entries() {
-								for (let rel of set) {
-									yield [rel[desc.other.side], rel[desc.other.side]];
-								}
-							},
-							*keys() {
-								for (let rel of set) {
-									yield rel[desc.other.side];
-								}
-							},
-							*values() {
-								for (let rel of set) {
-									yield rel[desc.other.side];
-								}
-							},
-							forEach(fn) {
-								for (let x of this) { fn(x, x, this) }
-							},
-							[Symbol.iterator]() { return this.values() },
-							[Symbol.toStringTag]: 'set'
-						};
-					}
-				}
-				return {
-					relInterface:      this._relationshipInterfaces        [desc.key],
-					shortcutInterface: this._relationshipShortcutInterfaces[desc.options.key]
-				};
-			}
-			Object.defineProperty(cls.prototype, desc.key, {
-				get() { return init.call(this).relInterface },
-				enumerable:   true,
-				configurable: false
-			});
-			if (isString(desc.options.key)) {
-				Object.defineProperty(cls.prototype, desc.options.key, {
-					get() { return init.call(this).shortcutInterface },
-					enumerable:   true,
-					configurable: false
-				});
-			}
-		}
-	}
+		
 	
 	/////////////////////////////////////////////////////////////////////
 	////////// STATIC (creating / caching / finding instances) //////////
 	/////////////////////////////////////////////////////////////////////
 	
-	static _cacheById   : { [id  :number]: Entity } = {};
-	static _cacheByHref : { [href:string]: Entity } = {};
-	
-	static new(
+	static async new(
 		values  : Object = {},
 	    options : Object = {}
 	): Promise<this> {
-		return new Promise((resolve, reject) => {
-			setTimeout(() => {
-				resolve(new this(
-					{ ...values, href: null, id: null, class: this.name },
-					{ ...options, new: true }
-				));
-			});
-		});
+		return new this(
+			{ ...values, id: null, href: null, class: this.name },
+			{ ...options, new: true }
+		);
 	}
 	
-	static get(
-		identification : { href: string } | { id: number } | string | number,
-		options        : Object = {} // TODO: filtering, expanding, paging, ...
+	static async get(
+		href:    { href: string } | string | number,
+		options: Object = {} // TODO: filtering, expanding, paging, ...
 	): Promise<Entity> {
-		for (let [key, check, cacheKey] of [
-			['id',   isInteger, '_cacheByHref'],
-			['href', isString,  '_cacheById'  ]
-		]) {
-			if (check(identification)) {
-				identification = { [key]: identification };
-			}
-			if (identification[key]) {
-				let entity;
-				if (identification[key] in Entity[cacheKey]) {
-					entity = Entity[cacheKey][identification[key]];
-				}
-				
-				assert(entity instanceof this, humanMsg`
-					The entity ${JSON.stringify(identification)} is not
-					of class '${this.name}'
-					but of class '${entity.constructor.name}'.
-				`);
-				return entity;
-			}
+		if (isObject(href)) { href = {href} }
+		let entity;
+		if (href in Entity[$$cache]) {
+			entity = Entity[$$cache][href];
+		} else {
+			
 		}
-		assert(false, humanMsg`You did not give a valid 'href' or 'id' reference.`);
+		
+		assert(entity instanceof this, humanMsg`
+			The entity at '${JSON.stringify(href)}' is not
+			of class '${this.name}'
+			but of class '${entity.constructor.name}'.
+		`);
 	}
+	
+	// static async load(
+	// 	href:    {href: string} | string | number,
+	// 	options: Object = {} // TODO: filtering, expanding, paging, ...
+	// ) {
+	//
+	// 	// TODO
+	//
+	// }
+	
+	
+	////////////////////////////
+	////////// EVENTS //////////
+	////////////////////////////
+	
+	@event() deleteEvent;
 	
 	
 	///////////////////////////////
 	////////// INSTANCES //////////
 	///////////////////////////////
 	
-	// all possible properties the model might have are available in this.constructor.properties
-	_pristineProperties    :         {} = {}; // local values as they were at last fetch or commit
-	_properties            :         {} = {}; // local values as they are now
-	                                 
-	_pristineRelationships :         {} = {};
-	_relationships         :         {} = {};
-	_relationshipInterfaces:         {} = {};
-	_relationshipShortcutInterfaces: {} = {};
-	
-	_pristineSides:                  {} = {};
-	_sides:                          {} = {};
+	get [Symbol.toStringTag]() { return this.constructor.name }
 	
 	constructor(
 		values:  Object = {},
 		options: Object = {}
 	) {
-		/* properties (of resources and relationships) */
-		for (let key of Object.keys(this.constructor.properties)) {
-			if (key in values) {
-				// TODO: CHECK CONSTRAINT: given property value conforms to JSON schema
-				// TODO: CHECK ADDITIONAL (PROPERTY-SPECIFIC) CONSTRAINTS: e.g., if this is a template, does it conform to its corresponding type?
-				this._pristineProperties[key] = values[key];
-				this[key] = values[key];
-			} else {
-				// TODO: If there is a default or constant value, no problem.
-				//     : If this property is not required, no problem.
-				//     : Otherwise: REGISTER CONSTRAINT VIOLATION: required property not present
-			}
-		}
+		super({ deleteEventName: 'delete' });
 		
-		/* relationships (of resources) */
-		if (this.constructor.isResource) {
-			for (let key of Object.keys(this.constructor.relationships)) {
-				if (key in values) {
-					this._pristineRelationships[key] = values[key];
-					this[key] = values[key];
-				}
-			}
-		}
+		Field.initializeEntity(this, values);
 		
-		/* sides (of relationships) */
-		if (this.constructor.isRelationship) {
-			for (let key of [1, 2]) {
-				if (key in values) {
-					this._pristineSides[key] = values[key];
-					this[key] = values[key];
-				}
-			}
-		}
-		
-		// TODO: CHECK ADDITIONAL (CROSS-PROPERTY) CONSTRAINTS?
+		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 	}
 	
-	commit(): Promise<this> {
-		// TODO: update pristine storage
-		// TODO: call commit implementation
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				Object.assign(this._pristineProperties, this._properties);
-				if (this.constructor.isResource) {
-					Object.assign(this._pristineRelationships, this._relationships);
-				}
-				if (this.constructor.isRelationship) {
-					Object.assign(this._pristineSides, this._sides);
-				}
-				resolve(this);
-			});
-		});
+	[$$createSubject](key: string | number) {
+		this[$$subjects]   [key] = new BehaviorSubject();
+		this[$$observables][key] = this[$$subjects][key].asObservable();
 	}
 	
-	rollback(): Promise<this> {
-		// TODO: overwrite local storage with pristine
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				Object.assign(this._properties, this._pristineProperties);
-				if (this.constructor.isResource) {
-					Object.assign(this._relationships, this._pristineRelationships);
-				}
-				if (this.constructor.isRelationship) {
-					Object.assign(this._sides, this._pristineSides);
-				}
-				resolve(this);
-			});
-		});
+	delete() {
+		// TODO: this is the synchronous delete operation;
+		//     : a `.commit()` call is required before it
+		//     : is actually deleted from asynchronous storage.
+		//     : That means we need to be able to rollback a deletion.
+		//     : We need to create a partially ordered
+		//     : log of performed actions (since last commit),
+		//     : that also allows undo. This will replace storing 'pristine' ops.
+		//     : (This is the Command design pattern.)
+		
+		this.e('delete').next();
+		
 	}
+	
 	
 
 }
+
+Object.assign(Entity, {
+	[$$cache] : {}
+});

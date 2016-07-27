@@ -9,6 +9,7 @@ import Graph       from 'graph.js/dist/graph.js';
 import {humanMsg, mapOptionalArray, parseCardinality, arrayify} from './util/misc';
 
 import Entity from './Entity';
+import {Field} from "./Field";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +66,7 @@ export default class Module {
 			this.register                            (constructor);
 			this.mergeSuperclassProperties           (constructor);
 			// jsonSchemaConfig                      (constructor); // TODO
-			Entity.createGetterSetters               (constructor);
+			Field.augmentClass                    (constructor);
 			return constructor;
 		});
 	}
@@ -80,7 +81,7 @@ export default class Module {
 			this.register                                (constructor);
 			this.mergeSuperclassProperties               (constructor);
 			// jsonSchemaConfig                          (constructor); // TODO
-			Entity.createGetterSetters                   (constructor);
+			Field.augmentClass                        (constructor);
 			return constructor;
 		});
 	}
@@ -94,7 +95,8 @@ export default class Module {
 		
 		if (config.isResource) {
 			defaults(config, {
-				relationships: {}
+				relationships:         {},
+				relationshipShortcuts: {}
 			});
 		}
 		
@@ -137,7 +139,8 @@ export default class Module {
 		// - 1 is left-hand side, and
 		// - 2 is right-hand side of the relationship;
 		// these can be given directly, or multiple
-		// can be grouped in a 'domains' object
+		// can be grouped in a 'domains' array;
+		// here, we'll normalize them into a 'domains' array
 		
 		assert(!cls[1] & !cls[2] || !cls.domains, humanMsg`
 			A relationship can specify [1] and [2] domains directly,
@@ -170,12 +173,16 @@ export default class Module {
 				
 				/* put back-reference in classes */
 				thisSide.class.relationships[thisSide.key] = thisSide;
-				
-				Entity.createGetterSetters(thisSide.class);
+				Field.augmentClass(thisSide.class, thisSide.key);
+				if ('key' in thisSide.options) {
+					thisSide.class.relationshipShortcuts[thisSide.options.key] = thisSide;
+					Field.augmentClass(thisSide.class, thisSide.options.key);
+				}
 				
 				// TODO: this 'side' should somehow be mixed from
 				//     : all relevant domains; not just be the 'last'
 				//     : to be assigned in this domains.map()
+				
 			}
 			return newDomain;
 		});

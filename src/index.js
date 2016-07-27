@@ -8,7 +8,6 @@ export * from './modules/processes';
 export * from './modules/research';
 export * from './modules/visualisations';
 
-import TypedModule    from './TypedModule';
 import resources      from './modules/resources';
 import typed          from './modules/typed';
 import lyphs          from './modules/lyphs';
@@ -18,7 +17,9 @@ import omegaTrees     from './modules/omegaTrees';
 import processes      from './modules/processes';
 import research       from './modules/research';
 import visualisations from './modules/visualisations';
-export default new TypedModule('groups', [
+
+import TypedModule from './TypedModule';
+export default new TypedModule('all', [
 	resources,
 	typed,
 	lyphs,
