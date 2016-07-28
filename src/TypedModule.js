@@ -27,7 +27,9 @@ export default class TypedModule extends Module {
 				instanceSingular: conf.singular,
 				instancePlural:   conf.plural || `${conf.singular}s`,
 				
-				singular: `${conf.singular} type`
+				singular: `${conf.singular} type`,
+				
+				singleton: conf.singleton
 				
 			});
 			

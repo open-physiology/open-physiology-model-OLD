@@ -70,7 +70,7 @@ export const HasMeasurable = M.RELATIONSHIP({
 
 });
 
-export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Material, Border, Node, Process].map((Class) => ({
+export const InheritsAllMeasurablesFrom = M.RELATIONSHIP({
 
 	name: 'InheritsAllMeasurablesFrom',
 
@@ -78,12 +78,12 @@ export const [InheritsAllMeasurablesFrom] = M.RELATIONSHIP([Material, Border, No
 	
 	singular: "inherits all measurables from",
 
-	1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'measurableProviders' }],
-	2: [Class.Type, '0..*',                                                               ],
+	1: [MeasurableLocation.Type, '0..*', { anchors: true, covariant: true, key: 'measurableProviders' }],
+	2: [MeasurableLocation.Type, '0..*',                                                               ],
 
 	noCycles: true
 
-})));
+});
 
 
 export const Causality = M.TYPED_RESOURCE({/////////////////////////////////////////////////////////////////

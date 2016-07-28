@@ -1,22 +1,19 @@
-import isString   from 'lodash/isString';
-import defer      from 'lodash/defer';
 import isObject   from 'lodash/isObject';
+import defaults   from 'lodash/defaults';
+import uniqueId   from 'lodash/uniqueId';
 import assert     from 'power-assert';
 
-import {Subject}         from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {map}             from 'rxjs/operator/map';
 
 import {humanMsg} from "./util/misc";
-import {setDefault}  from "./util/misc";
-import ObservableSet from "./util/ObservableSet";
 import {Field} from "./Field";
 import ValueTracker, {event, property} from "./util/ValueTracker";
 
-const $$cache         = Symbol('$$cache'      );
-const $$createSubject = Symbol('$$createSubject');
-const $$subjects      = Symbol('$$subjects'   );
-const $$observables   = Symbol('$$observables');
+const $$cache           = Symbol('$$cache'      );
+const $$createSubject   = Symbol('$$createSubject');
+const $$subjects        = Symbol('$$subjects'   );
+const $$observables     = Symbol('$$observables');
+const $$singletonObject = Symbol('$$singletonObject');
 
 ////////////////////////////////////////////////////////////////
 
@@ -42,6 +39,7 @@ export default class Entity extends ValueTracker {
 			 **/
 			[Symbol.hasInstance]: {
 				value: (instance) => {
+					if (!instance) { return false }
 					if (instance.constructor === NewClass) { return true }
 					for (let SubClass of NewClass.extendedBy) {
 						if (SubClass[Symbol.hasInstance](instance)) { return true }
@@ -60,33 +58,45 @@ export default class Entity extends ValueTracker {
 	////////// STATIC (creating / caching / finding instances) //////////
 	/////////////////////////////////////////////////////////////////////
 	
-	static async new(
+	static new(
 		values  : Object = {},
 	    options : Object = {}
-	): Promise<this> {
+	): this {
 		return new this(
-			{ ...values, id: null, href: null, class: this.name },
+			{ ...values },
 			{ ...options, new: true }
 		);
 	}
 	
-	static async get(
+	static get(
 		href:    { href: string } | string | number,
 		options: Object = {} // TODO: filtering, expanding, paging, ...
-	): Promise<Entity> {
+	): this {
 		if (isObject(href)) { href = {href} }
 		let entity;
 		if (href in Entity[$$cache]) {
 			entity = Entity[$$cache][href];
 		} else {
-			
+			// We're assuming that this is solely a synchronous method call,
+			// so we can't query the server here.
+			return null;
 		}
-		
 		assert(entity instanceof this, humanMsg`
 			The entity at '${JSON.stringify(href)}' is not
 			of class '${this.name}'
 			but of class '${entity.constructor.name}'.
 		`);
+		return entity;
+	}
+	
+	static getSingleton() {
+		assert(this.singleton, humanMsg`The '${this.name}' class is not a singleton class.`);
+		if (!this[$$singletonObject]) {
+			this[$$singletonObject] = this.new();
+			// TODO: make sure that the singleton object is always loaded,
+			//     : so this can be done synchronously
+		}
+		return this[$$singletonObject];
 	}
 	
 	// static async load(
@@ -116,7 +126,18 @@ export default class Entity extends ValueTracker {
 		values:  Object = {},
 		options: Object = {}
 	) {
+		
 		super({ deleteEventName: 'delete' });
+		
+		if (this.constructor.singleton) {
+			
+		}
+		
+		defaults(values, {
+			id: null,
+			href: null,
+			class: this.constructor.name
+		});
 		
 		Field.initializeEntity(this, values);
 		
@@ -139,7 +160,27 @@ export default class Entity extends ValueTracker {
 		//     : (This is the Command design pattern.)
 		
 		this.e('delete').next();
-		
+	}
+	
+	//noinspection JSDuplicatedDeclaration // temporary, to suppress warning due to Webstorm bug
+	get(key)               { return this.field_get(key)               }
+	set(key, val, options) { return this.field_set(key, val, options) }
+	
+	async commit() {
+		return await this.field_commit().then(() => {
+			// setting up id and href here until actual server communication is set up
+			// TODO: remove when the server actually does this
+			if (this.get('id') === null) {
+				const newId = parseInt(uniqueId());
+				const opts = { ignoreReadonly: true, updatePristine: true };
+				this.set('id',    newId,             opts);
+				this.set('href', `cache://${newId}`, opts);
+			}
+		});
+	}
+	
+	async rollback() {
+		return await this.field_rollback();
 	}
 	
 	

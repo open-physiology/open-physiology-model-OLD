@@ -9,6 +9,7 @@ import isArray     from 'lodash/isArray';
 import isUndefined from 'lodash/isUndefined';
 import isNumber    from 'lodash/isNumber';
 import isObject    from 'lodash/isObject';
+import isFunction  from 'lodash/isFunction';
 import assert     from 'power-assert';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,3 +76,9 @@ export function setDefault(obj, key, val) {
 		obj[key] = val;
 	}
 }
+
+export const sw = (val, {autoInvoke = true} = {}) => (map) => {
+	let result = ( (val in map) ? map[val] : map.default );
+	if (autoInvoke && isFunction(result)) { result = result() }
+	return result;
+};

@@ -1,7 +1,7 @@
 {
   "name": "open-physiology-model",
   "version": "1.0.0",
-  "description": "a full description of the open physiology model in ES6",
+  "description": "a full description of the open physiology model in ES6/ES7",
   "main": "index.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register",

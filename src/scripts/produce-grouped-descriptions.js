@@ -1,29 +1,8 @@
-// import resources      from '../modules/resources';
-// import typed          from '../modules/typed';
-// import lyphs          from '../modules/lyphs';
-// import processes      from '../modules/processes';
-// import measurables    from '../modules/measurables';
-// import groups         from '../modules/groups';
-// import omegaTrees     from '../modules/omegaTrees';
-// import research       from '../modules/research';
-// import visualizations from '../modules/visualisations';
-// import Module from '../Module';
-
-// const M = new Module([
-// 	resources,
-// 	typed,
-// 	lyphs,
-// 	processes,
-// 	measurables,
-// 	groups,
-// 	omegaTrees,
-// 	research,
-// 	visualizations
-// ]);
-
 import M from '../index';
 
-import padEnd   from 'lodash/padEnd';
+// const M = require('../index').default;
+
+import padEnd from 'lodash/padEnd';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +42,7 @@ for (let [,cls] of M.classes) {
 			let cardinality = (desc) => (desc.cardinality.min === desc.cardinality.max
 				? `   ${desc.cardinality.min}`
 				: `${desc.cardinality.min}..${desc.cardinality.max === Infinity ? '*' : desc.cardinality.max}`);
-			let arrow = (desc === desc.relationship[1] ? '-->' : '<--');
+			let arrow = (desc === desc.relationshipClass[1] ? '-->' : '<--');
 			
 			entry.desc = `(${cardinality(desc.other)})${arrow}(${cardinality(desc)})  ${desc.other.class.name}`;
 			
@@ -114,9 +93,6 @@ for (let [,cls] of M.classes) {
 		
 	}
 }
-
-
-console.log(output);
 
 
 import fs from 'fs';

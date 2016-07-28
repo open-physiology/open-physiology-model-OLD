@@ -150,7 +150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var store      = __webpack_require__(89)('wks')
-	  , uid        = __webpack_require__(53)
+	  , uid        = __webpack_require__(52)
 	  , Symbol     = __webpack_require__(3).Symbol
 	  , USE_SYMBOL = typeof Symbol == 'function';
 	
@@ -257,7 +257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var global    = __webpack_require__(3)
 	  , hide      = __webpack_require__(13)
 	  , has       = __webpack_require__(11)
-	  , SRC       = __webpack_require__(53)('src')
+	  , SRC       = __webpack_require__(52)('src')
 	  , TO_STRING = 'toString'
 	  , $toString = Function[TO_STRING]
 	  , TPL       = ('' + $toString).split(TO_STRING);
@@ -316,7 +316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// to indexed object, toObject with fallback for non-array-like ES3 strings
-	var IObject = __webpack_require__(70)
+	var IObject = __webpack_require__(71)
 	  , defined = __webpack_require__(23);
 	module.exports = function(it){
 	  return IObject(defined(it));
@@ -326,7 +326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(69)
+	var global    = __webpack_require__(70)
 	  , core      = __webpack_require__(12)
 	  , ctx       = __webpack_require__(167)
 	  , hide      = __webpack_require__(260)
@@ -392,7 +392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var pIE            = __webpack_require__(71)
+	var pIE            = __webpack_require__(72)
 	  , createDesc     = __webpack_require__(38)
 	  , toIObject      = __webpack_require__(17)
 	  , toPrimitive    = __webpack_require__(28)
@@ -478,7 +478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// 5 -> Array#find
 	// 6 -> Array#findIndex
 	var ctx      = __webpack_require__(31)
-	  , IObject  = __webpack_require__(70)
+	  , IObject  = __webpack_require__(71)
 	  , toObject = __webpack_require__(10)
 	  , toLength = __webpack_require__(9)
 	  , asc      = __webpack_require__(287);
@@ -823,7 +823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _schemas = __webpack_require__(57);
 	
-	var _Module = __webpack_require__(74);
+	var _Module = __webpack_require__(66);
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
@@ -999,7 +999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	if(__webpack_require__(7)){
-	  var LIBRARY             = __webpack_require__(46)
+	  var LIBRARY             = __webpack_require__(45)
 	    , global              = __webpack_require__(3)
 	    , fails               = __webpack_require__(4)
 	    , $export             = __webpack_require__(1)
@@ -1009,11 +1009,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    , anInstance          = __webpack_require__(36)
 	    , propertyDesc        = __webpack_require__(38)
 	    , hide                = __webpack_require__(13)
-	    , redefineAll         = __webpack_require__(50)
+	    , redefineAll         = __webpack_require__(49)
 	    , isInteger           = __webpack_require__(125)
 	    , toInteger           = __webpack_require__(39)
 	    , toLength            = __webpack_require__(9)
-	    , toIndex             = __webpack_require__(52)
+	    , toIndex             = __webpack_require__(51)
 	    , toPrimitive         = __webpack_require__(28)
 	    , has                 = __webpack_require__(11)
 	    , same                = __webpack_require__(197)
@@ -1021,20 +1021,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    , isObject            = __webpack_require__(5)
 	    , toObject            = __webpack_require__(10)
 	    , isArrayIter         = __webpack_require__(123)
-	    , create              = __webpack_require__(47)
+	    , create              = __webpack_require__(46)
 	    , getPrototypeOf      = __webpack_require__(20)
-	    , gOPN                = __webpack_require__(48).f
+	    , gOPN                = __webpack_require__(47).f
 	    , isIterable          = __webpack_require__(294)
 	    , getIterFn           = __webpack_require__(140)
-	    , uid                 = __webpack_require__(53)
+	    , uid                 = __webpack_require__(52)
 	    , wks                 = __webpack_require__(6)
 	    , createArrayMethod   = __webpack_require__(25)
 	    , createArrayIncludes = __webpack_require__(79)
 	    , speciesConstructor  = __webpack_require__(132)
 	    , ArrayIterators      = __webpack_require__(141)
-	    , Iterators           = __webpack_require__(45)
+	    , Iterators           = __webpack_require__(44)
 	    , $iterDetect         = __webpack_require__(85)
-	    , setSpecies          = __webpack_require__(51)
+	    , setSpecies          = __webpack_require__(50)
 	    , arrayFill           = __webpack_require__(116)
 	    , arrayCopyWithin     = __webpack_require__(178)
 	    , $DP                 = __webpack_require__(8)
@@ -1549,7 +1549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var META     = __webpack_require__(53)('meta')
+	var META     = __webpack_require__(52)('meta')
 	  , isObject = __webpack_require__(5)
 	  , has      = __webpack_require__(11)
 	  , setDesc  = __webpack_require__(8).f
@@ -1673,125 +1673,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.default = undefined;
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _Module2 = __webpack_require__(74);
-	
-	var _Module3 = _interopRequireDefault(_Module2);
-	
-	var _typed = __webpack_require__(42);
-	
-	var _misc = __webpack_require__(56);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
-	
-	function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	/**
-	 * Typed Modules allow to more easily create related
-	 * Type, Template and HasType classes. For example,
-	 * to create LyphType and LyphTemplate resources and
-	 * their HasType relationship from one description.
-	 **/
-	var TypedModule = function (_Module) {
-		_inherits(TypedModule, _Module);
-	
-		function TypedModule() {
-			_classCallCheck(this, TypedModule);
-	
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(TypedModule).apply(this, arguments));
-		}
-	
-		_createClass(TypedModule, [{
-			key: 'TYPED_RESOURCE',
-			value: function TYPED_RESOURCE(config) {
-				var _this2 = this;
-	
-				return (0, _misc.mapOptionalArray)(config, function (conf) {
-	
-					var SuperClass = conf.extends || _typed.Typed;
-	
-					// TODO: Handle { Template: {}, Type: {}, typeCheck(type, value) {} }
-					//     : for each property
-	
-					var NewType = _this2.RESOURCE({
-	
-						name: conf.name + 'Type',
-	
-						extends: SuperClass.Type,
-	
-						instanceSingular: conf.singular,
-						instancePlural: conf.plural || conf.singular + 's',
-	
-						singular: conf.singular + ' type'
-	
-					});
-	
-					var NewTemplate = _this2.RESOURCE({
-	
-						name: conf.name + 'Template',
-	
-						extends: SuperClass.Template,
-	
-						instanceSingular: conf.singular,
-						instancePlural: conf.plural || conf.singular + 's',
-	
-						singular: conf.singular + ' template'
-	
-					});
-	
-					var NewHasType = _this2.RELATIONSHIP({
-	
-						name: 'HasType',
-	
-						extends: SuperClass.HasType,
-	
-						singular: 'has type',
-	
-						1: [NewTemplate, '1..1', { anchors: true, key: 'type' }],
-						2: [NewType, '0..*']
-	
-					});
-	
-					return _extends({}, conf, {
-						isTypedResource: true,
-						Type: NewType,
-						Template: NewTemplate,
-						HasType: NewHasType
-					});
-				});
-			}
-		}]);
-	
-		return TypedModule;
-	}(_Module3.default);
-	
-	exports.default = TypedModule;
-
-/***/ },
-/* 42 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
 	exports.Typed = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = undefined;
 	
 	var _schemas = __webpack_require__(57);
 	
-	var _Module = __webpack_require__(74);
+	var _Module = __webpack_require__(66);
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
@@ -1895,17 +1781,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	}); /////////////////////////////////////////////////////////////////////////////
 
 /***/ },
-/* 43 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(275);
 	module.exports = __webpack_require__(12).Array.forEach;
 
 /***/ },
-/* 44 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var fails = __webpack_require__(68);
+	var fails = __webpack_require__(69);
 	
 	module.exports = function(method, arg){
 	  return !!method && fails(function(){
@@ -1914,19 +1800,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 45 */
+/* 44 */
 /***/ function(module, exports) {
 
 	module.exports = {};
 
 /***/ },
-/* 46 */
+/* 45 */
 /***/ function(module, exports) {
 
 	module.exports = false;
 
 /***/ },
-/* 47 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
@@ -1971,7 +1857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 48 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
@@ -1983,7 +1869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 49 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.14 / 15.2.3.14 Object.keys(O)
@@ -1995,7 +1881,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 50 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var redefine = __webpack_require__(15);
@@ -2005,7 +1891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 51 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2023,7 +1909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 52 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var toInteger = __webpack_require__(39)
@@ -2035,7 +1921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 53 */
+/* 52 */
 /***/ function(module, exports) {
 
 	var id = 0
@@ -2045,7 +1931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 54 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2190,7 +2076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Observable.js.map
 
 /***/ },
-/* 55 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -2783,6 +2669,120 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(228)))
 
 /***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = undefined;
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Module2 = __webpack_require__(66);
+	
+	var _Module3 = _interopRequireDefault(_Module2);
+	
+	var _typed = __webpack_require__(41);
+	
+	var _misc = __webpack_require__(56);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
+	
+	function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	/**
+	 * Typed Modules allow to more easily create related
+	 * Type, Template and HasType classes. For example,
+	 * to create LyphType and LyphTemplate resources and
+	 * their HasType relationship from one description.
+	 **/
+	var TypedModule = function (_Module) {
+		_inherits(TypedModule, _Module);
+	
+		function TypedModule() {
+			_classCallCheck(this, TypedModule);
+	
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(TypedModule).apply(this, arguments));
+		}
+	
+		_createClass(TypedModule, [{
+			key: 'TYPED_RESOURCE',
+			value: function TYPED_RESOURCE(config) {
+				var _this2 = this;
+	
+				return (0, _misc.mapOptionalArray)(config, function (conf) {
+	
+					var SuperClass = conf.extends || _typed.Typed;
+	
+					// TODO: Handle { Template: {}, Type: {}, typeCheck(type, value) {} }
+					//     : for each property
+	
+					var NewType = _this2.RESOURCE({
+	
+						name: conf.name + 'Type',
+	
+						extends: SuperClass.Type,
+	
+						instanceSingular: conf.singular,
+						instancePlural: conf.plural || conf.singular + 's',
+	
+						singular: conf.singular + ' type'
+	
+					});
+	
+					var NewTemplate = _this2.RESOURCE({
+	
+						name: conf.name + 'Template',
+	
+						extends: SuperClass.Template,
+	
+						instanceSingular: conf.singular,
+						instancePlural: conf.plural || conf.singular + 's',
+	
+						singular: conf.singular + ' template'
+	
+					});
+	
+					var NewHasType = _this2.RELATIONSHIP({
+	
+						name: 'HasType',
+	
+						extends: SuperClass.HasType,
+	
+						singular: 'has type',
+	
+						1: [NewTemplate, '1..1', { anchors: true, key: 'type' }],
+						2: [NewType, '0..*']
+	
+					});
+	
+					return _extends({}, conf, {
+						isTypedResource: true,
+						Type: NewType,
+						Template: NewTemplate,
+						HasType: NewHasType
+					});
+				});
+			}
+		}]);
+	
+		return TypedModule;
+	}(_Module3.default);
+	
+	exports.default = TypedModule;
+
+/***/ },
 /* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2815,7 +2815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _trim2 = _interopRequireDefault(_trim);
 	
-	var _isString = __webpack_require__(72);
+	var _isString = __webpack_require__(73);
 	
 	var _isString2 = _interopRequireDefault(_isString);
 	
@@ -2835,7 +2835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isObject2 = _interopRequireDefault(_isObject);
 	
-	var _powerAssert = __webpack_require__(73);
+	var _powerAssert = __webpack_require__(74);
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
@@ -3359,560 +3359,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.HasNode = exports.NodeTemplate = exports.NodeType = exports.Node = exports.CoalescesThroughLayer = exports.CoalescesWith = exports.Coalescence = exports.HasPlusBorder = exports.HasMinusBorder = exports.HasOuterBorder = exports.HasInnerBorder = exports.BorderTemplate = exports.BorderType = exports.Border = exports.InheritsAllSegmentsFrom = exports.HasSegment = exports.CylindricalLyphTemplate = exports.CylindricalLyphType = exports.CylindricalLyph = exports.InheritsAllLayersFrom = exports.InheritsAllPatchesFrom = exports.InheritsAllPartsFrom = exports.HasPatch = exports.HasLayer = exports.HasPart = exports.LyphTemplate = exports.LyphType = exports.Lyph = exports.InheritsAllMaterialsFrom = exports.ContainsMaterial = exports.MaterialTemplate = exports.MaterialType = exports.Material = undefined;
-	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _isNumber = __webpack_require__(221);
-	
-	var _isNumber2 = _interopRequireDefault(_isNumber);
-	
-	var _TypedModule = __webpack_require__(41);
-	
-	var _TypedModule2 = _interopRequireDefault(_TypedModule);
-	
-	var _misc = __webpack_require__(56);
-	
-	var _schemas = __webpack_require__(57);
-	
-	var _resources = __webpack_require__(30);
-	
-	var _resources2 = _interopRequireDefault(_resources);
-	
-	var _typed = __webpack_require__(42);
-	
-	var _typed2 = _interopRequireDefault(_typed);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var M = new _TypedModule2.default('lyphs', [_resources2.default, _typed2.default]);
-	exports.default = M;
-	var Material = exports.Material = M.TYPED_RESOURCE({ //////////////////////////////////////
-	
-		name: 'Material',
-	
-		extends: _typed.Typed,
-	
-		singular: "material"
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	var MaterialType = exports.MaterialType = Material.Type;
-	var MaterialTemplate = exports.MaterialTemplate = Material.Template;
-	
-	var ContainsMaterial = exports.ContainsMaterial = M.RELATIONSHIP({
-	
-		name: 'ContainsMaterial',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "contains material",
-	
-		1: [Material.Type, '0..*', { anchors: true, key: 'materials' }],
-		2: [Material.Type, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var InheritsAllMaterialsFrom = exports.InheritsAllMaterialsFrom = M.RELATIONSHIP({
-	
-		name: 'InheritsAllMaterialsFrom',
-	
-		singular: "inherits all materials from",
-	
-		extends: _resources.IsRelatedTo,
-	
-		1: [Material.Type, '0..*', { anchors: true, key: 'materialProviders' }],
-		2: [Material.Type, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var Lyph = exports.Lyph = M.TYPED_RESOURCE({ //////////////////////////////////////////
-	
-		name: 'Lyph',
-	
-		extends: Material,
-	
-		singular: "lyph",
-	
-		properties: {
-			'species': {
-				Type: { type: 'string' }
-			}
-		}
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	var LyphType = exports.LyphType = Lyph.Type;
-	var LyphTemplate = exports.LyphTemplate = Lyph.Template;
-	
-	var HasPart = exports.HasPart = M.RELATIONSHIP({
-	
-		name: 'HasPart',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "has part",
-	
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'parts' }],
-		2: [Lyph.Template, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var HasLayer = exports.HasLayer = M.RELATIONSHIP({
-	
-		name: 'HasLayer',
-	
-		extends: HasPart,
-	
-		singular: "has layer",
-	
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'layers' }],
-		2: [Lyph.Template, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var HasPatch = exports.HasPatch = M.RELATIONSHIP({
-	
-		name: 'HasPatch',
-	
-		extends: HasPart,
-	
-		singular: "has part",
-	
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'patches' }],
-		2: [Lyph.Template, '0..*'],
-	
-		properties: {
-			'patchMap': { type: 'string' }
-		},
-	
-		noCycles: true
-	
-	});
-	
-	var InheritsAllPartsFrom = exports.InheritsAllPartsFrom = M.RELATIONSHIP({
-	
-		name: 'InheritsAllPartsFrom',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "inherits all parts from",
-	
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'partProviders' }],
-		2: [Lyph.Type, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var InheritsAllPatchesFrom = exports.InheritsAllPatchesFrom = M.RELATIONSHIP({
-	
-		name: 'InheritsAllPatchesFrom',
-	
-		extends: _resources.IsRelatedTo,
-		extendedBy: InheritsAllPartsFrom,
-	
-		singular: "inherits all patches from",
-	
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'patchProviders' }],
-		2: [Lyph.Type, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var InheritsAllLayersFrom = exports.InheritsAllLayersFrom = M.RELATIONSHIP({
-	
-		name: 'InheritsAllLayersFrom',
-	
-		extends: _resources.IsRelatedTo,
-		extendedBy: InheritsAllPartsFrom,
-	
-		singular: "inherits all layers from",
-	
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'layerProviders' }],
-		2: [Lyph.Type, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var CylindricalLyph = exports.CylindricalLyph = M.TYPED_RESOURCE({ ///////////////////////////////
-	
-		name: 'CylindricalLyph',
-	
-		extends: Lyph,
-	
-		singular: "cylindrical lyph"
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	var CylindricalLyphType = exports.CylindricalLyphType = CylindricalLyph.Type;
-	var CylindricalLyphTemplate = exports.CylindricalLyphTemplate = CylindricalLyph.Template;
-	
-	M.RELATIONSHIP({
-	
-		name: 'HasLayer',
-	
-		extends: HasPart,
-	
-		singular: "has layer",
-	
-		1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'layers' }],
-		2: [CylindricalLyph.Template, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var HasSegment = exports.HasSegment = M.RELATIONSHIP({
-	
-		name: 'HasSegment',
-	
-		extends: HasPatch,
-	
-		singular: "has segment",
-	
-		1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'segments' }],
-		2: [CylindricalLyph.Template, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var InheritsAllSegmentsFrom = exports.InheritsAllSegmentsFrom = M.RELATIONSHIP({
-	
-		name: 'InheritsAllSegmentsFrom',
-	
-		extends: _resources.IsRelatedTo,
-		extendedBy: InheritsAllPartsFrom,
-	
-		singular: "inherits all segments from",
-	
-		1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'segmentProviders' }],
-		2: [CylindricalLyph.Type, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var Border = exports.Border = M.TYPED_RESOURCE({ ////////////////////////////////////////
-	
-		name: 'Border',
-	
-		extends: _typed.Typed,
-	
-		singular: "border",
-	
-		properties: {
-			nature: {
-				Template: _extends({}, (0, _schemas.enumSchema)('open', 'closed'), { default: 'open', required: true }),
-				Type: _extends({}, (0, _schemas.enumArraySchema)('open', 'closed'), { default: ['open', 'closed'] }),
-				typeCheck: _misc.arrayContainsValue
-			}
-		}
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	var BorderType = exports.BorderType = Border.Type;
-	var BorderTemplate = exports.BorderTemplate = Border.Template;
-	
-	var _M$RELATIONSHIP = M.RELATIONSHIP([['HasInnerBorder', Lyph, 'innerBorder', "has inner border"], ['HasOuterBorder', Lyph, 'outerBorder', "has outer border"], ['HasMinusBorder', CylindricalLyph, 'minusBorder', "has minus border"], ['HasPlusBorder', CylindricalLyph, 'plusBorder', "has plus border"]].map(function (_ref) {
-		var _ref2 = _slicedToArray(_ref, 4);
-	
-		var name = _ref2[0];
-		var LyphClass = _ref2[1];
-		var key = _ref2[2];
-		var singular = _ref2[3];
-		return {
-	
-			name: name,
-	
-			extends: _resources.IsRelatedTo,
-	
-			singular: singular,
-	
-			1: [LyphClass.Type, '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key: key }],
-			2: [Border.Template, '1..1'],
-	
-			// The 'readonly' flag above implies that when a lyph is created,
-			// its borders are also automatically created.
-	
-			properties: {
-				'position': {
-					Type: _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.rangeSchema)), { required: false }),
-					Template: _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.distributionSchema)), { required: true }),
-					typeCheck: function typeCheck(t, v) {
-						t = (0, _misc.normalizeToRange)(t);
-						v = (0, _misc.normalizeToRange)(v);
-						return t.min <= v.min && v.max <= t.max;
-					}
-				}
-			}
-	
-			// Two lyphs never share the same border, formally speaking.
-			// The degree to which two borders overlap can be controlled through
-			// the existence of shared nodes on those borders.
-			// (1) Simply a single shared node between two borders indicates that they overlap anywhere.
-			// (2) If a node is on, e.g., the minus and top borders, it is in the corner, with all meaning it implies.
-			// (3) In the strictest case, two nodes could be used to connect four corners and perfectly align two lyphs.
-	
-			// TODO: CONSTRAINT: Outer border                 always has `nature: 'closed'`.
-			//     :             Inner border of position = 0 always has `nature: 'open'  `.
-			//     :             Inner border of position > 0 always has `nature: 'closed'`.
-			//     : Plus border and minus border can be either.
-	
-		};
-	}));
-	
-	var _M$RELATIONSHIP2 = _slicedToArray(_M$RELATIONSHIP, 4);
-	
-	var HasInnerBorder = _M$RELATIONSHIP2[0];
-	var HasOuterBorder = _M$RELATIONSHIP2[1];
-	var HasMinusBorder = _M$RELATIONSHIP2[2];
-	var HasPlusBorder = _M$RELATIONSHIP2[3];
-	exports.HasInnerBorder = HasInnerBorder;
-	exports.HasOuterBorder = HasOuterBorder;
-	exports.HasMinusBorder = HasMinusBorder;
-	exports.HasPlusBorder = HasPlusBorder;
-	var Coalescence = exports.Coalescence = M.RESOURCE({ /////////////////////////////////////////
-	
-		name: 'Coalescence',
-	
-		extends: _resources.Resource,
-	
-		singular: "coalescence"
-	
-		// coalescence between two or more lyph templates means
-		// that at least one lyph from each participating lyph template
-		// shares its outer layer with the other participating lyphs
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	
-	
-	var CoalescesWith = exports.CoalescesWith = M.RELATIONSHIP({
-	
-		name: 'CoalescesWith',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "coalesces with",
-	
-		1: [Lyph.Template, '0..*', { key: 'coalescences' }],
-		2: [Coalescence, '2..*', { anchors: true, key: 'lyphs' }]
-	
-	});
-	
-	var CoalescesThroughLayer = exports.CoalescesThroughLayer = M.RELATIONSHIP({
-	
-		name: 'CoalescesThroughLayer',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "coalesces through layer",
-	
-		1: [Coalescence, '0..*', { anchors: true, key: 'interfaceLayers' }],
-		2: [Lyph.Type, '0..*']
-	
-	});
-	
-	var Node = exports.Node = M.TYPED_RESOURCE({ //////////////////////////////////////////
-	
-		name: 'Node',
-	
-		extends: _typed.Typed,
-	
-		singular: "node"
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	var NodeType = exports.NodeType = Node.Type;
-	var NodeTemplate = exports.NodeTemplate = Node.Template;
-	
-	var _M$RELATIONSHIP3 = M.RELATIONSHIP([Lyph, Border].map(function (Class) {
-		return {
-	
-			name: 'HasNode',
-	
-			singular: "has node",
-	
-			extends: _resources.IsRelatedTo,
-	
-			1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'nodes' }],
-			2: [Node.Template, '0..*']
-	
-		};
-	}));
-	
-	var _M$RELATIONSHIP4 = _slicedToArray(_M$RELATIONSHIP3, 1);
-	
-	var HasNode = _M$RELATIONSHIP4[0];
-	exports.HasNode = HasNode;
-
-/***/ },
-/* 67 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// Thank's IE8 for his funny defineProperty
-	module.exports = !__webpack_require__(68)(function(){
-	  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
-	});
-
-/***/ },
-/* 68 */
-/***/ function(module, exports) {
-
-	module.exports = function(exec){
-	  try {
-	    return !!exec();
-	  } catch(e){
-	    return true;
-	  }
-	};
-
-/***/ },
-/* 69 */
-/***/ function(module, exports) {
-
-	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-	var global = module.exports = typeof window != 'undefined' && window.Math == Math
-	  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-
-/***/ },
-/* 70 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// fallback for non-array-like ES3 and non-enumerable old V8 strings
-	var cof = __webpack_require__(22);
-	module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
-	  return cof(it) == 'String' ? it.split('') : Object(it);
-	};
-
-/***/ },
-/* 71 */
-/***/ function(module, exports) {
-
-	exports.f = {}.propertyIsEnumerable;
-
-/***/ },
-/* 72 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isArray = __webpack_require__(35),
-	    isObjectLike = __webpack_require__(65);
-	
-	/** `Object#toString` result references. */
-	var stringTag = '[object String]';
-	
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
-	
-	/**
-	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objectToString = objectProto.toString;
-	
-	/**
-	 * Checks if `value` is classified as a `String` primitive or object.
-	 *
-	 * @static
-	 * @since 0.1.0
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified,
-	 *  else `false`.
-	 * @example
-	 *
-	 * _.isString('abc');
-	 * // => true
-	 *
-	 * _.isString(1);
-	 * // => false
-	 */
-	function isString(value) {
-	  return typeof value == 'string' ||
-	    (!isArray(value) && isObjectLike(value) && objectToString.call(value) == stringTag);
-	}
-	
-	module.exports = isString;
-
-
-/***/ },
-/* 73 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * power-assert.js - Power Assert in JavaScript.
-	 *
-	 * https://github.com/power-assert-js/power-assert
-	 *
-	 * Copyright (c) 2013-2016 Takuto Wada
-	 * Licensed under the MIT license.
-	 *   https://github.com/power-assert-js/power-assert/blob/master/MIT-LICENSE.txt
-	 */
-	'use strict';
-	
-	var baseAssert = __webpack_require__(243);
-	var _deepEqual = __webpack_require__(624);
-	var empower = __webpack_require__(474);
-	var formatter = __webpack_require__(585);
-	var extend = __webpack_require__(627);
-	var define = __webpack_require__(467);
-	var empowerOptions = {
-	    modifyMessageOnRethrow: true,
-	    saveContextOnRethrow: true
-	};
-	
-	if (typeof baseAssert.deepStrictEqual !== 'function') {
-	    baseAssert.deepStrictEqual = function deepStrictEqual (actual, expected, message) {
-	        if (!_deepEqual(actual, expected, true)) {
-	            baseAssert.fail(actual, expected, message, 'deepStrictEqual', deepStrictEqual);
-	        }
-	    };
-	}
-	if (typeof baseAssert.notDeepStrictEqual !== 'function') {
-	    baseAssert.notDeepStrictEqual = function notDeepStrictEqual (actual, expected, message) {
-	        if (_deepEqual(actual, expected, true)) {
-	            baseAssert.fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
-	        }
-	    };
-	}
-	
-	function customize (customOptions) {
-	    var options = customOptions || {};
-	    var poweredAssert = empower(
-	        baseAssert,
-	        formatter(options.output),
-	        extend(empowerOptions, options.assertion)
-	    );
-	    poweredAssert.customize = customize;
-	    return poweredAssert;
-	}
-	
-	var defaultAssert = customize();
-	define(defaultAssert, { '__esModule': true });
-	defaultAssert['default'] = defaultAssert;
-	module.exports = defaultAssert;
-
-
-/***/ },
-/* 74 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
 	exports.default = undefined;
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -3951,7 +3397,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isEqual2 = _interopRequireDefault(_isEqual);
 	
-	var _powerAssert = __webpack_require__(73);
+	var _powerAssert = __webpack_require__(74);
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
@@ -4869,6 +4315,560 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
+/* 67 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.HasNode = exports.NodeTemplate = exports.NodeType = exports.Node = exports.CoalescesThroughLayer = exports.CoalescesWith = exports.Coalescence = exports.HasPlusBorder = exports.HasMinusBorder = exports.HasOuterBorder = exports.HasInnerBorder = exports.BorderTemplate = exports.BorderType = exports.Border = exports.InheritsAllSegmentsFrom = exports.HasSegment = exports.CylindricalLyphTemplate = exports.CylindricalLyphType = exports.CylindricalLyph = exports.InheritsAllLayersFrom = exports.InheritsAllPatchesFrom = exports.InheritsAllPartsFrom = exports.HasPatch = exports.HasLayer = exports.HasPart = exports.LyphTemplate = exports.LyphType = exports.Lyph = exports.InheritsAllMaterialsFrom = exports.ContainsMaterial = exports.MaterialTemplate = exports.MaterialType = exports.Material = undefined;
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _isNumber = __webpack_require__(221);
+	
+	var _isNumber2 = _interopRequireDefault(_isNumber);
+	
+	var _TypedModule = __webpack_require__(55);
+	
+	var _TypedModule2 = _interopRequireDefault(_TypedModule);
+	
+	var _misc = __webpack_require__(56);
+	
+	var _schemas = __webpack_require__(57);
+	
+	var _resources = __webpack_require__(30);
+	
+	var _resources2 = _interopRequireDefault(_resources);
+	
+	var _typed = __webpack_require__(41);
+	
+	var _typed2 = _interopRequireDefault(_typed);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var M = new _TypedModule2.default('lyphs', [_resources2.default, _typed2.default]);
+	exports.default = M;
+	var Material = exports.Material = M.TYPED_RESOURCE({ //////////////////////////////////////
+	
+		name: 'Material',
+	
+		extends: _typed.Typed,
+	
+		singular: "material"
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	var MaterialType = exports.MaterialType = Material.Type;
+	var MaterialTemplate = exports.MaterialTemplate = Material.Template;
+	
+	var ContainsMaterial = exports.ContainsMaterial = M.RELATIONSHIP({
+	
+		name: 'ContainsMaterial',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "contains material",
+	
+		1: [Material.Type, '0..*', { anchors: true, key: 'materials' }],
+		2: [Material.Type, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var InheritsAllMaterialsFrom = exports.InheritsAllMaterialsFrom = M.RELATIONSHIP({
+	
+		name: 'InheritsAllMaterialsFrom',
+	
+		singular: "inherits all materials from",
+	
+		extends: _resources.IsRelatedTo,
+	
+		1: [Material.Type, '0..*', { anchors: true, key: 'materialProviders' }],
+		2: [Material.Type, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var Lyph = exports.Lyph = M.TYPED_RESOURCE({ //////////////////////////////////////////
+	
+		name: 'Lyph',
+	
+		extends: Material,
+	
+		singular: "lyph",
+	
+		properties: {
+			'species': {
+				Type: { type: 'string' }
+			}
+		}
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	var LyphType = exports.LyphType = Lyph.Type;
+	var LyphTemplate = exports.LyphTemplate = Lyph.Template;
+	
+	var HasPart = exports.HasPart = M.RELATIONSHIP({
+	
+		name: 'HasPart',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "has part",
+	
+		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'parts' }],
+		2: [Lyph.Template, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var HasLayer = exports.HasLayer = M.RELATIONSHIP({
+	
+		name: 'HasLayer',
+	
+		extends: HasPart,
+	
+		singular: "has layer",
+	
+		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'layers' }],
+		2: [Lyph.Template, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var HasPatch = exports.HasPatch = M.RELATIONSHIP({
+	
+		name: 'HasPatch',
+	
+		extends: HasPart,
+	
+		singular: "has part",
+	
+		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'patches' }],
+		2: [Lyph.Template, '0..*'],
+	
+		properties: {
+			'patchMap': { type: 'string' }
+		},
+	
+		noCycles: true
+	
+	});
+	
+	var InheritsAllPartsFrom = exports.InheritsAllPartsFrom = M.RELATIONSHIP({
+	
+		name: 'InheritsAllPartsFrom',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "inherits all parts from",
+	
+		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'partProviders' }],
+		2: [Lyph.Type, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var InheritsAllPatchesFrom = exports.InheritsAllPatchesFrom = M.RELATIONSHIP({
+	
+		name: 'InheritsAllPatchesFrom',
+	
+		extends: _resources.IsRelatedTo,
+		extendedBy: InheritsAllPartsFrom,
+	
+		singular: "inherits all patches from",
+	
+		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'patchProviders' }],
+		2: [Lyph.Type, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var InheritsAllLayersFrom = exports.InheritsAllLayersFrom = M.RELATIONSHIP({
+	
+		name: 'InheritsAllLayersFrom',
+	
+		extends: _resources.IsRelatedTo,
+		extendedBy: InheritsAllPartsFrom,
+	
+		singular: "inherits all layers from",
+	
+		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'layerProviders' }],
+		2: [Lyph.Type, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var CylindricalLyph = exports.CylindricalLyph = M.TYPED_RESOURCE({ ///////////////////////////////
+	
+		name: 'CylindricalLyph',
+	
+		extends: Lyph,
+	
+		singular: "cylindrical lyph"
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	var CylindricalLyphType = exports.CylindricalLyphType = CylindricalLyph.Type;
+	var CylindricalLyphTemplate = exports.CylindricalLyphTemplate = CylindricalLyph.Template;
+	
+	M.RELATIONSHIP({
+	
+		name: 'HasLayer',
+	
+		extends: HasPart,
+	
+		singular: "has layer",
+	
+		1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'layers' }],
+		2: [CylindricalLyph.Template, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var HasSegment = exports.HasSegment = M.RELATIONSHIP({
+	
+		name: 'HasSegment',
+	
+		extends: HasPatch,
+	
+		singular: "has segment",
+	
+		1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'segments' }],
+		2: [CylindricalLyph.Template, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var InheritsAllSegmentsFrom = exports.InheritsAllSegmentsFrom = M.RELATIONSHIP({
+	
+		name: 'InheritsAllSegmentsFrom',
+	
+		extends: _resources.IsRelatedTo,
+		extendedBy: InheritsAllPartsFrom,
+	
+		singular: "inherits all segments from",
+	
+		1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'segmentProviders' }],
+		2: [CylindricalLyph.Type, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var Border = exports.Border = M.TYPED_RESOURCE({ ////////////////////////////////////////
+	
+		name: 'Border',
+	
+		extends: _typed.Typed,
+	
+		singular: "border",
+	
+		properties: {
+			nature: {
+				Template: _extends({}, (0, _schemas.enumSchema)('open', 'closed'), { default: 'open', required: true }),
+				Type: _extends({}, (0, _schemas.enumArraySchema)('open', 'closed'), { default: ['open', 'closed'] }),
+				typeCheck: _misc.arrayContainsValue
+			}
+		}
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	var BorderType = exports.BorderType = Border.Type;
+	var BorderTemplate = exports.BorderTemplate = Border.Template;
+	
+	var _M$RELATIONSHIP = M.RELATIONSHIP([['HasInnerBorder', Lyph, 'innerBorder', "has inner border"], ['HasOuterBorder', Lyph, 'outerBorder', "has outer border"], ['HasMinusBorder', CylindricalLyph, 'minusBorder', "has minus border"], ['HasPlusBorder', CylindricalLyph, 'plusBorder', "has plus border"]].map(function (_ref) {
+		var _ref2 = _slicedToArray(_ref, 4);
+	
+		var name = _ref2[0];
+		var LyphClass = _ref2[1];
+		var key = _ref2[2];
+		var singular = _ref2[3];
+		return {
+	
+			name: name,
+	
+			extends: _resources.IsRelatedTo,
+	
+			singular: singular,
+	
+			1: [LyphClass.Type, '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key: key }],
+			2: [Border.Template, '1..1'],
+	
+			// The 'readonly' flag above implies that when a lyph is created,
+			// its borders are also automatically created.
+	
+			properties: {
+				'position': {
+					Type: _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.rangeSchema)), { required: false }),
+					Template: _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.distributionSchema)), { required: true }),
+					typeCheck: function typeCheck(t, v) {
+						t = (0, _misc.normalizeToRange)(t);
+						v = (0, _misc.normalizeToRange)(v);
+						return t.min <= v.min && v.max <= t.max;
+					}
+				}
+			}
+	
+			// Two lyphs never share the same border, formally speaking.
+			// The degree to which two borders overlap can be controlled through
+			// the existence of shared nodes on those borders.
+			// (1) Simply a single shared node between two borders indicates that they overlap anywhere.
+			// (2) If a node is on, e.g., the minus and top borders, it is in the corner, with all meaning it implies.
+			// (3) In the strictest case, two nodes could be used to connect four corners and perfectly align two lyphs.
+	
+			// TODO: CONSTRAINT: Outer border                 always has `nature: 'closed'`.
+			//     :             Inner border of position = 0 always has `nature: 'open'  `.
+			//     :             Inner border of position > 0 always has `nature: 'closed'`.
+			//     : Plus border and minus border can be either.
+	
+		};
+	}));
+	
+	var _M$RELATIONSHIP2 = _slicedToArray(_M$RELATIONSHIP, 4);
+	
+	var HasInnerBorder = _M$RELATIONSHIP2[0];
+	var HasOuterBorder = _M$RELATIONSHIP2[1];
+	var HasMinusBorder = _M$RELATIONSHIP2[2];
+	var HasPlusBorder = _M$RELATIONSHIP2[3];
+	exports.HasInnerBorder = HasInnerBorder;
+	exports.HasOuterBorder = HasOuterBorder;
+	exports.HasMinusBorder = HasMinusBorder;
+	exports.HasPlusBorder = HasPlusBorder;
+	var Coalescence = exports.Coalescence = M.RESOURCE({ /////////////////////////////////////////
+	
+		name: 'Coalescence',
+	
+		extends: _resources.Resource,
+	
+		singular: "coalescence"
+	
+		// coalescence between two or more lyph templates means
+		// that at least one lyph from each participating lyph template
+		// shares its outer layer with the other participating lyphs
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	
+	
+	var CoalescesWith = exports.CoalescesWith = M.RELATIONSHIP({
+	
+		name: 'CoalescesWith',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "coalesces with",
+	
+		1: [Lyph.Template, '0..*', { key: 'coalescences' }],
+		2: [Coalescence, '2..*', { anchors: true, key: 'lyphs' }]
+	
+	});
+	
+	var CoalescesThroughLayer = exports.CoalescesThroughLayer = M.RELATIONSHIP({
+	
+		name: 'CoalescesThroughLayer',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "coalesces through layer",
+	
+		1: [Coalescence, '0..*', { anchors: true, key: 'interfaceLayers' }],
+		2: [Lyph.Type, '0..*']
+	
+	});
+	
+	var Node = exports.Node = M.TYPED_RESOURCE({ //////////////////////////////////////////
+	
+		name: 'Node',
+	
+		extends: _typed.Typed,
+	
+		singular: "node"
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	var NodeType = exports.NodeType = Node.Type;
+	var NodeTemplate = exports.NodeTemplate = Node.Template;
+	
+	var _M$RELATIONSHIP3 = M.RELATIONSHIP([Lyph, Border].map(function (Class) {
+		return {
+	
+			name: 'HasNode',
+	
+			singular: "has node",
+	
+			extends: _resources.IsRelatedTo,
+	
+			1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'nodes' }],
+			2: [Node.Template, '0..*']
+	
+		};
+	}));
+	
+	var _M$RELATIONSHIP4 = _slicedToArray(_M$RELATIONSHIP3, 1);
+	
+	var HasNode = _M$RELATIONSHIP4[0];
+	exports.HasNode = HasNode;
+
+/***/ },
+/* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Thank's IE8 for his funny defineProperty
+	module.exports = !__webpack_require__(69)(function(){
+	  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
+	});
+
+/***/ },
+/* 69 */
+/***/ function(module, exports) {
+
+	module.exports = function(exec){
+	  try {
+	    return !!exec();
+	  } catch(e){
+	    return true;
+	  }
+	};
+
+/***/ },
+/* 70 */
+/***/ function(module, exports) {
+
+	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+	var global = module.exports = typeof window != 'undefined' && window.Math == Math
+	  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+
+/***/ },
+/* 71 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// fallback for non-array-like ES3 and non-enumerable old V8 strings
+	var cof = __webpack_require__(22);
+	module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
+	  return cof(it) == 'String' ? it.split('') : Object(it);
+	};
+
+/***/ },
+/* 72 */
+/***/ function(module, exports) {
+
+	exports.f = {}.propertyIsEnumerable;
+
+/***/ },
+/* 73 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isArray = __webpack_require__(35),
+	    isObjectLike = __webpack_require__(65);
+	
+	/** `Object#toString` result references. */
+	var stringTag = '[object String]';
+	
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+	
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+	
+	/**
+	 * Checks if `value` is classified as a `String` primitive or object.
+	 *
+	 * @static
+	 * @since 0.1.0
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
+	 * @example
+	 *
+	 * _.isString('abc');
+	 * // => true
+	 *
+	 * _.isString(1);
+	 * // => false
+	 */
+	function isString(value) {
+	  return typeof value == 'string' ||
+	    (!isArray(value) && isObjectLike(value) && objectToString.call(value) == stringTag);
+	}
+	
+	module.exports = isString;
+
+
+/***/ },
+/* 74 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * power-assert.js - Power Assert in JavaScript.
+	 *
+	 * https://github.com/power-assert-js/power-assert
+	 *
+	 * Copyright (c) 2013-2016 Takuto Wada
+	 * Licensed under the MIT license.
+	 *   https://github.com/power-assert-js/power-assert/blob/master/MIT-LICENSE.txt
+	 */
+	'use strict';
+	
+	var baseAssert = __webpack_require__(243);
+	var _deepEqual = __webpack_require__(624);
+	var empower = __webpack_require__(474);
+	var formatter = __webpack_require__(585);
+	var extend = __webpack_require__(627);
+	var define = __webpack_require__(467);
+	var empowerOptions = {
+	    modifyMessageOnRethrow: true,
+	    saveContextOnRethrow: true
+	};
+	
+	if (typeof baseAssert.deepStrictEqual !== 'function') {
+	    baseAssert.deepStrictEqual = function deepStrictEqual (actual, expected, message) {
+	        if (!_deepEqual(actual, expected, true)) {
+	            baseAssert.fail(actual, expected, message, 'deepStrictEqual', deepStrictEqual);
+	        }
+	    };
+	}
+	if (typeof baseAssert.notDeepStrictEqual !== 'function') {
+	    baseAssert.notDeepStrictEqual = function notDeepStrictEqual (actual, expected, message) {
+	        if (_deepEqual(actual, expected, true)) {
+	            baseAssert.fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
+	        }
+	    };
+	}
+	
+	function customize (customOptions) {
+	    var options = customOptions || {};
+	    var poweredAssert = empower(
+	        baseAssert,
+	        formatter(options.output),
+	        extend(empowerOptions, options.assertion)
+	    );
+	    poweredAssert.customize = customize;
+	    return poweredAssert;
+	}
+	
+	var defaultAssert = customize();
+	define(defaultAssert, { '__esModule': true });
+	defaultAssert['default'] = defaultAssert;
+	module.exports = defaultAssert;
+
+
+/***/ },
 /* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4953,7 +4953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// true  -> Array#includes
 	var toIObject = __webpack_require__(17)
 	  , toLength  = __webpack_require__(9)
-	  , toIndex   = __webpack_require__(52);
+	  , toIndex   = __webpack_require__(51);
 	module.exports = function(IS_INCLUDES){
 	  return function($this, el, fromIndex){
 	    var O      = toIObject($this)
@@ -4979,7 +4979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var global            = __webpack_require__(3)
 	  , $export           = __webpack_require__(1)
 	  , redefine          = __webpack_require__(15)
-	  , redefineAll       = __webpack_require__(50)
+	  , redefineAll       = __webpack_require__(49)
 	  , meta              = __webpack_require__(37)
 	  , forOf             = __webpack_require__(61)
 	  , anInstance        = __webpack_require__(36)
@@ -5177,7 +5177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// Forced replacement prototype accessors methods
-	module.exports = __webpack_require__(46)|| !__webpack_require__(4)(function(){
+	module.exports = __webpack_require__(45)|| !__webpack_require__(4)(function(){
 	  var K = Math.random();
 	  // In FF throws only define methods
 	  __defineSetter__.call(null, K, function(){ /* empty */});
@@ -5237,7 +5237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var global = __webpack_require__(3)
 	  , hide   = __webpack_require__(13)
-	  , uid    = __webpack_require__(53)
+	  , uid    = __webpack_require__(52)
 	  , TYPED  = uid('typed_array')
 	  , VIEW   = uid('view')
 	  , ABV    = !!(global.ArrayBuffer && global.DataView)
@@ -5680,7 +5680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(54);
+	var Observable_1 = __webpack_require__(53);
 	var Subscriber_1 = __webpack_require__(29);
 	var Subscription_1 = __webpack_require__(150);
 	var ObjectUnsubscribedError_1 = __webpack_require__(236);
@@ -5845,7 +5845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(54);
+	var Observable_1 = __webpack_require__(53);
 	var ScalarObservable_1 = __webpack_require__(230);
 	var EmptyObservable_1 = __webpack_require__(151);
 	var isScheduler_1 = __webpack_require__(104);
@@ -6005,7 +6005,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var root_1 = __webpack_require__(105);
 	var isArray_1 = __webpack_require__(154);
 	var isPromise_1 = __webpack_require__(616);
-	var Observable_1 = __webpack_require__(54);
+	var Observable_1 = __webpack_require__(53);
 	var iterator_1 = __webpack_require__(612);
 	var InnerSubscriber_1 = __webpack_require__(596);
 	var symbol_observable_1 = __webpack_require__(240);
@@ -6090,7 +6090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _schemas = __webpack_require__(57);
 	
-	var _TypedModule = __webpack_require__(41);
+	var _TypedModule = __webpack_require__(55);
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
@@ -6098,11 +6098,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(42);
+	var _typed = __webpack_require__(41);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
-	var _lyphs = __webpack_require__(66);
+	var _lyphs = __webpack_require__(67);
 	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
 	
@@ -6246,7 +6246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _TypedModule = __webpack_require__(41);
+	var _TypedModule = __webpack_require__(55);
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
@@ -6258,11 +6258,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(42);
+	var _typed = __webpack_require__(41);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
-	var _lyphs = __webpack_require__(66);
+	var _lyphs = __webpack_require__(67);
 	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
 	
@@ -6462,7 +6462,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isEqual2 = _interopRequireDefault(_isEqual);
 	
-	var _powerAssert = __webpack_require__(73);
+	var _powerAssert = __webpack_require__(74);
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
@@ -6891,7 +6891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , toPrimitive    = __webpack_require__(272)
 	  , dP             = Object.defineProperty;
 	
-	exports.f = __webpack_require__(67) ? Object.defineProperty : function defineProperty(O, P, Attributes){
+	exports.f = __webpack_require__(68) ? Object.defineProperty : function defineProperty(O, P, Attributes){
 	  anObject(O);
 	  P = toPrimitive(P, true);
 	  anObject(Attributes);
@@ -6933,7 +6933,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
 	'use strict';
 	var toObject = __webpack_require__(10)
-	  , toIndex  = __webpack_require__(52)
+	  , toIndex  = __webpack_require__(51)
 	  , toLength = __webpack_require__(9);
 	module.exports = function fill(value /*, start = 0, end = @length */){
 	  var O      = toObject(this)
@@ -7021,7 +7021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// check on default Array iterator
-	var Iterators  = __webpack_require__(45)
+	var Iterators  = __webpack_require__(44)
 	  , ITERATOR   = __webpack_require__(6)('iterator')
 	  , ArrayProto = Array.prototype;
 	
@@ -7055,7 +7055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var create         = __webpack_require__(47)
+	var create         = __webpack_require__(46)
 	  , descriptor     = __webpack_require__(38)
 	  , setToStringTag = __webpack_require__(62)
 	  , IteratorPrototype = {};
@@ -7073,12 +7073,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var LIBRARY        = __webpack_require__(46)
+	var LIBRARY        = __webpack_require__(45)
 	  , $export        = __webpack_require__(1)
 	  , redefine       = __webpack_require__(15)
 	  , hide           = __webpack_require__(13)
 	  , has            = __webpack_require__(11)
-	  , Iterators      = __webpack_require__(45)
+	  , Iterators      = __webpack_require__(44)
 	  , $iterCreate    = __webpack_require__(126)
 	  , setToStringTag = __webpack_require__(62)
 	  , getPrototypeOf = __webpack_require__(20)
@@ -7245,7 +7245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var shared = __webpack_require__(89)('keys')
-	  , uid    = __webpack_require__(53);
+	  , uid    = __webpack_require__(52);
 	module.exports = function(key){
 	  return shared[key] || (shared[key] = uid(key));
 	};
@@ -7409,15 +7409,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var global         = __webpack_require__(3)
 	  , DESCRIPTORS    = __webpack_require__(7)
-	  , LIBRARY        = __webpack_require__(46)
+	  , LIBRARY        = __webpack_require__(45)
 	  , $typed         = __webpack_require__(90)
 	  , hide           = __webpack_require__(13)
-	  , redefineAll    = __webpack_require__(50)
+	  , redefineAll    = __webpack_require__(49)
 	  , fails          = __webpack_require__(4)
 	  , anInstance     = __webpack_require__(36)
 	  , toInteger      = __webpack_require__(39)
 	  , toLength       = __webpack_require__(9)
-	  , gOPN           = __webpack_require__(48).f
+	  , gOPN           = __webpack_require__(47).f
 	  , dP             = __webpack_require__(8).f
 	  , arrayFill      = __webpack_require__(116)
 	  , setToStringTag = __webpack_require__(62)
@@ -7688,7 +7688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var global         = __webpack_require__(3)
 	  , core           = __webpack_require__(26)
-	  , LIBRARY        = __webpack_require__(46)
+	  , LIBRARY        = __webpack_require__(45)
 	  , wksExt         = __webpack_require__(199)
 	  , defineProperty = __webpack_require__(8).f;
 	module.exports = function(name){
@@ -7702,7 +7702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var classof   = __webpack_require__(60)
 	  , ITERATOR  = __webpack_require__(6)('iterator')
-	  , Iterators = __webpack_require__(45);
+	  , Iterators = __webpack_require__(44);
 	module.exports = __webpack_require__(26).getIteratorMethod = function(it){
 	  if(it != undefined)return it[ITERATOR]
 	    || it['@@iterator']
@@ -7716,7 +7716,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var addToUnscopables = __webpack_require__(59)
 	  , step             = __webpack_require__(187)
-	  , Iterators        = __webpack_require__(45)
+	  , Iterators        = __webpack_require__(44)
 	  , toIObject        = __webpack_require__(17);
 	
 	// 22.1.3.4 Array.prototype.entries()
@@ -9061,7 +9061,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(54);
+	var Observable_1 = __webpack_require__(53);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -9265,7 +9265,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _inRange2 = _interopRequireDefault(_inRange);
 	
-	var _isString = __webpack_require__(72);
+	var _isString = __webpack_require__(73);
 	
 	var _isString2 = _interopRequireDefault(_isString);
 	
@@ -9273,7 +9273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isArray2 = _interopRequireDefault(_isArray);
 	
-	var _powerAssert = __webpack_require__(73);
+	var _powerAssert = __webpack_require__(74);
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
@@ -10863,7 +10863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.HasElement = exports.GroupTemplate = exports.GroupType = exports.Group = undefined;
 	
-	var _TypedModule = __webpack_require__(41);
+	var _TypedModule = __webpack_require__(55);
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
@@ -10871,7 +10871,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(42);
+	var _typed = __webpack_require__(41);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -12993,7 +12993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isObject = __webpack_require__(77)
-	  , document = __webpack_require__(69).document
+	  , document = __webpack_require__(70).document
 	  // in old IE typeof document.createElement is 'object'
 	  , is = isObject(document) && isObject(document.createElement);
 	module.exports = function(it){
@@ -13033,7 +13033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global = __webpack_require__(69)
+	var global = __webpack_require__(70)
 	  , SHARED = '__core-js_shared__'
 	  , store  = global[SHARED] || (global[SHARED] = {});
 	module.exports = function(key){
@@ -13089,7 +13089,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
 	'use strict';
 	var toObject = __webpack_require__(10)
-	  , toIndex  = __webpack_require__(52)
+	  , toIndex  = __webpack_require__(51)
 	  , toLength = __webpack_require__(9);
 	
 	module.exports = [].copyWithin || function copyWithin(target/*= 0*/, start/*= 0, end = @length*/){
@@ -13132,7 +13132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var aFunction = __webpack_require__(14)
 	  , toObject  = __webpack_require__(10)
-	  , IObject   = __webpack_require__(70)
+	  , IObject   = __webpack_require__(71)
 	  , toLength  = __webpack_require__(9);
 	
 	module.exports = function(that, callbackfn, aLen, memo, isRight){
@@ -13194,16 +13194,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	var dP          = __webpack_require__(8).f
-	  , create      = __webpack_require__(47)
+	  , create      = __webpack_require__(46)
 	  , hide        = __webpack_require__(13)
-	  , redefineAll = __webpack_require__(50)
+	  , redefineAll = __webpack_require__(49)
 	  , ctx         = __webpack_require__(31)
 	  , anInstance  = __webpack_require__(36)
 	  , defined     = __webpack_require__(23)
 	  , forOf       = __webpack_require__(61)
 	  , $iterDefine = __webpack_require__(127)
 	  , step        = __webpack_require__(187)
-	  , setSpecies  = __webpack_require__(51)
+	  , setSpecies  = __webpack_require__(50)
 	  , DESCRIPTORS = __webpack_require__(7)
 	  , fastKey     = __webpack_require__(37).fastKey
 	  , SIZE        = DESCRIPTORS ? '_s' : 'size';
@@ -13355,7 +13355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var redefineAll       = __webpack_require__(50)
+	var redefineAll       = __webpack_require__(49)
 	  , getWeak           = __webpack_require__(37).getWeak
 	  , anObject          = __webpack_require__(2)
 	  , isObject          = __webpack_require__(5)
@@ -13486,11 +13486,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	// 19.1.2.1 Object.assign(target, source, ...)
-	var getKeys  = __webpack_require__(49)
+	var getKeys  = __webpack_require__(48)
 	  , gOPS     = __webpack_require__(87)
-	  , pIE      = __webpack_require__(71)
+	  , pIE      = __webpack_require__(72)
 	  , toObject = __webpack_require__(10)
-	  , IObject  = __webpack_require__(70)
+	  , IObject  = __webpack_require__(71)
 	  , $assign  = Object.assign;
 	
 	// should work with symbols and should have deterministic property order (V8 bug)
@@ -13524,7 +13524,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var dP       = __webpack_require__(8)
 	  , anObject = __webpack_require__(2)
-	  , getKeys  = __webpack_require__(49);
+	  , getKeys  = __webpack_require__(48);
 	
 	module.exports = __webpack_require__(7) ? Object.defineProperties : function defineProperties(O, Properties){
 	  anObject(O);
@@ -13542,7 +13542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
 	var toIObject = __webpack_require__(17)
-	  , gOPN      = __webpack_require__(48).f
+	  , gOPN      = __webpack_require__(47).f
 	  , toString  = {}.toString;
 	
 	var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
@@ -13587,9 +13587,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getKeys   = __webpack_require__(49)
+	var getKeys   = __webpack_require__(48)
 	  , toIObject = __webpack_require__(17)
-	  , isEnum    = __webpack_require__(71).f;
+	  , isEnum    = __webpack_require__(72).f;
 	module.exports = function(isEntries){
 	  return function(it){
 	    var O      = toIObject(it)
@@ -13609,7 +13609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// all object keys, includes non-enumerable and symbols
-	var gOPN     = __webpack_require__(48)
+	var gOPN     = __webpack_require__(47)
 	  , gOPS     = __webpack_require__(87)
 	  , anObject = __webpack_require__(2)
 	  , Reflect  = __webpack_require__(3).Reflect;
@@ -14202,7 +14202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    isArguments = __webpack_require__(564),
 	    isArray = __webpack_require__(35),
 	    isLength = __webpack_require__(146),
-	    isString = __webpack_require__(72);
+	    isString = __webpack_require__(73);
 	
 	/**
 	 * Creates an array of index keys for `object` values of arrays,
@@ -14978,7 +14978,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(54);
+	var Observable_1 = __webpack_require__(53);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -16124,7 +16124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	var util = __webpack_require__(55);
+	var util = __webpack_require__(54);
 	var hasOwn = Object.prototype.hasOwnProperty;
 	var pSlice = Array.prototype.slice;
 	var functionsHaveNames = (function () {
@@ -16575,7 +16575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tThe entity at \'', '\' is not\n\t\t\tof class \'', '\'\n\t\t\tbut of class \'', '\'.\n\t\t'], ['\n\t\t\tThe entity at \'', '\' is not\n\t\t\tof class \'', '\'\n\t\t\tbut of class \'', '\'.\n\t\t']);
 	
-	var _isString = __webpack_require__(72);
+	var _isString = __webpack_require__(73);
 	
 	var _isString2 = _interopRequireDefault(_isString);
 	
@@ -16587,7 +16587,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isObject2 = _interopRequireDefault(_isObject);
 	
-	var _powerAssert = __webpack_require__(73);
+	var _powerAssert = __webpack_require__(74);
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
@@ -17041,140 +17041,357 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
+	exports.PresentsModel = exports.CausalityArrow = exports.MeasurableGlyph = exports.ProcessEdge = exports.NodeGlyph = exports.CoalescenceRectangle = exports.BorderLine = exports.CylindricalLyphRectangle = exports.LyphRectangle = exports.MaterialGlyph = exports.LyphCanvas = exports.ContainsArtefact = exports.Dim0Container = exports.Dim1Container = exports.Dim2Container = exports.Dim0Artefact = exports.Dim1Artefact = exports.Dim2Artefact = exports.Artefact = exports.PrescribesStyleFor = exports.Theme = exports.InvolvesPublication = exports.Publication = exports.InvolvesClinicalIndex = exports.EncompassesClinicalIndex = exports.ClinicalIndex = exports.InvolvesMeasurable = exports.Correlation = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.Causes = exports.CausalityTemplate = exports.CausalityType = exports.InheritsAllMeasurablesFrom = exports.HasMeasurable = exports.MeasurableLocationTemplate = exports.MeasurableLocationType = exports.MeasuresMaterial = exports.MeasurableTemplate = exports.MeasurableType = exports.InheritsAllChannelsFrom = exports.HasChannel = exports.TransportsMaterial = exports.ConveysProcess = exports.FlowsTo = exports.ProcessTemplate = exports.ProcessType = exports.HasElement = exports.GroupTemplate = exports.GroupType = exports.HasNode = exports.NodeTemplate = exports.NodeType = exports.CoalescesThroughLayer = exports.CoalescesWith = exports.Coalescence = exports.HasPlusBorder = exports.HasMinusBorder = exports.HasOuterBorder = exports.HasInnerBorder = exports.BorderTemplate = exports.BorderType = exports.InheritsAllSegmentsFrom = exports.HasSegment = exports.CylindricalLyphTemplate = exports.CylindricalLyphType = exports.InheritsAllLayersFrom = exports.InheritsAllPatchesFrom = exports.InheritsAllPartsFrom = exports.HasPatch = exports.HasLayer = exports.HasPart = exports.LyphTemplate = exports.LyphType = exports.InheritsAllMaterialsFrom = exports.ContainsMaterial = exports.MaterialTemplate = exports.MaterialType = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = exports.CorrespondsTo = exports.IsExternallyRelatedTo = exports.ExternalResource = exports.IsRelatedTo = exports.Resource = undefined;
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _resources = __webpack_require__(30);
 	
-	Object.keys(_resources).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _resources[key];
-			}
-		});
-	});
-	
-	var _typed = __webpack_require__(42);
-	
-	Object.keys(_typed).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _typed[key];
-			}
-		});
-	});
-	
-	var _lyphs = __webpack_require__(66);
-	
-	Object.keys(_lyphs).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _lyphs[key];
-			}
-		});
-	});
-	
-	var _groups = __webpack_require__(157);
-	
-	Object.keys(_groups).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _groups[key];
-			}
-		});
-	});
-	
-	var _measurables = __webpack_require__(107);
-	
-	Object.keys(_measurables).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _measurables[key];
-			}
-		});
-	});
-	
-	var _omegaTrees = __webpack_require__(246);
-	
-	Object.keys(_omegaTrees).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _omegaTrees[key];
-			}
-		});
-	});
-	
-	var _processes = __webpack_require__(108);
-	
-	Object.keys(_processes).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _processes[key];
-			}
-		});
-	});
-	
-	var _research = __webpack_require__(247);
-	
-	Object.keys(_research).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _research[key];
-			}
-		});
-	});
-	
-	var _visualisations = __webpack_require__(248);
-	
-	Object.keys(_visualisations).forEach(function (key) {
-		if (key === "default") return;
-		Object.defineProperty(exports, key, {
-			enumerable: true,
-			get: function get() {
-				return _visualisations[key];
-			}
-		});
-	});
-	
 	var _resources2 = _interopRequireDefault(_resources);
+	
+	var _typed = __webpack_require__(41);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
+	var _lyphs = __webpack_require__(67);
+	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
+	
+	var _groups = __webpack_require__(157);
 	
 	var _groups2 = _interopRequireDefault(_groups);
 	
+	var _measurables = __webpack_require__(107);
+	
 	var _measurables2 = _interopRequireDefault(_measurables);
+	
+	var _omegaTrees = __webpack_require__(246);
 	
 	var _omegaTrees2 = _interopRequireDefault(_omegaTrees);
 	
+	var _processes = __webpack_require__(108);
+	
 	var _processes2 = _interopRequireDefault(_processes);
+	
+	var _research = __webpack_require__(247);
 	
 	var _research2 = _interopRequireDefault(_research);
 	
+	var _visualisations = __webpack_require__(248);
+	
 	var _visualisations2 = _interopRequireDefault(_visualisations);
 	
-	var _TypedModule = __webpack_require__(41);
+	var _Module = __webpack_require__(66);
 	
-	var _TypedModule2 = _interopRequireDefault(_TypedModule);
+	var _Module2 = _interopRequireDefault(_Module);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	exports.default = new _TypedModule2.default('all', [_resources2.default, _typed2.default, _lyphs2.default, _groups2.default, _measurables2.default, _omegaTrees2.default, _processes2.default, _research2.default, _visualisations2.default]);
+	var M = new _Module2.default('all', [_resources2.default, _typed2.default, _lyphs2.default, _groups2.default, _measurables2.default, _omegaTrees2.default, _processes2.default, _research2.default, _visualisations2.default]);
+	exports.default = M;
+	
+	
+	var classesObject = {};
+	_M$classes$vertices = M.classes.vertices();
+	
+	if (!(_M$classes$vertices && (typeof _M$classes$vertices[Symbol.iterator] === 'function' || Array.isArray(_M$classes$vertices)))) {
+		throw new TypeError('Expected _M$classes$vertices to be iterable, got ' + _inspect(_M$classes$vertices));
+	}
+	
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+	
+	try {
+		for (var _iterator = _M$classes$vertices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var _M$classes$vertices;
+	
+			var _step$value = _slicedToArray(_step.value, 2);
+	
+			var key = _step$value[0];
+			var val = _step$value[1];
+	
+			classesObject[key] = val;
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
+	
+	var Resource = classesObject.Resource;
+	var IsRelatedTo = classesObject.IsRelatedTo;
+	var ExternalResource = classesObject.ExternalResource;
+	var IsExternallyRelatedTo = classesObject.IsExternallyRelatedTo;
+	var CorrespondsTo = classesObject.CorrespondsTo;
+	var Type = classesObject.Type;
+	var IsSubtypeOf = classesObject.IsSubtypeOf;
+	var Template = classesObject.Template;
+	var HasCardinalityMultipliedByThatOf = classesObject.HasCardinalityMultipliedByThatOf;
+	var HasType = classesObject.HasType;
+	var MaterialType = classesObject.MaterialType;
+	var MaterialTemplate = classesObject.MaterialTemplate;
+	var ContainsMaterial = classesObject.ContainsMaterial;
+	var InheritsAllMaterialsFrom = classesObject.InheritsAllMaterialsFrom;
+	var LyphType = classesObject.LyphType;
+	var LyphTemplate = classesObject.LyphTemplate;
+	var HasPart = classesObject.HasPart;
+	var HasLayer = classesObject.HasLayer;
+	var HasPatch = classesObject.HasPatch;
+	var InheritsAllPartsFrom = classesObject.InheritsAllPartsFrom;
+	var InheritsAllPatchesFrom = classesObject.InheritsAllPatchesFrom;
+	var InheritsAllLayersFrom = classesObject.InheritsAllLayersFrom;
+	var CylindricalLyphType = classesObject.CylindricalLyphType;
+	var CylindricalLyphTemplate = classesObject.CylindricalLyphTemplate;
+	var HasSegment = classesObject.HasSegment;
+	var InheritsAllSegmentsFrom = classesObject.InheritsAllSegmentsFrom;
+	var BorderType = classesObject.BorderType;
+	var BorderTemplate = classesObject.BorderTemplate;
+	var HasInnerBorder = classesObject.HasInnerBorder;
+	var HasOuterBorder = classesObject.HasOuterBorder;
+	var HasMinusBorder = classesObject.HasMinusBorder;
+	var HasPlusBorder = classesObject.HasPlusBorder;
+	var Coalescence = classesObject.Coalescence;
+	var CoalescesWith = classesObject.CoalescesWith;
+	var CoalescesThroughLayer = classesObject.CoalescesThroughLayer;
+	var NodeType = classesObject.NodeType;
+	var NodeTemplate = classesObject.NodeTemplate;
+	var HasNode = classesObject.HasNode;
+	var GroupType = classesObject.GroupType;
+	var GroupTemplate = classesObject.GroupTemplate;
+	var HasElement = classesObject.HasElement;
+	var ProcessType = classesObject.ProcessType;
+	var ProcessTemplate = classesObject.ProcessTemplate;
+	var FlowsTo = classesObject.FlowsTo;
+	var ConveysProcess = classesObject.ConveysProcess;
+	var TransportsMaterial = classesObject.TransportsMaterial;
+	var HasChannel = classesObject.HasChannel;
+	var InheritsAllChannelsFrom = classesObject.InheritsAllChannelsFrom;
+	var MeasurableType = classesObject.MeasurableType;
+	var MeasurableTemplate = classesObject.MeasurableTemplate;
+	var MeasuresMaterial = classesObject.MeasuresMaterial;
+	var MeasurableLocationType = classesObject.MeasurableLocationType;
+	var MeasurableLocationTemplate = classesObject.MeasurableLocationTemplate;
+	var HasMeasurable = classesObject.HasMeasurable;
+	var InheritsAllMeasurablesFrom = classesObject.InheritsAllMeasurablesFrom;
+	var CausalityType = classesObject.CausalityType;
+	var CausalityTemplate = classesObject.CausalityTemplate;
+	var Causes = classesObject.Causes;
+	var OmegaTreeType = classesObject.OmegaTreeType;
+	var OmegaTreeTemplate = classesObject.OmegaTreeTemplate;
+	var HasAsRoot = classesObject.HasAsRoot;
+	var Correlation = classesObject.Correlation;
+	var InvolvesMeasurable = classesObject.InvolvesMeasurable;
+	var ClinicalIndex = classesObject.ClinicalIndex;
+	var EncompassesClinicalIndex = classesObject.EncompassesClinicalIndex;
+	var InvolvesClinicalIndex = classesObject.InvolvesClinicalIndex;
+	var Publication = classesObject.Publication;
+	var InvolvesPublication = classesObject.InvolvesPublication;
+	var Theme = classesObject.Theme;
+	var PrescribesStyleFor = classesObject.PrescribesStyleFor;
+	var Artefact = classesObject.Artefact;
+	var Dim2Artefact = classesObject.Dim2Artefact;
+	var Dim1Artefact = classesObject.Dim1Artefact;
+	var Dim0Artefact = classesObject.Dim0Artefact;
+	var Dim2Container = classesObject.Dim2Container;
+	var Dim1Container = classesObject.Dim1Container;
+	var Dim0Container = classesObject.Dim0Container;
+	var ContainsArtefact = classesObject.ContainsArtefact;
+	var LyphCanvas = classesObject.LyphCanvas;
+	var MaterialGlyph = classesObject.MaterialGlyph;
+	var LyphRectangle = classesObject.LyphRectangle;
+	var CylindricalLyphRectangle = classesObject.CylindricalLyphRectangle;
+	var BorderLine = classesObject.BorderLine;
+	var CoalescenceRectangle = classesObject.CoalescenceRectangle;
+	var NodeGlyph = classesObject.NodeGlyph;
+	var ProcessEdge = classesObject.ProcessEdge;
+	var MeasurableGlyph = classesObject.MeasurableGlyph;
+	var CausalityArrow = classesObject.CausalityArrow;
+	var PresentsModel = classesObject.PresentsModel;
+	
+	// export * from './modules/resources';
+	// export * from './modules/typed';
+	// export * from './modules/lyphs';
+	// export * from './modules/groups';
+	// export * from './modules/measurables';
+	// export * from './modules/omegaTrees';
+	// export * from './modules/processes';
+	// export * from './modules/research';
+	// export * from './modules/visualisations';
+	
+	exports.Resource = Resource;
+	exports.IsRelatedTo = IsRelatedTo;
+	exports.ExternalResource = ExternalResource;
+	exports.IsExternallyRelatedTo = IsExternallyRelatedTo;
+	exports.CorrespondsTo = CorrespondsTo;
+	exports.Type = Type;
+	exports.IsSubtypeOf = IsSubtypeOf;
+	exports.Template = Template;
+	exports.HasCardinalityMultipliedByThatOf = HasCardinalityMultipliedByThatOf;
+	exports.HasType = HasType;
+	exports.MaterialType = MaterialType;
+	exports.MaterialTemplate = MaterialTemplate;
+	exports.ContainsMaterial = ContainsMaterial;
+	exports.InheritsAllMaterialsFrom = InheritsAllMaterialsFrom;
+	exports.LyphType = LyphType;
+	exports.LyphTemplate = LyphTemplate;
+	exports.HasPart = HasPart;
+	exports.HasLayer = HasLayer;
+	exports.HasPatch = HasPatch;
+	exports.InheritsAllPartsFrom = InheritsAllPartsFrom;
+	exports.InheritsAllPatchesFrom = InheritsAllPatchesFrom;
+	exports.InheritsAllLayersFrom = InheritsAllLayersFrom;
+	exports.CylindricalLyphType = CylindricalLyphType;
+	exports.CylindricalLyphTemplate = CylindricalLyphTemplate;
+	exports.HasSegment = HasSegment;
+	exports.InheritsAllSegmentsFrom = InheritsAllSegmentsFrom;
+	exports.BorderType = BorderType;
+	exports.BorderTemplate = BorderTemplate;
+	exports.HasInnerBorder = HasInnerBorder;
+	exports.HasOuterBorder = HasOuterBorder;
+	exports.HasMinusBorder = HasMinusBorder;
+	exports.HasPlusBorder = HasPlusBorder;
+	exports.Coalescence = Coalescence;
+	exports.CoalescesWith = CoalescesWith;
+	exports.CoalescesThroughLayer = CoalescesThroughLayer;
+	exports.NodeType = NodeType;
+	exports.NodeTemplate = NodeTemplate;
+	exports.HasNode = HasNode;
+	exports.GroupType = GroupType;
+	exports.GroupTemplate = GroupTemplate;
+	exports.HasElement = HasElement;
+	exports.ProcessType = ProcessType;
+	exports.ProcessTemplate = ProcessTemplate;
+	exports.FlowsTo = FlowsTo;
+	exports.ConveysProcess = ConveysProcess;
+	exports.TransportsMaterial = TransportsMaterial;
+	exports.HasChannel = HasChannel;
+	exports.InheritsAllChannelsFrom = InheritsAllChannelsFrom;
+	exports.MeasurableType = MeasurableType;
+	exports.MeasurableTemplate = MeasurableTemplate;
+	exports.MeasuresMaterial = MeasuresMaterial;
+	exports.MeasurableLocationType = MeasurableLocationType;
+	exports.MeasurableLocationTemplate = MeasurableLocationTemplate;
+	exports.HasMeasurable = HasMeasurable;
+	exports.InheritsAllMeasurablesFrom = InheritsAllMeasurablesFrom;
+	exports.CausalityType = CausalityType;
+	exports.CausalityTemplate = CausalityTemplate;
+	exports.Causes = Causes;
+	exports.OmegaTreeType = OmegaTreeType;
+	exports.OmegaTreeTemplate = OmegaTreeTemplate;
+	exports.HasAsRoot = HasAsRoot;
+	exports.Correlation = Correlation;
+	exports.InvolvesMeasurable = InvolvesMeasurable;
+	exports.ClinicalIndex = ClinicalIndex;
+	exports.EncompassesClinicalIndex = EncompassesClinicalIndex;
+	exports.InvolvesClinicalIndex = InvolvesClinicalIndex;
+	exports.Publication = Publication;
+	exports.InvolvesPublication = InvolvesPublication;
+	exports.Theme = Theme;
+	exports.PrescribesStyleFor = PrescribesStyleFor;
+	exports.Artefact = Artefact;
+	exports.Dim2Artefact = Dim2Artefact;
+	exports.Dim1Artefact = Dim1Artefact;
+	exports.Dim0Artefact = Dim0Artefact;
+	exports.Dim2Container = Dim2Container;
+	exports.Dim1Container = Dim1Container;
+	exports.Dim0Container = Dim0Container;
+	exports.ContainsArtefact = ContainsArtefact;
+	exports.LyphCanvas = LyphCanvas;
+	exports.MaterialGlyph = MaterialGlyph;
+	exports.LyphRectangle = LyphRectangle;
+	exports.CylindricalLyphRectangle = CylindricalLyphRectangle;
+	exports.BorderLine = BorderLine;
+	exports.CoalescenceRectangle = CoalescenceRectangle;
+	exports.NodeGlyph = NodeGlyph;
+	exports.ProcessEdge = ProcessEdge;
+	exports.MeasurableGlyph = MeasurableGlyph;
+	exports.CausalityArrow = CausalityArrow;
+	exports.PresentsModel = PresentsModel;
+
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+			var entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + entries + '\n' + indent + '}';
+			}
+		}
+	}
 
 /***/ },
 /* 246 */
@@ -17187,7 +17404,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.OmegaTree = undefined;
 	
-	var _TypedModule = __webpack_require__(41);
+	var _TypedModule = __webpack_require__(55);
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
@@ -17199,7 +17416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _groups2 = _interopRequireDefault(_groups);
 	
-	var _lyphs = __webpack_require__(66);
+	var _lyphs = __webpack_require__(67);
 	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
 	
@@ -17243,7 +17460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.InvolvesPublication = exports.Publication = exports.InvolvesClinicalIndex = exports.EncompassesClinicalIndex = exports.ClinicalIndex = exports.InvolvesMeasurable = exports.Correlation = undefined;
 	
-	var _Module = __webpack_require__(74);
+	var _Module = __webpack_require__(66);
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
@@ -17366,7 +17583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _TypedModule = __webpack_require__(41);
+	var _TypedModule = __webpack_require__(55);
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
@@ -17376,11 +17593,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _lyphs = __webpack_require__(66);
+	var _lyphs = __webpack_require__(67);
 	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
 	
-	var _typed = __webpack_require__(42);
+	var _typed = __webpack_require__(41);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -18039,7 +18256,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var dP         = __webpack_require__(113)
 	  , createDesc = __webpack_require__(270);
-	module.exports = __webpack_require__(67) ? function(object, key, value){
+	module.exports = __webpack_require__(68) ? function(object, key, value){
 	  return dP.f(object, key, createDesc(1, value));
 	} : function(object, key, value){
 	  object[key] = value;
@@ -18050,13 +18267,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(69).document && document.documentElement;
+	module.exports = __webpack_require__(70).document && document.documentElement;
 
 /***/ },
 /* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = !__webpack_require__(67) && !__webpack_require__(68)(function(){
+	module.exports = !__webpack_require__(68) && !__webpack_require__(69)(function(){
 	  return Object.defineProperty(__webpack_require__(169)('div'), 'a', {get: function(){ return 7; }}).a != 7;
 	});
 
@@ -18074,7 +18291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $assign  = Object.assign;
 	
 	// should work with symbols and should have deterministic property order (V8 bug)
-	module.exports = !$assign || __webpack_require__(68)(function(){
+	module.exports = !$assign || __webpack_require__(69)(function(){
 	  var A = {}
 	    , B = {}
 	    , S = Symbol()
@@ -18151,7 +18368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , anObject = __webpack_require__(112)
 	  , getKeys  = __webpack_require__(114);
 	
-	module.exports = __webpack_require__(67) ? Object.defineProperties : function defineProperties(O, Properties){
+	module.exports = __webpack_require__(68) ? Object.defineProperties : function defineProperties(O, Properties){
 	  anObject(O);
 	  var keys   = getKeys(Properties)
 	    , length = keys.length
@@ -18202,7 +18419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// most Object methods by ES6 should accept primitives
 	var $export = __webpack_require__(18)
 	  , core    = __webpack_require__(12)
-	  , fails   = __webpack_require__(68);
+	  , fails   = __webpack_require__(69);
 	module.exports = function(KEY, exec){
 	  var fn  = (core.Object || {})[KEY] || Object[KEY]
 	    , exp = {};
@@ -18258,7 +18475,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var store      = __webpack_require__(173)('wks')
 	  , uid        = __webpack_require__(176)
-	  , Symbol     = __webpack_require__(69).Symbol
+	  , Symbol     = __webpack_require__(70).Symbol
 	  , USE_SYMBOL = typeof Symbol == 'function';
 	
 	var $exports = module.exports = function(name){
@@ -18276,7 +18493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $filter = __webpack_require__(75)(2);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].filter, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(43)([].filter, true), 'Array', {
 	  // 22.1.3.7 / 15.4.4.20 Array.prototype.filter(callbackfn [, thisArg])
 	  filter: function filter(callbackfn /* , thisArg */){
 	    return $filter(this, callbackfn, arguments[1]);
@@ -18290,7 +18507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var $export  = __webpack_require__(18)
 	  , $forEach = __webpack_require__(75)(0)
-	  , STRICT   = __webpack_require__(44)([].forEach, true);
+	  , STRICT   = __webpack_require__(43)([].forEach, true);
 	
 	$export($export.P + $export.F * !STRICT, 'Array', {
 	  // 22.1.3.10 / 15.4.4.18 Array.prototype.forEach(callbackfn [, thisArg])
@@ -18309,7 +18526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $native       = [].indexOf
 	  , NEGATIVE_ZERO = !!$native && 1 / [1].indexOf(1, -0) < 0;
 	
-	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(44)($native)), 'Array', {
+	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(43)($native)), 'Array', {
 	  // 22.1.3.11 / 15.4.4.14 Array.prototype.indexOf(searchElement [, fromIndex])
 	  indexOf: function indexOf(searchElement /*, fromIndex = 0 */){
 	    return NEGATIVE_ZERO
@@ -18336,7 +18553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $map    = __webpack_require__(75)(1);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].map, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(43)([].map, true), 'Array', {
 	  // 22.1.3.15 / 15.4.4.19 Array.prototype.map(callbackfn [, thisArg])
 	  map: function map(callbackfn /* , thisArg */){
 	    return $map(this, callbackfn, arguments[1]);
@@ -18351,7 +18568,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $reduce = __webpack_require__(165);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].reduceRight, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(43)([].reduceRight, true), 'Array', {
 	  // 22.1.3.19 / 15.4.4.22 Array.prototype.reduceRight(callbackfn [, initialValue])
 	  reduceRight: function reduceRight(callbackfn /* , initialValue */){
 	    return $reduce(this, callbackfn, arguments.length, arguments[1], true);
@@ -18366,7 +18583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $reduce = __webpack_require__(165);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].reduce, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(43)([].reduce, true), 'Array', {
 	  // 22.1.3.18 / 15.4.4.21 Array.prototype.reduce(callbackfn [, initialValue])
 	  reduce: function reduce(callbackfn /* , initialValue */){
 	    return $reduce(this, callbackfn, arguments.length, arguments[1], false);
@@ -18381,7 +18598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $some   = __webpack_require__(75)(3);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].some, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(43)([].some, true), 'Array', {
 	  // 22.1.3.23 / 15.4.4.17 Array.prototype.some(callbackfn [, thisArg])
 	  some: function some(callbackfn /* , thisArg */){
 	    return $some(this, callbackfn, arguments[1]);
@@ -18411,7 +18628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var $export = __webpack_require__(18);
 	// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
-	$export($export.S + $export.F * !__webpack_require__(67), 'Object', {defineProperty: __webpack_require__(113).f});
+	$export($export.S + $export.F * !__webpack_require__(68), 'Object', {defineProperty: __webpack_require__(113).f});
 
 /***/ },
 /* 285 */
@@ -18478,9 +18695,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// all enumerable object keys, includes symbols
-	var getKeys = __webpack_require__(49)
+	var getKeys = __webpack_require__(48)
 	  , gOPS    = __webpack_require__(87)
-	  , pIE     = __webpack_require__(71);
+	  , pIE     = __webpack_require__(72);
 	module.exports = function(it){
 	  var result     = getKeys(it)
 	    , getSymbols = gOPS.f;
@@ -18497,7 +18714,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 290 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getKeys   = __webpack_require__(49)
+	var getKeys   = __webpack_require__(48)
 	  , toIObject = __webpack_require__(17);
 	module.exports = function(object, el){
 	  var O      = toIObject(object)
@@ -18561,7 +18778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var classof   = __webpack_require__(60)
 	  , ITERATOR  = __webpack_require__(6)('iterator')
-	  , Iterators = __webpack_require__(45);
+	  , Iterators = __webpack_require__(44);
 	module.exports = __webpack_require__(26).isIterable = function(it){
 	  var O = Object(it);
 	  return O[ITERATOR] !== undefined
@@ -18769,7 +18986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , arrayJoin = [].join;
 	
 	// fallback for not array-like strings
-	$export($export.P + $export.F * (__webpack_require__(70) != Object || !__webpack_require__(24)(arrayJoin)), 'Array', {
+	$export($export.P + $export.F * (__webpack_require__(71) != Object || !__webpack_require__(24)(arrayJoin)), 'Array', {
 	  join: function join(separator){
 	    return arrayJoin.call(toIObject(this), separator === undefined ? ',' : separator);
 	  }
@@ -18879,7 +19096,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export    = __webpack_require__(1)
 	  , html       = __webpack_require__(121)
 	  , cof        = __webpack_require__(22)
-	  , toIndex    = __webpack_require__(52)
+	  , toIndex    = __webpack_require__(51)
 	  , toLength   = __webpack_require__(9)
 	  , arraySlice = [].slice;
 	
@@ -18951,7 +19168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 315 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(51)('Array');
+	__webpack_require__(50)('Array');
 
 /***/ },
 /* 316 */
@@ -19388,7 +19605,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , inheritIfRequired = __webpack_require__(122)
 	  , toPrimitive       = __webpack_require__(28)
 	  , fails             = __webpack_require__(4)
-	  , gOPN              = __webpack_require__(48).f
+	  , gOPN              = __webpack_require__(47).f
 	  , gOPD              = __webpack_require__(19).f
 	  , dP                = __webpack_require__(8).f
 	  , $trim             = __webpack_require__(63).trim
@@ -19397,7 +19614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , Base              = $Number
 	  , proto             = $Number.prototype
 	  // Opera ~12 has broken Object#toString
-	  , BROKEN_COF        = cof(__webpack_require__(47)(proto)) == NUMBER
+	  , BROKEN_COF        = cof(__webpack_require__(46)(proto)) == NUMBER
 	  , TRIM              = 'trim' in String.prototype;
 	
 	// 7.1.3 ToNumber(argument)
@@ -19704,7 +19921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var $export = __webpack_require__(1)
 	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-	$export($export.S, 'Object', {create: __webpack_require__(47)});
+	$export($export.S, 'Object', {create: __webpack_require__(46)});
 
 /***/ },
 /* 355 */
@@ -19826,7 +20043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 19.1.2.14 Object.keys(O)
 	var toObject = __webpack_require__(10)
-	  , $keys    = __webpack_require__(49);
+	  , $keys    = __webpack_require__(48);
 	
 	__webpack_require__(27)('keys', function(){
 	  return function keys(it){
@@ -19908,7 +20125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var LIBRARY            = __webpack_require__(46)
+	var LIBRARY            = __webpack_require__(45)
 	  , global             = __webpack_require__(3)
 	  , ctx                = __webpack_require__(31)
 	  , classof            = __webpack_require__(60)
@@ -20113,7 +20330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
 	    this._n = false;          // <- notify
 	  };
-	  Internal.prototype = __webpack_require__(50)($Promise.prototype, {
+	  Internal.prototype = __webpack_require__(49)($Promise.prototype, {
 	    // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
 	    then: function then(onFulfilled, onRejected){
 	      var reaction    = newPromiseCapability(speciesConstructor(this, $Promise));
@@ -20140,7 +20357,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	$export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: $Promise});
 	__webpack_require__(62)($Promise, PROMISE);
-	__webpack_require__(51)(PROMISE);
+	__webpack_require__(50)(PROMISE);
 	Wrapper = __webpack_require__(26)[PROMISE];
 	
 	// statics
@@ -20231,7 +20448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 26.1.2 Reflect.construct(target, argumentsList [, newTarget])
 	var $export   = __webpack_require__(1)
-	  , create    = __webpack_require__(47)
+	  , create    = __webpack_require__(46)
 	  , aFunction = __webpack_require__(14)
 	  , anObject  = __webpack_require__(2)
 	  , isObject  = __webpack_require__(5)
@@ -20521,7 +20738,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var global            = __webpack_require__(3)
 	  , inheritIfRequired = __webpack_require__(122)
 	  , dP                = __webpack_require__(8).f
-	  , gOPN              = __webpack_require__(48).f
+	  , gOPN              = __webpack_require__(47).f
 	  , isRegExp          = __webpack_require__(84)
 	  , $flags            = __webpack_require__(82)
 	  , $RegExp           = global.RegExp
@@ -20560,7 +20777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __webpack_require__(15)(global, 'RegExp', $RegExp);
 	}
 	
-	__webpack_require__(51)('RegExp');
+	__webpack_require__(50)('RegExp');
 
 /***/ },
 /* 388 */
@@ -20842,7 +21059,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var $export        = __webpack_require__(1)
-	  , toIndex        = __webpack_require__(52)
+	  , toIndex        = __webpack_require__(51)
 	  , fromCharCode   = String.fromCharCode
 	  , $fromCodePoint = String.fromCodePoint;
 	
@@ -21060,7 +21277,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $fails         = __webpack_require__(4)
 	  , shared         = __webpack_require__(89)
 	  , setToStringTag = __webpack_require__(62)
-	  , uid            = __webpack_require__(53)
+	  , uid            = __webpack_require__(52)
 	  , wks            = __webpack_require__(6)
 	  , wksExt         = __webpack_require__(199)
 	  , wksDefine      = __webpack_require__(139)
@@ -21071,11 +21288,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , toIObject      = __webpack_require__(17)
 	  , toPrimitive    = __webpack_require__(28)
 	  , createDesc     = __webpack_require__(38)
-	  , _create        = __webpack_require__(47)
+	  , _create        = __webpack_require__(46)
 	  , gOPNExt        = __webpack_require__(191)
 	  , $GOPD          = __webpack_require__(19)
 	  , $DP            = __webpack_require__(8)
-	  , $keys          = __webpack_require__(49)
+	  , $keys          = __webpack_require__(48)
 	  , gOPD           = $GOPD.f
 	  , dP             = $DP.f
 	  , gOPN           = gOPNExt.f
@@ -21198,11 +21415,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  $GOPD.f = $getOwnPropertyDescriptor;
 	  $DP.f   = $defineProperty;
-	  __webpack_require__(48).f = gOPNExt.f = $getOwnPropertyNames;
-	  __webpack_require__(71).f  = $propertyIsEnumerable;
+	  __webpack_require__(47).f = gOPNExt.f = $getOwnPropertyNames;
+	  __webpack_require__(72).f  = $propertyIsEnumerable;
 	  __webpack_require__(87).f = $getOwnPropertySymbols;
 	
-	  if(DESCRIPTORS && !__webpack_require__(46)){
+	  if(DESCRIPTORS && !__webpack_require__(45)){
 	    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
 	  }
 	
@@ -21294,7 +21511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $typed       = __webpack_require__(90)
 	  , buffer       = __webpack_require__(138)
 	  , anObject     = __webpack_require__(2)
-	  , toIndex      = __webpack_require__(52)
+	  , toIndex      = __webpack_require__(51)
 	  , toLength     = __webpack_require__(9)
 	  , isObject     = __webpack_require__(5)
 	  , TYPED_ARRAY  = __webpack_require__(6)('typed_array')
@@ -21335,7 +21552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	
-	__webpack_require__(51)(ARRAY_BUFFER);
+	__webpack_require__(50)(ARRAY_BUFFER);
 
 /***/ },
 /* 417 */
@@ -21730,7 +21947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , aFunction   = __webpack_require__(14)
 	  , anObject    = __webpack_require__(2)
 	  , anInstance  = __webpack_require__(36)
-	  , redefineAll = __webpack_require__(50)
+	  , redefineAll = __webpack_require__(49)
 	  , hide        = __webpack_require__(13)
 	  , forOf       = __webpack_require__(61)
 	  , RETURN      = forOf.RETURN;
@@ -21918,7 +22135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	$export($export.G, {Observable: $Observable});
 	
-	__webpack_require__(51)('Observable');
+	__webpack_require__(50)('Observable');
 
 /***/ },
 /* 444 */
@@ -22223,7 +22440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , redefine      = __webpack_require__(15)
 	  , global        = __webpack_require__(3)
 	  , hide          = __webpack_require__(13)
-	  , Iterators     = __webpack_require__(45)
+	  , Iterators     = __webpack_require__(44)
 	  , wks           = __webpack_require__(6)
 	  , ITERATOR      = wks('iterator')
 	  , TO_STRING_TAG = wks('toStringTag')
@@ -25095,7 +25312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(42);
 	var filter = __webpack_require__(160);
 	var map = __webpack_require__(110);
 	var signature = __webpack_require__(251);
@@ -25308,7 +25525,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var defineProperty = __webpack_require__(162);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(42);
 	var keys = __webpack_require__(58);
 	
 	module.exports = function defineProperties (obj, map) {
@@ -25461,7 +25678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var defineProperty = __webpack_require__(162);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(42);
 	var keys = __webpack_require__(58);
 	
 	module.exports = function defineProperties (obj, map) {
@@ -31915,7 +32132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseIndexOf = __webpack_require__(144),
 	    isArrayLike = __webpack_require__(97),
-	    isString = __webpack_require__(72),
+	    isString = __webpack_require__(73),
 	    toInteger = __webpack_require__(147),
 	    values = __webpack_require__(573);
 	
@@ -32666,7 +32883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var ContextTraversal = __webpack_require__(227);
-	var inherits = __webpack_require__(55).inherits;
+	var inherits = __webpack_require__(54).inherits;
 	var slice = Array.prototype.slice;
 	
 	function LegacyContextTraversal (powerAssertContext) {
@@ -36246,9 +36463,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var EventEmitter = __webpack_require__(482).EventEmitter;
-	var inherits = __webpack_require__(55).inherits;
+	var inherits = __webpack_require__(54).inherits;
 	var estraverse = __webpack_require__(142);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(42);
 	var reduce = __webpack_require__(111);
 	var locationOf = __webpack_require__(584);
 	var literalPattern = /^(?:String|Numeric|Null|Boolean|RegExp)?Literal$/;
@@ -36457,7 +36674,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var BaseRenderer = __webpack_require__(100);
-	var inherits = __webpack_require__(55).inherits;
+	var inherits = __webpack_require__(54).inherits;
 	
 	function AssertionRenderer () {
 	    BaseRenderer.call(this);
@@ -36483,10 +36700,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var BaseRenderer = __webpack_require__(100);
-	var inherits = __webpack_require__(55).inherits;
+	var inherits = __webpack_require__(54).inherits;
 	var typeName = __webpack_require__(155);
 	var keys = __webpack_require__(58);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(42);
 	var udiff = __webpack_require__(590);
 	var stringifier = __webpack_require__(239);
 	var assign = __webpack_require__(21);
@@ -36667,8 +36884,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var BaseRenderer = __webpack_require__(100);
-	var inherits = __webpack_require__(55).inherits;
-	var forEach = __webpack_require__(43);
+	var inherits = __webpack_require__(54).inherits;
+	var forEach = __webpack_require__(42);
 	var stringifier = __webpack_require__(239);
 	var stringWidth = __webpack_require__(593);
 	var assign = __webpack_require__(21);
@@ -36856,7 +37073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var BaseRenderer = __webpack_require__(100);
-	var inherits = __webpack_require__(55).inherits;
+	var inherits = __webpack_require__(54).inherits;
 	
 	function FileRenderer () {
 	    BaseRenderer.call(this);
@@ -37658,7 +37875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Observable_1 = __webpack_require__(54);
+	var Observable_1 = __webpack_require__(53);
 	var do_1 = __webpack_require__(606);
 	Observable_1.Observable.prototype.do = do_1._do;
 	//# sourceMappingURL=do.js.map
@@ -37673,7 +37890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(54);
+	var Observable_1 = __webpack_require__(53);
 	var noop_1 = __webpack_require__(617);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
@@ -38779,7 +38996,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var typeName = __webpack_require__(155);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(42);
 	var arrayFilter = __webpack_require__(160);
 	var reduceRight = __webpack_require__(254);
 	var indexOf = __webpack_require__(161);
