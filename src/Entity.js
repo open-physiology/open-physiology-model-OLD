@@ -7,10 +7,11 @@ import {humanMsg} from "./util/misc";
 import {Field} from "./Field";
 import ValueTracker, {event, property} from "./util/ValueTracker";
 
-const $$cache           = Symbol('$$cache'      );
-const $$subjects        = Symbol('$$subjects'   );
-const $$observables     = Symbol('$$observables');
-const $$singletonObject = Symbol('$$singletonObject');
+const $$cache            = Symbol('$$cache'      );
+const $$subjects         = Symbol('$$subjects'   );
+const $$observables      = Symbol('$$observables');
+const $$singletonObject  = Symbol('$$singletonObject');
+const $$newEntitySubject = Symbol('$$newEntitySubject');
 
 ////////////////////////////////////////////////////////////////
 
@@ -96,14 +97,14 @@ export default class Entity extends ValueTracker {
 		return this[$$singletonObject];
 	}
 	
-	// static async load(
-	// 	href:    {href: string} | string | number,
-	// 	options: Object = {} // TODO: filtering, expanding, paging, ...
-	// ) {
-	//
-	// 	// TODO
-	//
-	// }
+	static async load(
+		href:    {href: string} | string | number,
+		options: Object = {} // TODO: filtering, expanding, paging, ...
+	) {
+		
+		// TODO
+
+	}
 	
 	
 	////////////////////////////
@@ -117,6 +118,7 @@ export default class Entity extends ValueTracker {
 	////////// INSTANCES //////////
 	///////////////////////////////
 	
+	//noinspection JSDuplicatedDeclaration // hiding warning due to Webstorm bug
 	get [Symbol.toStringTag]() { return this.constructor.name }
 	
 	constructor(
@@ -173,10 +175,13 @@ export default class Entity extends ValueTracker {
 	}
 	
 	async rollback() {
-		await this.field_rollback();
+		await this.field_rollback(); // TODO
 	}
 	
-	
+	p(key, t) {
+		// Provide easier access to
+		return this.field(key) ? this.field(key).p('value', t) : super.p(key, t);
+	}
 
 }
 

@@ -46,19 +46,18 @@ export default class ObservableSet extends Set {
 		}
 	}
 	
-	get [Symbol.toStringTag]() { return 'set' }
-	
+	// get [Symbol.toStringTag]() { return 'set' }
 	// get size() { return this[$$set].size }
 	
 	add(obj) {
-		if (!super.has(obj)) {
+		if (!this.has(obj)) {
 			super.add(obj);
 			this.e('add').next(obj);
 		}
 		return this;
 	}
 	delete(obj) {
-		if (super.has(obj)) {
+		if (this.has(obj)) {
 			super.delete(obj);
 			this.e('delete').next(obj);
 			return true;

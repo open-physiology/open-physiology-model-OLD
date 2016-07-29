@@ -10959,7 +10959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'validateElement',
 			value: function validateElement(element) {
 				/* the value must be of the proper domain */
-				if (!_instanceof(element, this[$$desc].relationshipClass)) {
+				if (!_instanceof(element, this[$$desc].class)) {
 					throw new Error((0, _misc.humanMsg)(_templateObject7, element, this[$$owner].constructor.name, this[$$key]));
 				}
 			}
@@ -18392,14 +18392,14 @@ return /******/ (function(modules) { // webpackBootstrap
 						}
 				}
 			}
-		}, {
-			key: 'add',
 	
-	
+			// get [Symbol.toStringTag]() { return 'set' }
 			// get size() { return this[$$set].size }
 	
+		}, {
+			key: 'add',
 			value: function add(obj) {
-				if (!_get(Object.getPrototypeOf(ObservableSet.prototype), 'has', this).call(this, obj)) {
+				if (!this.has(obj)) {
 					_get(Object.getPrototypeOf(ObservableSet.prototype), 'add', this).call(this, obj);
 					this.e('add').next(obj);
 				}
@@ -18408,7 +18408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'delete',
 			value: function _delete(obj) {
-				if (_get(Object.getPrototypeOf(ObservableSet.prototype), 'has', this).call(this, obj)) {
+				if (this.has(obj)) {
 					_get(Object.getPrototypeOf(ObservableSet.prototype), 'delete', this).call(this, obj);
 					this.e('delete').next(obj);
 					return true;
@@ -18424,11 +18424,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			// forEach          (fn)  { for (let x of this[$$set]) fn(x, x, this) }
 			// [Symbol.iterator]()    { return this.values()                      }
 	
-		}, {
-			key: Symbol.toStringTag,
-			get: function get() {
-				return 'set';
-			}
 		}]);
 	
 		return ObservableSet;

@@ -854,7 +854,7 @@ export class RelShortcut$Field extends Field {
 	
 	validateElement(element) {
 		/* the value must be of the proper domain */
-		if (!(element instanceof this[$$desc].relationshipClass)) {
+		if (!(element instanceof this[$$desc].class)) {
 			throw new Error(humanMsg`
 				Invalid value '${element}' given as element for ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
