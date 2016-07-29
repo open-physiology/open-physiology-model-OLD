@@ -1,27 +1,51 @@
-import ValueTracker, {event} from "./ValueTracker";
+import {Subject} from 'rxjs/Subject';
+import assert    from 'power-assert';
 
-const $$set = Symbol('$$set');
+const $$set               = Symbol('$$set');
+const $$addSubject        = Symbol('$$addSubject');
+const $$deleteSubject     = Symbol('$$deleteSubject');
+const $$disableNextReplay = Symbol('$$disableNextReplay');
 
-export default class ObservableSet extends ValueTracker {
-	
-	@event() addEvent;
-	@event() deleteEvent;
+class AddReplaySubject extends Subject {
+	constructor(initialSet) {
+		super();
+		assert(initialSet[Symbol.iterator]);
+		this._setReference = initialSet;
+	}
+	normalSubscribe(...args) {
+		this[$$disableNextReplay] = true;
+		return this.subscribe(...args);
+	}
+	// noinspection JSDuplicatedDeclaration
+	_subscribe(subscriber) {
+		const subscription = super._subscribe(subscriber);
+		if (subscription && !subscription.isUnsubscribed && !this[$$disableNextReplay]) {
+			for (let v of this._setReference) { subscriber.next(v) }
+		}
+		this[$$disableNextReplay] = false;
+		return subscription;
+	}
+}
+
+
+export default class ObservableSet {
 	
 	constructor() {
-		super();
-		this[$$set] = new Set();
-		this.e('add')   .subscribe(::this.add   );
-		this.e('delete').subscribe(::this.delete);
+		this[$$set]           = new Set();
+		this[$$deleteSubject] = new Subject();
+		this[$$addSubject]    = new AddReplaySubject(this[$$set]);
+		this[$$deleteSubject].subscribe      (::this.delete);
+		this[$$addSubject]   .normalSubscribe(::this.add   );
+	}
+	
+	e(op) {
+		switch (op) {
+			case 'add':    { return this[$$addSubject]    }
+			case 'delete': { return this[$$deleteSubject] }
+		}
 	}
 	
 	get [Symbol.toStringTag]() { return 'set' }
-	
-	s(op: 'add' | 'delete') {
-		switch (op) {
-			case 'add':    return this.e('add');
-			case 'delete': return this.e('delete');
-		}
-	}
 	
 	get size() { return this[$$set].size }
 	
