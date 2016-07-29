@@ -3,14 +3,11 @@ import defaults   from 'lodash/defaults';
 import uniqueId   from 'lodash/uniqueId';
 import assert     from 'power-assert';
 
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-
 import {humanMsg} from "./util/misc";
 import {Field} from "./Field";
 import ValueTracker, {event, property} from "./util/ValueTracker";
 
 const $$cache           = Symbol('$$cache'      );
-const $$createSubject   = Symbol('$$createSubject');
 const $$subjects        = Symbol('$$subjects'   );
 const $$observables     = Symbol('$$observables');
 const $$singletonObject = Symbol('$$singletonObject');
@@ -144,11 +141,6 @@ export default class Entity extends ValueTracker {
 		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 	}
 	
-	[$$createSubject](key: string | number) {
-		this[$$subjects]   [key] = new BehaviorSubject();
-		this[$$observables][key] = this[$$subjects][key].asObservable();
-	}
-	
 	delete() {
 		// TODO: this is the synchronous delete operation;
 		//     : a `.commit()` call is required before it
@@ -167,20 +159,21 @@ export default class Entity extends ValueTracker {
 	set(key, val, options) { return this.field_set(key, val, options) }
 	
 	async commit() {
-		return await this.field_commit().then(() => {
-			// setting up id and href here until actual server communication is set up
-			// TODO: remove when the server actually does this
-			if (this.get('id') === null) {
-				const newId = parseInt(uniqueId());
-				const opts = { ignoreReadonly: true, updatePristine: true };
-				this.set('id',    newId,             opts);
-				this.set('href', `cache://${newId}`, opts);
-			}
-		});
+		
+		await this.field_commit();
+		
+		// setting up id and href here until actual server communication is set up
+		// TODO: remove when the server actually does this
+		if (this.get('id') === null) {
+			const newId = parseInt(uniqueId());
+			const opts = { ignoreReadonly: true, updatePristine: true };
+			this.set('id',    newId,             opts);
+			this.set('href', `cache://${newId}`, opts);
+		}
 	}
 	
 	async rollback() {
-		return await this.field_rollback();
+		await this.field_rollback();
 	}
 	
 	

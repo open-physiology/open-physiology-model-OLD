@@ -2,6 +2,10 @@ import Module                       from './Module';
 import {Typed}                      from './modules/typed';
 import {humanMsg, mapOptionalArray} from './util/misc';
 
+import defaults  from 'lodash/defaults';
+import mapValues from 'lodash-bound/mapValues';
+import omitBy    from 'lodash-bound/omitBy';
+
 /**
  * Typed Modules allow to more easily create related
  * Type, Template and HasType classes. For example,
@@ -15,8 +19,27 @@ export default class TypedModule extends Module {
 			
 			const SuperClass = conf.extends || Typed;
 			
-			// TODO: Handle { Template: {}, Type: {}, typeCheck(type, value) {} }
-			//     : for each property
+			defaults(config, {
+				properties: {},
+				patternProperties: {}
+			});
+			
+			const [
+				typeProperties,
+				templateProperties,
+				typePatternProperties,
+				templatePatternProperties
+		    ] = [
+		    	['properties',        'Type',     'Template'],
+			    ['properties',        'Template', 'Type'    ],
+			    ['patternProperties', 'Type',     'Template'],
+			    ['patternProperties', 'Template', 'Type'    ]
+			].map(([key, wanted, unwanted]) => config[key]
+				::omitBy(desc => !desc[wanted] && desc[unwanted])
+				::mapValues((desc) => {
+				if (desc[wanted]) { return { ...desc[wanted], typeCheck: desc.typeCheck } }
+				return { ...desc };
+			}));
 			
 			const NewType = this.RESOURCE({
 				
@@ -29,7 +52,10 @@ export default class TypedModule extends Module {
 				
 				singular: `${conf.singular} type`,
 				
-				singleton: conf.singleton
+				singleton: conf.singleton,
+				
+				properties:        typeProperties,
+				patternProperties: typePatternProperties
 				
 			});
 			
@@ -42,7 +68,10 @@ export default class TypedModule extends Module {
 				instanceSingular: conf.singular,
 				instancePlural:   conf.plural || `${conf.singular}s`,
 				
-				singular: `${conf.singular} template`
+				singular: `${conf.singular} template`,
+				
+				properties:        templateProperties,
+				patternProperties: templatePatternProperties
 				
 			});
 			

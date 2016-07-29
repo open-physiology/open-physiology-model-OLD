@@ -2,6 +2,7 @@ import {xdescribe, describe, it, expect} from './test.helper';
 
 import {Resource, IsRelatedTo}   from '../src/modules/resources';
 import {Type, Template, HasType} from '../src/modules/typed';
+import {Process} from '../src/modules/processes';
 import {MaterialType, MaterialTemplate, ContainsMaterial} from '../src/index';
 
 describe("integrated workflow", () => {
@@ -78,6 +79,12 @@ describe("integrated workflow", () => {
 		
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.a('number');
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
+		
+	});
+	
+	it("can create a process edge between nodes", () => {
+		
+		// TODO
 		
 	});
 	

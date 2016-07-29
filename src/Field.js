@@ -1,15 +1,14 @@
-import {Subject}         from 'rxjs/Subject';
-import {map}             from 'rxjs/operator/map';
-import {filter}          from 'rxjs/operator/filter';
-import {pairwise}        from 'rxjs/operator/pairwise';
-import {takeUntil}       from 'rxjs/operator/takeUntil';
-import {switchMap}       from 'rxjs/operator/switchMap';
-import {take}            from 'rxjs/operator/take';
-import {startWith}       from 'rxjs/operator/startWith';
+import {Subject}                  from 'rxjs/Subject';
+import {map}                      from 'rxjs/operator/map';
+import {filter}                   from 'rxjs/operator/filter';
+import {pairwise}                 from 'rxjs/operator/pairwise';
+import {takeUntil}                from 'rxjs/operator/takeUntil';
+import {switchMap}                from 'rxjs/operator/switchMap';
+import {take}                     from 'rxjs/operator/take';
+import {startWith}                from 'rxjs/operator/startWith';
 import {defer as deferObservable} from 'rxjs/observable/defer';
-import {merge}           from 'rxjs/observable/merge';
-import {concat}          from 'rxjs/observable/concat';
-import 'rxjs/add/operator/do';
+import {merge}                    from 'rxjs/observable/merge';
+import {concat}                   from 'rxjs/observable/concat';
 
 import inRange           from 'lodash/inRange';
 import isString          from 'lodash/isString';
@@ -18,7 +17,6 @@ import isUndefined       from 'lodash/isUndefined';
 import isFunction        from 'lodash/isFunction';
 import pick              from 'lodash/pick';
 import get               from 'lodash/get';
-import uniqueId          from 'lodash/uniqueId';
 
 import assert            from 'power-assert';
 
