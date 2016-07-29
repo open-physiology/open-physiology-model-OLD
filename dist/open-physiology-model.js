@@ -10959,7 +10959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'validateElement',
 			value: function validateElement(element) {
 				/* the value must be of the proper domain */
-				if (!_instanceof(element, this[$$desc].class)) {
+				if (!_instanceof(element, this[$$desc].other.class)) {
 					throw new Error((0, _misc.humanMsg)(_templateObject7, element, this[$$owner].constructor.name, this[$$key]));
 				}
 			}
