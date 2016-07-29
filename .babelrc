@@ -3,6 +3,7 @@
     "es2015"
   ],
   "plugins": [
+    ["babel-plugin-transform-builtin-extend", { "globals": ["Set"] }],
     "transform-object-rest-spread",
     "transform-decorators-legacy",
     "transform-class-properties",

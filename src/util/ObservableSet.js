@@ -30,8 +30,8 @@ class AddReplaySubject extends Subject {
 
 export default class ObservableSet extends Set {
 	
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 		// this[$$set]           = new Set();
 		this[$$deleteSubject] = new Subject();
 		this[$$addSubject]    = new AddReplaySubject(this);

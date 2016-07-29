@@ -18246,6 +18246,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	function _extendableBuiltin(cls) {
+		function ExtendableBuiltin() {
+			var instance = Reflect.construct(cls, Array.from(arguments));
+			Object.setPrototypeOf(instance, Object.getPrototypeOf(this));
+			return instance;
+		}
+	
+		ExtendableBuiltin.prototype = Object.create(cls.prototype, {
+			constructor: {
+				value: cls,
+				enumerable: false,
+				writable: true,
+				configurable: true
+			}
+		});
+	
+		if (Object.setPrototypeOf) {
+			Object.setPrototypeOf(ExtendableBuiltin, cls);
+		} else {
+			ExtendableBuiltin.__proto__ = cls;
+		}
+	
+		return ExtendableBuiltin;
+	}
+	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
 	function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -18331,14 +18356,20 @@ return /******/ (function(modules) { // webpackBootstrap
 		return AddReplaySubject;
 	}(_Subject2.Subject);
 	
-	var ObservableSet = function (_Set) {
-		_inherits(ObservableSet, _Set);
+	var ObservableSet = function (_extendableBuiltin2) {
+		_inherits(ObservableSet, _extendableBuiltin2);
 	
 		function ObservableSet() {
+			var _Object$getPrototypeO;
+	
 			_classCallCheck(this, ObservableSet);
 	
+			for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+				args[_key] = arguments[_key];
+			}
+	
 			// this[$$set]           = new Set();
-			var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(ObservableSet).call(this));
+			var _this2 = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(ObservableSet)).call.apply(_Object$getPrototypeO, [this].concat(args)));
 	
 			_this2[$$deleteSubject] = new _Subject2.Subject();
 			_this2[$$addSubject] = new AddReplaySubject(_this2);
@@ -18401,7 +18432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}]);
 	
 		return ObservableSet;
-	}(Set);
+	}(_extendableBuiltin(Set));
 	
 	exports.default = ObservableSet;
 	function setEquals(setA, setB) {
