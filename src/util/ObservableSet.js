@@ -28,12 +28,13 @@ class AddReplaySubject extends Subject {
 }
 
 
-export default class ObservableSet {
+export default class ObservableSet extends Set {
 	
 	constructor() {
-		this[$$set]           = new Set();
+		super();
+		// this[$$set]           = new Set();
 		this[$$deleteSubject] = new Subject();
-		this[$$addSubject]    = new AddReplaySubject(this[$$set]);
+		this[$$addSubject]    = new AddReplaySubject(this);
 		this[$$deleteSubject].subscribe      (::this.delete);
 		this[$$addSubject]   .normalSubscribe(::this.add   );
 	}
@@ -47,31 +48,31 @@ export default class ObservableSet {
 	
 	get [Symbol.toStringTag]() { return 'set' }
 	
-	get size() { return this[$$set].size }
+	// get size() { return this[$$set].size }
 	
 	add(obj) {
-		if (!this[$$set].has(obj)) {
-			this[$$set].add(obj);
+		if (!super.has(obj)) {
+			super.add(obj);
 			this.e('add').next(obj);
 		}
 		return this;
 	}
 	delete(obj) {
-		if (this[$$set].has(obj)) {
-			this[$$set].delete(obj);
+		if (super.has(obj)) {
+			super.delete(obj);
 			this.e('delete').next(obj);
 			return true;
 		} else {
 			return false;
 		}
 	}
-	clear            ()    { this[$$set].clear(); return this;         }
-	has              (obj) { return this[$$set].has(obj)               }
-	entries          ()    { return this[$$set].entries()              }
-	keys             ()    { return this[$$set].keys   ()              }
-	values           ()    { return this[$$set].values ()              }
-	forEach          (fn)  { for (let x of this[$$set]) fn(x, x, this) }
-	[Symbol.iterator]()    { return this.values()                      }
+	// clear            ()    { this[$$set].clear(); return this;         }
+	// has              (obj) { return this[$$set].has(obj)               }
+	// entries          ()    { return this[$$set].entries()              }
+	// keys             ()    { return this[$$set].keys   ()              }
+	// values           ()    { return this[$$set].values ()              }
+	// forEach          (fn)  { for (let x of this[$$set]) fn(x, x, this) }
+	// [Symbol.iterator]()    { return this.values()                      }
 	
 }
 
