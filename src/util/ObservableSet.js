@@ -32,11 +32,14 @@ export default class ObservableSet extends Set {
 	
 	constructor(...args) {
 		super(...args);
-		// this[$$set]           = new Set();
 		this[$$deleteSubject] = new Subject();
 		this[$$addSubject]    = new AddReplaySubject(this);
-		this[$$deleteSubject].subscribe      (::this.delete);
-		this[$$addSubject]   .normalSubscribe(::this.add   );
+		this[$$deleteSubject].subscribe((value) => {
+			if (this.has(value)) { this.delete(value) }
+		});
+		this[$$addSubject].normalSubscribe((value) => {
+			if (!this.has(value)) { this.add(value) }
+		});
 	}
 	
 	e(op) {
@@ -61,9 +64,8 @@ export default class ObservableSet extends Set {
 			super.delete(obj);
 			this.e('delete').next(obj);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 	// clear            ()    { this[$$set].clear(); return this;         }
 	// has              (obj) { return this[$$set].has(obj)               }

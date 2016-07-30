@@ -18381,13 +18381,20 @@ return /******/ (function(modules) { // webpackBootstrap
 				args[_key] = arguments[_key];
 			}
 	
-			// this[$$set]           = new Set();
 			var _this2 = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(ObservableSet)).call.apply(_Object$getPrototypeO, [this].concat(args)));
 	
 			_this2[$$deleteSubject] = new _Subject2.Subject();
 			_this2[$$addSubject] = new AddReplaySubject(_this2);
-			_this2[$$deleteSubject].subscribe(_this2.delete.bind(_this2));
-			_this2[$$addSubject].normalSubscribe(_this2.add.bind(_this2));
+			_this2[$$deleteSubject].subscribe(function (value) {
+				if (_this2.has(value)) {
+					_this2.delete(value);
+				}
+			});
+			_this2[$$addSubject].normalSubscribe(function (value) {
+				if (!_this2.has(value)) {
+					_this2.add(value);
+				}
+			});
 			return _this2;
 		}
 	
@@ -18425,9 +18432,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					_get(Object.getPrototypeOf(ObservableSet.prototype), 'delete', this).call(this, obj);
 					this.e('delete').next(obj);
 					return true;
-				} else {
-					return false;
 				}
+				return false;
 			}
 			// clear            ()    { this[$$set].clear(); return this;         }
 			// has              (obj) { return this[$$set].has(obj)               }
