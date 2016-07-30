@@ -19,10 +19,10 @@ import pick              from 'lodash/pick';
 import get               from 'lodash/get';
 import size              from 'lodash/size';
 
-import assert            from 'power-assert';
+import assert from 'power-assert';
 
 import ValueTracker,  {event, property}         from "./util/ValueTracker";
-import ObservableSet, {setEquals, transformSet} from './util/ObservableSet';
+import ObservableSet, {setEquals, copySetContent} from './util/ObservableSet';
 import {humanMsg} from "./util/misc";
 
 const $$owner    = Symbol('$$owner');
@@ -229,15 +229,12 @@ export class Field extends ValueTracker {
 	commit() {
 		const old = this[$$pristine];
 		const nw = this[$$pristine] = this[$$value];
-		this.e('commit').next({ old, new: nw });
+		this.e('commit').next(this[$$value]);
 	}
 	
 	rollback() {
-		this.e('rollback').next({
-			old: this[$$value],
-			new: this[$$pristine]
-		});
 		this.set(this[$$pristine]);
+		this.e('rollback').next(this[$$value]);
 	}
 	
 	isPristine() {
@@ -636,34 +633,32 @@ export class Rel$Field extends Field {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, related } = options;
 		
-		this[$$pristine] = new Set();
-		this[$$value]    = new ObservableSet();
+		Object.defineProperty(this, $$pristine, { value: new Set           });
+		Object.defineProperty(this, $$value,    { value: new ObservableSet });
 		
 		/* emit 'value' signals (but note that setValueThroughSignal = false) */
-		merge(this.get().e('add'), this.get().e('delete'))
+		merge(this[$$value].e('add'), this[$$value].e('delete'))
 			::waitUntilConstructed()
-			::map(::this.get)
+			::map(() => this[$$value])
 			.subscribe(this.p('value'));
 		
 		/* update relationships that are added or deleted here */
-		this.get().e('add')
+		this[$$value].e('add')
 			::waitUntilConstructed()
 			.subscribe((addedRel) => {
 				addedRel[$$fields][desc.side].set(this[$$owner]);
 			});
-		this.get().e('delete')
+		this[$$value].e('delete')
 			::waitUntilConstructed()
-			.subscribe((deletedRel) => {
-				deletedRel.delete();
-			});
+			.subscribe((deletedRel) => { deletedRel.delete() });
 		
-		/* remove a relationship when it removes this resource */
-		this.get().e('add')
+		/* decouple a relationship when it decouples from this resource */
+		this[$$value].e('add')
 			::waitUntilConstructed()
 			::switchMap(newRel => newRel[$$fields][desc.side].p('value')
 				::filter(res => res !== owner)
-				::map(()=>newRel)
-		).subscribe( this.get().e('delete') );
+				::map(() => newRel)
+			).subscribe( this[$$value].e('delete') );
 		
 		/* handle initial values */
 		if (initialValue !== undefined) {
@@ -694,7 +689,7 @@ export class Rel$Field extends Field {
 	set(newValue) {
 		assert(!this[$$desc].readonly);
 		this.validate(newValue);
-		transformSet(this[$$value], newValue);
+		copySetContent(this[$$value], newValue);
 	}
 	
 	validate(val) {
@@ -714,19 +709,13 @@ export class Rel$Field extends Field {
 	}
 	
 	commit() {
-		this.e('commit').next({
-			old: this[$$pristine],
-			new: this[$$value]
-		});
-		transformSet(this[$$pristine], this[$$value]);
+		copySetContent(this[$$pristine], this[$$value]);
+		this.e('commit').next(this[$$value]);
 	}
 	
 	rollback() {
-		this.e('rollback').next({
-			old: this[$$value],
-			new: this[$$pristine]
-		});
-		transformSet(this[$$value], this[$$pristine]);
+		copySetContent(this[$$value], this[$$pristine]);
+		this.e('rollback').next(this[$$value]);
 	}
 	
 }
@@ -792,7 +781,6 @@ export class RelShortcut$Field extends Field {
 				let newRelDisconnected = newRel[$$fields][desc.side].p('value')
 					::filter(v => v !== owner)
 					::take(1);
-				
 				newRel[$$fields][desc.other.side].p('value')
 					::takeUntil(newRelDisconnected)
 					::startWith(null)::pairwise().subscribe(([prev, curr]) => {
@@ -843,7 +831,7 @@ export class RelShortcut$Field extends Field {
 	set(newValue) {
 		assert(!this[$$desc].readonly);
 		this.validate(newValue);
-		transformSet(this[$$value], newValue);
+		copySetContent(this[$$value], newValue);
 	}
 	
 	validate(val) {
@@ -857,25 +845,20 @@ export class RelShortcut$Field extends Field {
 		/* the value must be of the proper domain */
 		if (!(element instanceof this[$$desc].other.class)) {
 			throw new Error(humanMsg`
-				Invalid value '${element}' given as element for ${this[$$owner].constructor.name}#${this[$$key]}.
+				Invalid value '${element}' given as element
+				for ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
 	}
 	
 	async commit() {
-		this.e('commit').next({
-			old: this[$$pristine],
-			new: this[$$value]
-		});
-		transformSet(this[$$pristine], this[$$value]);
+		copySetContent(this[$$pristine], this[$$value]);
+		this.e('commit').next(this[$$value]);
 	}
 	
 	rollback() {
-		this.e('rollback').next({
-			old: this[$$value],
-			new: this[$$pristine]
-		});
-		transformSet(this[$$value], this[$$pristine]);
+		copySetContent(this[$$value], this[$$pristine]);
+		this.e('rollback').next(this[$$value]);
 	}
 	
 }

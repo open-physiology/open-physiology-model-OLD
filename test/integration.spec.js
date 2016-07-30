@@ -18,9 +18,9 @@ describe("integrated workflow", () => {
 		expect(blood).to.have.a.property('href').which.is.null;
 		expect(blood).to.have.a.property('class', 'MaterialType');
 		expect(blood).to.have.a.property('name', "blood");
-		
+
 		await blood.commit();
-		
+
 		expect(blood).to.have.a.property('id'  ).which.is.a('number');
 		expect(blood).to.have.a.property('href').which.is.a('string');
 		
@@ -30,36 +30,36 @@ describe("integrated workflow", () => {
 
 		expect(water).to.be.an.instanceof(MaterialType);
 		expect(water).to.have.a.property('name', "waiter");
-		
+
 		water.name = "water";
-		
+
 		expect(water).to.have.a.property('name', "water");
-		
+
 		await water.rollback();
-		
+
 		expect(water).to.have.a.property('id'  ).which.is.null;
 		expect(water).to.have.a.property('href').which.is.null;
 		expect(water).to.have.a.property('class', 'MaterialType');
 		expect(water).to.have.a.property('name', "waiter");
-		
+
 		water.name = "water";
 		await water.commit();
-		
+
 		expect(water).to.have.a.property('id'  ).which.is.a('number');
 		expect(water).to.have.a.property('href').which.is.a('string');
 		expect(water).to.have.a.property('name', "water");
-		
+
 		const {
 			id:   waterId,
 			href: waterHref,
 			name: waterName
 		} = water;
 		await water.rollback();
-		
+
 		expect(water).to.have.a.property('id'  , waterId);
 		expect(water).to.have.a.property('href', waterHref);
 		expect(water).to.have.a.property('name', waterName);
-
+		
 		let bloodHasWater = await ContainsMaterial.new({
 			1: blood,
 			2: water
@@ -70,17 +70,20 @@ describe("integrated workflow", () => {
 		expect([...blood['-->ContainsMaterial']]).to.include(bloodHasWater);
 		expect([...blood.materials             ]).to.include(water        );
 		expect([...water['<--ContainsMaterial']]).to.include(bloodHasWater);
-		
+
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.null;
 		expect(bloodHasWater).to.have.a.property('href').which.is.null;
 		expect(bloodHasWater).to.have.a.property('class', 'ContainsMaterial');
-		
+
 		await bloodHasWater.commit();
-		
+
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.a('number');
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 		
+		
 	});
+	
+	
 	
 	it("can create a process edge between nodes", () => {
 		

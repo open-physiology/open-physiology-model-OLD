@@ -61,9 +61,15 @@ export default class ValueTracker {
 			`There is already an event '${name}' on this object.`);
 		assert(() => !this[$$properties][name],
 			`There is already a property '${name}' on this object.`);
-
-		return this[$$events][name] = new Subject
+		
+		this[$$events][name] = new Subject()
 			::takeUntil(this.e(this[$$deleteEventName]));
+		
+		// this[$$events][name].subscribe((v) => {
+		// 	console.log(this.constructor.name, `[[[${name}]]]`, v);
+		// });
+		
+		return this[$$events][name];
 	}
 
 	/**
@@ -108,6 +114,10 @@ export default class ValueTracker {
 			::takeUntil           (this.e(this[$$deleteEventName]))
 			::filter              (isValid)
 			::distinctUntilChanged(isEqual);
+		
+		// this[$$properties][name].subscribe((v) => {
+		// 	console.log(this.constructor.name, `[[[${name}]]]`, v);
+		// });
 		
 		/* create event version of the property */
 		this[$$events][name] = this[$$properties][name].asObservable();

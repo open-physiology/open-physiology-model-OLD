@@ -74,7 +74,7 @@ describe("integrated workflow", () => {
 		expect([...syncedSet]).to.include(5);
 		expect([...syncedSet]).to.not.include(1);
 		expect([...syncedSet]).to.not.include(2);
-		
+
 		expect([...s]).to.eql([...syncedSet]);
 		
 		

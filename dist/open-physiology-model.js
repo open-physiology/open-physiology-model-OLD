@@ -9933,13 +9933,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function commit() {
 				var old = this[$$pristine];
 				var nw = this[$$pristine] = this[$$value];
-				this.e('commit').next(this);
+				this.e('commit').next(this[$$value]);
 			}
 		}, {
 			key: 'rollback',
 			value: function rollback() {
 				this.set(this[$$pristine]);
-				this.e('rollback').next(this);
+				this.e('rollback').next(this[$$value]);
 			}
 		}, {
 			key: 'isPristine',
@@ -10698,20 +10698,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'commit',
 			value: function commit() {
-				this.e('commit').next({
-					old: this[$$pristine],
-					new: this[$$value]
-				});
 				(0, _ObservableSet.transformSet)(this[$$pristine], this[$$value]);
+				this.e('commit').next(this[$$value]);
 			}
 		}, {
 			key: 'rollback',
 			value: function rollback() {
-				this.e('rollback').next({
-					old: this[$$value],
-					new: this[$$pristine]
-				});
 				(0, _ObservableSet.transformSet)(this[$$value], this[$$pristine]);
+				this.e('rollback').next(this[$$value]);
 			}
 		}]);
 	
@@ -10743,7 +10737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec17._expr(_rec17._capt(_rec17._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/Field.js',
-					line: 742
+					line: 736
 				}));
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -10901,7 +10895,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec18._expr(_rec18._capt(!_rec18._capt(_rec18._capt(this[_rec18._capt($$desc, 'arguments/0/argument/object/property')], 'arguments/0/argument/object').readonly, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this[$$desc].readonly)',
 					filepath: 'src/Field.js',
-					line: 841
+					line: 835
 				}));
 				this.validate(newValue);
 				(0, _ObservableSet.transformSet)(this[$$value], newValue);
@@ -10915,7 +10909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec19._expr(_rec19._capt(_rec19._capt(val, 'arguments/0/object')[_rec19._capt(_rec19._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
 					content: 'assert(val[Symbol.iterator])',
 					filepath: 'src/Field.js',
-					line: 847
+					line: 841
 				}));
 				var _$$desc$cardinality2 = this[$$desc].cardinality;
 				var min = _$$desc$cardinality2.min;
@@ -10924,7 +10918,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec20._expr(_rec20._capt((0, _inRange2.default)(_rec20._capt((0, _size2.default)(_rec20._capt(val, 'arguments/0/arguments/0/arguments/0')), 'arguments/0/arguments/0'), _rec20._capt(min, 'arguments/0/arguments/1'), _rec20._capt(_rec20._capt(max, 'arguments/0/arguments/2/left') + 1, 'arguments/0/arguments/2')), 'arguments/0'), {
 					content: 'assert(inRange(size(val), min, max + 1))',
 					filepath: 'src/Field.js',
-					line: 849
+					line: 843
 				}));
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -10944,11 +10938,8 @@ return /******/ (function(modules) { // webpackBootstrap
 						while (1) {
 							switch (_context11.prev = _context11.next) {
 								case 0:
-									this.e('commit').next({
-										old: this[$$pristine],
-										new: this[$$value]
-									});
 									(0, _ObservableSet.transformSet)(this[$$pristine], this[$$value]);
+									this.e('commit').next(this[$$value]);
 	
 								case 2:
 								case 'end':
@@ -10967,11 +10958,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'rollback',
 			value: function rollback() {
-				this.e('rollback').next({
-					old: this[$$value],
-					new: this[$$pristine]
-				});
 				(0, _ObservableSet.transformSet)(this[$$value], this[$$pristine]);
+				this.e('rollback').next(this[$$value]);
 			}
 		}]);
 	

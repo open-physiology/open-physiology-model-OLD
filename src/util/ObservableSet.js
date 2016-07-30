@@ -20,7 +20,7 @@ class AddReplaySubject extends Subject {
 	_subscribe(subscriber) {
 		const subscription = super._subscribe(subscriber);
 		if (subscription && !subscription.isUnsubscribed && !this[$$disableNextReplay]) {
-			for (let v of this._setReference) { subscriber.next(v) }
+			this._setReference.forEach(::subscriber.next);
 		}
 		this[$$disableNextReplay] = false;
 		return subscription;
@@ -30,16 +30,13 @@ class AddReplaySubject extends Subject {
 
 export default class ObservableSet extends Set {
 	
-	constructor(...args) {
-		super(...args);
+	constructor(initialContent = []) {
+		super();
 		this[$$deleteSubject] = new Subject();
 		this[$$addSubject]    = new AddReplaySubject(this);
-		this[$$deleteSubject].subscribe((value) => {
-			if (this.has(value)) { this.delete(value) }
-		});
-		this[$$addSubject].normalSubscribe((value) => {
-			if (!this.has(value)) { this.add(value) }
-		});
+		this[$$deleteSubject].subscribe      (::this.delete);
+		this[$$addSubject]   .normalSubscribe(::this.add   );
+		initialContent.forEach(::this.add);
 	}
 	
 	e(op) {
@@ -48,9 +45,6 @@ export default class ObservableSet extends Set {
 			case 'delete': { return this[$$deleteSubject] }
 		}
 	}
-	
-	// get [Symbol.toStringTag]() { return 'set' }
-	// get size() { return this[$$set].size }
 	
 	add(obj) {
 		if (!this.has(obj)) {
@@ -67,14 +61,10 @@ export default class ObservableSet extends Set {
 		}
 		return false;
 	}
-	// clear            ()    { this[$$set].clear(); return this;         }
-	// has              (obj) { return this[$$set].has(obj)               }
-	// entries          ()    { return this[$$set].entries()              }
-	// keys             ()    { return this[$$set].keys   ()              }
-	// values           ()    { return this[$$set].values ()              }
-	// forEach          (fn)  { for (let x of this[$$set]) fn(x, x, this) }
-	// [Symbol.iterator]()    { return this.values()                      }
-	
+	clear() {
+		for (let value of this) { this.delete(value) }
+		return this;
+	}
 }
 
 export function setEquals(setA, setB) {
@@ -85,7 +75,7 @@ export function setEquals(setA, setB) {
 	return true;
 }
 
-export function transformSet(reference, newContent) {
+export function copySetContent(reference, newContent) {
 	newContent = new Set(newContent);
 	for (let e of reference) {
 		if (!newContent.has(e)) {
