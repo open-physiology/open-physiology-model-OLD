@@ -80,4 +80,21 @@ describe("integrated workflow", () => {
 		
 	});
 	
+	it("can emit a copy of the current set every time something is added or deleted", () => {
+		
+		let values = [];
+		
+		s.p('value').subscribe((v) => { values.push(v) });
+		
+		s.add(1);
+		s.add(2);
+		s.delete(1);
+		
+		expect([...values[0]]).to.eql([    ]);
+		expect([...values[1]]).to.eql([1   ]);
+		expect([...values[2]]).to.eql([1, 2]);
+		expect([...values[3]]).to.eql([   2]);
+		
+	});
+	
 });

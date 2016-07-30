@@ -1,9 +1,14 @@
-import {Subject} from 'rxjs/Subject';
+import {Subject}         from 'rxjs/Subject';
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {merge}           from "rxjs/operator/merge";
+import {map}             from "rxjs/operator/map";
 import assert    from 'power-assert';
+import {humanMsg} from "./misc";
 
 const $$set               = Symbol('$$set');
 const $$addSubject        = Symbol('$$addSubject');
 const $$deleteSubject     = Symbol('$$deleteSubject');
+const $$valueObservable      = Symbol('$$valueObservable');
 const $$disableNextReplay = Symbol('$$disableNextReplay');
 
 class AddReplaySubject extends Subject {
@@ -32,17 +37,44 @@ export default class ObservableSet extends Set {
 	
 	constructor(initialContent = []) {
 		super();
+		
+		this[$$addSubject] = new AddReplaySubject(this);
+		this[$$addSubject].normalSubscribe(::this.add);
+		
 		this[$$deleteSubject] = new Subject();
-		this[$$addSubject]    = new AddReplaySubject(this);
-		this[$$deleteSubject].subscribe      (::this.delete);
-		this[$$addSubject]   .normalSubscribe(::this.add   );
+		this[$$deleteSubject].subscribe(::this.delete);
+		
 		initialContent.forEach(::this.add);
+		
+		let valueSubject = new BehaviorSubject(new Set(this));
+		this[$$addSubject]   .normalSubscribe(() => { valueSubject.next(new Set(this)) });
+		this[$$deleteSubject].subscribe      (() => { valueSubject.next(new Set(this)) });
+		this[$$valueObservable] = valueSubject.asObservable();
+		// let a = merge(this[$$addSubject], this[$$deleteSubject]);
+		// let b = a::map(() => new Set(this));
+		// console.log(b);
+		// b.subscribe((v) => {
+		// 	console.log(v);
+		// 	valueSubject.next(v);
+		// });
 	}
 	
 	e(op) {
 		switch (op) {
 			case 'add':    { return this[$$addSubject]    }
 			case 'delete': { return this[$$deleteSubject] }
+			default: assert(false, humanMsg`
+				The ${op} event does not exist.
+			`);
+		}
+	}
+	
+	p(op) {
+		switch (op) {
+			case 'value': { return this[$$valueObservable] }
+			default: assert(false, humanMsg`
+				The ${op} property does not exist.
+			`);
 		}
 	}
 	

@@ -21,7 +21,7 @@ import size              from 'lodash/size';
 
 import assert from 'power-assert';
 
-import ValueTracker,  {event, property}         from "./util/ValueTracker";
+import ValueTracker,  {event, property}           from "./util/ValueTracker";
 import ObservableSet, {setEquals, copySetContent} from './util/ObservableSet';
 import {humanMsg} from "./util/misc";
 
@@ -87,6 +87,18 @@ export class Field extends ValueTracker {
 				keys.forEach(::this.field_rollback);
 				// TODO: rollback all fields in a single transaction?
 			}},
+			field_getJSON: { value() {
+				let result = {};
+				for (let [key, field] of Object.entries(this[$$fields])) {
+					result[key] = field.getJSON();
+				}
+				return result;
+			}},
+			field_setJSON: { value(data = {}) {
+				for (let [key, value] of Object.entries(data)) {
+					this[$$fields][key].setJSON(value);
+				}
+			}},
 			field: { value(key) {
 				assert(this[$$fields][key], humanMsg`
 					This entity does not have a '${key}' field.
@@ -98,7 +110,9 @@ export class Field extends ValueTracker {
 				    'set',
 				    'validate',
 				    'commit',
-				    'rollback'
+				    'rollback',
+				    'getJSON',
+				    'setJSON'
 				].map(m => ({ [m]: ::this[$$fields][key][m] })));
 			}}
 		});
@@ -637,10 +651,7 @@ export class Rel$Field extends Field {
 		Object.defineProperty(this, $$value,    { value: new ObservableSet });
 		
 		/* emit 'value' signals (but note that setValueThroughSignal = false) */
-		merge(this[$$value].e('add'), this[$$value].e('delete'))
-			::waitUntilConstructed()
-			::map(() => this[$$value])
-			.subscribe(this.p('value'));
+		this[$$value].p('value')::waitUntilConstructed().subscribe(this.p('value'));
 		
 		/* update relationships that are added or deleted here */
 		this[$$value].e('add')
@@ -768,11 +779,8 @@ export class RelShortcut$Field extends Field {
 		this[$$pristine] = new Set();
 		this[$$value]    = new ObservableSet();
 
-		// we emit 'value' signals, but note that setValueThroughSignal = false
-		merge(this.get().e('add'), this.get().e('delete'))
-			::waitUntilConstructed()
-			::map(::this.get)
-			.subscribe(this.p('value'));
+		/* emit 'value' signals (but note that setValueThroughSignal = false) */
+		this[$$value].p('value')::waitUntilConstructed().subscribe(this.p('value'));
 		
 		const correspondingRelField = owner[$$fields][desc.key][$$value];
 		correspondingRelField.e('add')
