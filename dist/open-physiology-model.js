@@ -9933,16 +9933,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function commit() {
 				var old = this[$$pristine];
 				var nw = this[$$pristine] = this[$$value];
-				this.e('commit').next({ old: old, new: nw });
+				this.e('commit').next(this);
 			}
 		}, {
 			key: 'rollback',
 			value: function rollback() {
-				this.e('rollback').next({
-					old: this[$$value],
-					new: this[$$pristine]
-				});
 				this.set(this[$$pristine]);
+				this.e('rollback').next(this);
 			}
 		}, {
 			key: 'isPristine',
@@ -10038,7 +10035,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt((0, _isUndefined2.default)(_rec5._capt(_rec5._capt(desc, 'arguments/0/left/arguments/0/object').value, 'arguments/0/left/arguments/0')), 'arguments/0/left') || _rec5._capt((0, _isUndefined2.default)(_rec5._capt(initialValue, 'arguments/0/right/arguments/0')), 'arguments/0/right'), 'arguments/0'), {
 				content: 'assert(isUndefined(desc.value) || isUndefined(initialValue), humanMsg`\n\t\t\tYou tried to manually assign a value ${ JSON.stringify(initialValue) }\n\t\t\tto ${ owner.constructor.name }#${ key },\n\t\t\tbut it already has a fixed value of ${ JSON.stringify(desc.value) }.\n\t\t`)',
 				filepath: 'src/Field.js',
-				line: 293
+				line: 290
 			}), (0, _misc.humanMsg)(_templateObject4, JSON.stringify(initialValue), owner.constructor.name, key, JSON.stringify(desc.value)));
 	
 			/* set the initial value */
@@ -10088,7 +10085,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec6._expr(_rec6._capt(_rec6._capt(cls, 'arguments/0/object').isRelationship, 'arguments/0'), {
 					content: 'assert(cls.isRelationship)',
 					filepath: 'src/Field.js',
-					line: 333
+					line: 330
 				}));
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -10210,7 +10207,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec7._expr(_rec7._capt(_rec7._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/Field.js',
-					line: 417
+					line: 414
 				}));
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -10280,7 +10277,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			(0, _powerAssert2.default)(_rec8._expr(_rec8._capt(_rec8._capt(!_rec8._capt(_rec8._capt(initialValue, 'arguments/0/left/argument/left') || _rec8._capt(_rec8._capt(_rec8._capt(_rec8._capt(desc, 'arguments/0/left/argument/right/object/object/object').other, 'arguments/0/left/argument/right/object/object').class, 'arguments/0/left/argument/right/object').singleton, 'arguments/0/left/argument/right'), 'arguments/0/left/argument'), 'arguments/0/left') || _rec8._capt(!_rec8._capt(givenShortcutInitialValue, 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
 				content: 'assert(!(initialValue || desc.other.class.singleton) || !givenShortcutInitialValue)',
 				filepath: 'src/Field.js',
-				line: 451
+				line: 448
 			}));
 	
 			/* set the initial value */
@@ -10334,13 +10331,13 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec9._expr(_rec9._capt(_rec9._capt(_rec9._capt(val, 'arguments/0/left/left') !== null, 'arguments/0/left') || _rec9._capt(_rec9._capt(_rec9._capt(_rec9._capt(this[_rec9._capt($$desc, 'arguments/0/right/left/object/object/property')], 'arguments/0/right/left/object/object').cardinality, 'arguments/0/right/left/object').min, 'arguments/0/right/left') === 0, 'arguments/0/right'), 'arguments/0'), {
 					content: 'assert(val !== null || this[$$desc].cardinality.min === 0, humanMsg`\n\t\t\tInvalid value \'${ val }\' given for ${ this[$$owner].constructor.name }#${ this[$$key] }.\n\t\t`)',
 					filepath: 'src/Field.js',
-					line: 492
+					line: 489
 				}), (0, _misc.humanMsg)(_templateObject6, val, this[$$owner].constructor.name, this[$$key]));
 				/* the value must be of the proper domain */
 				(0, _powerAssert2.default)(_rec10._expr(_rec10._capt(_rec10._capt(_rec10._capt(val, 'arguments/0/left/left') === null, 'arguments/0/left') || _rec10._capt(_instanceof(_rec10._capt(val, 'arguments/0/right/left'), _rec10._capt(_rec10._capt(this[_rec10._capt($$desc, 'arguments/0/right/right/object/property')], 'arguments/0/right/right/object').relationshipClass, 'arguments/0/right/right')), 'arguments/0/right'), 'arguments/0'), {
 					content: 'assert(val === null || val instanceof this[$$desc].relationshipClass, humanMsg`\n\t\t\tInvalid value \'${ val }\' given for ${ this[$$owner].constructor.name }#${ this[$$key] }.\n\t\t`)',
 					filepath: 'src/Field.js',
-					line: 496
+					line: 493
 				}), (0, _misc.humanMsg)(_templateObject6, val, this[$$owner].constructor.name, this[$$key]));
 				// TODO: these should not be assertions, but proper constraint-checks,
 				//     : recording errors, possibly allowing them temporarily, etc.
@@ -10375,7 +10372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec11._expr(_rec11._capt(_rec11._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/Field.js',
-					line: 516
+					line: 513
 				}));
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -10511,7 +10508,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec12._expr(_rec12._capt(_rec12._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/Field.js',
-					line: 605
+					line: 602
 				}));
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -10623,7 +10620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						(0, _powerAssert2.default)(_rec13._expr(_rec13._capt(_rec13._capt(_rec13._capt(rel, 'arguments/0/left/object')[_rec13._capt(_rec13._capt(desc, 'arguments/0/left/property/object').side, 'arguments/0/left/property')], 'arguments/0/left') === _this8, 'arguments/0'), {
 							content: 'assert(rel[desc.side] === this)',
 							filepath: 'src/Field.js',
-							line: 678
+							line: 675
 						}));
 	
 						_this8[$$pristine].add(rel);
@@ -10663,7 +10660,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec14._expr(_rec14._capt(!_rec14._capt(_rec14._capt(this[_rec14._capt($$desc, 'arguments/0/argument/object/property')], 'arguments/0/argument/object').readonly, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this[$$desc].readonly)',
 					filepath: 'src/Field.js',
-					line: 695
+					line: 692
 				}));
 				this.validate(newValue);
 				(0, _ObservableSet.transformSet)(this[$$value], newValue);
@@ -10677,7 +10674,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec15._expr(_rec15._capt(_rec15._capt(val, 'arguments/0/object')[_rec15._capt(_rec15._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
 					content: 'assert(val[Symbol.iterator])',
 					filepath: 'src/Field.js',
-					line: 701
+					line: 698
 				}));
 				var _$$desc$cardinality = this[$$desc].cardinality;
 				var min = _$$desc$cardinality.min;
@@ -10686,7 +10683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec16._expr(_rec16._capt((0, _inRange2.default)(_rec16._capt((0, _size2.default)(_rec16._capt(val, 'arguments/0/arguments/0/arguments/0')), 'arguments/0/arguments/0'), _rec16._capt(min, 'arguments/0/arguments/1'), _rec16._capt(_rec16._capt(max, 'arguments/0/arguments/2/left') + 1, 'arguments/0/arguments/2')), 'arguments/0'), {
 					content: 'assert(inRange(size(val), min, max + 1))',
 					filepath: 'src/Field.js',
-					line: 703
+					line: 700
 				}));
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -10746,7 +10743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec17._expr(_rec17._capt(_rec17._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/Field.js',
-					line: 745
+					line: 742
 				}));
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -10904,7 +10901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec18._expr(_rec18._capt(!_rec18._capt(_rec18._capt(this[_rec18._capt($$desc, 'arguments/0/argument/object/property')], 'arguments/0/argument/object').readonly, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this[$$desc].readonly)',
 					filepath: 'src/Field.js',
-					line: 844
+					line: 841
 				}));
 				this.validate(newValue);
 				(0, _ObservableSet.transformSet)(this[$$value], newValue);
@@ -10918,7 +10915,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec19._expr(_rec19._capt(_rec19._capt(val, 'arguments/0/object')[_rec19._capt(_rec19._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
 					content: 'assert(val[Symbol.iterator])',
 					filepath: 'src/Field.js',
-					line: 850
+					line: 847
 				}));
 				var _$$desc$cardinality2 = this[$$desc].cardinality;
 				var min = _$$desc$cardinality2.min;
@@ -10927,7 +10924,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec20._expr(_rec20._capt((0, _inRange2.default)(_rec20._capt((0, _size2.default)(_rec20._capt(val, 'arguments/0/arguments/0/arguments/0')), 'arguments/0/arguments/0'), _rec20._capt(min, 'arguments/0/arguments/1'), _rec20._capt(_rec20._capt(max, 'arguments/0/arguments/2/left') + 1, 'arguments/0/arguments/2')), 'arguments/0'), {
 					content: 'assert(inRange(size(val), min, max + 1))',
 					filepath: 'src/Field.js',
-					line: 852
+					line: 849
 				}));
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -16838,10 +16835,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }(),
 	    _dec,
+	    _dec2,
+	    _dec3,
 	    _desc,
 	    _value,
 	    _class,
-	    _descriptor;
+	    _descriptor,
+	    _descriptor2,
+	    _descriptor3;
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tThe entity at \'', '\' is not\n\t\t\tof class \'', '\'\n\t\t\tbut of class \'', '\'.\n\t\t'], ['\n\t\t\tThe entity at \'', '\' is not\n\t\t\tof class \'', '\'\n\t\t\tbut of class \'', '\'.\n\t\t']),
 	    _templateObject2 = _taggedTemplateLiteral(['The \'', '\' class is not a singleton class.'], ['The \'', '\' class is not a singleton class.']);
@@ -16939,7 +16940,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	////////////////////////////////////////////////////////////////
 	
-	var Entity = (_dec = (0, _ValueTracker2.event)(), (_class = function (_ValueTracker) {
+	var Entity = (_dec = (0, _ValueTracker2.event)(), _dec2 = (0, _ValueTracker2.event)(), _dec3 = (0, _ValueTracker2.event)(), (_class = function (_ValueTracker) {
 		_inherits(Entity, _ValueTracker);
 	
 		_createClass(Entity, [{
@@ -17172,6 +17173,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_initDefineProp(_this, 'deleteEvent', _descriptor, _this);
 	
+			_initDefineProp(_this, 'commitEvent', _descriptor2, _this);
+	
+			_initDefineProp(_this, 'rollbackEvent', _descriptor3, _this);
+	
 			if (_this.constructor.singleton) {}
 	
 			(0, _defaults2.default)(values, {
@@ -17237,7 +17242,9 @@ return /******/ (function(modules) { // webpackBootstrap
 										this.set('href', 'cache://' + newId, opts);
 									}
 	
-								case 3:
+									this.e('commit').next(this);
+	
+								case 4:
 								case 'end':
 									return _context2.stop();
 							}
@@ -17254,7 +17261,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'rollback',
 			value: function rollback() {
-				this.field_rollback(); // TODO
+				this.field_rollback();
+				this.e('rollback').next(this);
 			}
 		}, {
 			key: 'p',
@@ -17266,6 +17274,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		return Entity;
 	}(_ValueTracker3.default), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'deleteEvent', [_dec], {
+		enumerable: true,
+		initializer: null
+	}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, 'commitEvent', [_dec2], {
+		enumerable: true,
+		initializer: null
+	}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, 'rollbackEvent', [_dec3], {
 		enumerable: true,
 		initializer: null
 	})), _class));
@@ -18329,37 +18343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function _subscribe(subscriber) {
 				var subscription = _get(Object.getPrototypeOf(AddReplaySubject.prototype), '_subscribe', this).call(this, subscriber);
 				if (subscription && !subscription.isUnsubscribed && !this[$$disableNextReplay]) {
-					_setReference = this._setReference;
-	
-					if (!(_setReference && (typeof _setReference[Symbol.iterator] === 'function' || Array.isArray(_setReference)))) {
-						throw new TypeError('Expected _setReference to be iterable, got ' + _inspect(_setReference));
-					}
-	
-					var _iteratorNormalCompletion = true;
-					var _didIteratorError = false;
-					var _iteratorError = undefined;
-	
-					try {
-						for (var _iterator = _setReference[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-							var _setReference;
-	
-							var v = _step.value;
-							subscriber.next(v);
-						}
-					} catch (err) {
-						_didIteratorError = true;
-						_iteratorError = err;
-					} finally {
-						try {
-							if (!_iteratorNormalCompletion && _iterator.return) {
-								_iterator.return();
-							}
-						} finally {
-							if (_didIteratorError) {
-								throw _iteratorError;
-							}
-						}
-					}
+					this._setReference.forEach(subscriber.next.bind(subscriber));
 				}
 				this[$$disableNextReplay] = false;
 				return subscription;
@@ -18373,28 +18357,49 @@ return /******/ (function(modules) { // webpackBootstrap
 		_inherits(ObservableSet, _extendableBuiltin2);
 	
 		function ObservableSet() {
-			var _Object$getPrototypeO;
+			var initialContent = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 	
 			_classCallCheck(this, ObservableSet);
 	
-			for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-				args[_key] = arguments[_key];
-			}
-	
-			var _this2 = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(ObservableSet)).call.apply(_Object$getPrototypeO, [this].concat(args)));
+			var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(ObservableSet).call(this));
 	
 			_this2[$$deleteSubject] = new _Subject2.Subject();
-			_this2[$$addSubject] = new AddReplaySubject(_this2);
 			_this2[$$deleteSubject].subscribe(function (value) {
-				if (_this2.has(value)) {
-					_this2.delete(value);
-				}
+				_this2.delete(value);
 			});
+			_this2[$$addSubject] = new AddReplaySubject(_this2);
 			_this2[$$addSubject].normalSubscribe(function (value) {
-				if (!_this2.has(value)) {
-					_this2.add(value);
-				}
+				_this2.add(value);
 			});
+	
+			if (!(initialContent && (typeof initialContent[Symbol.iterator] === 'function' || Array.isArray(initialContent)))) {
+				throw new TypeError('Expected initialContent to be iterable, got ' + _inspect(initialContent));
+			}
+	
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+	
+			try {
+				for (var _iterator = initialContent[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var i = _step.value;
+					_this2.add(i);
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
+	
 			return _this2;
 		}
 	

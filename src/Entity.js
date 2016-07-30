@@ -112,6 +112,8 @@ export default class Entity extends ValueTracker {
 	////////////////////////////
 	
 	@event() deleteEvent;
+	@event() commitEvent;
+	@event() rollbackEvent;
 	
 	
 	///////////////////////////////
@@ -172,10 +174,13 @@ export default class Entity extends ValueTracker {
 			this.set('id',    newId,             opts);
 			this.set('href', `cache://${newId}`, opts);
 		}
+		
+		this.e('commit').next(this);
 	}
 	
 	rollback() {
-		this.field_rollback(); // TODO
+		this.field_rollback();
+		this.e('rollback').next(this);
 	}
 	
 	p(key, t) {
