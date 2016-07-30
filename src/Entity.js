@@ -174,12 +174,12 @@ export default class Entity extends ValueTracker {
 		}
 	}
 	
-	async rollback() {
-		await this.field_rollback(); // TODO
+	rollback() {
+		this.field_rollback(); // TODO
 	}
 	
 	p(key, t) {
-		// Provide easier access to
+		// Provide easier access to field property observables
 		return this.field(key) ? this.field(key).p('value', t) : super.p(key, t);
 	}
 
