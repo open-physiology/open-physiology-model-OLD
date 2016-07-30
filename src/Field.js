@@ -17,7 +17,7 @@ import isUndefined       from 'lodash/isUndefined';
 import isFunction        from 'lodash/isFunction';
 import pick              from 'lodash/pick';
 import get               from 'lodash/get';
-import size              from 'lodash-bound/size';
+import size              from 'lodash/size';
 
 import assert            from 'power-assert';
 
@@ -700,7 +700,7 @@ export class Rel$Field extends Field {
 	validate(val) {
 		assert(val[Symbol.iterator]);
 		const {min, max} = this[$$desc].cardinality;
-		assert(inRange(val::size, min, max+1));
+		assert(inRange(size(val), min, max+1));
 		val.forEach(::this.validateElement);
 	}
 	
@@ -849,7 +849,7 @@ export class RelShortcut$Field extends Field {
 	validate(val) {
 		assert(val[Symbol.iterator]);
 		const {min, max} = this[$$desc].cardinality;
-		assert(inRange(val::size, min, max+1));
+		assert(inRange(size(val), min, max+1));
 		val.forEach(::this.validateElement);
 	}
 	
@@ -870,7 +870,7 @@ export class RelShortcut$Field extends Field {
 		transformSet(this[$$pristine], this[$$value]);
 	}
 	
-	async rollback() {
+	rollback() {
 		this.e('rollback').next({
 			old: this[$$value],
 			new: this[$$pristine]
