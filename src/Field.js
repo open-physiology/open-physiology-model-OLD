@@ -17,6 +17,7 @@ import isUndefined       from 'lodash/isUndefined';
 import isFunction        from 'lodash/isFunction';
 import pick              from 'lodash/pick';
 import get               from 'lodash/get';
+import size              from 'lodash-bound/size';
 
 import assert            from 'power-assert';
 
@@ -79,11 +80,11 @@ export class Field extends ValueTracker {
 				return await Promise.all(keys.map(::this.field_commit));
 				// TODO: commit all fields in a single transaction?
 			}},
-			field_rollback: { async value(keys) {
-				if (isString(keys)) { return await this[$$fields][keys].rollback() }
+			field_rollback: { value(keys) {
+				if (isString(keys)) { return this[$$fields][keys].rollback() }
 				if (isUndefined(keys)) { keys = Object.keys(this[$$fields]) }
 				assert(isArray(keys));
-				return await Promise.all(keys.map(::this.field_rollback));
+				keys.forEach(::this.field_rollback);
 				// TODO: rollback all fields in a single transaction?
 			}},
 			field: { value(key) {
@@ -699,7 +700,7 @@ export class Rel$Field extends Field {
 	validate(val) {
 		assert(val[Symbol.iterator]);
 		const {min, max} = this[$$desc].cardinality;
-		assert(inRange(val.size, min, max+1));
+		assert(inRange(val::size, min, max+1));
 		val.forEach(::this.validateElement);
 	}
 	
@@ -848,7 +849,7 @@ export class RelShortcut$Field extends Field {
 	validate(val) {
 		assert(val[Symbol.iterator]);
 		const {min, max} = this[$$desc].cardinality;
-		assert(inRange(val.size, min, max+1));
+		assert(inRange(val::size, min, max+1));
 		val.forEach(::this.validateElement);
 	}
 	
