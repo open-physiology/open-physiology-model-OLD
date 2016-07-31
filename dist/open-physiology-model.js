@@ -3165,7 +3165,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						name: 'HasType',
 	
-						extends: superClasses.HasType,
+						extends: superClasses.map(function (sc) {
+							return sc.HasType;
+						}),
+						extendedBy: subClasses.map(function (sc) {
+							return sc.HasType;
+						}),
 	
 						singular: 'has type',
 	

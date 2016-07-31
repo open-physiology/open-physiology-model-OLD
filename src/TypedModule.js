@@ -86,7 +86,8 @@ export default class TypedModule extends Module {
 				
 				name: 'HasType',
 				
-				extends: superClasses.HasType,
+				extends:    superClasses.map(sc => sc.HasType),
+				extendedBy: subClasses  .map(sc => sc.HasType),
 				
 				singular: 'has type',
 				
