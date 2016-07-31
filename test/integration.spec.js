@@ -7,6 +7,51 @@ import {MaterialType, MaterialTemplate, ContainsMaterial} from '../src/index';
 
 describe("integrated workflow", () => {
 	
+	
+	
+	it("can track available entities with a stream per class", async () => {
+		// TODO: These tests have to come first, because otherwise the global
+		//     : caches of the classes are already populated.
+		//     : We need to make it more modular.
+		
+		let gathered_MaterialType = new Set;
+		let gathered_Type         = new Set;
+		let gathered_Resource     = new Set;
+		
+		MaterialType.p('all').subscribe((all) => { gathered_MaterialType = all });
+		Type        .p('all').subscribe((all) => { gathered_Type         = all });
+		Resource    .p('all').subscribe((all) => { gathered_Resource     = all });
+		
+		console.log([...gathered_MaterialType].join(', '))
+		
+		expect([...gathered_MaterialType]).to.eql([]);
+		expect([...gathered_Type        ]).to.eql([]);
+		expect([...gathered_Resource    ]).to.eql([]);
+		
+		let blood = MaterialType.new({
+			name: "blood"
+		});
+		await blood.commit();
+		
+		expect([...gathered_MaterialType]).to.eql([blood]);
+		expect([...gathered_Type        ]).to.eql([blood]);
+		expect([...gathered_Resource    ]).to.eql([blood]);
+		
+		let water = MaterialType.new({
+			name: "water"
+		});
+		await water.commit();
+		
+		expect([...gathered_MaterialType]).to.eql([blood, water]);
+		expect([...gathered_Type        ]).to.eql([blood, water]);
+		expect([...gathered_Resource    ]).to.eql([blood, water]);
+		
+		expect([...MaterialType.getAll()]).to.eql([blood, water]);
+		expect([...Type        .getAll()]).to.eql([blood, water]);
+		expect([...Resource    .getAll()]).to.eql([blood, water]);
+		
+	});
+	
 	it("can create new 'MaterialType's and link them", async () => {
 		
 		let blood = MaterialType.new({
@@ -82,14 +127,6 @@ describe("integrated workflow", () => {
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.a('number');
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 		
-		
-	});
-	
-	
-	
-	it("can create a process edge between nodes", () => {
-		
-		// TODO
 		
 	});
 	

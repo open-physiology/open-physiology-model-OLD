@@ -64,9 +64,9 @@ export default class Module {
 			let constructor = Entity.createClass     (conf);
 			constructor = this.mergeSameNameResources(constructor);
 			this.register                            (constructor);
-			this.mergeSuperclassFields           (constructor);
+			this.mergeSuperclassFields               (constructor);
 			// jsonSchemaConfig                      (constructor); // TODO
-			Field.augmentClass                    (constructor);
+			Field.augmentClass                       (constructor);
 			return constructor;
 		});
 	}
@@ -79,9 +79,9 @@ export default class Module {
 			this.normalizeRelationshipSides              (constructor);
 			constructor = this.mergeSameNameRelationships(constructor);
 			this.register                                (constructor);
-			this.mergeSuperclassFields               (constructor);
+			this.mergeSuperclassFields                   (constructor);
 			// jsonSchemaConfig                          (constructor); // TODO
-			Field.augmentClass                        (constructor);
+			Field.augmentClass                           (constructor);
 			return constructor;
 		});
 	}

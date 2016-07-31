@@ -3,17 +3,21 @@ import defaults   from 'lodash-bound/defaults';
 import uniqueId   from 'lodash/uniqueId';
 import assert     from 'power-assert';
 
+import ObservableSet from './util/ObservableSet';
 import {humanMsg} from "./util/misc";
 import {Field} from "./Field";
 import ValueTracker, {event, property} from "./util/ValueTracker";
 import {tracker} from './changes/Change';
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {filter} from 'rxjs/operator/filter';
+import {map} from 'rxjs/operator/map';
 
-const $$cache            = Symbol('$$cache'      );
-const $$subjects         = Symbol('$$subjects'   );
-const $$observables      = Symbol('$$observables');
-const $$singletonObject  = Symbol('$$singletonObject');
+const $$cache            = Symbol('$$cache'           );
+const $$cacheSet         = Symbol('$$cacheSet'        );
+const $$singletonObject  = Symbol('$$singletonObject' );
 const $$newEntitySubject = Symbol('$$newEntitySubject');
-const $$deleted          = Symbol('$$deleted');
+const $$deleted          = Symbol('$$deleted'         );
+const $$allSubject       = Symbol('$$allSubject'      );
 
 ////////////////////////////////////////////////////////////////
 
@@ -26,9 +30,11 @@ export default class Entity extends ValueTracker {
 	static createClass(config): Class<Entity> {
 		/* create the class with the right name, constructor and static content */
 		const {name, ...rest} = config;
+		
 		const NewClassObj = {};
 		NewClassObj[name] = class extends Entity {};
 		const NewClass = NewClassObj[name];
+		
 		Object.defineProperties(NewClass, {
 			/**
 			 * Set the name property of this class to
@@ -54,9 +60,31 @@ export default class Entity extends ValueTracker {
 					}
 					return false;
 				}
+			},
+			p: {
+				value(name) {
+					switch (name) {
+						case 'all': {
+							return this[$$allSubject]; // TODO
+						}
+						default: assert(false, humanMsg`
+							The ${name} property does not exist on ${this.name}.
+						`);
+					}
+				}
 			}
 		});
 		Object.assign(NewClass, rest);
+		
+		/* maintaining <Class>.p('all') */
+		let allSubject = new BehaviorSubject(new Set());
+		Entity[$$cacheSet].e('add')
+			::filter(::NewClass[Symbol.hasInstance])
+			.subscribe(() => { allSubject.next(new Set(Entity[$$cacheSet])) });
+		Entity[$$cacheSet].e('delete')
+			::filter(::NewClass[Symbol.hasInstance])
+			.subscribe(() => { allSubject.next(new Set(Entity[$$cacheSet])) });
+		Object.defineProperty(NewClass, $$allSubject, { value: allSubject.asObservable() });
 		
 		return NewClass;
 	}
@@ -94,8 +122,6 @@ export default class Entity extends ValueTracker {
 		}
 	};
 	
-	
-	
 	static new(
 		values  : Object = {},
 	    options : Object = {}
@@ -127,6 +153,8 @@ export default class Entity extends ValueTracker {
 		`);
 		return entity;
 	}
+	
+	static getAll() { return new Set([...this[$$cacheSet]].filter(e=>e instanceof this)) }
 	
 	static getSingleton() {
 		assert(this.singleton, humanMsg`
@@ -220,6 +248,8 @@ export default class Entity extends ValueTracker {
 			const opts = { ignoreReadonly: true, updatePristine: true };
 			this.set('id',    newId,             opts);
 			this.set('href', `cache://${newId}`, opts);
+			Entity[$$cache][this.href] = this;
+			Entity[$$cacheSet].add(this);
 		}
 		
 		this.e('commit').next(this);
@@ -238,5 +268,7 @@ export default class Entity extends ValueTracker {
 }
 
 Object.assign(Entity, {
-	[$$cache] : {}
+	[$$cache]     : {},
+	[$$cacheSet]  : new ObservableSet(),
+	[$$allSubject]: new BehaviorSubject(new Set())
 });

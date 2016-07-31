@@ -50,13 +50,6 @@ export default class ObservableSet extends Set {
 		this[$$addSubject]   .normalSubscribe(() => { valueSubject.next(new Set(this)) });
 		this[$$deleteSubject].subscribe      (() => { valueSubject.next(new Set(this)) });
 		this[$$valueObservable] = valueSubject.asObservable();
-		// let a = merge(this[$$addSubject], this[$$deleteSubject]);
-		// let b = a::map(() => new Set(this));
-		// console.log(b);
-		// b.subscribe((v) => {
-		// 	console.log(v);
-		// 	valueSubject.next(v);
-		// });
 	}
 	
 	e(op) {
@@ -69,11 +62,11 @@ export default class ObservableSet extends Set {
 		}
 	}
 	
-	p(op) {
-		switch (op) {
+	p(name) {
+		switch (name) {
 			case 'value': { return this[$$valueObservable] }
 			default: assert(false, humanMsg`
-				The ${op} property does not exist.
+				The ${name} property does not exist.
 			`);
 		}
 	}
