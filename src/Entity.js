@@ -25,9 +25,8 @@ export default class Entity extends ValueTracker {
 	static createClass(config): Class<Entity> {
 		/* create the class with the right name, constructor and static content */
 		const {name, ...rest} = config;
-		const NewClassObj = {
-			[name]: class extends Entity {}
-		};
+		const NewClassObj = {};
+		NewClassObj[name] = class extends Entity {};
 		const NewClass = NewClassObj[name];
 		Object.defineProperties(NewClass, {
 			/**
@@ -40,10 +39,10 @@ export default class Entity extends ValueTracker {
 			 * our own flavor of multiple inheritance.
 			 **/
 			[Symbol.hasInstance]: {
-				value: (instance) => {
+				value(instance) {
 					if (!instance) { return false }
-					if (instance.constructor === NewClass) { return true }
-					for (let SubClass of NewClass.extendedBy) {
+					if (instance.constructor === this) { return true }
+					for (let SubClass of this.extendedBy) {
 						if (SubClass[Symbol.hasInstance](instance)) { return true }
 					}
 					return false;
