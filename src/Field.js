@@ -10,14 +10,14 @@ import {defer as deferObservable} from 'rxjs/observable/defer';
 import {merge}                    from 'rxjs/observable/merge';
 import {concat}                   from 'rxjs/observable/concat';
 
-import inRange           from 'lodash/inRange';
+import inRange           from 'lodash-bound/inRange';
+import get               from 'lodash-bound/get';
+import size              from 'lodash-bound/size';
 import isString          from 'lodash/isString';
 import isArray           from 'lodash/isArray';
 import isUndefined       from 'lodash/isUndefined';
 import isFunction        from 'lodash/isFunction';
 import pick              from 'lodash/pick';
-import get               from 'lodash/get';
-import size              from 'lodash/size';
 
 import assert from 'power-assert';
 
@@ -234,7 +234,7 @@ export class Field extends ValueTracker {
 		
 	}
 	
-	validate(val) {}
+	validate(val, stages = []) {}
 	
 	async commit() {
 		this.validate(this[$$value], ['commit']);
@@ -417,16 +417,14 @@ export class SideField extends Field {
 	}
 	
 	validate(val, stages = []) {
-		
 		if (stages.includes('commit')) {
 			assert(!isUndefined(val), humanMsg`
 			    No resource specified for side ${this[$$key]} of
 				this '${this[$$owner].constructor.name}'.
 			`);
 		}
-		
 		/* the value must be of the proper domain */
-		assert(val instanceof this[$$desc].class, humanMsg`
+		assert(isUndefined(val) || val instanceof this[$$desc].class, humanMsg`
 			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
 	}
@@ -477,7 +475,7 @@ export class Rel1Field extends Field {
 		const { owner, key, desc, initialValue, waitUntilConstructed, related } = options;
 		
 		/* you cannot give a value as an actual relation and as a shortcut at the same time */
-		let givenShortcutInitialValue = get(related, [desc.options.key, 'initialValue']);
+		let givenShortcutInitialValue = related::get([desc.options.key, 'initialValue']);
 		assert(!(initialValue || desc.other.class.singleton) || !givenShortcutInitialValue, humanMsg`
 			You cannot set the fields '${key}' and '${desc.options.key}'
 			at the same time for a ${this.constructor.singular}.
@@ -522,16 +520,18 @@ export class Rel1Field extends Field {
 	
 	validate(val, stages = []) {
 		
+		const notGiven = val === null || isUndefined(val);
+		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
-			assert(val !== null || this[$$desc].cardinality.min === 0, humanMsg`
-				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+			assert(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`
+				No value '${val}' given for required field ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
 		
 		/* the value must be of the proper domain */
-		assert(val === null || val instanceof this[$$desc].relationshipClass, humanMsg`
-			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+		assert(notGiven || val instanceof this[$$desc].relationshipClass, humanMsg`
+			Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
 		
 		// TODO: these should not be assertions, but proper constraint-checks,
@@ -613,20 +613,24 @@ export class RelShortcut1Field extends Field {
 	}
 		
 	validate(val, stages = []) {
+		
+		const notGiven = val === null || isUndefined(val);
+		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
-			if (val === null && this[$$desc].cardinality.min > 0) {
-				throw new Error(humanMsg`
-					Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
-				`);
-			}
-		}
-		/* the value must be of the proper domain */
-		if (!(val instanceof this[$$desc].other.class)) {
-			throw new Error(humanMsg`
-				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+			assert(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`
+				No value '${val}' given for required field ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
+		
+		/* the value must be of the proper domain */
+		assert(notGiven || val instanceof this[$$desc].other.class, humanMsg`
+			Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
+		
+		// TODO: these should not be assertions, but proper constraint-checks,
+		//     : recording errors, possibly allowing them temporarily, etc.
+		
 	}
 	
 }
@@ -730,10 +734,13 @@ export class Rel$Field extends Field {
 	}
 	
 	validate(val, stages = []) {
-		assert(val[Symbol.iterator]);
+		assert(val[Symbol.iterator], humanMsg`
+			The value ${val} given for ${this[$$owner].constructor.name}#${this[$$key]}
+			is not an iterable collection (like array or set).
+		`);
 		if (stages.includes('commit')) {
 			const { min, max } = this[$$desc].cardinality;
-			assert(inRange(size(val), min, max + 1));
+			assert(val::size()::inRange(min, max + 1));
 		}
 		val.forEach(::this.validateElement);
 	}
@@ -741,7 +748,7 @@ export class Rel$Field extends Field {
 	validateElement(element) {
 		/* the value must be of the proper domain */
 		assert(element instanceof this[$$desc].relationshipClass, humanMsg`
-			Invalid value '${element}' given as element for
+			Invalid value ${element} given as element for
 			${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
 	}
@@ -871,10 +878,13 @@ export class RelShortcut$Field extends Field {
 	}
 	
 	validate(val, stages = []) {
-		assert(val[Symbol.iterator]);
+		assert(val[Symbol.iterator], humanMsg`
+			The value ${val} given for ${this[$$owner].constructor.name}#${this[$$key]}
+			is not an iterable collection (like array or set).
+		`);
 		if (stages.includes('commit')) {
 			const {min, max} = this[$$desc].cardinality;
-			assert(inRange(size(val), min, max+1));
+			assert(val::size()::inRange(min, max+1));
 		}
 		val.forEach(::this.validateElement);
 	}
@@ -882,7 +892,7 @@ export class RelShortcut$Field extends Field {
 	validateElement(element) {
 		/* the value must be of the proper domain */
 		assert(element instanceof this[$$desc].other.class, humanMsg`
-			Invalid value '${element}' given as element for
+			Invalid value ${element} given as element for
 			${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
 	}
