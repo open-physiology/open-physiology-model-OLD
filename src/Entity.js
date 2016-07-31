@@ -13,6 +13,7 @@ const $$subjects         = Symbol('$$subjects'   );
 const $$observables      = Symbol('$$observables');
 const $$singletonObject  = Symbol('$$singletonObject');
 const $$newEntitySubject = Symbol('$$newEntitySubject');
+const $$deleted          = Symbol('$$deleted');
 
 ////////////////////////////////////////////////////////////////
 
@@ -197,8 +198,12 @@ export default class Entity extends ValueTracker {
 		//     : that also allows undo. This will replace storing 'pristine' ops.
 		//     : (This is the Command design pattern.)
 		
-		this.e('delete').next();
+		if (this[$$deleted]) { return }
+		this[$$deleted] = true;
+		this.e('delete').next(this);
 	}
+	
+	isDeleted() { return !!this[$$deleted] }
 	
 	//noinspection JSDuplicatedDeclaration // temporary, to suppress warning due to Webstorm bug
 	get(key)               { return this.field_get(key)               }
