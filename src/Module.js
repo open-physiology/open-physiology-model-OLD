@@ -64,7 +64,7 @@ export default class Module {
 			let constructor = Entity.createClass     (conf);
 			constructor = this.mergeSameNameResources(constructor);
 			this.register                            (constructor);
-			this.mergeSuperclassProperties           (constructor);
+			this.mergeSuperclassFields           (constructor);
 			// jsonSchemaConfig                      (constructor); // TODO
 			Field.augmentClass                    (constructor);
 			return constructor;
@@ -79,7 +79,7 @@ export default class Module {
 			this.normalizeRelationshipSides              (constructor);
 			constructor = this.mergeSameNameRelationships(constructor);
 			this.register                                (constructor);
-			this.mergeSuperclassProperties               (constructor);
+			this.mergeSuperclassFields               (constructor);
 			// jsonSchemaConfig                          (constructor); // TODO
 			Field.augmentClass                        (constructor);
 			return constructor;
@@ -204,45 +204,55 @@ export default class Module {
 		}
 	}
 	
-	mergeSuperclassProperties(cls) : void {
+	_mergeSuperclassField(cls, kind, customMerge) {
+		if (isUndefined(cls[kind])) { return }
 		for (let [,supercls] of this.classes.verticesTo(cls.name)) {
-			for (let [key, superDesc] of Object.entries(supercls.properties)) {
-				let subDesc = cls.properties[key];
+			for (let [key, superDesc] of Object.entries(supercls[kind])) {
+				let subDesc = cls[kind][key];
 				if (isUndefined(subDesc)) {
-					cls.properties[key] = superDesc;
+					cls[kind][key] = superDesc;
 				} else if (isEqual(subDesc, superDesc)) {
 					continue;
 				} else {
-					
-					assert(isUndefined(subDesc.type) || subDesc.type === superDesc.type);
-					
-					// We're assuming that the only kind of non-trivial merging
-					// right now is to give a property a specific constant value
-					// in the subclass, which has to be checked in the superclass.
-					// TODO: use actual json-schema validation to validate value
-					let singleSuperDesc;
-					if (isUndefined(superDesc.type) && superDesc.oneOf) {
-						for (let disjunct of superDesc.oneOf) {
-							if (typeof subDesc.value === disjunct.type                  ||
-							    subDesc.value::isInteger() && disjunct.type === 'integer' ||
-							    isEqual(subDesc.value, disjunct.value)
-							) {
-								singleSuperDesc = { ...superDesc, ...disjunct };
-								delete singleSuperDesc.oneOf;
-								delete singleSuperDesc.default;
-							}
-						}
-					} else {
-						singleSuperDesc = { ...superDesc };
-					}
-					
-					assert(singleSuperDesc);
-					
-					Object.assign(subDesc, singleSuperDesc);
-					
+					Object.assign(subDesc, customMerge(superDesc, subDesc));
 				}
 			}
 		}
+	}
+	
+	mergeSuperclassFields(cls) : void {
+		this._mergeSuperclassField(cls, 'properties', (superDesc, subDesc) => {
+			assert(isUndefined(subDesc.type) || subDesc.type === superDesc.type);
+			// We're assuming that the only kind of non-trivial merging
+			// right now is to give a property a specific constant value
+			// in the subclass, which has to be checked in the superclass.
+			// TODO: use actual json-schema validation to validate value
+			let singleSuperDesc;
+			if (isUndefined(superDesc.type) && superDesc.oneOf) {
+				for (let disjunct of superDesc.oneOf) {
+					if (typeof subDesc.value === disjunct.type                    ||
+					    subDesc.value::isInteger() && disjunct.type === 'integer' ||
+					    isEqual(subDesc.value, disjunct.value)
+					) {
+						singleSuperDesc = { ...superDesc, ...disjunct };
+						delete singleSuperDesc.oneOf;
+						delete singleSuperDesc.default;
+					}
+				}
+			} else {
+				singleSuperDesc = { ...superDesc };
+			}
+			assert(singleSuperDesc);
+			return singleSuperDesc;
+		});
+		this._mergeSuperclassField(cls, 'relationships', (superDesc, subDesc) => {
+			assert(superDesc.class.hasSubclass(subDesc.class));
+			return { ...superDesc };
+		});
+		this._mergeSuperclassField(cls, 'relationshipShortcuts', (superDesc, subDesc) => {
+			assert(superDesc.class.hasSubclass(subDesc.class));
+			return { ...superDesc };
+		});
 	}
 	
 	mergeSameNameResources(cls) : Class<Entity> {

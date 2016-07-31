@@ -7,7 +7,16 @@ import * as exports from '../../src/modules/lyphs';
 const { default: module, ...exportedClasses } = exports;
 
 describe("'lyphs' Module", () => {
-
+	
+	const {
+		MaterialType,
+		LyphType,
+		CylindricalLyphType,
+		MaterialTemplate,
+		LyphTemplate,
+		CylindricalLyphTemplate
+    } = exportedClasses;
+	
 	it("exports the expected classes", () => {
 
 		expect(exportedClasses).to.contain.typedResources(
@@ -43,41 +52,30 @@ describe("'lyphs' Module", () => {
 	});
 
 	it("exports classes that can be instantiated", async () => {
-
-		// for (let cls of Object.values(exportedClasses)) {
-		// 	if (cls.isResource) {
-		// 		expect(new cls()).to.be.an.instanceof(cls, Resource);
-		// 	} else if (cls.isRelationship) {
-		// 		expect(new cls()).to.be.an.instanceof(cls, IsRelatedTo);
-		// 	} else if (cls.isTypedResource) {
-		// 		expect(new cls.Type()    ).to.be.an.instanceof(cls.Type,     Type,     Resource);
-		// 		expect(new cls.Template()).to.be.an.instanceof(cls.Template, Template, Resource);
-		// 	}
-		// }
-
-		const {
-			Material,
-			Lyph,
-			CylindricalLyph
-		} = exportedClasses;
 		
+		let materialType            = await MaterialType.new();
+		let materialTemplate        = await MaterialTemplate.new({ type: materialType });
+		let lyphType                = await LyphType.new();
+		let lyphTemplate            = await LyphTemplate.new({ type: lyphType });
+		let cylindricalLyphType     = await CylindricalLyphType.new();
+		let cylindricalLyphTemplate = await CylindricalLyphTemplate.new({ type: cylindricalLyphType });
 		
-		let materialType            = await Material.Type.new();
-		let materialTemplate        = await Material.Template.new({ type: materialType });
-		let lyphType                = await Lyph.Type.new();
-		let lyphTemplate            = await Lyph.Template.new({ type: lyphType });
-		let cylindricalLyphType     = await CylindricalLyph.Type.new();
-		let cylindricalLyphTemplate = await CylindricalLyph.Template.new({ type: cylindricalLyphType });
-		
-		
-		expect(materialType           ).to.be.an.instanceof(                                         Material.Type    );
-		expect(materialTemplate       ).to.be.an.instanceof(                                         Material.Template);
-		expect(lyphType               ).to.be.an.instanceof(                          Lyph.Type    , Material.Type    );
-		expect(lyphTemplate           ).to.be.an.instanceof(                          Lyph.Template, Material.Template);
-		expect(cylindricalLyphType    ).to.be.an.instanceof(CylindricalLyph.Type    , Lyph.Type    , Material.Type    );
-		expect(cylindricalLyphTemplate).to.be.an.instanceof(CylindricalLyph.Template, Lyph.Template, Material.Template);
+		expect(materialType           ).to.be.an.instanceof(                                       MaterialType    );
+		expect(materialTemplate       ).to.be.an.instanceof(                                       MaterialTemplate);
+		expect(lyphType               ).to.be.an.instanceof(                         LyphType    , MaterialType    );
+		expect(lyphTemplate           ).to.be.an.instanceof(                         LyphTemplate, MaterialTemplate);
+		expect(cylindricalLyphType    ).to.be.an.instanceof(CylindricalLyphType    , LyphType    , MaterialType    );
+		expect(cylindricalLyphTemplate).to.be.an.instanceof(CylindricalLyphTemplate, LyphTemplate, MaterialTemplate);
 
 	});
+	
+	it("exports classes that have the properties, relationships and relationshipShortcuts of their superclasses", () => {
+		
+		expect(LyphType.properties           ).to.have.property('href');
+		expect(LyphType.relationships        ).to.have.property('-->ContainsMaterial');
+		expect(LyphType.relationshipShortcuts).to.have.property('materials');
+		
+	})
 
 
 

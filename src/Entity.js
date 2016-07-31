@@ -41,9 +41,15 @@ export default class Entity extends ValueTracker {
 			[Symbol.hasInstance]: {
 				value(instance) {
 					if (!instance) { return false }
-					if (instance.constructor === this) { return true }
+					return this.hasSubclass(instance.constructor);
+				}
+			},
+			hasSubclass: {
+				value(otherClass) {
+					if (!otherClass) { return false }
+					if (otherClass === this) { return true }
 					for (let SubClass of this.extendedBy) {
-						if (SubClass[Symbol.hasInstance](instance)) { return true }
+						if (SubClass.hasSubclass(otherClass)) { return true }
 					}
 					return false;
 				}
@@ -53,7 +59,7 @@ export default class Entity extends ValueTracker {
 		
 		return NewClass;
 	}
-		
+	
 	
 	/////////////////////////////////////////////////////////////////////
 	////////// STATIC (creating / caching / finding instances) //////////
