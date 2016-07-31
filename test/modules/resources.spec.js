@@ -16,7 +16,12 @@ describe("'resources' Module", () => {
 			'IsExternallyRelatedTo',
 			'CorrespondsTo'
 		);
-
+		
+	});
+	
+	it("has abstract classes", () => {
+		expect(exports.Resource)   .to.have.property('abstract', true);
+		expect(exports.IsRelatedTo).to.have.property('abstract', true);
 	});
 
 
