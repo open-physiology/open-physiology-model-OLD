@@ -321,10 +321,18 @@ export class PropertyField extends Field {
 		);
 	}
 	
-	validate(val) {
+	validate(val, stages = []) {
+		
+		if (stages.includes('commit')) {
+			assert(!this[$$desc].required || !isUndefined(val), humanMsg`
+			    No value given for required field '${this[$$owner].constructor.name}#${this[$$key]}'.
+			`);
+		}
+		
 		// TODO: CHECK CONSTRAINT: given property value conforms to JSON schema
 		// TODO: CHECK ADDITIONAL (PROPERTY-SPECIFIC) CONSTRAINTS: e.g., if this
 		//     : is a template, does it conform to its corresponding type?
+		
 	}
 	
 }
@@ -408,13 +416,19 @@ export class SideField extends Field {
 		
 	}
 	
-	validate(val) {
-		/* the value must be of the proper domain */
-		if ((!val instanceof this[$$desc].class)) {
-			throw new Error(humanMsg`
-				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+	validate(val, stages = []) {
+		
+		if (stages.includes('commit')) {
+			assert(!isUndefined(val), humanMsg`
+			    No resource specified for side ${this[$$key]} of
+				this '${this[$$owner].constructor.name}'.
 			`);
 		}
+		
+		/* the value must be of the proper domain */
+		assert(val instanceof this[$$desc].class, humanMsg`
+			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
 	}
 	
 }
