@@ -46,6 +46,9 @@ export default class Entity extends ValueTracker {
 			 * our own flavor of multiple inheritance.
 			 **/
 			[Symbol.hasInstance]: {
+				value(instance) { return this.hasInstance(instance) }
+			},
+			hasInstance: {
 				value(instance) {
 					if (!instance) { return false }
 					return this.hasSubclass(instance.constructor);
@@ -54,6 +57,7 @@ export default class Entity extends ValueTracker {
 			hasSubclass: {
 				value(otherClass) {
 					if (!otherClass) { return false }
+					console.log('((hasSubclass))', this.name, otherClass.name); // TODO: remove
 					if (otherClass === this) { return true }
 					for (let SubClass of this.extendedBy) {
 						if (SubClass.hasSubclass(otherClass)) { return true }
@@ -146,7 +150,7 @@ export default class Entity extends ValueTracker {
 			// so we can't query the server here.
 			return null;
 		}
-		assert(entity instanceof this, humanMsg`
+		assert(this.hasInstance(entity), humanMsg`
 			The entity at '${JSON.stringify(href)}' is not
 			of class '${this.name}'
 			but of class '${entity.constructor.name}'.
@@ -154,7 +158,9 @@ export default class Entity extends ValueTracker {
 		return entity;
 	}
 	
-	static getAll() { return new Set([...this[$$cacheSet]].filter(e=>e instanceof this)) }
+	static getAll() {
+		return new Set([...this[$$cacheSet]].filter(::this.hasInstance));
+	}
 	
 	static getSingleton() {
 		assert(this.singleton, humanMsg`

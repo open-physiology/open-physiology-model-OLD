@@ -422,9 +422,11 @@ export class SideField extends Field {
 			`);
 		}
 		/* the value must be of the proper domain */
-		assert(isUndefined(val) || val instanceof this[$$desc].class, humanMsg`
-			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
-		`);
+		if (!(isUndefined(val) || this[$$desc].class.hasInstance(val))) {
+			throw new Error(humanMsg`
+				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+			`);
+		}
 	}
 	
 }
@@ -528,9 +530,11 @@ export class Rel1Field extends Field {
 		}
 		
 		/* the value must be of the proper domain */
-		assert(notGiven || val instanceof this[$$desc].relationshipClass, humanMsg`
-			Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
-		`);
+		if (!(notGiven || this[$$desc].relationshipClass.hasInstance(val))) {
+			throw new Error(humanMsg`
+				Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
+			`);
+		}
 		
 		// TODO: these should not be assertions, but proper constraint-checks,
 		//     : recording errors, possibly allowing them temporarily, etc.
@@ -622,9 +626,11 @@ export class RelShortcut1Field extends Field {
 		}
 		
 		/* the value must be of the proper domain */
-		assert(notGiven || val instanceof this[$$desc].other.class, humanMsg`
-			Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
-		`);
+		if (!(notGiven || this[$$desc].other.class.hasInstance(val))) {
+			throw new Error(humanMsg`
+				Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
+			`);
+		}
 		
 		// TODO: these should not be assertions, but proper constraint-checks,
 		//     : recording errors, possibly allowing them temporarily, etc.
@@ -745,10 +751,12 @@ export class Rel$Field extends Field {
 	
 	validateElement(element) {
 		/* the value must be of the proper domain */
-		assert(element instanceof this[$$desc].relationshipClass, humanMsg`
-			Invalid value ${element} given as element for
-			${this[$$owner].constructor.name}#${this[$$key]}.
-		`);
+		if (!this[$$desc].relationshipClass.hasInstance(element)) {
+			throw new Error(humanMsg`
+				Invalid value ${element} given as element for
+				${this[$$owner].constructor.name}#${this[$$key]}.
+			`);
+		}
 	}
 	
 	async commit() {
@@ -889,10 +897,12 @@ export class RelShortcut$Field extends Field {
 	
 	validateElement(element) {
 		/* the value must be of the proper domain */
-		assert(element instanceof this[$$desc].other.class, humanMsg`
-			Invalid value ${element} given as element for
-			${this[$$owner].constructor.name}#${this[$$key]}.
-		`);
+		if (!this[$$desc].other.class.hasInstance(element)) {
+			throw new Error(humanMsg`
+				Invalid value ${element} given as element for
+				${this[$$owner].constructor.name}#${this[$$key]}.
+			`);
+		}
 	}
 	
 	async commit() {
