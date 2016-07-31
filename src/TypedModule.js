@@ -5,6 +5,7 @@ import {humanMsg, mapOptionalArray} from './util/misc';
 import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
+import isArray   from 'lodash-bound/isArray';
 
 /**
  * Typed Modules allow to more easily create related
@@ -17,7 +18,11 @@ export default class TypedModule extends Module {
 	TYPED_RESOURCE(config) {
 		return mapOptionalArray(config, (conf) => {
 			
-			const SuperClass = conf.extends || Typed;
+			let superClasses = conf.extends || [Typed];
+			if (!superClasses::isArray()) { superClasses = [superClasses] }
+			
+			let subClasses = conf.extendedBy || [];
+			if (!subClasses::isArray()) { subClasses = [subClasses] }
 			
 			config::defaults({
 				properties: {},
@@ -45,7 +50,8 @@ export default class TypedModule extends Module {
 				
 				name: `${conf.name}Type`,
 				
-				extends: SuperClass.Type,
+				extends:    superClasses.map(sc => sc.Type),
+				extendedBy: subClasses  .map(sc => sc.Type),
 				
 				instanceSingular: conf.singular,
 				instancePlural:   conf.plural || `${conf.singular}s`,
@@ -63,7 +69,8 @@ export default class TypedModule extends Module {
 				
 				name: `${conf.name}Template`,
 				
-				extends: SuperClass.Template,
+				extends:    superClasses.map(sc => sc.Template),
+				extendedBy: subClasses  .map(sc => sc.Template),
 				
 				instanceSingular: conf.singular,
 				instancePlural:   conf.plural || `${conf.singular}s`,
@@ -79,7 +86,7 @@ export default class TypedModule extends Module {
 				
 				name: 'HasType',
 				
-				extends: SuperClass.HasType,
+				extends: superClasses.HasType,
 				
 				singular: 'has type',
 				

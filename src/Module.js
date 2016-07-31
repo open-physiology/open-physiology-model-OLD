@@ -207,6 +207,12 @@ export default class Module {
 	_mergeSuperclassField(cls, kind, customMerge) {
 		if (isUndefined(cls[kind])) { return }
 		for (let [,supercls] of this.classes.verticesTo(cls.name)) {
+			
+			
+			if (supercls.name === 'MeasurableLocationType') {
+				console.log(supercls.name, cls.name);
+			}
+			
 			for (let [key, superDesc] of Object.entries(supercls[kind])) {
 				let subDesc = cls[kind][key];
 				if (isUndefined(subDesc)) {

@@ -32,11 +32,13 @@ export default class Entity extends ValueTracker {
 		/* create the class with the right name, constructor and static content */
 		const {name, ...rest} = config;
 		
-		const NewClassObj = {};
-		NewClassObj[name] = class extends Entity {};
-		const NewClass = NewClassObj[name];
+		/* create the new class */
+		const EntitySubclass = class extends Entity {};
 		
-		Object.defineProperties(NewClass, {
+		/* populate it with  */
+		Object.assign(EntitySubclass, rest);
+		
+		Object.defineProperties(EntitySubclass, {
 			/**
 			 * Set the name property of this class to
 			 * the name given in the configuration.
@@ -78,23 +80,23 @@ export default class Entity extends ValueTracker {
 				}
 			}
 		});
-		Object.assign(NewClass, rest);
 		
 		/* maintaining <Class>.p('all') */
-		let allEntitiesOfNewClass = new ObservableSet();
+		{
+			let allEntitiesOfNewClass = new ObservableSet();
+			Entity[$$cacheSet].e('add')
+				::filter(::EntitySubclass.hasInstance)
+				.subscribe(allEntitiesOfNewClass.e('add'));
+			Entity[$$cacheSet].e('delete')
+				::filter(::EntitySubclass.hasInstance)
+				.subscribe(allEntitiesOfNewClass.e('delete'));
+			Object.defineProperty(EntitySubclass, $$allSubject, {
+				value: allEntitiesOfNewClass.p('value')
+			});
+		}
 		
-		Entity[$$cacheSet].e('add')
-			::filter(::NewClass.hasInstance)
-			.subscribe(allEntitiesOfNewClass.e('add'));
-		Entity[$$cacheSet].e('delete')
-			::filter(::NewClass.hasInstance)
-			.subscribe(allEntitiesOfNewClass.e('delete'));
-		Object.defineProperty(NewClass, $$allSubject, {
-			value: allEntitiesOfNewClass.p('value')
-		});
 		
-		
-		return NewClass;
+		return EntitySubclass;
 	}
 	
 	

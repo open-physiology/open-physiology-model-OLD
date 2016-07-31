@@ -50,7 +50,7 @@ export const MeasurableLocation = M.TYPED_RESOURCE({
 	
 	abstract: true,
 	
-	extends: Resource,
+	extends: Typed,
 	
 	extendedBy: [Material, Border, Node, Process]
 	
