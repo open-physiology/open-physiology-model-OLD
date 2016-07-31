@@ -3,7 +3,7 @@ import {xdescribe, describe, it, expect} from './test.helper';
 import {Resource, IsRelatedTo}   from '../src/modules/resources';
 import {Type, Template, HasType} from '../src/modules/typed';
 import {Process} from '../src/modules/processes';
-import {MaterialType, MaterialTemplate, ContainsMaterial} from '../src/index';
+import {MaterialType, MaterialTemplate, ContainsMaterial, MeasurableType} from '../src/index';
 
 describe("integrated workflow", () => {
 	
@@ -14,6 +14,11 @@ describe("integrated workflow", () => {
 		//     : caches of the classes are already populated.
 		//     : We need to make it more modular.
 		
+		
+		MaterialType.p('all').subscribe(::console.log);
+		
+		
+		
 		let gathered_MaterialType = new Set;
 		let gathered_Type         = new Set;
 		let gathered_Resource     = new Set;
@@ -21,8 +26,6 @@ describe("integrated workflow", () => {
 		MaterialType.p('all').subscribe((all) => { gathered_MaterialType = all });
 		Type        .p('all').subscribe((all) => { gathered_Type         = all });
 		Resource    .p('all').subscribe((all) => { gathered_Resource     = all });
-		
-		console.log([...gathered_MaterialType].join(', '))
 		
 		expect([...gathered_MaterialType]).to.eql([]);
 		expect([...gathered_Type        ]).to.eql([]);
@@ -49,7 +52,7 @@ describe("integrated workflow", () => {
 		expect([...MaterialType.getAll()]).to.eql([blood, water]);
 		expect([...Type        .getAll()]).to.eql([blood, water]);
 		expect([...Resource    .getAll()]).to.eql([blood, water]);
-		
+				
 	});
 	
 	it("can create new 'MaterialType's and link them", async () => {

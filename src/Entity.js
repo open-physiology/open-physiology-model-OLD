@@ -10,6 +10,7 @@ import ValueTracker, {event, property} from "./util/ValueTracker";
 import {tracker} from './changes/Change';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {filter} from 'rxjs/operator/filter';
+import 'rxjs/add/operator/do';
 import {map} from 'rxjs/operator/map';
 
 const $$cache            = Symbol('$$cache'           );
@@ -57,7 +58,6 @@ export default class Entity extends ValueTracker {
 			hasSubclass: {
 				value(otherClass) {
 					if (!otherClass) { return false }
-					console.log('((hasSubclass))', this.name, otherClass.name); // TODO: remove
 					if (otherClass === this) { return true }
 					for (let SubClass of this.extendedBy) {
 						if (SubClass.hasSubclass(otherClass)) { return true }
@@ -81,14 +81,18 @@ export default class Entity extends ValueTracker {
 		Object.assign(NewClass, rest);
 		
 		/* maintaining <Class>.p('all') */
-		let allSubject = new BehaviorSubject(new Set());
+		let allEntitiesOfNewClass = new ObservableSet();
+		
 		Entity[$$cacheSet].e('add')
-			::filter(::NewClass[Symbol.hasInstance])
-			.subscribe(() => { allSubject.next(new Set(Entity[$$cacheSet])) });
+			::filter(::NewClass.hasInstance)
+			.subscribe(allEntitiesOfNewClass.e('add'));
 		Entity[$$cacheSet].e('delete')
-			::filter(::NewClass[Symbol.hasInstance])
-			.subscribe(() => { allSubject.next(new Set(Entity[$$cacheSet])) });
-		Object.defineProperty(NewClass, $$allSubject, { value: allSubject.asObservable() });
+			::filter(::NewClass.hasInstance)
+			.subscribe(allEntitiesOfNewClass.e('delete'));
+		Object.defineProperty(NewClass, $$allSubject, {
+			value: allEntitiesOfNewClass.p('value')
+		});
+		
 		
 		return NewClass;
 	}

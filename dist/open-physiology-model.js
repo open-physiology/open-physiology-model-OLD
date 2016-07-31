@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , core      = __webpack_require__(26)
 	  , hide      = __webpack_require__(13)
 	  , redefine  = __webpack_require__(15)
-	  , ctx       = __webpack_require__(31)
+	  , ctx       = __webpack_require__(32)
 	  , PROTOTYPE = 'prototype';
 	
 	var $export = function(type, name, source){
@@ -150,7 +150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var store      = __webpack_require__(96)('wks')
-	  , uid        = __webpack_require__(53)
+	  , uid        = __webpack_require__(54)
 	  , Symbol     = __webpack_require__(3).Symbol
 	  , USE_SYMBOL = typeof Symbol == 'function';
 	
@@ -257,7 +257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var global    = __webpack_require__(3)
 	  , hide      = __webpack_require__(13)
 	  , has       = __webpack_require__(11)
-	  , SRC       = __webpack_require__(53)('src')
+	  , SRC       = __webpack_require__(54)('src')
 	  , TO_STRING = 'toString'
 	  , $toString = Function[TO_STRING]
 	  , TPL       = ('' + $toString).split(TO_STRING);
@@ -477,7 +477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// 4 -> Array#every
 	// 5 -> Array#find
 	// 6 -> Array#findIndex
-	var ctx      = __webpack_require__(31)
+	var ctx      = __webpack_require__(32)
 	  , IObject  = __webpack_require__(73)
 	  , toObject = __webpack_require__(10)
 	  , toLength = __webpack_require__(9)
@@ -592,6 +592,260 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var isFunction_1 = __webpack_require__(258);
+	var Subscription_1 = __webpack_require__(164);
+	var Observer_1 = __webpack_require__(649);
+	var rxSubscriber_1 = __webpack_require__(168);
+	/**
+	 * Implements the {@link Observer} interface and extends the
+	 * {@link Subscription} class. While the {@link Observer} is the public API for
+	 * consuming the values of an {@link Observable}, all Observers get converted to
+	 * a Subscriber, in order to provide Subscription-like capabilities such as
+	 * `unsubscribe`. Subscriber is a common type in RxJS, and crucial for
+	 * implementing operators, but it is rarely used as a public API.
+	 *
+	 * @class Subscriber<T>
+	 */
+	var Subscriber = (function (_super) {
+	    __extends(Subscriber, _super);
+	    /**
+	     * @param {Observer|function(value: T): void} [destinationOrNext] A partially
+	     * defined Observer or a `next` callback function.
+	     * @param {function(e: ?any): void} [error] The `error` callback of an
+	     * Observer.
+	     * @param {function(): void} [complete] The `complete` callback of an
+	     * Observer.
+	     */
+	    function Subscriber(destinationOrNext, error, complete) {
+	        _super.call(this);
+	        this.syncErrorValue = null;
+	        this.syncErrorThrown = false;
+	        this.syncErrorThrowable = false;
+	        this.isStopped = false;
+	        switch (arguments.length) {
+	            case 0:
+	                this.destination = Observer_1.empty;
+	                break;
+	            case 1:
+	                if (!destinationOrNext) {
+	                    this.destination = Observer_1.empty;
+	                    break;
+	                }
+	                if (typeof destinationOrNext === 'object') {
+	                    if (destinationOrNext instanceof Subscriber) {
+	                        this.destination = destinationOrNext;
+	                        this.destination.add(this);
+	                    }
+	                    else {
+	                        this.syncErrorThrowable = true;
+	                        this.destination = new SafeSubscriber(this, destinationOrNext);
+	                    }
+	                    break;
+	                }
+	            default:
+	                this.syncErrorThrowable = true;
+	                this.destination = new SafeSubscriber(this, destinationOrNext, error, complete);
+	                break;
+	        }
+	    }
+	    Subscriber.prototype[rxSubscriber_1.$$rxSubscriber] = function () { return this; };
+	    /**
+	     * A static factory for a Subscriber, given a (potentially partial) definition
+	     * of an Observer.
+	     * @param {function(x: ?T): void} [next] The `next` callback of an Observer.
+	     * @param {function(e: ?any): void} [error] The `error` callback of an
+	     * Observer.
+	     * @param {function(): void} [complete] The `complete` callback of an
+	     * Observer.
+	     * @return {Subscriber<T>} A Subscriber wrapping the (partially defined)
+	     * Observer represented by the given arguments.
+	     */
+	    Subscriber.create = function (next, error, complete) {
+	        var subscriber = new Subscriber(next, error, complete);
+	        subscriber.syncErrorThrowable = false;
+	        return subscriber;
+	    };
+	    /**
+	     * The {@link Observer} callback to receive notifications of type `next` from
+	     * the Observable, with a value. The Observable may call this method 0 or more
+	     * times.
+	     * @param {T} [value] The `next` value.
+	     * @return {void}
+	     */
+	    Subscriber.prototype.next = function (value) {
+	        if (!this.isStopped) {
+	            this._next(value);
+	        }
+	    };
+	    /**
+	     * The {@link Observer} callback to receive notifications of type `error` from
+	     * the Observable, with an attached {@link Error}. Notifies the Observer that
+	     * the Observable has experienced an error condition.
+	     * @param {any} [err] The `error` exception.
+	     * @return {void}
+	     */
+	    Subscriber.prototype.error = function (err) {
+	        if (!this.isStopped) {
+	            this.isStopped = true;
+	            this._error(err);
+	        }
+	    };
+	    /**
+	     * The {@link Observer} callback to receive a valueless notification of type
+	     * `complete` from the Observable. Notifies the Observer that the Observable
+	     * has finished sending push-based notifications.
+	     * @return {void}
+	     */
+	    Subscriber.prototype.complete = function () {
+	        if (!this.isStopped) {
+	            this.isStopped = true;
+	            this._complete();
+	        }
+	    };
+	    Subscriber.prototype.unsubscribe = function () {
+	        if (this.isUnsubscribed) {
+	            return;
+	        }
+	        this.isStopped = true;
+	        _super.prototype.unsubscribe.call(this);
+	    };
+	    Subscriber.prototype._next = function (value) {
+	        this.destination.next(value);
+	    };
+	    Subscriber.prototype._error = function (err) {
+	        this.destination.error(err);
+	        this.unsubscribe();
+	    };
+	    Subscriber.prototype._complete = function () {
+	        this.destination.complete();
+	        this.unsubscribe();
+	    };
+	    return Subscriber;
+	}(Subscription_1.Subscription));
+	exports.Subscriber = Subscriber;
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @ignore
+	 * @extends {Ignored}
+	 */
+	var SafeSubscriber = (function (_super) {
+	    __extends(SafeSubscriber, _super);
+	    function SafeSubscriber(_parent, observerOrNext, error, complete) {
+	        _super.call(this);
+	        this._parent = _parent;
+	        var next;
+	        var context = this;
+	        if (isFunction_1.isFunction(observerOrNext)) {
+	            next = observerOrNext;
+	        }
+	        else if (observerOrNext) {
+	            context = observerOrNext;
+	            next = observerOrNext.next;
+	            error = observerOrNext.error;
+	            complete = observerOrNext.complete;
+	            if (isFunction_1.isFunction(context.unsubscribe)) {
+	                this.add(context.unsubscribe.bind(context));
+	            }
+	            context.unsubscribe = this.unsubscribe.bind(this);
+	        }
+	        this._context = context;
+	        this._next = next;
+	        this._error = error;
+	        this._complete = complete;
+	    }
+	    SafeSubscriber.prototype.next = function (value) {
+	        if (!this.isStopped && this._next) {
+	            var _parent = this._parent;
+	            if (!_parent.syncErrorThrowable) {
+	                this.__tryOrUnsub(this._next, value);
+	            }
+	            else if (this.__tryOrSetError(_parent, this._next, value)) {
+	                this.unsubscribe();
+	            }
+	        }
+	    };
+	    SafeSubscriber.prototype.error = function (err) {
+	        if (!this.isStopped) {
+	            var _parent = this._parent;
+	            if (this._error) {
+	                if (!_parent.syncErrorThrowable) {
+	                    this.__tryOrUnsub(this._error, err);
+	                    this.unsubscribe();
+	                }
+	                else {
+	                    this.__tryOrSetError(_parent, this._error, err);
+	                    this.unsubscribe();
+	                }
+	            }
+	            else if (!_parent.syncErrorThrowable) {
+	                this.unsubscribe();
+	                throw err;
+	            }
+	            else {
+	                _parent.syncErrorValue = err;
+	                _parent.syncErrorThrown = true;
+	                this.unsubscribe();
+	            }
+	        }
+	    };
+	    SafeSubscriber.prototype.complete = function () {
+	        if (!this.isStopped) {
+	            var _parent = this._parent;
+	            if (this._complete) {
+	                if (!_parent.syncErrorThrowable) {
+	                    this.__tryOrUnsub(this._complete);
+	                    this.unsubscribe();
+	                }
+	                else {
+	                    this.__tryOrSetError(_parent, this._complete);
+	                    this.unsubscribe();
+	                }
+	            }
+	            else {
+	                this.unsubscribe();
+	            }
+	        }
+	    };
+	    SafeSubscriber.prototype.__tryOrUnsub = function (fn, value) {
+	        try {
+	            fn.call(this._context, value);
+	        }
+	        catch (err) {
+	            this.unsubscribe();
+	            throw err;
+	        }
+	    };
+	    SafeSubscriber.prototype.__tryOrSetError = function (parent, fn, value) {
+	        try {
+	            fn.call(this._context, value);
+	        }
+	        catch (err) {
+	            parent.syncErrorValue = err;
+	            parent.syncErrorThrown = true;
+	            return true;
+	        }
+	        return false;
+	    };
+	    SafeSubscriber.prototype._unsubscribe = function () {
+	        var _parent = this._parent;
+	        this._context = null;
+	        this._parent = null;
+	        _parent.unsubscribe();
+	    };
+	    return SafeSubscriber;
+	}(Subscriber));
+	//# sourceMappingURL=Subscriber.js.map
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -693,7 +947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// optional / simple context binding
@@ -718,7 +972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Map     = __webpack_require__(217)
@@ -774,26 +1028,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	if(__webpack_require__(7)){
-	  var LIBRARY             = __webpack_require__(46)
+	  var LIBRARY             = __webpack_require__(47)
 	    , global              = __webpack_require__(3)
 	    , fails               = __webpack_require__(4)
 	    , $export             = __webpack_require__(1)
 	    , $typed              = __webpack_require__(97)
 	    , $buffer             = __webpack_require__(143)
-	    , ctx                 = __webpack_require__(31)
+	    , ctx                 = __webpack_require__(32)
 	    , anInstance          = __webpack_require__(36)
 	    , propertyDesc        = __webpack_require__(38)
 	    , hide                = __webpack_require__(13)
-	    , redefineAll         = __webpack_require__(50)
+	    , redefineAll         = __webpack_require__(51)
 	    , isInteger           = __webpack_require__(130)
 	    , toInteger           = __webpack_require__(39)
 	    , toLength            = __webpack_require__(9)
-	    , toIndex             = __webpack_require__(52)
+	    , toIndex             = __webpack_require__(53)
 	    , toPrimitive         = __webpack_require__(28)
 	    , has                 = __webpack_require__(11)
 	    , same                = __webpack_require__(214)
@@ -801,20 +1055,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    , isObject            = __webpack_require__(5)
 	    , toObject            = __webpack_require__(10)
 	    , isArrayIter         = __webpack_require__(128)
-	    , create              = __webpack_require__(47)
+	    , create              = __webpack_require__(48)
 	    , getPrototypeOf      = __webpack_require__(20)
-	    , gOPN                = __webpack_require__(48).f
+	    , gOPN                = __webpack_require__(49).f
 	    , isIterable          = __webpack_require__(316)
 	    , getIterFn           = __webpack_require__(145)
-	    , uid                 = __webpack_require__(53)
+	    , uid                 = __webpack_require__(54)
 	    , wks                 = __webpack_require__(6)
 	    , createArrayMethod   = __webpack_require__(25)
 	    , createArrayIncludes = __webpack_require__(86)
 	    , speciesConstructor  = __webpack_require__(137)
 	    , ArrayIterators      = __webpack_require__(146)
-	    , Iterators           = __webpack_require__(45)
+	    , Iterators           = __webpack_require__(46)
 	    , $iterDetect         = __webpack_require__(92)
-	    , setSpecies          = __webpack_require__(51)
+	    , setSpecies          = __webpack_require__(52)
 	    , arrayFill           = __webpack_require__(121)
 	    , arrayCopyWithin     = __webpack_require__(195)
 	    , $DP                 = __webpack_require__(8)
@@ -1260,7 +1514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	} else module.exports = function(){ /* empty */ };
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var checkGlobal = __webpack_require__(556);
@@ -1282,260 +1536,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var isFunction_1 = __webpack_require__(258);
-	var Subscription_1 = __webpack_require__(164);
-	var Observer_1 = __webpack_require__(649);
-	var rxSubscriber_1 = __webpack_require__(168);
-	/**
-	 * Implements the {@link Observer} interface and extends the
-	 * {@link Subscription} class. While the {@link Observer} is the public API for
-	 * consuming the values of an {@link Observable}, all Observers get converted to
-	 * a Subscriber, in order to provide Subscription-like capabilities such as
-	 * `unsubscribe`. Subscriber is a common type in RxJS, and crucial for
-	 * implementing operators, but it is rarely used as a public API.
-	 *
-	 * @class Subscriber<T>
-	 */
-	var Subscriber = (function (_super) {
-	    __extends(Subscriber, _super);
-	    /**
-	     * @param {Observer|function(value: T): void} [destinationOrNext] A partially
-	     * defined Observer or a `next` callback function.
-	     * @param {function(e: ?any): void} [error] The `error` callback of an
-	     * Observer.
-	     * @param {function(): void} [complete] The `complete` callback of an
-	     * Observer.
-	     */
-	    function Subscriber(destinationOrNext, error, complete) {
-	        _super.call(this);
-	        this.syncErrorValue = null;
-	        this.syncErrorThrown = false;
-	        this.syncErrorThrowable = false;
-	        this.isStopped = false;
-	        switch (arguments.length) {
-	            case 0:
-	                this.destination = Observer_1.empty;
-	                break;
-	            case 1:
-	                if (!destinationOrNext) {
-	                    this.destination = Observer_1.empty;
-	                    break;
-	                }
-	                if (typeof destinationOrNext === 'object') {
-	                    if (destinationOrNext instanceof Subscriber) {
-	                        this.destination = destinationOrNext;
-	                        this.destination.add(this);
-	                    }
-	                    else {
-	                        this.syncErrorThrowable = true;
-	                        this.destination = new SafeSubscriber(this, destinationOrNext);
-	                    }
-	                    break;
-	                }
-	            default:
-	                this.syncErrorThrowable = true;
-	                this.destination = new SafeSubscriber(this, destinationOrNext, error, complete);
-	                break;
-	        }
-	    }
-	    Subscriber.prototype[rxSubscriber_1.$$rxSubscriber] = function () { return this; };
-	    /**
-	     * A static factory for a Subscriber, given a (potentially partial) definition
-	     * of an Observer.
-	     * @param {function(x: ?T): void} [next] The `next` callback of an Observer.
-	     * @param {function(e: ?any): void} [error] The `error` callback of an
-	     * Observer.
-	     * @param {function(): void} [complete] The `complete` callback of an
-	     * Observer.
-	     * @return {Subscriber<T>} A Subscriber wrapping the (partially defined)
-	     * Observer represented by the given arguments.
-	     */
-	    Subscriber.create = function (next, error, complete) {
-	        var subscriber = new Subscriber(next, error, complete);
-	        subscriber.syncErrorThrowable = false;
-	        return subscriber;
-	    };
-	    /**
-	     * The {@link Observer} callback to receive notifications of type `next` from
-	     * the Observable, with a value. The Observable may call this method 0 or more
-	     * times.
-	     * @param {T} [value] The `next` value.
-	     * @return {void}
-	     */
-	    Subscriber.prototype.next = function (value) {
-	        if (!this.isStopped) {
-	            this._next(value);
-	        }
-	    };
-	    /**
-	     * The {@link Observer} callback to receive notifications of type `error` from
-	     * the Observable, with an attached {@link Error}. Notifies the Observer that
-	     * the Observable has experienced an error condition.
-	     * @param {any} [err] The `error` exception.
-	     * @return {void}
-	     */
-	    Subscriber.prototype.error = function (err) {
-	        if (!this.isStopped) {
-	            this.isStopped = true;
-	            this._error(err);
-	        }
-	    };
-	    /**
-	     * The {@link Observer} callback to receive a valueless notification of type
-	     * `complete` from the Observable. Notifies the Observer that the Observable
-	     * has finished sending push-based notifications.
-	     * @return {void}
-	     */
-	    Subscriber.prototype.complete = function () {
-	        if (!this.isStopped) {
-	            this.isStopped = true;
-	            this._complete();
-	        }
-	    };
-	    Subscriber.prototype.unsubscribe = function () {
-	        if (this.isUnsubscribed) {
-	            return;
-	        }
-	        this.isStopped = true;
-	        _super.prototype.unsubscribe.call(this);
-	    };
-	    Subscriber.prototype._next = function (value) {
-	        this.destination.next(value);
-	    };
-	    Subscriber.prototype._error = function (err) {
-	        this.destination.error(err);
-	        this.unsubscribe();
-	    };
-	    Subscriber.prototype._complete = function () {
-	        this.destination.complete();
-	        this.unsubscribe();
-	    };
-	    return Subscriber;
-	}(Subscription_1.Subscription));
-	exports.Subscriber = Subscriber;
-	/**
-	 * We need this JSDoc comment for affecting ESDoc.
-	 * @ignore
-	 * @extends {Ignored}
-	 */
-	var SafeSubscriber = (function (_super) {
-	    __extends(SafeSubscriber, _super);
-	    function SafeSubscriber(_parent, observerOrNext, error, complete) {
-	        _super.call(this);
-	        this._parent = _parent;
-	        var next;
-	        var context = this;
-	        if (isFunction_1.isFunction(observerOrNext)) {
-	            next = observerOrNext;
-	        }
-	        else if (observerOrNext) {
-	            context = observerOrNext;
-	            next = observerOrNext.next;
-	            error = observerOrNext.error;
-	            complete = observerOrNext.complete;
-	            if (isFunction_1.isFunction(context.unsubscribe)) {
-	                this.add(context.unsubscribe.bind(context));
-	            }
-	            context.unsubscribe = this.unsubscribe.bind(this);
-	        }
-	        this._context = context;
-	        this._next = next;
-	        this._error = error;
-	        this._complete = complete;
-	    }
-	    SafeSubscriber.prototype.next = function (value) {
-	        if (!this.isStopped && this._next) {
-	            var _parent = this._parent;
-	            if (!_parent.syncErrorThrowable) {
-	                this.__tryOrUnsub(this._next, value);
-	            }
-	            else if (this.__tryOrSetError(_parent, this._next, value)) {
-	                this.unsubscribe();
-	            }
-	        }
-	    };
-	    SafeSubscriber.prototype.error = function (err) {
-	        if (!this.isStopped) {
-	            var _parent = this._parent;
-	            if (this._error) {
-	                if (!_parent.syncErrorThrowable) {
-	                    this.__tryOrUnsub(this._error, err);
-	                    this.unsubscribe();
-	                }
-	                else {
-	                    this.__tryOrSetError(_parent, this._error, err);
-	                    this.unsubscribe();
-	                }
-	            }
-	            else if (!_parent.syncErrorThrowable) {
-	                this.unsubscribe();
-	                throw err;
-	            }
-	            else {
-	                _parent.syncErrorValue = err;
-	                _parent.syncErrorThrown = true;
-	                this.unsubscribe();
-	            }
-	        }
-	    };
-	    SafeSubscriber.prototype.complete = function () {
-	        if (!this.isStopped) {
-	            var _parent = this._parent;
-	            if (this._complete) {
-	                if (!_parent.syncErrorThrowable) {
-	                    this.__tryOrUnsub(this._complete);
-	                    this.unsubscribe();
-	                }
-	                else {
-	                    this.__tryOrSetError(_parent, this._complete);
-	                    this.unsubscribe();
-	                }
-	            }
-	            else {
-	                this.unsubscribe();
-	            }
-	        }
-	    };
-	    SafeSubscriber.prototype.__tryOrUnsub = function (fn, value) {
-	        try {
-	            fn.call(this._context, value);
-	        }
-	        catch (err) {
-	            this.unsubscribe();
-	            throw err;
-	        }
-	    };
-	    SafeSubscriber.prototype.__tryOrSetError = function (parent, fn, value) {
-	        try {
-	            fn.call(this._context, value);
-	        }
-	        catch (err) {
-	            parent.syncErrorValue = err;
-	            parent.syncErrorThrown = true;
-	            return true;
-	        }
-	        return false;
-	    };
-	    SafeSubscriber.prototype._unsubscribe = function () {
-	        var _parent = this._parent;
-	        this._context = null;
-	        this._parent = null;
-	        _parent.unsubscribe();
-	    };
-	    return SafeSubscriber;
-	}(Subscriber));
-	//# sourceMappingURL=Subscriber.js.map
-
-/***/ },
 /* 36 */
 /***/ function(module, exports) {
 
@@ -1549,7 +1549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var META     = __webpack_require__(53)('meta')
+	var META     = __webpack_require__(54)('meta')
 	  , isObject = __webpack_require__(5)
 	  , has      = __webpack_require__(11)
 	  , setDesc  = __webpack_require__(8).f
@@ -1668,6 +1668,151 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
+	var root_1 = __webpack_require__(112);
+	var toSubscriber_1 = __webpack_require__(672);
+	var symbol_observable_1 = __webpack_require__(261);
+	/**
+	 * A representation of any set of values over any amount of time. This the most basic building block
+	 * of RxJS.
+	 *
+	 * @class Observable<T>
+	 */
+	var Observable = (function () {
+	    /**
+	     * @constructor
+	     * @param {Function} subscribe the function that is  called when the Observable is
+	     * initially subscribed to. This function is given a Subscriber, to which new values
+	     * can be `next`ed, or an `error` method can be called to raise an error, or
+	     * `complete` can be called to notify of a successful completion.
+	     */
+	    function Observable(subscribe) {
+	        this._isScalar = false;
+	        if (subscribe) {
+	            this._subscribe = subscribe;
+	        }
+	    }
+	    /**
+	     * Creates a new Observable, with this Observable as the source, and the passed
+	     * operator defined as the new observable's operator.
+	     * @method lift
+	     * @param {Operator} operator the operator defining the operation to take on the observable
+	     * @return {Observable} a new observable with the Operator applied
+	     */
+	    Observable.prototype.lift = function (operator) {
+	        var observable = new Observable();
+	        observable.source = this;
+	        observable.operator = operator;
+	        return observable;
+	    };
+	    /**
+	     * Registers handlers for handling emitted values, error and completions from the observable, and
+	     *  executes the observable's subscriber function, which will take action to set up the underlying data stream
+	     * @method subscribe
+	     * @param {PartialObserver|Function} observerOrNext (optional) either an observer defining all functions to be called,
+	     *  or the first of three possible handlers, which is the handler for each value emitted from the observable.
+	     * @param {Function} error (optional) a handler for a terminal event resulting from an error. If no error handler is provided,
+	     *  the error will be thrown as unhandled
+	     * @param {Function} complete (optional) a handler for a terminal event resulting from successful completion.
+	     * @return {ISubscription} a subscription reference to the registered handlers
+	     */
+	    Observable.prototype.subscribe = function (observerOrNext, error, complete) {
+	        var operator = this.operator;
+	        var sink = toSubscriber_1.toSubscriber(observerOrNext, error, complete);
+	        if (operator) {
+	            operator.call(sink, this);
+	        }
+	        else {
+	            sink.add(this._subscribe(sink));
+	        }
+	        if (sink.syncErrorThrowable) {
+	            sink.syncErrorThrowable = false;
+	            if (sink.syncErrorThrown) {
+	                throw sink.syncErrorValue;
+	            }
+	        }
+	        return sink;
+	    };
+	    /**
+	     * @method forEach
+	     * @param {Function} next a handler for each value emitted by the observable
+	     * @param {PromiseConstructor} [PromiseCtor] a constructor function used to instantiate the Promise
+	     * @return {Promise} a promise that either resolves on observable completion or
+	     *  rejects with the handled error
+	     */
+	    Observable.prototype.forEach = function (next, PromiseCtor) {
+	        var _this = this;
+	        if (!PromiseCtor) {
+	            if (root_1.root.Rx && root_1.root.Rx.config && root_1.root.Rx.config.Promise) {
+	                PromiseCtor = root_1.root.Rx.config.Promise;
+	            }
+	            else if (root_1.root.Promise) {
+	                PromiseCtor = root_1.root.Promise;
+	            }
+	        }
+	        if (!PromiseCtor) {
+	            throw new Error('no Promise impl found');
+	        }
+	        return new PromiseCtor(function (resolve, reject) {
+	            var subscription = _this.subscribe(function (value) {
+	                if (subscription) {
+	                    // if there is a subscription, then we can surmise
+	                    // the next handling is asynchronous. Any errors thrown
+	                    // need to be rejected explicitly and unsubscribe must be
+	                    // called manually
+	                    try {
+	                        next(value);
+	                    }
+	                    catch (err) {
+	                        reject(err);
+	                        subscription.unsubscribe();
+	                    }
+	                }
+	                else {
+	                    // if there is NO subscription, then we're getting a nexted
+	                    // value synchronously during subscription. We can just call it.
+	                    // If it errors, Observable's `subscribe` imple will ensure the
+	                    // unsubscription logic is called, then synchronously rethrow the error.
+	                    // After that, Promise will trap the error and send it
+	                    // down the rejection path.
+	                    next(value);
+	                }
+	            }, reject, resolve);
+	        });
+	    };
+	    Observable.prototype._subscribe = function (subscriber) {
+	        return this.source.subscribe(subscriber);
+	    };
+	    /**
+	     * An interop point defined by the es7-observable spec https://github.com/zenparsing/es-observable
+	     * @method Symbol.observable
+	     * @return {Observable} this instance of the observable
+	     */
+	    Observable.prototype[symbol_observable_1.default] = function () {
+	        return this;
+	    };
+	    // HACK: Since TypeScript inherits static properties too, we have to
+	    // fight against TypeScript here so Subject can have a different static create signature
+	    /**
+	     * Creates a new cold Observable by calling the Observable constructor
+	     * @static true
+	     * @owner Observable
+	     * @method create
+	     * @param {Function} subscribe? the subscriber function to be passed to the Observable constructor
+	     * @return {Observable} a new cold observable
+	     */
+	    Observable.create = function (subscribe) {
+	        return new Observable(subscribe);
+	    };
+	    return Observable;
+	}());
+	exports.Observable = Observable;
+	//# sourceMappingURL=Observable.js.map
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -1681,7 +1826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -1781,7 +1926,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}); /////////////////////////////////////////////////////////////////////////////
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2080,14 +2225,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(297);
 	module.exports = __webpack_require__(12).Array.forEach;
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var fails = __webpack_require__(71);
@@ -2099,19 +2244,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports) {
 
 	module.exports = {};
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports) {
 
 	module.exports = false;
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
@@ -2156,7 +2301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
@@ -2168,7 +2313,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.14 / 15.2.3.14 Object.keys(O)
@@ -2180,7 +2325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var redefine = __webpack_require__(15);
@@ -2190,7 +2335,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2208,7 +2353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 52 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var toInteger = __webpack_require__(39)
@@ -2220,7 +2365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 53 */
+/* 54 */
 /***/ function(module, exports) {
 
 	var id = 0
@@ -2230,7 +2375,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 54 */
+/* 55 */
 /***/ function(module, exports) {
 
 	/**
@@ -2263,151 +2408,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	module.exports = isObjectLike;
 
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var root_1 = __webpack_require__(112);
-	var toSubscriber_1 = __webpack_require__(670);
-	var symbol_observable_1 = __webpack_require__(261);
-	/**
-	 * A representation of any set of values over any amount of time. This the most basic building block
-	 * of RxJS.
-	 *
-	 * @class Observable<T>
-	 */
-	var Observable = (function () {
-	    /**
-	     * @constructor
-	     * @param {Function} subscribe the function that is  called when the Observable is
-	     * initially subscribed to. This function is given a Subscriber, to which new values
-	     * can be `next`ed, or an `error` method can be called to raise an error, or
-	     * `complete` can be called to notify of a successful completion.
-	     */
-	    function Observable(subscribe) {
-	        this._isScalar = false;
-	        if (subscribe) {
-	            this._subscribe = subscribe;
-	        }
-	    }
-	    /**
-	     * Creates a new Observable, with this Observable as the source, and the passed
-	     * operator defined as the new observable's operator.
-	     * @method lift
-	     * @param {Operator} operator the operator defining the operation to take on the observable
-	     * @return {Observable} a new observable with the Operator applied
-	     */
-	    Observable.prototype.lift = function (operator) {
-	        var observable = new Observable();
-	        observable.source = this;
-	        observable.operator = operator;
-	        return observable;
-	    };
-	    /**
-	     * Registers handlers for handling emitted values, error and completions from the observable, and
-	     *  executes the observable's subscriber function, which will take action to set up the underlying data stream
-	     * @method subscribe
-	     * @param {PartialObserver|Function} observerOrNext (optional) either an observer defining all functions to be called,
-	     *  or the first of three possible handlers, which is the handler for each value emitted from the observable.
-	     * @param {Function} error (optional) a handler for a terminal event resulting from an error. If no error handler is provided,
-	     *  the error will be thrown as unhandled
-	     * @param {Function} complete (optional) a handler for a terminal event resulting from successful completion.
-	     * @return {ISubscription} a subscription reference to the registered handlers
-	     */
-	    Observable.prototype.subscribe = function (observerOrNext, error, complete) {
-	        var operator = this.operator;
-	        var sink = toSubscriber_1.toSubscriber(observerOrNext, error, complete);
-	        if (operator) {
-	            operator.call(sink, this);
-	        }
-	        else {
-	            sink.add(this._subscribe(sink));
-	        }
-	        if (sink.syncErrorThrowable) {
-	            sink.syncErrorThrowable = false;
-	            if (sink.syncErrorThrown) {
-	                throw sink.syncErrorValue;
-	            }
-	        }
-	        return sink;
-	    };
-	    /**
-	     * @method forEach
-	     * @param {Function} next a handler for each value emitted by the observable
-	     * @param {PromiseConstructor} [PromiseCtor] a constructor function used to instantiate the Promise
-	     * @return {Promise} a promise that either resolves on observable completion or
-	     *  rejects with the handled error
-	     */
-	    Observable.prototype.forEach = function (next, PromiseCtor) {
-	        var _this = this;
-	        if (!PromiseCtor) {
-	            if (root_1.root.Rx && root_1.root.Rx.config && root_1.root.Rx.config.Promise) {
-	                PromiseCtor = root_1.root.Rx.config.Promise;
-	            }
-	            else if (root_1.root.Promise) {
-	                PromiseCtor = root_1.root.Promise;
-	            }
-	        }
-	        if (!PromiseCtor) {
-	            throw new Error('no Promise impl found');
-	        }
-	        return new PromiseCtor(function (resolve, reject) {
-	            var subscription = _this.subscribe(function (value) {
-	                if (subscription) {
-	                    // if there is a subscription, then we can surmise
-	                    // the next handling is asynchronous. Any errors thrown
-	                    // need to be rejected explicitly and unsubscribe must be
-	                    // called manually
-	                    try {
-	                        next(value);
-	                    }
-	                    catch (err) {
-	                        reject(err);
-	                        subscription.unsubscribe();
-	                    }
-	                }
-	                else {
-	                    // if there is NO subscription, then we're getting a nexted
-	                    // value synchronously during subscription. We can just call it.
-	                    // If it errors, Observable's `subscribe` imple will ensure the
-	                    // unsubscription logic is called, then synchronously rethrow the error.
-	                    // After that, Promise will trap the error and send it
-	                    // down the rejection path.
-	                    next(value);
-	                }
-	            }, reject, resolve);
-	        });
-	    };
-	    Observable.prototype._subscribe = function (subscriber) {
-	        return this.source.subscribe(subscriber);
-	    };
-	    /**
-	     * An interop point defined by the es7-observable spec https://github.com/zenparsing/es-observable
-	     * @method Symbol.observable
-	     * @return {Observable} this instance of the observable
-	     */
-	    Observable.prototype[symbol_observable_1.default] = function () {
-	        return this;
-	    };
-	    // HACK: Since TypeScript inherits static properties too, we have to
-	    // fight against TypeScript here so Subject can have a different static create signature
-	    /**
-	     * Creates a new cold Observable by calling the Observable constructor
-	     * @static true
-	     * @owner Observable
-	     * @method create
-	     * @param {Function} subscribe? the subscriber function to be passed to the Observable constructor
-	     * @return {Observable} a new cold observable
-	     */
-	    Observable.create = function (subscribe) {
-	        return new Observable(subscribe);
-	    };
-	    return Observable;
-	}());
-	exports.Observable = Observable;
-	//# sourceMappingURL=Observable.js.map
 
 /***/ },
 /* 56 */
@@ -2938,7 +2938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(676);
+	exports.isBuffer = __webpack_require__(678);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -3023,9 +3023,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module3 = _interopRequireDefault(_Module2);
 	
-	var _typed = __webpack_require__(41);
+	var _typed = __webpack_require__(42);
 	
-	var _misc = __webpack_require__(42);
+	var _misc = __webpack_require__(43);
 	
 	var _defaults = __webpack_require__(148);
 	
@@ -3337,7 +3337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ctx         = __webpack_require__(31)
+	var ctx         = __webpack_require__(32)
 	  , call        = __webpack_require__(203)
 	  , isArrayIter = __webpack_require__(128)
 	  , anObject    = __webpack_require__(2)
@@ -3476,10 +3476,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var baseAssert = __webpack_require__(264);
-	var _deepEqual = __webpack_require__(675);
+	var _deepEqual = __webpack_require__(677);
 	var empower = __webpack_require__(496);
 	var formatter = __webpack_require__(637);
-	var extend = __webpack_require__(678);
+	var extend = __webpack_require__(680);
 	var define = __webpack_require__(489);
 	var empowerOptions = {
 	    modifyMessageOnRethrow: true,
@@ -3574,7 +3574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _graph2 = _interopRequireDefault(_graph);
 	
-	var _misc = __webpack_require__(42);
+	var _misc = __webpack_require__(43);
 	
 	var _Entity = __webpack_require__(265);
 	
@@ -4557,15 +4557,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _misc = __webpack_require__(42);
+	var _misc = __webpack_require__(43);
 	
 	var _schemas = __webpack_require__(58);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(41);
+	var _typed = __webpack_require__(42);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -5100,7 +5100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isArray = __webpack_require__(29),
-	    isObjectLike = __webpack_require__(54);
+	    isObjectLike = __webpack_require__(55);
 	
 	/** `Object#toString` result references. */
 	var stringTag = '[object String]';
@@ -5213,7 +5213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subscriber_1 = __webpack_require__(35);
+	var Subscriber_1 = __webpack_require__(30);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @ignore
@@ -5245,9 +5245,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var root_1 = __webpack_require__(112);
 	var isArray_1 = __webpack_require__(170);
-	var isPromise_1 = __webpack_require__(667);
-	var Observable_1 = __webpack_require__(55);
-	var iterator_1 = __webpack_require__(663);
+	var isPromise_1 = __webpack_require__(669);
+	var Observable_1 = __webpack_require__(41);
+	var iterator_1 = __webpack_require__(665);
 	var InnerSubscriber_1 = __webpack_require__(648);
 	var symbol_observable_1 = __webpack_require__(261);
 	function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
@@ -5399,7 +5399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// true  -> Array#includes
 	var toIObject = __webpack_require__(17)
 	  , toLength  = __webpack_require__(9)
-	  , toIndex   = __webpack_require__(52);
+	  , toIndex   = __webpack_require__(53);
 	module.exports = function(IS_INCLUDES){
 	  return function($this, el, fromIndex){
 	    var O      = toIObject($this)
@@ -5425,7 +5425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var global            = __webpack_require__(3)
 	  , $export           = __webpack_require__(1)
 	  , redefine          = __webpack_require__(15)
-	  , redefineAll       = __webpack_require__(50)
+	  , redefineAll       = __webpack_require__(51)
 	  , meta              = __webpack_require__(37)
 	  , forOf             = __webpack_require__(62)
 	  , anInstance        = __webpack_require__(36)
@@ -5623,7 +5623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// Forced replacement prototype accessors methods
-	module.exports = __webpack_require__(46)|| !__webpack_require__(4)(function(){
+	module.exports = __webpack_require__(47)|| !__webpack_require__(4)(function(){
 	  var K = Math.random();
 	  // In FF throws only define methods
 	  __defineSetter__.call(null, K, function(){ /* empty */});
@@ -5652,7 +5652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
 	    function(test, buggy, set){
 	      try {
-	        set = __webpack_require__(31)(Function.call, __webpack_require__(19).f(Object.prototype, '__proto__').set, 2);
+	        set = __webpack_require__(32)(Function.call, __webpack_require__(19).f(Object.prototype, '__proto__').set, 2);
 	        set(test, []);
 	        buggy = !(test instanceof Array);
 	      } catch(e){ buggy = true; }
@@ -5683,7 +5683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var global = __webpack_require__(3)
 	  , hide   = __webpack_require__(13)
-	  , uid    = __webpack_require__(53)
+	  , uid    = __webpack_require__(54)
 	  , TYPED  = uid('typed_array')
 	  , VIEW   = uid('view')
 	  , ABV    = !!(global.ArrayBuffer && global.DataView)
@@ -5958,7 +5958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObjectLike = __webpack_require__(54);
+	var isObjectLike = __webpack_require__(55);
 	
 	/** `Object#toString` result references. */
 	var symbolTag = '[object Symbol]';
@@ -6125,8 +6125,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(55);
-	var Subscriber_1 = __webpack_require__(35);
+	var Observable_1 = __webpack_require__(41);
+	var Subscriber_1 = __webpack_require__(30);
 	var Subscription_1 = __webpack_require__(164);
 	var ObjectUnsubscribedError_1 = __webpack_require__(257);
 	var SubjectSubscription_1 = __webpack_require__(650);
@@ -6290,7 +6290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(55);
+	var Observable_1 = __webpack_require__(41);
 	var ScalarObservable_1 = __webpack_require__(252);
 	var EmptyObservable_1 = __webpack_require__(165);
 	var isScheduler_1 = __webpack_require__(111);
@@ -6440,7 +6440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exports.root = freeGlobal;
 	}
 	//# sourceMappingURL=root.js.map
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(677)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(679)(module), (function() { return this; }())))
 
 /***/ },
 /* 113 */
@@ -6463,11 +6463,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(41);
+	var _typed = __webpack_require__(42);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -6613,15 +6613,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _misc = __webpack_require__(42);
+	var _misc = __webpack_require__(43);
 	
 	var _schemas = __webpack_require__(58);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(41);
+	var _typed = __webpack_require__(42);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -6865,7 +6865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
 	'use strict';
 	var toObject = __webpack_require__(10)
-	  , toIndex  = __webpack_require__(52)
+	  , toIndex  = __webpack_require__(53)
 	  , toLength = __webpack_require__(9);
 	module.exports = function fill(value /*, start = 0, end = @length */){
 	  var O      = toObject(this)
@@ -6953,7 +6953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// check on default Array iterator
-	var Iterators  = __webpack_require__(45)
+	var Iterators  = __webpack_require__(46)
 	  , ITERATOR   = __webpack_require__(6)('iterator')
 	  , ArrayProto = Array.prototype;
 	
@@ -6987,7 +6987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var create         = __webpack_require__(47)
+	var create         = __webpack_require__(48)
 	  , descriptor     = __webpack_require__(38)
 	  , setToStringTag = __webpack_require__(63)
 	  , IteratorPrototype = {};
@@ -7005,12 +7005,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var LIBRARY        = __webpack_require__(46)
+	var LIBRARY        = __webpack_require__(47)
 	  , $export        = __webpack_require__(1)
 	  , redefine       = __webpack_require__(15)
 	  , hide           = __webpack_require__(13)
 	  , has            = __webpack_require__(11)
-	  , Iterators      = __webpack_require__(45)
+	  , Iterators      = __webpack_require__(46)
 	  , $iterCreate    = __webpack_require__(131)
 	  , setToStringTag = __webpack_require__(63)
 	  , getPrototypeOf = __webpack_require__(20)
@@ -7177,7 +7177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var shared = __webpack_require__(96)('keys')
-	  , uid    = __webpack_require__(53);
+	  , uid    = __webpack_require__(54);
 	module.exports = function(key){
 	  return shared[key] || (shared[key] = uid(key));
 	};
@@ -7258,7 +7258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ctx                = __webpack_require__(31)
+	var ctx                = __webpack_require__(32)
 	  , invoke             = __webpack_require__(90)
 	  , html               = __webpack_require__(126)
 	  , cel                = __webpack_require__(123)
@@ -7341,15 +7341,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var global         = __webpack_require__(3)
 	  , DESCRIPTORS    = __webpack_require__(7)
-	  , LIBRARY        = __webpack_require__(46)
+	  , LIBRARY        = __webpack_require__(47)
 	  , $typed         = __webpack_require__(97)
 	  , hide           = __webpack_require__(13)
-	  , redefineAll    = __webpack_require__(50)
+	  , redefineAll    = __webpack_require__(51)
 	  , fails          = __webpack_require__(4)
 	  , anInstance     = __webpack_require__(36)
 	  , toInteger      = __webpack_require__(39)
 	  , toLength       = __webpack_require__(9)
-	  , gOPN           = __webpack_require__(48).f
+	  , gOPN           = __webpack_require__(49).f
 	  , dP             = __webpack_require__(8).f
 	  , arrayFill      = __webpack_require__(121)
 	  , setToStringTag = __webpack_require__(63)
@@ -7620,7 +7620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var global         = __webpack_require__(3)
 	  , core           = __webpack_require__(26)
-	  , LIBRARY        = __webpack_require__(46)
+	  , LIBRARY        = __webpack_require__(47)
 	  , wksExt         = __webpack_require__(216)
 	  , defineProperty = __webpack_require__(8).f;
 	module.exports = function(name){
@@ -7634,7 +7634,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var classof   = __webpack_require__(61)
 	  , ITERATOR  = __webpack_require__(6)('iterator')
-	  , Iterators = __webpack_require__(45);
+	  , Iterators = __webpack_require__(46);
 	module.exports = __webpack_require__(26).getIteratorMethod = function(it){
 	  if(it != undefined)return it[ITERATOR]
 	    || it['@@iterator']
@@ -7648,7 +7648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var addToUnscopables = __webpack_require__(60)
 	  , step             = __webpack_require__(204)
-	  , Iterators        = __webpack_require__(45)
+	  , Iterators        = __webpack_require__(46)
 	  , toIObject        = __webpack_require__(17);
 	
 	// 22.1.3.4 Array.prototype.entries()
@@ -8687,7 +8687,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseIsEqualDeep = __webpack_require__(540),
 	    isObject = __webpack_require__(40),
-	    isObjectLike = __webpack_require__(54);
+	    isObjectLike = __webpack_require__(55);
 	
 	/**
 	 * The base implementation of `_.isEqual` which supports partial comparisons
@@ -9014,7 +9014,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Subject_1 = __webpack_require__(109);
-	var throwError_1 = __webpack_require__(669);
+	var throwError_1 = __webpack_require__(671);
 	var ObjectUnsubscribedError_1 = __webpack_require__(257);
 	/**
 	 * @class BehaviorSubject<T>
@@ -9064,11 +9064,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	var isArray_1 = __webpack_require__(170);
-	var isObject_1 = __webpack_require__(666);
+	var isObject_1 = __webpack_require__(668);
 	var isFunction_1 = __webpack_require__(258);
 	var tryCatch_1 = __webpack_require__(259);
 	var errorObject_1 = __webpack_require__(169);
-	var UnsubscriptionError_1 = __webpack_require__(665);
+	var UnsubscriptionError_1 = __webpack_require__(667);
 	/**
 	 * Represents a disposable resource, such as the execution of an Observable. A
 	 * Subscription has one important method, `unsubscribe`, that takes no argument
@@ -9223,7 +9223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(55);
+	var Observable_1 = __webpack_require__(41);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -9303,7 +9303,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subscriber_1 = __webpack_require__(35);
+	var Subscriber_1 = __webpack_require__(30);
 	/**
 	 * Filter items emitted by the source Observable by only emitting those that
 	 * satisfy a specified predicate.
@@ -9401,7 +9401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subscriber_1 = __webpack_require__(35);
+	var Subscriber_1 = __webpack_require__(30);
 	/**
 	 * Applies a given `project` function to each value emitted by the source
 	 * Observable, and emits the resulting values as an Observable.
@@ -9603,21 +9603,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _filter = __webpack_require__(166);
 	
-	var _pairwise = __webpack_require__(659);
+	var _pairwise = __webpack_require__(661);
 	
 	var _takeUntil = __webpack_require__(256);
 	
-	var _switchMap = __webpack_require__(661);
+	var _switchMap = __webpack_require__(663);
 	
-	var _take = __webpack_require__(662);
+	var _take = __webpack_require__(664);
 	
-	var _startWith = __webpack_require__(660);
+	var _startWith = __webpack_require__(662);
 	
-	var _defer = __webpack_require__(654);
+	var _defer = __webpack_require__(655);
 	
-	var _merge = __webpack_require__(655);
+	var _merge = __webpack_require__(656);
 	
-	var _concat = __webpack_require__(653);
+	var _concat = __webpack_require__(654);
 	
 	var _inRange = __webpack_require__(512);
 	
@@ -9663,7 +9663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ObservableSet2 = _interopRequireDefault(_ObservableSet);
 	
-	var _misc = __webpack_require__(42);
+	var _misc = __webpack_require__(43);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -11614,11 +11614,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(41);
+	var _typed = __webpack_require__(42);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -11689,7 +11689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
-	var _misc = __webpack_require__(42);
+	var _misc = __webpack_require__(43);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -12121,11 +12121,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _BehaviorSubject = __webpack_require__(163);
 	
-	var _never = __webpack_require__(656);
+	var _never = __webpack_require__(657);
 	
-	var _combineLatest = __webpack_require__(657);
+	var _combineLatest = __webpack_require__(658);
 	
-	var _distinctUntilChanged = __webpack_require__(658);
+	var _distinctUntilChanged = __webpack_require__(659);
 	
 	var _filter = __webpack_require__(166);
 	
@@ -14315,7 +14315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
 	'use strict';
 	var toObject = __webpack_require__(10)
-	  , toIndex  = __webpack_require__(52)
+	  , toIndex  = __webpack_require__(53)
 	  , toLength = __webpack_require__(9);
 	
 	module.exports = [].copyWithin || function copyWithin(target/*= 0*/, start/*= 0, end = @length*/){
@@ -14420,16 +14420,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	var dP          = __webpack_require__(8).f
-	  , create      = __webpack_require__(47)
+	  , create      = __webpack_require__(48)
 	  , hide        = __webpack_require__(13)
-	  , redefineAll = __webpack_require__(50)
-	  , ctx         = __webpack_require__(31)
+	  , redefineAll = __webpack_require__(51)
+	  , ctx         = __webpack_require__(32)
 	  , anInstance  = __webpack_require__(36)
 	  , defined     = __webpack_require__(23)
 	  , forOf       = __webpack_require__(62)
 	  , $iterDefine = __webpack_require__(132)
 	  , step        = __webpack_require__(204)
-	  , setSpecies  = __webpack_require__(51)
+	  , setSpecies  = __webpack_require__(52)
 	  , DESCRIPTORS = __webpack_require__(7)
 	  , fastKey     = __webpack_require__(37).fastKey
 	  , SIZE        = DESCRIPTORS ? '_s' : 'size';
@@ -14581,7 +14581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var redefineAll       = __webpack_require__(50)
+	var redefineAll       = __webpack_require__(51)
 	  , getWeak           = __webpack_require__(37).getWeak
 	  , anObject          = __webpack_require__(2)
 	  , isObject          = __webpack_require__(5)
@@ -14712,7 +14712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	// 19.1.2.1 Object.assign(target, source, ...)
-	var getKeys  = __webpack_require__(49)
+	var getKeys  = __webpack_require__(50)
 	  , gOPS     = __webpack_require__(94)
 	  , pIE      = __webpack_require__(74)
 	  , toObject = __webpack_require__(10)
@@ -14750,7 +14750,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var dP       = __webpack_require__(8)
 	  , anObject = __webpack_require__(2)
-	  , getKeys  = __webpack_require__(49);
+	  , getKeys  = __webpack_require__(50);
 	
 	module.exports = __webpack_require__(7) ? Object.defineProperties : function defineProperties(O, Properties){
 	  anObject(O);
@@ -14768,7 +14768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
 	var toIObject = __webpack_require__(17)
-	  , gOPN      = __webpack_require__(48).f
+	  , gOPN      = __webpack_require__(49).f
 	  , toString  = {}.toString;
 	
 	var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
@@ -14813,7 +14813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getKeys   = __webpack_require__(49)
+	var getKeys   = __webpack_require__(50)
 	  , toIObject = __webpack_require__(17)
 	  , isEnum    = __webpack_require__(74).f;
 	module.exports = function(isEntries){
@@ -14835,7 +14835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// all object keys, includes non-enumerable and symbols
-	var gOPN     = __webpack_require__(48)
+	var gOPN     = __webpack_require__(49)
 	  , gOPS     = __webpack_require__(94)
 	  , anObject = __webpack_require__(2)
 	  , Reflect  = __webpack_require__(3).Reflect;
@@ -18511,7 +18511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(65),
-	    root = __webpack_require__(34);
+	    root = __webpack_require__(35);
 	
 	/* Built-in method references that are verified to be native. */
 	var Map = getNative(root, 'Map');
@@ -18555,7 +18555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(34);
+	var root = __webpack_require__(35);
 	
 	/** Built-in value references. */
 	var Symbol = root.Symbol;
@@ -19171,7 +19171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isArrayLike = __webpack_require__(77),
-	    isObjectLike = __webpack_require__(54);
+	    isObjectLike = __webpack_require__(55);
 	
 	/**
 	 * This method is like `_.isArrayLike` except that it also checks if `value`
@@ -19669,7 +19669,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(55);
+	var Observable_1 = __webpack_require__(41);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -20248,10 +20248,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	'use strict';
 	
-	var traverse = __webpack_require__(674);
+	var traverse = __webpack_require__(676);
 	var typeName = __webpack_require__(171);
 	var assign = __webpack_require__(21);
-	var s = __webpack_require__(671);
+	var s = __webpack_require__(673);
 	
 	function defaultHandlers () {
 	    return {
@@ -20350,7 +20350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(672);
+	module.exports = __webpack_require__(674);
 
 
 /***/ },
@@ -21246,7 +21246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ObservableSet2 = _interopRequireDefault(_ObservableSet);
 	
-	var _misc = __webpack_require__(42);
+	var _misc = __webpack_require__(43);
 	
 	var _Field = __webpack_require__(172);
 	
@@ -21259,6 +21259,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _BehaviorSubject = __webpack_require__(163);
 	
 	var _filter = __webpack_require__(166);
+	
+	__webpack_require__(651);
 	
 	var _map = __webpack_require__(167);
 	
@@ -21409,7 +21411,6 @@ return /******/ (function(modules) { // webpackBootstrap
 						if (!otherClass) {
 							return false;
 						}
-						console.log('((hasSubclass))', this.name, otherClass.name); // TODO: remove
 						if (otherClass === this) {
 							return true;
 						}
@@ -21465,14 +21466,13 @@ return /******/ (function(modules) { // webpackBootstrap
 				Object.assign(NewClass, rest);
 	
 				/* maintaining <Class>.p('all') */
-				var allSubject = new _BehaviorSubject.BehaviorSubject(new Set());
-				(_context = Entity[$$cacheSet].e('add'), _filter.filter).call(_context, NewClass[Symbol.hasInstance].bind(NewClass)).subscribe(function () {
-					allSubject.next(new Set(Entity[$$cacheSet]));
+				var allEntitiesOfNewClass = new _ObservableSet2.default();
+	
+				(_context = Entity[$$cacheSet].e('add'), _filter.filter).call(_context, NewClass.hasInstance.bind(NewClass)).subscribe(allEntitiesOfNewClass.e('add'));
+				(_context = Entity[$$cacheSet].e('delete'), _filter.filter).call(_context, NewClass.hasInstance.bind(NewClass)).subscribe(allEntitiesOfNewClass.e('delete'));
+				Object.defineProperty(NewClass, $$allSubject, {
+					value: allEntitiesOfNewClass.p('value')
 				});
-				(_context = Entity[$$cacheSet].e('delete'), _filter.filter).call(_context, NewClass[Symbol.hasInstance].bind(NewClass)).subscribe(function () {
-					allSubject.next(new Set(Entity[$$cacheSet]));
-				});
-				Object.defineProperty(NewClass, $$allSubject, { value: allSubject.asObservable() });
 	
 				return _ref(NewClass);
 			}
@@ -21529,7 +21529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(this.hasInstance(_rec2._capt(entity, 'arguments/0/arguments/0')), 'arguments/0'), {
 					content: 'assert(this.hasInstance(entity), humanMsg`\n\t\t\tThe entity at \'${ JSON.stringify(href) }\' is not\n\t\t\tof class \'${ this.name }\'\n\t\t\tbut of class \'${ entity.constructor.name }\'.\n\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 153,
+					line: 157,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"hasInstance","range":[12,23]},"computed":false,"range":[7,23]},"arguments":[{"type":"Identifier","name":"entity","range":[24,30]}],"range":[7,31]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[33,41]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe entity at \'","cooked":"\\n\\t\\t\\tThe entity at \'"},"tail":false,"range":[42,18]},{"type":"TemplateElement","value":{"raw":"\' is not\\n\\t\\t\\tof class \'","cooked":"\' is not\\n\\t\\t\\tof class \'"},"tail":false,"range":[43,13]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\tbut of class \'","cooked":"\'\\n\\t\\t\\tbut of class \'"},"tail":false,"range":[27,17]},{"type":"TemplateElement","value":{"raw":"\'.\\n\\t\\t","cooked":"\'.\\n\\t\\t"},"tail":true,"range":[45,2]}],"expressions":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[21,25]},"property":{"type":"Identifier","name":"stringify","range":[26,35]},"computed":false,"range":[21,35]},"arguments":[{"type":"Identifier","name":"href","range":[36,40]}],"range":[21,41]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[16,20]},"property":{"type":"Identifier","name":"name","range":[21,25]},"computed":false,"range":[16,25]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"entity","range":[20,26]},"property":{"type":"Identifier","name":"constructor","range":[27,38]},"computed":false,"range":[20,38]},"property":{"type":"Identifier","name":"name","range":[39,43]},"computed":false,"range":[20,43]}],"range":[41,3]},"range":[33,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"hasInstance","range":[12,23]},{"type":{"label":"("},"range":[23,24]},{"type":{"label":"name"},"value":"entity","range":[24,30]},{"type":{"label":")"},"range":[30,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"humanMsg","range":[33,41]},{"type":{"label":"`"},"range":[41,42]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe entity at \'","range":[42,18]},{"type":{"label":"${"},"range":[18,20]},{"type":{"label":"name"},"value":"JSON","range":[21,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"stringify","range":[26,35]},{"type":{"label":"("},"range":[35,36]},{"type":{"label":"name"},"value":"href","range":[36,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":"\' is not\\n\\t\\t\\tof class \'","range":[43,13]},{"type":{"label":"${"},"range":[13,15]},{"type":{"label":"this"},"value":"this","range":[16,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"name","range":[21,25]},{"type":{"label":"}"},"range":[26,27]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\tbut of class \'","range":[27,17]},{"type":{"label":"${"},"range":[17,19]},{"type":{"label":"name"},"value":"entity","range":[20,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"\'.\\n\\t\\t","range":[45,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -21549,7 +21549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(this.singleton, 'arguments/0'), {
 					content: 'assert(this.singleton, humanMsg`\n\t\t\tThe \'${ this.name }\' class is not a singleton class.\n\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 166,
+					line: 170,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"singleton","range":[12,21]},"computed":false,"range":[7,21]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[23,31]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\tThe \'"},"tail":false,"range":[32,8]},{"type":"TemplateElement","value":{"raw":"\' class is not a singleton class.\\n\\t\\t","cooked":"\' class is not a singleton class.\\n\\t\\t"},"tail":true,"range":[22,2]}],"expressions":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[11,15]},"property":{"type":"Identifier","name":"name","range":[16,20]},"computed":false,"range":[11,20]}],"range":[31,3]},"range":[23,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"singleton","range":[12,21]},{"type":{"label":","},"range":[21,22]},{"type":{"label":"name"},"value":"humanMsg","range":[23,31]},{"type":{"label":"`"},"range":[31,32]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe \'","range":[32,8]},{"type":{"label":"${"},"range":[8,10]},{"type":{"label":"this"},"value":"this","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"name","range":[16,20]},{"type":{"label":"}"},"range":[21,22]},{"type":{"label":"template"},"value":"\' class is not a singleton class.\\n\\t\\t","range":[22,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -21750,7 +21750,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(!_rec._capt(_rec._capt(this.context, 'arguments/0/argument/object').abstract, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this.context.abstract, humanMsg`\n\t\t\t\tCannot instantiate the abstract\n\t\t\t\tclass ${ this.context.name }.\n\t\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 110,
+					line: 114,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"context","range":[13,20]},"computed":false,"range":[8,20]},"property":{"type":"Identifier","name":"abstract","range":[21,29]},"computed":false,"range":[8,29]},"prefix":true,"range":[7,29]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[31,39]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","cooked":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass "},"tail":false,"range":[40,10]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t","cooked":".\\n\\t\\t\\t"},"tail":true,"range":[32,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[13,17]},"property":{"type":"Identifier","name":"context","range":[18,25]},"computed":false,"range":[13,25]},"property":{"type":"Identifier","name":"name","range":[26,30]},"computed":false,"range":[13,30]}],"range":[39,4]},"range":[31,4]}],"range":[0,5]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"."},"range":[12,13]},{"type":{"label":"name"},"value":"context","range":[13,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"abstract","range":[21,29]},{"type":{"label":","},"range":[29,30]},{"type":{"label":"name"},"value":"humanMsg","range":[31,39]},{"type":{"label":"`"},"range":[39,40]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","range":[40,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"this"},"value":"this","range":[13,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"context","range":[18,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"name","range":[26,30]},{"type":{"label":"}"},"range":[31,32]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[32,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -22427,11 +22427,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(41);
+	var _typed = __webpack_require__(42);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -22788,7 +22788,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -22844,7 +22844,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -22969,7 +22969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _schemas = __webpack_require__(58);
 	
-	var _resources = __webpack_require__(30);
+	var _resources = __webpack_require__(31);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -22977,7 +22977,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
 	
-	var _typed = __webpack_require__(41);
+	var _typed = __webpack_require__(42);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -23873,7 +23873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $filter = __webpack_require__(82)(2);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].filter, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(45)([].filter, true), 'Array', {
 	  // 22.1.3.7 / 15.4.4.20 Array.prototype.filter(callbackfn [, thisArg])
 	  filter: function filter(callbackfn /* , thisArg */){
 	    return $filter(this, callbackfn, arguments[1]);
@@ -23887,7 +23887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var $export  = __webpack_require__(18)
 	  , $forEach = __webpack_require__(82)(0)
-	  , STRICT   = __webpack_require__(44)([].forEach, true);
+	  , STRICT   = __webpack_require__(45)([].forEach, true);
 	
 	$export($export.P + $export.F * !STRICT, 'Array', {
 	  // 22.1.3.10 / 15.4.4.18 Array.prototype.forEach(callbackfn [, thisArg])
@@ -23906,7 +23906,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $native       = [].indexOf
 	  , NEGATIVE_ZERO = !!$native && 1 / [1].indexOf(1, -0) < 0;
 	
-	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(44)($native)), 'Array', {
+	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(45)($native)), 'Array', {
 	  // 22.1.3.11 / 15.4.4.14 Array.prototype.indexOf(searchElement [, fromIndex])
 	  indexOf: function indexOf(searchElement /*, fromIndex = 0 */){
 	    return NEGATIVE_ZERO
@@ -23933,7 +23933,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $map    = __webpack_require__(82)(1);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].map, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(45)([].map, true), 'Array', {
 	  // 22.1.3.15 / 15.4.4.19 Array.prototype.map(callbackfn [, thisArg])
 	  map: function map(callbackfn /* , thisArg */){
 	    return $map(this, callbackfn, arguments[1]);
@@ -23948,7 +23948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $reduce = __webpack_require__(182);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].reduceRight, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(45)([].reduceRight, true), 'Array', {
 	  // 22.1.3.19 / 15.4.4.22 Array.prototype.reduceRight(callbackfn [, initialValue])
 	  reduceRight: function reduceRight(callbackfn /* , initialValue */){
 	    return $reduce(this, callbackfn, arguments.length, arguments[1], true);
@@ -23963,7 +23963,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $reduce = __webpack_require__(182);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].reduce, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(45)([].reduce, true), 'Array', {
 	  // 22.1.3.18 / 15.4.4.21 Array.prototype.reduce(callbackfn [, initialValue])
 	  reduce: function reduce(callbackfn /* , initialValue */){
 	    return $reduce(this, callbackfn, arguments.length, arguments[1], false);
@@ -23978,7 +23978,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export = __webpack_require__(18)
 	  , $some   = __webpack_require__(82)(3);
 	
-	$export($export.P + $export.F * !__webpack_require__(44)([].some, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(45)([].some, true), 'Array', {
 	  // 22.1.3.23 / 15.4.4.17 Array.prototype.some(callbackfn [, thisArg])
 	  some: function some(callbackfn /* , thisArg */){
 	    return $some(this, callbackfn, arguments[1]);
@@ -24075,7 +24075,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// all enumerable object keys, includes symbols
-	var getKeys = __webpack_require__(49)
+	var getKeys = __webpack_require__(50)
 	  , gOPS    = __webpack_require__(94)
 	  , pIE     = __webpack_require__(74);
 	module.exports = function(it){
@@ -24094,7 +24094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 312 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getKeys   = __webpack_require__(49)
+	var getKeys   = __webpack_require__(50)
 	  , toIObject = __webpack_require__(17);
 	module.exports = function(object, el){
 	  var O      = toIObject(object)
@@ -24158,7 +24158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var classof   = __webpack_require__(61)
 	  , ITERATOR  = __webpack_require__(6)('iterator')
-	  , Iterators = __webpack_require__(45);
+	  , Iterators = __webpack_require__(46);
 	module.exports = __webpack_require__(26).isIterable = function(it){
 	  var O = Object(it);
 	  return O[ITERATOR] !== undefined
@@ -24288,7 +24288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var ctx            = __webpack_require__(31)
+	var ctx            = __webpack_require__(32)
 	  , $export        = __webpack_require__(1)
 	  , toObject       = __webpack_require__(10)
 	  , call           = __webpack_require__(203)
@@ -24476,7 +24476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $export    = __webpack_require__(1)
 	  , html       = __webpack_require__(126)
 	  , cof        = __webpack_require__(22)
-	  , toIndex    = __webpack_require__(52)
+	  , toIndex    = __webpack_require__(53)
 	  , toLength   = __webpack_require__(9)
 	  , arraySlice = [].slice;
 	
@@ -24548,7 +24548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 337 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(51)('Array');
+	__webpack_require__(52)('Array');
 
 /***/ },
 /* 338 */
@@ -24985,7 +24985,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , inheritIfRequired = __webpack_require__(127)
 	  , toPrimitive       = __webpack_require__(28)
 	  , fails             = __webpack_require__(4)
-	  , gOPN              = __webpack_require__(48).f
+	  , gOPN              = __webpack_require__(49).f
 	  , gOPD              = __webpack_require__(19).f
 	  , dP                = __webpack_require__(8).f
 	  , $trim             = __webpack_require__(64).trim
@@ -24994,7 +24994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , Base              = $Number
 	  , proto             = $Number.prototype
 	  // Opera ~12 has broken Object#toString
-	  , BROKEN_COF        = cof(__webpack_require__(47)(proto)) == NUMBER
+	  , BROKEN_COF        = cof(__webpack_require__(48)(proto)) == NUMBER
 	  , TRIM              = 'trim' in String.prototype;
 	
 	// 7.1.3 ToNumber(argument)
@@ -25301,7 +25301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var $export = __webpack_require__(1)
 	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-	$export($export.S, 'Object', {create: __webpack_require__(47)});
+	$export($export.S, 'Object', {create: __webpack_require__(48)});
 
 /***/ },
 /* 377 */
@@ -25423,7 +25423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 19.1.2.14 Object.keys(O)
 	var toObject = __webpack_require__(10)
-	  , $keys    = __webpack_require__(49);
+	  , $keys    = __webpack_require__(50);
 	
 	__webpack_require__(27)('keys', function(){
 	  return function keys(it){
@@ -25505,9 +25505,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var LIBRARY            = __webpack_require__(46)
+	var LIBRARY            = __webpack_require__(47)
 	  , global             = __webpack_require__(3)
-	  , ctx                = __webpack_require__(31)
+	  , ctx                = __webpack_require__(32)
 	  , classof            = __webpack_require__(61)
 	  , $export            = __webpack_require__(1)
 	  , isObject           = __webpack_require__(5)
@@ -25710,7 +25710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
 	    this._n = false;          // <- notify
 	  };
-	  Internal.prototype = __webpack_require__(50)($Promise.prototype, {
+	  Internal.prototype = __webpack_require__(51)($Promise.prototype, {
 	    // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
 	    then: function then(onFulfilled, onRejected){
 	      var reaction    = newPromiseCapability(speciesConstructor(this, $Promise));
@@ -25737,7 +25737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	$export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: $Promise});
 	__webpack_require__(63)($Promise, PROMISE);
-	__webpack_require__(51)(PROMISE);
+	__webpack_require__(52)(PROMISE);
 	Wrapper = __webpack_require__(26)[PROMISE];
 	
 	// statics
@@ -25828,7 +25828,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 26.1.2 Reflect.construct(target, argumentsList [, newTarget])
 	var $export   = __webpack_require__(1)
-	  , create    = __webpack_require__(47)
+	  , create    = __webpack_require__(48)
 	  , aFunction = __webpack_require__(14)
 	  , anObject  = __webpack_require__(2)
 	  , isObject  = __webpack_require__(5)
@@ -26118,7 +26118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var global            = __webpack_require__(3)
 	  , inheritIfRequired = __webpack_require__(127)
 	  , dP                = __webpack_require__(8).f
-	  , gOPN              = __webpack_require__(48).f
+	  , gOPN              = __webpack_require__(49).f
 	  , isRegExp          = __webpack_require__(91)
 	  , $flags            = __webpack_require__(89)
 	  , $RegExp           = global.RegExp
@@ -26157,7 +26157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __webpack_require__(15)(global, 'RegExp', $RegExp);
 	}
 	
-	__webpack_require__(51)('RegExp');
+	__webpack_require__(52)('RegExp');
 
 /***/ },
 /* 410 */
@@ -26439,7 +26439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var $export        = __webpack_require__(1)
-	  , toIndex        = __webpack_require__(52)
+	  , toIndex        = __webpack_require__(53)
 	  , fromCharCode   = String.fromCharCode
 	  , $fromCodePoint = String.fromCodePoint;
 	
@@ -26657,7 +26657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $fails         = __webpack_require__(4)
 	  , shared         = __webpack_require__(96)
 	  , setToStringTag = __webpack_require__(63)
-	  , uid            = __webpack_require__(53)
+	  , uid            = __webpack_require__(54)
 	  , wks            = __webpack_require__(6)
 	  , wksExt         = __webpack_require__(216)
 	  , wksDefine      = __webpack_require__(144)
@@ -26668,11 +26668,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , toIObject      = __webpack_require__(17)
 	  , toPrimitive    = __webpack_require__(28)
 	  , createDesc     = __webpack_require__(38)
-	  , _create        = __webpack_require__(47)
+	  , _create        = __webpack_require__(48)
 	  , gOPNExt        = __webpack_require__(208)
 	  , $GOPD          = __webpack_require__(19)
 	  , $DP            = __webpack_require__(8)
-	  , $keys          = __webpack_require__(49)
+	  , $keys          = __webpack_require__(50)
 	  , gOPD           = $GOPD.f
 	  , dP             = $DP.f
 	  , gOPN           = gOPNExt.f
@@ -26795,11 +26795,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  $GOPD.f = $getOwnPropertyDescriptor;
 	  $DP.f   = $defineProperty;
-	  __webpack_require__(48).f = gOPNExt.f = $getOwnPropertyNames;
+	  __webpack_require__(49).f = gOPNExt.f = $getOwnPropertyNames;
 	  __webpack_require__(74).f  = $propertyIsEnumerable;
 	  __webpack_require__(94).f = $getOwnPropertySymbols;
 	
-	  if(DESCRIPTORS && !__webpack_require__(46)){
+	  if(DESCRIPTORS && !__webpack_require__(47)){
 	    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
 	  }
 	
@@ -26891,7 +26891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $typed       = __webpack_require__(97)
 	  , buffer       = __webpack_require__(143)
 	  , anObject     = __webpack_require__(2)
-	  , toIndex      = __webpack_require__(52)
+	  , toIndex      = __webpack_require__(53)
 	  , toLength     = __webpack_require__(9)
 	  , isObject     = __webpack_require__(5)
 	  , TYPED_ARRAY  = __webpack_require__(6)('typed_array')
@@ -26932,7 +26932,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	
-	__webpack_require__(51)(ARRAY_BUFFER);
+	__webpack_require__(52)(ARRAY_BUFFER);
 
 /***/ },
 /* 439 */
@@ -26947,7 +26947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 440 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Float32', 4, function(init){
+	__webpack_require__(34)('Float32', 4, function(init){
 	  return function Float32Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -26957,7 +26957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 441 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Float64', 8, function(init){
+	__webpack_require__(34)('Float64', 8, function(init){
 	  return function Float64Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -26967,7 +26967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 442 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Int16', 2, function(init){
+	__webpack_require__(34)('Int16', 2, function(init){
 	  return function Int16Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -26977,7 +26977,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 443 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Int32', 4, function(init){
+	__webpack_require__(34)('Int32', 4, function(init){
 	  return function Int32Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -26987,7 +26987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 444 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Int8', 1, function(init){
+	__webpack_require__(34)('Int8', 1, function(init){
 	  return function Int8Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -26997,7 +26997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 445 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Uint16', 2, function(init){
+	__webpack_require__(34)('Uint16', 2, function(init){
 	  return function Uint16Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -27007,7 +27007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 446 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Uint32', 4, function(init){
+	__webpack_require__(34)('Uint32', 4, function(init){
 	  return function Uint32Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -27017,7 +27017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 447 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Uint8', 1, function(init){
+	__webpack_require__(34)('Uint8', 1, function(init){
 	  return function Uint8Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -27027,7 +27027,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 448 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33)('Uint8', 1, function(init){
+	__webpack_require__(34)('Uint8', 1, function(init){
 	  return function Uint8ClampedArray(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
@@ -27327,7 +27327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , aFunction   = __webpack_require__(14)
 	  , anObject    = __webpack_require__(2)
 	  , anInstance  = __webpack_require__(36)
-	  , redefineAll = __webpack_require__(50)
+	  , redefineAll = __webpack_require__(51)
 	  , hide        = __webpack_require__(13)
 	  , forOf       = __webpack_require__(62)
 	  , RETURN      = forOf.RETURN;
@@ -27515,13 +27515,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	$export($export.G, {Observable: $Observable});
 	
-	__webpack_require__(51)('Observable');
+	__webpack_require__(52)('Observable');
 
 /***/ },
 /* 466 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata                  = __webpack_require__(32)
+	var metadata                  = __webpack_require__(33)
 	  , anObject                  = __webpack_require__(2)
 	  , toMetaKey                 = metadata.key
 	  , ordinaryDefineOwnMetadata = metadata.set;
@@ -27534,7 +27534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 467 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(32)
+	var metadata               = __webpack_require__(33)
 	  , anObject               = __webpack_require__(2)
 	  , toMetaKey              = metadata.key
 	  , getOrCreateMetadataMap = metadata.map
@@ -27556,7 +27556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Set                     = __webpack_require__(219)
 	  , from                    = __webpack_require__(196)
-	  , metadata                = __webpack_require__(32)
+	  , metadata                = __webpack_require__(33)
 	  , anObject                = __webpack_require__(2)
 	  , getPrototypeOf          = __webpack_require__(20)
 	  , ordinaryOwnMetadataKeys = metadata.keys
@@ -27578,7 +27578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 469 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(32)
+	var metadata               = __webpack_require__(33)
 	  , anObject               = __webpack_require__(2)
 	  , getPrototypeOf         = __webpack_require__(20)
 	  , ordinaryHasOwnMetadata = metadata.has
@@ -27600,7 +27600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 470 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata                = __webpack_require__(32)
+	var metadata                = __webpack_require__(33)
 	  , anObject                = __webpack_require__(2)
 	  , ordinaryOwnMetadataKeys = metadata.keys
 	  , toMetaKey               = metadata.key;
@@ -27613,7 +27613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 471 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(32)
+	var metadata               = __webpack_require__(33)
 	  , anObject               = __webpack_require__(2)
 	  , ordinaryGetOwnMetadata = metadata.get
 	  , toMetaKey              = metadata.key;
@@ -27627,7 +27627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 472 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(32)
+	var metadata               = __webpack_require__(33)
 	  , anObject               = __webpack_require__(2)
 	  , getPrototypeOf         = __webpack_require__(20)
 	  , ordinaryHasOwnMetadata = metadata.has
@@ -27648,7 +27648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 473 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(32)
+	var metadata               = __webpack_require__(33)
 	  , anObject               = __webpack_require__(2)
 	  , ordinaryHasOwnMetadata = metadata.has
 	  , toMetaKey              = metadata.key;
@@ -27662,7 +27662,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 474 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metadata                  = __webpack_require__(32)
+	var metadata                  = __webpack_require__(33)
 	  , anObject                  = __webpack_require__(2)
 	  , aFunction                 = __webpack_require__(14)
 	  , toMetaKey                 = metadata.key
@@ -27820,7 +27820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , redefine      = __webpack_require__(15)
 	  , global        = __webpack_require__(3)
 	  , hide          = __webpack_require__(13)
-	  , Iterators     = __webpack_require__(45)
+	  , Iterators     = __webpack_require__(46)
 	  , wks           = __webpack_require__(6)
 	  , ITERATOR      = wks('iterator')
 	  , TO_STRING_TAG = wks('toStringTag')
@@ -30692,7 +30692,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(44);
 	var filter = __webpack_require__(177);
 	var map = __webpack_require__(115);
 	var signature = __webpack_require__(273);
@@ -30905,7 +30905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var defineProperty = __webpack_require__(179);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(44);
 	var keys = __webpack_require__(59);
 	
 	module.exports = function defineProperties (obj, map) {
@@ -31058,7 +31058,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	var defineProperty = __webpack_require__(179);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(44);
 	var keys = __webpack_require__(59);
 	
 	module.exports = function defineProperties (obj, map) {
@@ -31984,7 +31984,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(65),
-	    root = __webpack_require__(34);
+	    root = __webpack_require__(35);
 	
 	/* Built-in method references that are verified to be native. */
 	var DataView = getNative(root, 'DataView');
@@ -32035,7 +32035,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(65),
-	    root = __webpack_require__(34);
+	    root = __webpack_require__(35);
 	
 	/* Built-in method references that are verified to be native. */
 	var Promise = getNative(root, 'Promise');
@@ -32047,7 +32047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 525 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(34);
+	var root = __webpack_require__(35);
 	
 	/** Built-in value references. */
 	var Reflect = root.Reflect;
@@ -32060,7 +32060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(65),
-	    root = __webpack_require__(34);
+	    root = __webpack_require__(35);
 	
 	/* Built-in method references that are verified to be native. */
 	var Set = getNative(root, 'Set');
@@ -32105,7 +32105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 528 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(34);
+	var root = __webpack_require__(35);
 	
 	/** Built-in value references. */
 	var Uint8Array = root.Uint8Array;
@@ -32118,7 +32118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(65),
-	    root = __webpack_require__(34);
+	    root = __webpack_require__(35);
 	
 	/* Built-in method references that are verified to be native. */
 	var WeakMap = getNative(root, 'WeakMap');
@@ -33080,7 +33080,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 558 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(34);
+	var root = __webpack_require__(35);
 	
 	/** Used to detect overreaching core-js shims. */
 	var coreJsData = root['__core-js_shared__'];
@@ -34779,7 +34779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 611 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObjectLike = __webpack_require__(54);
+	var isObjectLike = __webpack_require__(55);
 	
 	/** `Object#toString` result references. */
 	var numberTag = '[object Number]';
@@ -34834,7 +34834,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isLength = __webpack_require__(105),
-	    isObjectLike = __webpack_require__(54);
+	    isObjectLike = __webpack_require__(55);
 	
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -35200,7 +35200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var getTag = __webpack_require__(237),
 	    isArrayLike = __webpack_require__(77),
-	    isObjectLike = __webpack_require__(54),
+	    isObjectLike = __webpack_require__(55),
 	    isString = __webpack_require__(78),
 	    keys = __webpack_require__(79),
 	    stringSize = __webpack_require__(601);
@@ -39235,7 +39235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EventEmitter = __webpack_require__(504).EventEmitter;
 	var inherits = __webpack_require__(56).inherits;
 	var estraverse = __webpack_require__(147);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(44);
 	var reduce = __webpack_require__(116);
 	var locationOf = __webpack_require__(636);
 	var literalPattern = /^(?:String|Numeric|Null|Boolean|RegExp)?Literal$/;
@@ -39473,7 +39473,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var inherits = __webpack_require__(56).inherits;
 	var typeName = __webpack_require__(171);
 	var keys = __webpack_require__(59);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(44);
 	var udiff = __webpack_require__(642);
 	var stringifier = __webpack_require__(260);
 	var assign = __webpack_require__(21);
@@ -39655,7 +39655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var BaseRenderer = __webpack_require__(108);
 	var inherits = __webpack_require__(56).inherits;
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(44);
 	var stringifier = __webpack_require__(260);
 	var stringWidth = __webpack_require__(645);
 	var assign = __webpack_require__(21);
@@ -40551,7 +40551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subscriber_1 = __webpack_require__(35);
+	var Subscriber_1 = __webpack_require__(30);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @ignore
@@ -40645,12 +40645,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var Observable_1 = __webpack_require__(41);
+	var do_1 = __webpack_require__(660);
+	Observable_1.Observable.prototype.do = do_1._do;
+	//# sourceMappingURL=do.js.map
+
+/***/ },
+/* 652 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(55);
+	var Observable_1 = __webpack_require__(41);
 	var subscribeToResult_1 = __webpack_require__(81);
 	var OuterSubscriber_1 = __webpack_require__(80);
 	/**
@@ -40739,7 +40749,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=DeferObservable.js.map
 
 /***/ },
-/* 652 */
+/* 653 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40748,8 +40758,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(55);
-	var noop_1 = __webpack_require__(668);
+	var Observable_1 = __webpack_require__(41);
+	var noop_1 = __webpack_require__(670);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -40803,7 +40813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=NeverObservable.js.map
 
 /***/ },
-/* 653 */
+/* 654 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40812,16 +40822,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=concat.js.map
 
 /***/ },
-/* 654 */
+/* 655 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var DeferObservable_1 = __webpack_require__(651);
+	var DeferObservable_1 = __webpack_require__(652);
 	exports.defer = DeferObservable_1.DeferObservable.create;
 	//# sourceMappingURL=defer.js.map
 
 /***/ },
-/* 655 */
+/* 656 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40830,16 +40840,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=merge.js.map
 
 /***/ },
-/* 656 */
+/* 657 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var NeverObservable_1 = __webpack_require__(652);
+	var NeverObservable_1 = __webpack_require__(653);
 	exports.never = NeverObservable_1.NeverObservable.create;
 	//# sourceMappingURL=never.js.map
 
 /***/ },
-/* 657 */
+/* 658 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40991,7 +41001,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=combineLatest.js.map
 
 /***/ },
-/* 658 */
+/* 659 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41000,7 +41010,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subscriber_1 = __webpack_require__(35);
+	var Subscriber_1 = __webpack_require__(30);
 	var tryCatch_1 = __webpack_require__(259);
 	var errorObject_1 = __webpack_require__(169);
 	/**
@@ -41073,7 +41083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=distinctUntilChanged.js.map
 
 /***/ },
-/* 659 */
+/* 660 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41082,7 +41092,124 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subscriber_1 = __webpack_require__(35);
+	var Subscriber_1 = __webpack_require__(30);
+	/**
+	 * Perform a side effect for every emission on the source Observable, but return
+	 * an Observable that is identical to the source.
+	 *
+	 * <span class="informal">Intercepts each emission on the source and runs a
+	 * function, but returns an output which is identical to the source.</span>
+	 *
+	 * <img src="./img/do.png" width="100%">
+	 *
+	 * Returns a mirrored Observable of the source Observable, but modified so that
+	 * the provided Observer is called to perform a side effect for every value,
+	 * error, and completion emitted by the source. Any errors that are thrown in
+	 * the aforementioned Observer or handlers are safely sent down the error path
+	 * of the output Observable.
+	 *
+	 * This operator is useful for debugging your Observables for the correct values
+	 * or performing other side effects.
+	 *
+	 * Note: this is different to a `subscribe` on the Observable. If the Observable
+	 * returned by `do` is not subscribed, the side effects specified by the
+	 * Observer will never happen. `do` therefore simply spies on existing
+	 * execution, it does not trigger an execution to happen like `subscribe` does.
+	 *
+	 * @example <caption>Map every every click to the clientX position of that click, while also logging the click event</caption>
+	 * var clicks = Rx.Observable.fromEvent(document, 'click');
+	 * var positions = clicks
+	 *   .do(ev => console.log(ev))
+	 *   .map(ev => ev.clientX);
+	 * positions.subscribe(x => console.log(x));
+	 *
+	 * @see {@link map}
+	 * @see {@link subscribe}
+	 *
+	 * @param {Observer|function} [nextOrObserver] A normal Observer object or a
+	 * callback for `next`.
+	 * @param {function} [error] Callback for errors in the source.
+	 * @param {function} [complete] Callback for the completion of the source.
+	 * @return {Observable} An Observable identical to the source, but runs the
+	 * specified Observer or callback(s) for each item.
+	 * @method do
+	 * @name do
+	 * @owner Observable
+	 */
+	function _do(nextOrObserver, error, complete) {
+	    return this.lift(new DoOperator(nextOrObserver, error, complete));
+	}
+	exports._do = _do;
+	var DoOperator = (function () {
+	    function DoOperator(nextOrObserver, error, complete) {
+	        this.nextOrObserver = nextOrObserver;
+	        this.error = error;
+	        this.complete = complete;
+	    }
+	    DoOperator.prototype.call = function (subscriber, source) {
+	        return source._subscribe(new DoSubscriber(subscriber, this.nextOrObserver, this.error, this.complete));
+	    };
+	    return DoOperator;
+	}());
+	/**
+	 * We need this JSDoc comment for affecting ESDoc.
+	 * @ignore
+	 * @extends {Ignored}
+	 */
+	var DoSubscriber = (function (_super) {
+	    __extends(DoSubscriber, _super);
+	    function DoSubscriber(destination, nextOrObserver, error, complete) {
+	        _super.call(this, destination);
+	        var safeSubscriber = new Subscriber_1.Subscriber(nextOrObserver, error, complete);
+	        safeSubscriber.syncErrorThrowable = true;
+	        this.add(safeSubscriber);
+	        this.safeSubscriber = safeSubscriber;
+	    }
+	    DoSubscriber.prototype._next = function (value) {
+	        var safeSubscriber = this.safeSubscriber;
+	        safeSubscriber.next(value);
+	        if (safeSubscriber.syncErrorThrown) {
+	            this.destination.error(safeSubscriber.syncErrorValue);
+	        }
+	        else {
+	            this.destination.next(value);
+	        }
+	    };
+	    DoSubscriber.prototype._error = function (err) {
+	        var safeSubscriber = this.safeSubscriber;
+	        safeSubscriber.error(err);
+	        if (safeSubscriber.syncErrorThrown) {
+	            this.destination.error(safeSubscriber.syncErrorValue);
+	        }
+	        else {
+	            this.destination.error(err);
+	        }
+	    };
+	    DoSubscriber.prototype._complete = function () {
+	        var safeSubscriber = this.safeSubscriber;
+	        safeSubscriber.complete();
+	        if (safeSubscriber.syncErrorThrown) {
+	            this.destination.error(safeSubscriber.syncErrorValue);
+	        }
+	        else {
+	            this.destination.complete();
+	        }
+	    };
+	    return DoSubscriber;
+	}(Subscriber_1.Subscriber));
+	//# sourceMappingURL=do.js.map
+
+/***/ },
+/* 661 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Subscriber_1 = __webpack_require__(30);
 	/**
 	 * Groups pairs of consecutive emissions together and emits them as an array of
 	 * two values.
@@ -41155,7 +41282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=pairwise.js.map
 
 /***/ },
-/* 660 */
+/* 662 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41203,7 +41330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=startWith.js.map
 
 /***/ },
-/* 661 */
+/* 663 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41347,7 +41474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=switchMap.js.map
 
 /***/ },
-/* 662 */
+/* 664 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41356,8 +41483,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subscriber_1 = __webpack_require__(35);
-	var ArgumentOutOfRangeError_1 = __webpack_require__(664);
+	var Subscriber_1 = __webpack_require__(30);
+	var ArgumentOutOfRangeError_1 = __webpack_require__(666);
 	var EmptyObservable_1 = __webpack_require__(165);
 	/**
 	 * Emits only the first `count` values emitted by the source Observable.
@@ -41440,7 +41567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=take.js.map
 
 /***/ },
-/* 663 */
+/* 665 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41477,7 +41604,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=iterator.js.map
 
 /***/ },
-/* 664 */
+/* 666 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -41510,7 +41637,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ArgumentOutOfRangeError.js.map
 
 /***/ },
-/* 665 */
+/* 667 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -41540,7 +41667,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=UnsubscriptionError.js.map
 
 /***/ },
-/* 666 */
+/* 668 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -41551,7 +41678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=isObject.js.map
 
 /***/ },
-/* 667 */
+/* 669 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -41562,7 +41689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=isPromise.js.map
 
 /***/ },
-/* 668 */
+/* 670 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -41572,7 +41699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=noop.js.map
 
 /***/ },
-/* 669 */
+/* 671 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -41581,11 +41708,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=throwError.js.map
 
 /***/ },
-/* 670 */
+/* 672 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Subscriber_1 = __webpack_require__(35);
+	var Subscriber_1 = __webpack_require__(30);
 	var rxSubscriber_1 = __webpack_require__(168);
 	function toSubscriber(nextOrObserver, error, complete) {
 	    if (nextOrObserver) {
@@ -41605,13 +41732,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=toSubscriber.js.map
 
 /***/ },
-/* 671 */
+/* 673 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var typeName = __webpack_require__(171);
-	var forEach = __webpack_require__(43);
+	var forEach = __webpack_require__(44);
 	var arrayFilter = __webpack_require__(177);
 	var reduceRight = __webpack_require__(276);
 	var indexOf = __webpack_require__(178);
@@ -42024,7 +42151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 672 */
+/* 674 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -42033,7 +42160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	
-	var _ponyfill = __webpack_require__(673);
+	var _ponyfill = __webpack_require__(675);
 	
 	var _ponyfill2 = _interopRequireDefault(_ponyfill);
 	
@@ -42052,7 +42179,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 673 */
+/* 675 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -42080,7 +42207,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 674 */
+/* 676 */
 /***/ function(module, exports) {
 
 	var traverse = module.exports = function (obj) {
@@ -42400,7 +42527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 675 */
+/* 677 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// port of https://github.com/nodejs/node/blob/v6.3.0/lib/assert.js#L145-L248
@@ -42638,7 +42765,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 676 */
+/* 678 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -42649,7 +42776,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 677 */
+/* 679 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -42665,7 +42792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 678 */
+/* 680 */
 /***/ function(module, exports) {
 
 	module.exports = extend
