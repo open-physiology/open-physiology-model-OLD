@@ -1,4 +1,3 @@
-import isNumber    from 'lodash/isNumber';
 import TypedModule from '../TypedModule';
 import {
 	arrayContainsValue,

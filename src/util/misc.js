@@ -3,14 +3,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import zip         from 'lodash/zip';
-import trim        from 'lodash/trim';
-import isString    from 'lodash/isString';
-import isArray     from 'lodash/isArray';
 import isUndefined from 'lodash/isUndefined';
-import isNumber    from 'lodash/isNumber';
-import isObject    from 'lodash/isObject';
-import isFunction  from 'lodash/isFunction';
-import assert     from 'power-assert';
+import trim        from 'lodash-bound/trim';
+import isString    from 'lodash-bound/isString';
+import isArray     from 'lodash-bound/isArray';
+import isNumber    from 'lodash-bound/isNumber';
+import isObject    from 'lodash-bound/isObject';
+import isFunction  from 'lodash-bound/isFunction';
+import assert      from 'power-assert';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +23,7 @@ export const humanMsg = (strings, ...values) => {
 	for (let [val, str] of zip(values, strings.slice(1))) {
 		result += val + simpleSpaced(str);
 	}
-	return trim(result);
+	return result::trim();
 };
 
 export const inspect = (obj, options = {}) => {
@@ -35,19 +35,19 @@ export const inspect = (obj, options = {}) => {
 
 export function mapOptionalArray(val, fn) {
 	if (isUndefined(val)) { return [] }
-	let isArray = Array.isArray(val);
-	val = (isArray ? val : [val]).map(fn);
-	return isArray ? val : val[0];
+	let isArr = val::isArray();
+	val = (isArr ? val : [val]).map(fn);
+	return isArr ? val : val[0];
 }
 
 export function arrayify(val) {
-	if (typeof val === 'undefined') { return [] }
-	if (isArray(val)) { return val }
+	if (isUndefined(val)) { return [] }
+	if (val::isArray()) { return val }
 	return [val];
 }
 
 export function parseCardinality(val) {
-	assert(isString(val), `
+	assert(val::isString(), `
 		A cardinality range has to be a string,
 		but a value ${JSON.stringify(val)} was given.
 	`);
@@ -64,10 +64,10 @@ export function parseCardinality(val) {
 }
 
 export function normalizeToRange(val) {
-	if (isNumber(val))       { val = {min: val, max: val} }
-	else if (!isObject(val)) { val = {}                   }
-	if (!isNumber(val.min)) { val.min = -Infinity }
-	if (!isNumber(val.max)) { val.max =  Infinity }
+	if (val::isNumber())       { val = {min: val, max: val} }
+	else if (!val::isObject()) { val = {}                   }
+	if (!val.min::isNumber()) { val.min = -Infinity }
+	if (!val.max::isNumber()) { val.max =  Infinity }
 	return val;
 }
 
@@ -79,6 +79,6 @@ export function setDefault(obj, key, val) {
 
 export const sw = (val, {autoInvoke = true} = {}) => (map) => {
 	let result = ( (val in map) ? map[val] : map.default );
-	if (autoInvoke && isFunction(result)) { result = result() }
+	if (autoInvoke && result::isFunction()) { result = result() }
 	return result;
 };

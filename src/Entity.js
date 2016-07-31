@@ -1,5 +1,5 @@
-import isObject   from 'lodash/isObject';
-import defaults   from 'lodash/defaults';
+import isObject   from 'lodash-bound/isObject';
+import defaults   from 'lodash-bound/defaults';
 import uniqueId   from 'lodash/uniqueId';
 import assert     from 'power-assert';
 
@@ -105,7 +105,7 @@ export default class Entity extends ValueTracker {
 		href:    { href: string } | string | number,
 		options: Object = {} // TODO: filtering, expanding, paging, ...
 	): this {
-		if (isObject(href)) { href = {href} }
+		if (href::isObject()) { href = {href} }
 		let entity;
 		if (href in Entity[$$cache]) {
 			entity = Entity[$$cache][href];
@@ -171,7 +171,7 @@ export default class Entity extends ValueTracker {
 			
 		}
 		
-		defaults(values, {
+		values::defaults({
 			id: null,
 			href: null,
 			class: this.constructor.name

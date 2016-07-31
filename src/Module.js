@@ -1,8 +1,8 @@
-import isArray     from 'lodash/isArray';
-import isInteger   from 'lodash/isInteger';
-import defaults    from 'lodash/defaults';
 import isUndefined from 'lodash/isUndefined';
 import isEqual     from 'lodash/isEqual';
+import isArray     from 'lodash-bound/isArray';
+import isInteger   from 'lodash-bound/isInteger';
+import defaults    from 'lodash-bound/defaults';
 import assert      from 'power-assert';
 import Graph       from 'graph.js/dist/graph.js';
 
@@ -94,7 +94,7 @@ export default class Module {
 		
 		
 		if (config.isResource) {
-			defaults(config, {
+			config::defaults({
 				relationships:         {},
 				relationshipShortcuts: {}
 			});
@@ -102,7 +102,7 @@ export default class Module {
 		
 		/* normalizing extends/extendedBy */
 		for (let key of ['extends', 'extendedBy']) {
-			defaults(config, { [key]: [] });
+			config::defaults({ [key]: [] });
 			config[key] = new Set( arrayify(config[key]) );
 		}
 		
@@ -111,7 +111,7 @@ export default class Module {
 			['properties',        'key'    ],
 			['patternProperties', 'pattern']
 		]) {
-			defaults(config, { [pKey]: {} });
+			config::defaults({ [pKey]: {} });
 			for (let [k, desc] of Object.entries(config[pKey])) {
 				desc[kKey] = k;
 			}
@@ -156,7 +156,7 @@ export default class Module {
 				[2]: { key: `<--${cls.name}` }
 			};
 			for (let side of [1, 2]) {
-				assert(isArray(domainPair[side]), humanMsg`
+				assert(domainPair[side]::isArray(), humanMsg`
 					Relationship sides 1, 2 need to be arrays.
 				`);
 				let thisSide  = newDomain[side  ];
@@ -224,7 +224,7 @@ export default class Module {
 					if (isUndefined(superDesc.type) && superDesc.oneOf) {
 						for (let disjunct of superDesc.oneOf) {
 							if (typeof subDesc.value === disjunct.type                  ||
-							    isInteger(subDesc.value) && disjunct.type === 'integer' ||
+							    subDesc.value::isInteger() && disjunct.type === 'integer' ||
 							    isEqual(subDesc.value, disjunct.value)
 							) {
 								singleSuperDesc = { ...superDesc, ...disjunct };

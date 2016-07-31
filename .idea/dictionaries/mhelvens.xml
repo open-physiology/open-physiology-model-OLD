@@ -10,6 +10,7 @@
       <w>iface</w>
       <w>instanceof</w>
       <w>iterable</w>
+      <w>lodash</w>
       <w>manies</w>
       <w>measurables</w>
       <w>rdep</w>

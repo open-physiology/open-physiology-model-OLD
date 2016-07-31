@@ -1,6 +1,7 @@
-import includes      from 'lodash/includes';
-import isArray       from 'lodash/isArray';
-import set           from 'lodash/set';
+import includes      from 'lodash-bound/includes';
+import isArray       from 'lodash-bound/isArray';
+import isString      from 'lodash-bound/isString';
+import set           from 'lodash-bound/set';
 import ldIsEqual     from 'lodash/isEqual';
 import assert        from 'power-assert';
 
@@ -100,9 +101,9 @@ export default class ValueTracker {
 			`There is already a property '${name}' on this object.`);
 
 		/* if isValid is an array, check for inclusion */
-		if (isArray(isValid)) {
+		if (isValid::isArray()) {
 			let options = isValid;
-			isValid = (v) => includes(options, v)
+			isValid = (v) => options::includes(v)
 		}
 
 		/* bind functions to their proper context */
@@ -151,17 +152,23 @@ export default class ValueTracker {
 	 */
 	p(nameOrDeps, optionalTransformer) {
 		this[$$initialize]();
-		if (isArray(nameOrDeps)) {
+		if (nameOrDeps::isArray()) {
 			return combineLatest(nameOrDeps.map(n => this.p(n)), optionalTransformer);
-		} else {
-			return this[$$properties][nameOrDeps] || never();
+		} else if (nameOrDeps::isString()) {
+			return this[$$properties][nameOrDeps] || (
+				console.warning(`
+					Returning 'Observable::never()' for non-existent
+					property ${this.constructor.name}#${nameOrDeps}.
+				`),
+				never()
+			);
 		}
 	}
 
 };
 
 export const property = (options = {}) => (target, key) => {
-	set(target, ['constructor', $$properties, key], options);
+	target::set(['constructor', $$properties, key], options);
 	let {settable = true} = options;
 	return Object.assign({
 		get() { return this.p(key).get() }
@@ -173,6 +180,6 @@ export const property = (options = {}) => (target, key) => {
 export const event = (options = {}) => (target, key) => {
 	let match = key.match(/^(\w+)Event$/);
 	assert(match);
-	set(target, ['constructor', $$events, match[1]], options);
+	target::set(['constructor', $$events, match[1]], options);
 	return { get() { return this.e(match[1]) } };
 };

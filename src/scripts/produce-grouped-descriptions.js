@@ -1,8 +1,6 @@
 import M from '../index';
 
-// const M = require('../index').default;
-
-import padEnd from 'lodash/padEnd';
+import padEnd from 'lodash-bound/padEnd';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -81,11 +79,11 @@ for (let [,cls] of M.classes) {
 		o('\n');
 		o('----------------------------------------\n');
 		for (let entry of entries || []) {
-			entry.key = padEnd(entry.key, entries.largestKeySize);
+			entry.key = entry.key::padEnd(entries.largestKeySize);
 			o(entry.key, ' ', entry.op, '  ', entry.desc, ' ', '\n');
 			for (let sub of entry.sub || []) {
-				sub.key = padEnd(sub.key, entry.sub.largestKeySize);
-				o(padEnd('', entries.largestKeySize+4), sub.key, ' ', sub.op, '  ', sub.desc, '\n');
+				sub.key = sub.key::padEnd(entry.sub.largestKeySize);
+				o(''::padEnd(entries.largestKeySize+4), sub.key, ' ', sub.op, '  ', sub.desc, '\n');
 			}
 		}
 		o('\n');

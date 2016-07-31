@@ -17,7 +17,7 @@
     "development": {
       "plugins": [
         "typecheck",
-        "espower"
+        ["espower", { "embedAst": true }]
       ]
     },
     "production": {

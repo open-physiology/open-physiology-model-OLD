@@ -2,7 +2,7 @@ import Module                       from './Module';
 import {Typed}                      from './modules/typed';
 import {humanMsg, mapOptionalArray} from './util/misc';
 
-import defaults  from 'lodash/defaults';
+import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
 
@@ -19,7 +19,7 @@ export default class TypedModule extends Module {
 			
 			const SuperClass = conf.extends || Typed;
 			
-			defaults(config, {
+			config::defaults({
 				properties: {},
 				patternProperties: {}
 			});

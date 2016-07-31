@@ -10,14 +10,14 @@ import {defer as deferObservable} from 'rxjs/observable/defer';
 import {merge}                    from 'rxjs/observable/merge';
 import {concat}                   from 'rxjs/observable/concat';
 
-import inRange           from 'lodash-bound/inRange';
-import get               from 'lodash-bound/get';
-import size              from 'lodash-bound/size';
-import isString          from 'lodash/isString';
-import isArray           from 'lodash/isArray';
-import isUndefined       from 'lodash/isUndefined';
-import isFunction        from 'lodash/isFunction';
-import pick              from 'lodash/pick';
+import inRange     from 'lodash-bound/inRange';
+import get         from 'lodash-bound/get';
+import size        from 'lodash-bound/size';
+import pick        from 'lodash-bound/pick';
+import isString    from 'lodash-bound/isString';
+import isArray     from 'lodash-bound/isArray';
+import isFunction  from 'lodash-bound/isFunction';
+import isUndefined from 'lodash/isUndefined';
 
 import assert from 'power-assert';
 
@@ -74,16 +74,16 @@ export class Field extends ValueTracker {
 			field_get:      { value(key)                 { return this[$$fields][key].get()               } },
 			field_set:      { value(key, value, options) { return this[$$fields][key].set(value, options) } },
 			field_commit:   { async value(keys) {
-				if (isString(keys)) { return await this[$$fields][keys].commit() }
+				if (keys::isString()) { return await this[$$fields][keys].commit() }
 				if (isUndefined(keys)) { keys = Object.keys(this[$$fields]) }
-				assert(isArray(keys));
+				assert(isArray.call(keys));
 				return await Promise.all(keys.map(::this.field_commit));
 				// TODO: commit all fields in a single transaction?
 			}},
 			field_rollback: { value(keys) {
-				if (isString(keys)) { return this[$$fields][keys].rollback() }
+				if (keys::isString()) { return this[$$fields][keys].rollback() }
 				if (isUndefined(keys)) { keys = Object.keys(this[$$fields]) }
-				assert(isArray(keys));
+				assert(isArray.call(keys));
 				keys.forEach(::this.field_rollback);
 				// TODO: rollback all fields in a single transaction?
 			}},
@@ -150,7 +150,7 @@ export class Field extends ValueTracker {
 			};
 		}
 		for (let entry of Object.values(entries)) {
-			entry.related = pick(entries, entry.relatedKeys);
+			entry.related = entries::pick(entry.relatedKeys);
 		}
 		for (let entry of Object.values(entries)) {
 			let {FieldClass} = entry;
@@ -218,9 +218,9 @@ export class Field extends ValueTracker {
 	[$$initSet](...alternatives) {
 		
 		for (let [guard, value] of alternatives) {
-			if (isFunction(guard) ? guard() : guard) {
+			if (guard::isFunction() ? guard() : guard) {
 				if (isUndefined(value)) { return }
-				let val = isFunction(value) ? value() : value;
+				let val = value::isFunction() ? value() : value;
 				if (this.constructor.isEqual(this[$$value], val)) { return }
 				this.validate(val, ['initialize', 'set']);
 				this.set(val, {
