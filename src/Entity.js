@@ -6,6 +6,7 @@ import assert     from 'power-assert';
 import {humanMsg} from "./util/misc";
 import {Field} from "./Field";
 import ValueTracker, {event, property} from "./util/ValueTracker";
+import {tracker} from './changes/Change';
 
 const $$cache            = Symbol('$$cache'      );
 const $$subjects         = Symbol('$$subjects'   );
@@ -24,7 +25,10 @@ export default class Entity extends ValueTracker {
 	static createClass(config): Class<Entity> {
 		/* create the class with the right name, constructor and static content */
 		const {name, ...rest} = config;
-		const NewClass = class extends Entity {};
+		const NewClassObj = {
+			[name]: class extends Entity {}
+		};
+		const NewClass = NewClassObj[name];
 		Object.defineProperties(NewClass, {
 			/**
 			 * Set the name property of this class to
@@ -56,14 +60,45 @@ export default class Entity extends ValueTracker {
 	////////// STATIC (creating / caching / finding instances) //////////
 	/////////////////////////////////////////////////////////////////////
 	
+	
+	static Change_new = class extends tracker.Change {
+		constructor(context, props = {}, options = {}) {
+			super(options);
+			this.context       = context;
+			this.initialValues = props;
+		}
+
+		run() {
+			assert(!this.context.abstract, humanMsg`
+				Cannot instantiate the abstract
+				class ${this.context.name}.
+			`);
+			return new this.context(
+				{ ...this.initialValues },
+				{ ...this.options, new: true }
+			);
+		}
+
+		async commit() {
+			//TODO
+		}
+
+		rollback() {
+			// TODO
+		}
+	};
+	
+	
+	
 	static new(
 		values  : Object = {},
 	    options : Object = {}
 	): this {
-		return new this(
+		return new this.Change_new(
+			this,
 			{ ...values },
 			{ ...options, new: true }
-		);
+		).run();
 	}
 	
 	static get(
@@ -88,7 +123,9 @@ export default class Entity extends ValueTracker {
 	}
 	
 	static getSingleton() {
-		assert(this.singleton, humanMsg`The '${this.name}' class is not a singleton class.`);
+		assert(this.singleton, humanMsg`
+			The '${this.name}' class is not a singleton class.
+		`);
 		if (!this[$$singletonObject]) {
 			this[$$singletonObject] = this.new();
 			// TODO: make sure that the singleton object is always loaded,

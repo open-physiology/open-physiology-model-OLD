@@ -9,7 +9,7 @@ describe("integrated workflow", () => {
 	
 	it("can create new 'MaterialType's and link them", async () => {
 		
-		let blood = await MaterialType.new({
+		let blood = MaterialType.new({
 			name: "blood"
 		});
 		
@@ -24,7 +24,7 @@ describe("integrated workflow", () => {
 		expect(blood).to.have.a.property('id'  ).which.is.a('number');
 		expect(blood).to.have.a.property('href').which.is.a('string');
 		
-		let water = await MaterialType.new({
+		let water = MaterialType.new({
 			name: "waiter"
 		});
 
@@ -35,7 +35,7 @@ describe("integrated workflow", () => {
 
 		expect(water).to.have.a.property('name', "water");
 
-		await water.rollback();
+		water.rollback();
 
 		expect(water).to.have.a.property('id'  ).which.is.null;
 		expect(water).to.have.a.property('href').which.is.null;
@@ -43,24 +43,26 @@ describe("integrated workflow", () => {
 		expect(water).to.have.a.property('name', "waiter");
 
 		water.name = "water";
+		
 		await water.commit();
-
+		
 		expect(water).to.have.a.property('id'  ).which.is.a('number');
 		expect(water).to.have.a.property('href').which.is.a('string');
 		expect(water).to.have.a.property('name', "water");
-
+		
 		const {
 			id:   waterId,
 			href: waterHref,
 			name: waterName
 		} = water;
-		await water.rollback();
+		
+		water.rollback();
 
-		expect(water).to.have.a.property('id'  , waterId);
+		expect(water).to.have.a.property('id'  , waterId  );
 		expect(water).to.have.a.property('href', waterHref);
 		expect(water).to.have.a.property('name', waterName);
 		
-		let bloodHasWater = await ContainsMaterial.new({
+		let bloodHasWater = ContainsMaterial.new({
 			1: blood,
 			2: water
 		});

@@ -202,10 +202,10 @@ export class Field extends ValueTracker {
 	set(val, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
 		if (!this.constructor.isEqual(this[$$value], val)) {
 			assert(ignoreReadonly || !this[$$desc].readonly, humanMsg`
-				Tried to set the readonly field '${this[$$owner].constructor.name} # ${this[$$key]}'.
+				Tried to set the readonly field '${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
 			if (!ignoreValidation) {
-				this.validate(val);
+				this.validate(val, ['set']);
 			}
 			if (updatePristine) {
 				this[$$pristine] = val;
@@ -222,7 +222,7 @@ export class Field extends ValueTracker {
 				if (isUndefined(value)) { return }
 				let val = isFunction(value) ? value() : value;
 				if (this.constructor.isEqual(this[$$value], val)) { return }
-				this.validate(val);
+				this.validate(val, ['initialize', 'set']);
 				this.set(val, {
 					ignoreReadonly:   true,
 					ignoreValidation: true,
@@ -232,17 +232,13 @@ export class Field extends ValueTracker {
 			}
 		}
 		
-		assert(false, humanMsg`
-			No value given for '${this[$$owner].constructor.name} # ${this[$$key]}'.
-		`);
-		
 	}
 	
 	validate(val) {}
 	
-	commit() {
-		const old = this[$$pristine];
-		const nw = this[$$pristine] = this[$$value];
+	async commit() {
+		this.validate(this[$$value], ['commit']);
+		this[$$pristine] = this[$$value];
 		this.e('commit').next(this[$$value]);
 	}
 	
@@ -261,6 +257,15 @@ export class Field extends ValueTracker {
 
 
 export class PropertyField extends Field {
+	
+	//////////////////
+	// Change class //
+	//////////////////
+	
+	
+	
+	
+	
 	
 	// this[$$owner] instanceof RelatedTo | Resource
 	// this[$$key]   instanceof "name" | "class" | "href" | ...
@@ -459,7 +464,10 @@ export class Rel1Field extends Field {
 		
 		/* you cannot give a value as an actual relation and as a shortcut at the same time */
 		let givenShortcutInitialValue = get(related, [desc.options.key, 'initialValue']);
-		assert(!(initialValue || desc.other.class.singleton) || !givenShortcutInitialValue);
+		assert(!(initialValue || desc.other.class.singleton) || !givenShortcutInitialValue, humanMsg`
+			You cannot set the fields '${key}' and '${desc.options.key}'
+			at the same time for a ${this.constructor.singular}.
+		`);
 		
 		/* set the initial value */
 		this[$$initSet](
@@ -498,15 +506,20 @@ export class Rel1Field extends Field {
 			.subscribe( this.p('value') );
 	}
 	
-	validate(val) {
-		/* if there's a minimum cardinality, a value must have been given */
-		assert(val !== null || this[$$desc].cardinality.min === 0, humanMsg`
-			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
-		`);
+	validate(val, stages = []) {
+		
+		if (stages.includes('commit')) {
+			/* if there's a minimum cardinality, a value must have been given */
+			assert(val !== null || this[$$desc].cardinality.min === 0, humanMsg`
+				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+			`);
+		}
+		
 		/* the value must be of the proper domain */
 		assert(val === null || val instanceof this[$$desc].relationshipClass, humanMsg`
 			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
+		
 		// TODO: these should not be assertions, but proper constraint-checks,
 		//     : recording errors, possibly allowing them temporarily, etc.
 	}
@@ -585,12 +598,14 @@ export class RelShortcut1Field extends Field {
 			});
 	}
 		
-	validate(val) {
-		/* if there's a minimum cardinality, a value must have been given */
-		if (val === null && this[$$desc].cardinality.min > 0) {
-			throw new Error(humanMsg`
-				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
-			`);
+	validate(val, stages = []) {
+		if (stages.includes('commit')) {
+			/* if there's a minimum cardinality, a value must have been given */
+			if (val === null && this[$$desc].cardinality.min > 0) {
+				throw new Error(humanMsg`
+					Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+				`);
+			}
 		}
 		/* the value must be of the proper domain */
 		if (!(val instanceof this[$$desc].other.class)) {
@@ -690,36 +705,35 @@ export class Rel$Field extends Field {
 			// OK, this field is optional
 		} else if (related[desc.options.key] && related[desc.options.key].initialValue) {
 			// OK, a shortcut was given
-		} else {
-			assert(false);
 		}
-		// TODO: option to auto-create default relationship + opposing resource?
-		
+		// missing required field is checked in validation
 	}
 	
 	set(newValue) {
 		assert(!this[$$desc].readonly);
-		this.validate(newValue);
+		this.validate(newValue, ['set']);
 		copySetContent(this[$$value], newValue);
 	}
 	
-	validate(val) {
+	validate(val, stages = []) {
 		assert(val[Symbol.iterator]);
-		const {min, max} = this[$$desc].cardinality;
-		assert(inRange(size(val), min, max+1));
+		if (stages.includes('commit')) {
+			const { min, max } = this[$$desc].cardinality;
+			assert(inRange(size(val), min, max + 1));
+		}
 		val.forEach(::this.validateElement);
 	}
 	
 	validateElement(element) {
 		/* the value must be of the proper domain */
-		if (!(element instanceof this[$$desc].relationshipClass)) {
-			throw new Error(humanMsg`
-				Invalid value '${element}' given as element for ${this[$$owner].constructor.name}#${this[$$key]}.
-			`);
-		}
+		assert(element instanceof this[$$desc].relationshipClass, humanMsg`
+			Invalid value '${element}' given as element for
+			${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
 	}
 	
-	commit() {
+	async commit() {
+		this.validate(this[$$value], ['commit']);
 		copySetContent(this[$$pristine], this[$$value]);
 		this.e('commit').next(this[$$value]);
 	}
@@ -771,7 +785,7 @@ export class RelShortcut$Field extends Field {
 	//////////////
 	// instance //
 	//////////////
-	
+	 
 	constructor(options) {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, related } = options;
@@ -780,8 +794,11 @@ export class RelShortcut$Field extends Field {
 		this[$$value]    = new ObservableSet();
 
 		/* emit 'value' signals (but note that setValueThroughSignal = false) */
-		this[$$value].p('value')::waitUntilConstructed().subscribe(this.p('value'));
+		this[$$value].p('value')
+			::waitUntilConstructed()
+			.subscribe(this.p('value'));
 		
+		/* syncing with relationship field */
 		const correspondingRelField = owner[$$fields][desc.key][$$value];
 		correspondingRelField.e('add')
 			::waitUntilConstructed()
@@ -800,6 +817,7 @@ export class RelShortcut$Field extends Field {
 				});
 			});
 		
+		/* syncing with relationship field */
 		this[$$value].e('add')
 			::waitUntilConstructed()
 			.subscribe((newRes) => {
@@ -828,38 +846,35 @@ export class RelShortcut$Field extends Field {
 			// OK, this field is optional
 		} else if (related[desc.key].initialValue) {
 			// OK, a non-shortcut value was given
-		} else {
-			assert(false, humanMsg`
-				No value given for '${this[$$owner].constructor.name} # ${this[$$key]}'.
-			`);
 		}
-		
+		// possible missing required value is checked in validate method
 	}
 	
 	set(newValue) {
 		assert(!this[$$desc].readonly);
-		this.validate(newValue);
+		this.validate(newValue, ['set']);
 		copySetContent(this[$$value], newValue);
 	}
 	
-	validate(val) {
+	validate(val, stages = []) {
 		assert(val[Symbol.iterator]);
-		const {min, max} = this[$$desc].cardinality;
-		assert(inRange(size(val), min, max+1));
+		if (stages.includes('commit')) {
+			const {min, max} = this[$$desc].cardinality;
+			assert(inRange(size(val), min, max+1));
+		}
 		val.forEach(::this.validateElement);
 	}
 	
 	validateElement(element) {
 		/* the value must be of the proper domain */
-		if (!(element instanceof this[$$desc].other.class)) {
-			throw new Error(humanMsg`
-				Invalid value '${element}' given as element
-				for ${this[$$owner].constructor.name}#${this[$$key]}.
-			`);
-		}
+		assert(element instanceof this[$$desc].other.class, humanMsg`
+			Invalid value '${element}' given as element for
+			${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
 	}
 	
 	async commit() {
+		this.validate(this[$$value], ['commit']);
 		copySetContent(this[$$pristine], this[$$value]);
 		this.e('commit').next(this[$$value]);
 	}
