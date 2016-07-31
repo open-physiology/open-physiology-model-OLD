@@ -110,9 +110,7 @@ export class Field extends ValueTracker {
 				    'set',
 				    'validate',
 				    'commit',
-				    'rollback',
-				    'getJSON',
-				    'setJSON'
+				    'rollback'
 				].map(m => ({ [m]: ::this[$$fields][key][m] })));
 			}}
 		});
