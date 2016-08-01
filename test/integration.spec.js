@@ -4,6 +4,7 @@ import {Resource, IsRelatedTo}   from '../src/modules/resources';
 import {Type, Template, HasType} from '../src/modules/typed';
 import {Process} from '../src/modules/processes';
 import {MaterialType, MaterialTemplate, ContainsMaterial, MeasurableType} from '../src/index';
+import {LyphType, BorderType, BorderTemplate} from '../src/modules/lyphs';
 
 describe("integrated workflow", () => {
 	
@@ -68,7 +69,7 @@ describe("integrated workflow", () => {
 		expect(blood).to.have.a.property('name', "blood");
 		expect(blood).to.have.a.property('measurables');
 		expect(blood).to.have.a.property('measurableProviders');
-
+		
 		await blood.commit();
 
 		expect(blood).to.have.a.property('id'  ).which.is.a('number');
@@ -132,6 +133,18 @@ describe("integrated workflow", () => {
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.a('number');
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 		
+		
+	});
+	
+	xit("can create lyph-types with borders",  () => {
+		
+		let lyph1 = LyphType.new({ name: 'heart', species: 'dragon' });
+		
+		expect(lyph1).to.have.property('innerBorder').that.is.an.instanceof(BorderTemplate);
+		
+		// TODO: fix a single relationship domain for each relationship/shortcut field
+		//     : this would create a specific 'desc' for each side of each relationship.
+		//     : Among other things, specific HasType for each pair of typed classes.
 		
 	});
 	

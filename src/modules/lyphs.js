@@ -74,9 +74,18 @@ export const Lyph = M.TYPED_RESOURCE({//////////////////////////////////////////
 	properties: {
 		'species': {
 			Type: { type: 'string' }
+		},
+		'thickness': {
+			Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }) },
+			Template: { ...oneOf({ type: 'number' }, { ...distributionSchema }) },
+			typeCheck(t, v) {
+				t = normalizeToRange(t);
+				v = normalizeToRange(v);
+				return t.min <= v.min && v.max <= t.max;
+			}
 		}
 	},
-
+	
 });/////////////////////////////////////////////////////////////////////////////
 export const LyphType     = Lyph.Type;
 export const LyphTemplate = Lyph.Template;
@@ -188,7 +197,19 @@ export const CylindricalLyph = M.TYPED_RESOURCE({///////////////////////////////
 
 	extends: Lyph,
 
-	singular: "cylindrical lyph"
+	singular: "cylindrical lyph",
+	
+	properties: {
+		'length': {
+			Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }) },
+			Template: { ...oneOf({ type: 'number' }, { ...distributionSchema }) },
+			typeCheck(t, v) {
+				t = normalizeToRange(t);
+				v = normalizeToRange(v);
+				return t.min <= v.min && v.max <= t.max;
+			}
+		}
+	}
 
 });/////////////////////////////////////////////////////////////////////////////
 export const CylindricalLyphType     = CylindricalLyph.Type;
@@ -285,28 +306,10 @@ export const [
 	singular,
 
 	1: [LyphClass.Type,  '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key }],
-	2: [Border.Template, '0..1'                                                                                                   ],
+	2: [Border.Template, '1..1'                                                                                                   ],
 
-	// TODO: the 0..1 above should actually be 1..1, but the code that handles
-	//     : this is not yet sophisticated enough. One of them is created before
-	//     : the other, and will therefore fail the minimum cardinality constraint
-	//     : before this can be automatically fixed.
-	//     : When the code is fixed, put 1..1 back.
-	
 	// The 'readonly' flag above implies that when a lyph is created,
 	// its borders are also automatically created.
-
-	properties: {
-		'position': {
-			Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }), required: false },
-			Template: { ...oneOf({ type: 'number' }, { ...distributionSchema }), required: true  },
-			typeCheck(t, v) {
-				t = normalizeToRange(t);
-				v = normalizeToRange(v);
-				return t.min <= v.min && v.max <= t.max;
-			}
-		}
-	}
 
 	// Two lyphs never share the same border, formally speaking.
 	// The degree to which two borders overlap can be controlled through

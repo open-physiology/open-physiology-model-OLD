@@ -496,8 +496,6 @@ export class Rel1Field extends Field {
 			[desc.cardinality.min === 0, null                               ]
 		);
 		
-		// TODO: must have synchronous way to create new uncommitted object
-				
 		/* keep the relationship up to date with changes here */
 		this.p('value')
 			::waitUntilConstructed()
