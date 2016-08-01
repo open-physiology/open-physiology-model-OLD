@@ -56,7 +56,6 @@ export const MeasurableLocation = M.TYPED_RESOURCE({
 	
 });
 
-
 export const HasMeasurable = M.RELATIONSHIP({
 
 	name: 'HasMeasurable',

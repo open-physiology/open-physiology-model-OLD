@@ -12,6 +12,9 @@ import Entity from './Entity';
 import {Field} from "./Field";
 
 
+const $$processedFor = Symbol('$$processedFor');
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Module / Resource / Relationship Factory                                   //
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,29 +197,53 @@ export default class Module {
 		/* register the class in this module */
 		this.classes.ensureVertex(cls.name, cls);
 		/* add subclassing edges and cross-register sub/superclasses */
+		
+		
+		
+		if (cls.name === 'MeasurableLocationType') {
+			console.log([...this.classes.vertexValue('MaterialType').extends].map(x=>x.name));
+		}
+		
 		for (let extendee of cls.extends || []) {
 			this.classes.addEdge(extendee.name, cls.name);
 			extendee.extendedBy.add(cls);
 		}
+		
+		if (cls.name === 'MeasurableLocationType') {
+			console.log([...this.classes.vertexValue('MaterialType').extends].map(x=>x.name));
+		}
+		
 		for (let extender of cls.extendedBy || []) {
 			this.classes.addEdge(cls.name, extender.name);
 			extender.extends.add(cls);
 		}
+		
+		if (cls.name === 'MeasurableLocationType') {
+			console.log([...this.classes.vertexValue('MaterialType').extends].map(x=>x.name));
+		}
+		
+		
+		
 	}
 	
-	_mergeSuperclassField(cls, kind, customMerge) {
+	_mergeSuperclassField(cls, newCls, kind, customMerge) {
 		if (isUndefined(cls[kind])) { return }
-		for (let [,supercls] of this.classes.verticesTo(cls.name)) {
-			
-			
-			if (supercls.name === 'MeasurableLocationType') {
-				console.log(supercls.name, cls.name);
-			}
-			
-			for (let [key, superDesc] of Object.entries(supercls[kind])) {
-				let subDesc = cls[kind][key];
+		
+		if (!cls[$$processedFor]) { cls[$$processedFor] = {} }
+		if (!cls[$$processedFor][kind]) { cls[$$processedFor][kind] = new WeakSet() }
+		if (cls[$$processedFor][kind].has(newCls)) { return }
+		cls[$$processedFor][kind].add(newCls);
+		
+		
+		for (let superCls of cls.extends) {
+			let subCls = cls;
+			for (let key of Object.keys(superCls[kind])) {
+				let superDesc = superCls[kind][key];
+				let subDesc   = subCls[kind][key];
+				this._mergeSuperclassField(superCls, newCls, kind, customMerge);
 				if (isUndefined(subDesc)) {
-					cls[kind][key] = superDesc;
+					subCls[kind][key] = superDesc;
+					Field.augmentClass(subCls, key);
 				} else if (isEqual(subDesc, superDesc)) {
 					continue;
 				} else {
@@ -224,11 +251,30 @@ export default class Module {
 				}
 			}
 		}
+		
+		for (let subCls of cls.extendedBy) {
+			let superCls = cls;
+			for (let key of Object.keys(superCls[kind])) {
+				let superDesc = superCls[kind][key];
+				let subDesc   = subCls[kind][key];
+				if (isUndefined(subDesc)) {
+					subCls[kind][key] = superDesc;
+					Field.augmentClass(subCls, key);
+				} else if (isEqual(subDesc, superDesc)) {
+					// do nothing
+				} else {
+					Object.assign(subDesc, customMerge(superDesc, subDesc));
+				}
+			}
+			this._mergeSuperclassField(subCls, newCls, kind, customMerge);
+		}
+			
 	}
 	
 	mergeSuperclassFields(cls) : void {
-		this._mergeSuperclassField(cls, 'properties', (superDesc, subDesc) => {
-			assert(isUndefined(subDesc.type) || subDesc.type === superDesc.type);
+		
+		this._mergeSuperclassField(cls, cls, 'properties', (superDesc, subDesc) => {
+			assert(subDesc.key === superDesc.key);
 			// We're assuming that the only kind of non-trivial merging
 			// right now is to give a property a specific constant value
 			// in the subclass, which has to be checked in the superclass.
@@ -251,14 +297,19 @@ export default class Module {
 			assert(singleSuperDesc);
 			return singleSuperDesc;
 		});
-		this._mergeSuperclassField(cls, 'relationships', (superDesc, subDesc) => {
+		
+		this._mergeSuperclassField(cls, cls, 'relationships', (superDesc, subDesc) => {
 			assert(superDesc.class.hasSubclass(subDesc.class));
 			return { ...superDesc };
 		});
-		this._mergeSuperclassField(cls, 'relationshipShortcuts', (superDesc, subDesc) => {
+		
+		this._mergeSuperclassField(cls, cls, 'relationshipShortcuts', (superDesc, subDesc) => {
 			assert(superDesc.class.hasSubclass(subDesc.class));
 			return { ...superDesc };
 		});
+		
+		// TODO: for sides of a relationship (after splitting / merging all relevant domains)
+		
 	}
 	
 	mergeSameNameResources(cls) : Class<Entity> {
