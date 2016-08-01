@@ -3614,8 +3614,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
@@ -4099,14 +4097,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function register(cls) {
 				/* register the class in this module */
 				this.classes.ensureVertex(cls.name, cls);
+	
 				/* add subclassing edges and cross-register sub/superclasses */
-	
-				if (cls.name === 'MeasurableLocationType') {
-					console.log([].concat(_toConsumableArray(this.classes.vertexValue('MaterialType').extends)).map(function (x) {
-						return x.name;
-					}));
-				}
-	
 				_ref8 = cls.extends || [];
 	
 				if (!(_ref8 && (typeof _ref8[Symbol.iterator] === 'function' || Array.isArray(_ref8)))) {
@@ -4141,12 +4133,6 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				}
 	
-				if (cls.name === 'MeasurableLocationType') {
-					console.log([].concat(_toConsumableArray(this.classes.vertexValue('MaterialType').extends)).map(function (x) {
-						return x.name;
-					}));
-				}
-	
 				_ref9 = cls.extendedBy || [];
 	
 				if (!(_ref9 && (typeof _ref9[Symbol.iterator] === 'function' || Array.isArray(_ref9)))) {
@@ -4179,12 +4165,6 @@ return /******/ (function(modules) { // webpackBootstrap
 							throw _iteratorError11;
 						}
 					}
-				}
-	
-				if (cls.name === 'MeasurableLocationType') {
-					console.log([].concat(_toConsumableArray(this.classes.vertexValue('MaterialType').extends)).map(function (x) {
-						return x.name;
-					}));
 				}
 			}
 		}, {
@@ -4367,7 +4347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt(_rec5._capt(subDesc, 'arguments/0/left/object').key, 'arguments/0/left') === _rec5._capt(_rec5._capt(superDesc, 'arguments/0/right/object').key, 'arguments/0/right'), 'arguments/0'), {
 						content: 'assert(subDesc.key === superDesc.key)',
 						filepath: 'src/Module.js',
-						line: 277,
+						line: 259,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[7,14]},"property":{"type":"Identifier","name":"key","range":[15,18]},"computed":false,"range":[7,18]},"right":{"type":"MemberExpression","object":{"type":"Identifier","name":"superDesc","range":[23,32]},"property":{"type":"Identifier","name":"key","range":[33,36]},"computed":false,"range":[23,36]},"range":[7,36]}],"range":[0,37]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"subDesc","range":[7,14]},{"type":{"label":"."},"range":[14,15]},{"type":{"label":"name"},"value":"key","range":[15,18]},{"type":{"label":"==/!="},"value":"===","range":[19,22]},{"type":{"label":"name"},"value":"superDesc","range":[23,32]},{"type":{"label":"."},"range":[32,33]},{"type":{"label":"name"},"value":"key","range":[33,36]},{"type":{"label":")"},"range":[36,37]}]',
 						visitorKeys: _powerAssertVisitorKeys
@@ -4422,7 +4402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec6._expr(_rec6._capt(singleSuperDesc, 'arguments/0'), {
 						content: 'assert(singleSuperDesc)',
 						filepath: 'src/Module.js',
-						line: 297,
+						line: 279,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"Identifier","name":"singleSuperDesc","range":[7,22]}],"range":[0,23]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"singleSuperDesc","range":[7,22]},{"type":{"label":")"},"range":[22,23]}]',
 						visitorKeys: _powerAssertVisitorKeys
@@ -4436,7 +4416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec7._expr(_rec7._capt(_rec7._capt(_rec7._capt(superDesc, 'arguments/0/callee/object/object').class, 'arguments/0/callee/object').hasSubclass(_rec7._capt(_rec7._capt(subDesc, 'arguments/0/arguments/0/object').class, 'arguments/0/arguments/0')), 'arguments/0'), {
 						content: 'assert(superDesc.class.hasSubclass(subDesc.class))',
 						filepath: 'src/Module.js',
-						line: 302,
+						line: 284,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"superDesc","range":[7,16]},"property":{"type":"Identifier","name":"class","range":[17,22]},"computed":false,"range":[7,22]},"property":{"type":"Identifier","name":"hasSubclass","range":[23,34]},"computed":false,"range":[7,34]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[35,42]},"property":{"type":"Identifier","name":"class","range":[43,48]},"computed":false,"range":[35,48]}],"range":[7,49]}],"range":[0,50]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"superDesc","range":[7,16]},{"type":{"label":"."},"range":[16,17]},{"type":{"label":"class"},"value":"class","range":[17,22]},{"type":{"label":"."},"range":[22,23]},{"type":{"label":"name"},"value":"hasSubclass","range":[23,34]},{"type":{"label":"("},"range":[34,35]},{"type":{"label":"name"},"value":"subDesc","range":[35,42]},{"type":{"label":"."},"range":[42,43]},{"type":{"label":"class"},"value":"class","range":[43,48]},{"type":{"label":")"},"range":[48,49]},{"type":{"label":")"},"range":[49,50]}]',
 						visitorKeys: _powerAssertVisitorKeys
@@ -4450,7 +4430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec8._expr(_rec8._capt(_rec8._capt(_rec8._capt(superDesc, 'arguments/0/callee/object/object').class, 'arguments/0/callee/object').hasSubclass(_rec8._capt(_rec8._capt(subDesc, 'arguments/0/arguments/0/object').class, 'arguments/0/arguments/0')), 'arguments/0'), {
 						content: 'assert(superDesc.class.hasSubclass(subDesc.class))',
 						filepath: 'src/Module.js',
-						line: 307,
+						line: 289,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"superDesc","range":[7,16]},"property":{"type":"Identifier","name":"class","range":[17,22]},"computed":false,"range":[7,22]},"property":{"type":"Identifier","name":"hasSubclass","range":[23,34]},"computed":false,"range":[7,34]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[35,42]},"property":{"type":"Identifier","name":"class","range":[43,48]},"computed":false,"range":[35,48]}],"range":[7,49]}],"range":[0,50]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"superDesc","range":[7,16]},{"type":{"label":"."},"range":[16,17]},{"type":{"label":"class"},"value":"class","range":[17,22]},{"type":{"label":"."},"range":[22,23]},{"type":{"label":"name"},"value":"hasSubclass","range":[23,34]},{"type":{"label":"("},"range":[34,35]},{"type":{"label":"name"},"value":"subDesc","range":[35,42]},{"type":{"label":"."},"range":[42,43]},{"type":{"label":"class"},"value":"class","range":[43,48]},{"type":{"label":")"},"range":[48,49]},{"type":{"label":")"},"range":[49,50]}]',
 						visitorKeys: _powerAssertVisitorKeys

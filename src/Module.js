@@ -196,34 +196,16 @@ export default class Module {
 	register(cls) : void {
 		/* register the class in this module */
 		this.classes.ensureVertex(cls.name, cls);
+		
 		/* add subclassing edges and cross-register sub/superclasses */
-		
-		
-		
-		if (cls.name === 'MeasurableLocationType') {
-			console.log([...this.classes.vertexValue('MaterialType').extends].map(x=>x.name));
-		}
-		
 		for (let extendee of cls.extends || []) {
 			this.classes.addEdge(extendee.name, cls.name);
 			extendee.extendedBy.add(cls);
 		}
-		
-		if (cls.name === 'MeasurableLocationType') {
-			console.log([...this.classes.vertexValue('MaterialType').extends].map(x=>x.name));
-		}
-		
 		for (let extender of cls.extendedBy || []) {
 			this.classes.addEdge(cls.name, extender.name);
 			extender.extends.add(cls);
 		}
-		
-		if (cls.name === 'MeasurableLocationType') {
-			console.log([...this.classes.vertexValue('MaterialType').extends].map(x=>x.name));
-		}
-		
-		
-		
 	}
 	
 	_mergeSuperclassField(cls, newCls, kind, customMerge) {
