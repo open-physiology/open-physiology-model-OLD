@@ -306,7 +306,7 @@ export const [
 	singular,
 
 	1: [LyphClass.Type,  '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key }],
-	2: [Border.Template, '1..1'                                                                                                   ],
+	2: [Border.Template, '0..1'                                                                                                   ],
 
 	// The 'readonly' flag above implies that when a lyph is created,
 	// its borders are also automatically created.

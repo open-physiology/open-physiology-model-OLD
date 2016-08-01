@@ -216,7 +216,6 @@ export default class Module {
 		if (cls[$$processedFor][kind].has(newCls)) { return }
 		cls[$$processedFor][kind].add(newCls);
 		
-		
 		for (let superCls of cls.extends) {
 			let subCls = cls;
 			for (let key of Object.keys(superCls[kind])) {
@@ -263,6 +262,7 @@ export default class Module {
 			// TODO: use actual json-schema validation to validate value
 			let singleSuperDesc;
 			if (isUndefined(superDesc.type) && superDesc.oneOf) {
+				assert(superDesc.oneOf.length > 0);
 				for (let disjunct of superDesc.oneOf) {
 					if (typeof subDesc.value === disjunct.type                    ||
 					    subDesc.value::isInteger() && disjunct.type === 'integer' ||
@@ -276,7 +276,6 @@ export default class Module {
 			} else {
 				singleSuperDesc = { ...superDesc };
 			}
-			assert(singleSuperDesc);
 			return singleSuperDesc;
 		});
 		

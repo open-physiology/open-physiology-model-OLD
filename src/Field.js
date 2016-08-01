@@ -6,6 +6,7 @@ import {takeUntil}                from 'rxjs/operator/takeUntil';
 import {switchMap}                from 'rxjs/operator/switchMap';
 import {take}                     from 'rxjs/operator/take';
 import {startWith}                from 'rxjs/operator/startWith';
+import {mergeMap}                 from 'rxjs/operator/mergeMap';
 import {defer as deferObservable} from 'rxjs/observable/defer';
 import {merge}                    from 'rxjs/observable/merge';
 import {concat}                   from 'rxjs/observable/concat';
@@ -485,14 +486,14 @@ export class Rel1Field extends Field {
 		this[$$initSet](
 			[initialValue,               initialValue                       ],
 			[desc.other.class.singleton, () => desc.relationshipClass.new({ //
-					[desc.side]:       this[$$owner],                       //
-					[desc.other.side]: desc.other.class.getSingleton()      //
-				})                                                          ],
+				[desc.side]:       this[$$owner],                           //
+				[desc.other.side]: desc.other.class.getSingleton()          //
+			})                                                              ],
 			[givenShortcutInitialValue],
 			[desc.options.auto, () => desc.relationshipClass.new({          //
-					[desc.side]:       this[$$owner],                       //
-					[desc.other.side]: desc.other.class.new()               //
-				})                                                          ],
+				[desc.side]:       this[$$owner],                           //
+				[desc.other.side]: desc.other.class.new()                   //
+			})                                                              ],
 			[desc.cardinality.min === 0, null                               ]
 		);
 		
@@ -523,7 +524,7 @@ export class Rel1Field extends Field {
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
 			assert(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`
-				No value '${val}' given for required field ${this[$$owner].constructor.name}#${this[$$key]}.
+				No value given for required field ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
 		
@@ -593,23 +594,67 @@ export class RelShortcut1Field extends Field {
 		// so that the two don't compete. Therefore, this constructor is very
 		// forgiving. The constraint checks are done on the other constructor.
 		
-		const correspondingRel = deferObservable(() => owner[$$fields][desc.key].p('value'))
-			::waitUntilConstructed();
+		const correspondingRelValue =
+			deferObservable(() => owner[$$fields][desc.key].p('value'))
+				::waitUntilConstructed();
+		
+		
+		
+		// if (owner.constructor.name === 'BorderTemplate') {
+		// 	console.log(
+		// 		owner[$$fields][desc.key][$$value],
+		// 		this[$$value],
+		// 		initialValue
+		// 	);
+		// }
+		
+		
+		// TODO: make this more general, with subscriptions
+		if (!owner[$$fields][desc.key][$$value] && this[$$value]) {
+			
+			owner[$$fields][desc.key].set(desc.relationshipClass.new({
+				[desc.side]:       owner,
+				[desc.other.side]: this[$$value]
+			}));
+		}
+		
+		
+		
+		
 		
 		/* keep this value up to date with new sides of new relationships */
-		correspondingRel
+		correspondingRelValue
 			::filter(rel => rel)
 			::switchMap(rel => rel[$$fields][desc.other.side].p('value'))
 			.subscribe( this.p('value') );
 		
 		/* keep the relationship up to date */
-		correspondingRel
-			::filter(rel => rel)
-			.subscribe((rel) => {
-				this.p('value')
-					::takeUntil(correspondingRel::filter(r => r !== rel))
-					.subscribe( rel[$$fields][desc.other.side].p('value') );
-			});
+		merge(
+			this.p('value'),
+			correspondingRelValue
+		).subscribe((scValue, relValue) => {
+			if (!relValue && scValue) {
+				// console.log(''+owner, key, desc.key, ''+scValue);
+				// console.log(desc.relationshipClass.name);
+				owner[$$fields][desc.key].set(desc.relationshipClass.new({
+					[desc.side]:       owner,
+					[desc.other.side]: scValue
+				}));
+			} else if (relValue && !scValue) {
+				rel[$$fields][desc.other.side].set(null);
+			} else if (relValue && scValue && scValue !== rel[$$fields][desc.other.side][$$value]) {
+				// rel[$$fields][desc.key].set(scValue);
+				rel[$$fields][desc.other.side].set(scValue);
+			}
+		});
+		
+		// correspondingRelValue
+		// 	::filter(rel => rel)
+		// 	.subscribe((rel) => {
+		// 		this.p('value')
+		// 			::takeUntil(correspondingRelValue::filter(r => r !== rel))
+		// 			.subscribe( rel[$$fields][desc.other.side].p('value') );
+		// 	});
 	}
 		
 	validate(val, stages = []) {
