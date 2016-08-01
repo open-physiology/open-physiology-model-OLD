@@ -3614,11 +3614,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
 	function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var $$processedFor = Symbol('$$processedFor');
 	
 	////////////////////////////////////////////////////////////////////////////////
 	// Module / Resource / Relationship Factory                                   //
@@ -3949,7 +3953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 								(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(this.classes, 'arguments/0/callee/object').hasVertex(_rec._capt(_rec._capt(other, 'arguments/0/arguments/0/object').name, 'arguments/0/arguments/0')), 'arguments/0'), {
 									content: 'assert(this.classes.hasVertex(other.name), humanMsg`\n\t\t\t\t\tThe \'${ config.name }\' class is being processed\n\t\t\t\t\tby module \'${ this.name }\', but it extends a \'${ other.name }\'\n\t\t\t\t\tclass that has not yet been processed. How can that be?\n\t\t\t\t`)',
 									filepath: 'src/Module.js',
-									line: 123,
+									line: 126,
 									ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"classes","range":[12,19]},"computed":false,"range":[7,19]},"property":{"type":"Identifier","name":"hasVertex","range":[20,29]},"computed":false,"range":[7,29]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[30,35]},"property":{"type":"Identifier","name":"name","range":[36,40]},"computed":false,"range":[30,40]}],"range":[7,41]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[43,51]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\t\\t\\tThe \'"},"tail":false,"range":[52,10]},{"type":"TemplateElement","value":{"raw":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","cooked":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'"},"tail":false,"range":[26,16]},{"type":"TemplateElement","value":{"raw":"\', but it extends a \'","cooked":"\', but it extends a \'"},"tail":false,"range":[30,51]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t","cooked":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t"},"tail":true,"range":[66,4]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"config","range":[13,19]},"property":{"type":"Identifier","name":"name","range":[20,24]},"computed":false,"range":[13,24]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[19,23]},"property":{"type":"Identifier","name":"name","range":[24,28]},"computed":false,"range":[19,28]},{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[54,59]},"property":{"type":"Identifier","name":"name","range":[60,64]},"computed":false,"range":[54,64]}],"range":[51,5]},"range":[43,5]}],"range":[0,6]}',
 									tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"classes","range":[12,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"hasVertex","range":[20,29]},{"type":{"label":"("},"range":[29,30]},{"type":{"label":"name"},"value":"other","range":[30,35]},{"type":{"label":"."},"range":[35,36]},{"type":{"label":"name"},"value":"name","range":[36,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":","},"range":[41,42]},{"type":{"label":"name"},"value":"humanMsg","range":[43,51]},{"type":{"label":"`"},"range":[51,52]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tThe \'","range":[52,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"name"},"value":"config","range":[13,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"name","range":[20,24]},{"type":{"label":"}"},"range":[25,26]},{"type":{"label":"template"},"value":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","range":[26,16]},{"type":{"label":"${"},"range":[16,18]},{"type":{"label":"this"},"value":"this","range":[19,23]},{"type":{"label":"."},"range":[23,24]},{"type":{"label":"name"},"value":"name","range":[24,28]},{"type":{"label":"}"},"range":[29,30]},{"type":{"label":"template"},"value":"\', but it extends a \'","range":[30,51]},{"type":{"label":"${"},"range":[51,53]},{"type":{"label":"name"},"value":"other","range":[54,59]},{"type":{"label":"."},"range":[59,60]},{"type":{"label":"name"},"value":"name","range":[60,64]},{"type":{"label":"}"},"range":[65,66]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t","range":[66,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
 									visitorKeys: _powerAssertVisitorKeys
@@ -3957,7 +3961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 								(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(_rec2._capt(this.classes, 'arguments/0/left/callee/object').vertexValue(_rec2._capt(_rec2._capt(other, 'arguments/0/left/arguments/0/object').name, 'arguments/0/left/arguments/0')), 'arguments/0/left') === _rec2._capt(other, 'arguments/0/right'), 'arguments/0'), {
 									content: 'assert(this.classes.vertexValue(other.name) === other, humanMsg`\n\t\t\t\t\tThe \'${ config.name }\' class is being processed\n\t\t\t\t\tby module \'${ this.name }\', but it extends an \'${ other.name }\'\n\t\t\t\t\tclass that is in conflict with another class known\n\t\t\t\t\tby that name.\n\t\t\t\t`)',
 									filepath: 'src/Module.js',
-									line: 128,
+									line: 131,
 									ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"classes","range":[12,19]},"computed":false,"range":[7,19]},"property":{"type":"Identifier","name":"vertexValue","range":[20,31]},"computed":false,"range":[7,31]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[32,37]},"property":{"type":"Identifier","name":"name","range":[38,42]},"computed":false,"range":[32,42]}],"range":[7,43]},"right":{"type":"Identifier","name":"other","range":[48,53]},"range":[7,53]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[55,63]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\t\\t\\tThe \'"},"tail":false,"range":[64,10]},{"type":"TemplateElement","value":{"raw":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","cooked":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'"},"tail":false,"range":[26,16]},{"type":"TemplateElement","value":{"raw":"\', but it extends an \'","cooked":"\', but it extends an \'"},"tail":false,"range":[30,52]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t","cooked":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t"},"tail":true,"range":[67,4]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"config","range":[13,19]},"property":{"type":"Identifier","name":"name","range":[20,24]},"computed":false,"range":[13,24]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[19,23]},"property":{"type":"Identifier","name":"name","range":[24,28]},"computed":false,"range":[19,28]},{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[55,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[55,65]}],"range":[63,5]},"range":[55,5]}],"range":[0,6]}',
 									tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"classes","range":[12,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"vertexValue","range":[20,31]},{"type":{"label":"("},"range":[31,32]},{"type":{"label":"name"},"value":"other","range":[32,37]},{"type":{"label":"."},"range":[37,38]},{"type":{"label":"name"},"value":"name","range":[38,42]},{"type":{"label":")"},"range":[42,43]},{"type":{"label":"==/!="},"value":"===","range":[44,47]},{"type":{"label":"name"},"value":"other","range":[48,53]},{"type":{"label":","},"range":[53,54]},{"type":{"label":"name"},"value":"humanMsg","range":[55,63]},{"type":{"label":"`"},"range":[63,64]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tThe \'","range":[64,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"name"},"value":"config","range":[13,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"name","range":[20,24]},{"type":{"label":"}"},"range":[25,26]},{"type":{"label":"template"},"value":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","range":[26,16]},{"type":{"label":"${"},"range":[16,18]},{"type":{"label":"this"},"value":"this","range":[19,23]},{"type":{"label":"."},"range":[23,24]},{"type":{"label":"name"},"value":"name","range":[24,28]},{"type":{"label":"}"},"range":[29,30]},{"type":{"label":"template"},"value":"\', but it extends an \'","range":[30,52]},{"type":{"label":"${"},"range":[52,54]},{"type":{"label":"name"},"value":"other","range":[55,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t","range":[67,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
 									visitorKeys: _powerAssertVisitorKeys
@@ -4009,7 +4013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(_rec3._capt(_rec3._capt(!_rec3._capt(_rec3._capt(cls, 'arguments/0/left/left/argument/object')[1], 'arguments/0/left/left/argument'), 'arguments/0/left/left') & _rec3._capt(!_rec3._capt(_rec3._capt(cls, 'arguments/0/left/right/argument/object')[2], 'arguments/0/left/right/argument'), 'arguments/0/left/right'), 'arguments/0/left') || _rec3._capt(!_rec3._capt(_rec3._capt(cls, 'arguments/0/right/argument/object').domains, 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
 					content: 'assert(!cls[1] & !cls[2] || !cls.domains, humanMsg`\n\t\t\tA relationship can specify [1] and [2] domains directly,\n\t\t\tor group multiple pairs in a \'domains\' object, but not both.\n\t\t`)',
 					filepath: 'src/Module.js',
-					line: 145,
+					line: 148,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"BinaryExpression","operator":"&","left":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[8,11]},"property":{"type":"NumericLiteral","value":1,"range":[12,13]},"computed":true,"range":[8,14]},"prefix":true,"range":[7,14]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[18,21]},"property":{"type":"NumericLiteral","value":2,"range":[22,23]},"computed":true,"range":[18,24]},"prefix":true,"range":[17,24]},"range":[7,24]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[29,32]},"property":{"type":"Identifier","name":"domains","range":[33,40]},"computed":false,"range":[29,40]},"prefix":true,"range":[28,40]},"range":[7,40]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[42,50]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tA relationship can specify [1] and [2] domains directly,\\n\\t\\t\\tor group multiple pairs in a \'domains\' object, but not both.\\n\\t\\t","cooked":"\\n\\t\\t\\tA relationship can specify [1] and [2] domains directly,\\n\\t\\t\\tor group multiple pairs in a \'domains\' object, but not both.\\n\\t\\t"},"tail":true,"range":[51,2]}],"expressions":[],"range":[50,3]},"range":[42,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"name"},"value":"cls","range":[8,11]},{"type":{"label":"["},"range":[11,12]},{"type":{"label":"num"},"value":1,"range":[12,13]},{"type":{"label":"]"},"range":[13,14]},{"type":{"label":"&"},"value":"&","range":[15,16]},{"type":{"label":"prefix"},"value":"!","range":[17,18]},{"type":{"label":"name"},"value":"cls","range":[18,21]},{"type":{"label":"["},"range":[21,22]},{"type":{"label":"num"},"value":2,"range":[22,23]},{"type":{"label":"]"},"range":[23,24]},{"type":{"label":"||"},"value":"||","range":[25,27]},{"type":{"label":"prefix"},"value":"!","range":[28,29]},{"type":{"label":"name"},"value":"cls","range":[29,32]},{"type":{"label":"."},"range":[32,33]},{"type":{"label":"name"},"value":"domains","range":[33,40]},{"type":{"label":","},"range":[40,41]},{"type":{"label":"name"},"value":"humanMsg","range":[42,50]},{"type":{"label":"`"},"range":[50,51]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tA relationship can specify [1] and [2] domains directly,\\n\\t\\t\\tor group multiple pairs in a \'domains\' object, but not both.\\n\\t\\t","range":[51,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -4041,7 +4045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							(0, _powerAssert2.default)(_rec4._expr(_rec4._capt((_context = domainPair[side], _isArray2.default).call(_context), 'arguments/0'), {
 								content: 'assert(domainPair[side]::isArray(), humanMsg`\n\t\t\t\t\tRelationship sides 1, 2 need to be arrays.\n\t\t\t\t`)',
 								filepath: 'src/Module.js',
-								line: 159,
+								line: 162,
 								ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"domainPair","range":[7,17]},"property":{"type":"Identifier","name":"side","range":[18,22]},"computed":true,"range":[7,23]},"callee":{"type":"Identifier","name":"isArray","range":[25,32]},"range":[7,32]},"arguments":[],"range":[7,34]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[36,44]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tRelationship sides 1, 2 need to be arrays.\\n\\t\\t\\t\\t","cooked":"\\n\\t\\t\\t\\t\\tRelationship sides 1, 2 need to be arrays.\\n\\t\\t\\t\\t"},"tail":true,"range":[45,4]}],"expressions":[],"range":[44,5]},"range":[36,5]}],"range":[0,6]}',
 								tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"domainPair","range":[7,17]},{"type":{"label":"["},"range":[17,18]},{"type":{"label":"name"},"value":"side","range":[18,22]},{"type":{"label":"]"},"range":[22,23]},{"type":{"label":"::"},"value":"::","range":[23,25]},{"type":{"label":"name"},"value":"isArray","range":[25,32]},{"type":{"label":"("},"range":[32,33]},{"type":{"label":")"},"range":[33,34]},{"type":{"label":","},"range":[34,35]},{"type":{"label":"name"},"value":"humanMsg","range":[36,44]},{"type":{"label":"`"},"range":[44,45]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tRelationship sides 1, 2 need to be arrays.\\n\\t\\t\\t\\t","range":[45,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
 								visitorKeys: _powerAssertVisitorKeys
@@ -4096,6 +4100,13 @@ return /******/ (function(modules) { // webpackBootstrap
 				/* register the class in this module */
 				this.classes.ensureVertex(cls.name, cls);
 				/* add subclassing edges and cross-register sub/superclasses */
+	
+				if (cls.name === 'MeasurableLocationType') {
+					console.log([].concat(_toConsumableArray(this.classes.vertexValue('MaterialType').extends)).map(function (x) {
+						return x.name;
+					}));
+				}
+	
 				_ref8 = cls.extends || [];
 	
 				if (!(_ref8 && (typeof _ref8[Symbol.iterator] === 'function' || Array.isArray(_ref8)))) {
@@ -4128,6 +4139,12 @@ return /******/ (function(modules) { // webpackBootstrap
 							throw _iteratorError10;
 						}
 					}
+				}
+	
+				if (cls.name === 'MeasurableLocationType') {
+					console.log([].concat(_toConsumableArray(this.classes.vertexValue('MaterialType').extends)).map(function (x) {
+						return x.name;
+					}));
 				}
 	
 				_ref9 = cls.extendedBy || [];
@@ -4163,17 +4180,35 @@ return /******/ (function(modules) { // webpackBootstrap
 						}
 					}
 				}
+	
+				if (cls.name === 'MeasurableLocationType') {
+					console.log([].concat(_toConsumableArray(this.classes.vertexValue('MaterialType').extends)).map(function (x) {
+						return x.name;
+					}));
+				}
 			}
 		}, {
 			key: '_mergeSuperclassField',
-			value: function _mergeSuperclassField(cls, kind, customMerge) {
+			value: function _mergeSuperclassField(cls, newCls, kind, customMerge) {
 				if ((0, _isUndefined2.default)(cls[kind])) {
 					return;
 				}
-				_classes$verticesTo = this.classes.verticesTo(cls.name);
 	
-				if (!(_classes$verticesTo && (typeof _classes$verticesTo[Symbol.iterator] === 'function' || Array.isArray(_classes$verticesTo)))) {
-					throw new TypeError('Expected _classes$verticesTo to be iterable, got ' + _inspect(_classes$verticesTo));
+				if (!cls[$$processedFor]) {
+					cls[$$processedFor] = {};
+				}
+				if (!cls[$$processedFor][kind]) {
+					cls[$$processedFor][kind] = new WeakSet();
+				}
+				if (cls[$$processedFor][kind].has(newCls)) {
+					return;
+				}
+				cls[$$processedFor][kind].add(newCls);
+	
+				_cls$extends = cls.extends;
+	
+				if (!(_cls$extends && (typeof _cls$extends[Symbol.iterator] === 'function' || Array.isArray(_cls$extends)))) {
+					throw new TypeError('Expected _cls$extends to be iterable, got ' + _inspect(_cls$extends));
 				}
 	
 				var _iteratorNormalCompletion12 = true;
@@ -4181,40 +4216,34 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _iteratorError12 = undefined;
 	
 				try {
-					for (var _iterator12 = _classes$verticesTo[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-						var _classes$verticesTo;
+					for (var _iterator12 = _cls$extends[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+						var _cls$extends;
 	
-						var _step12$value = _slicedToArray(_step12.value, 2);
+						var superCls = _step12.value;
 	
-						var supercls = _step12$value[1];
+						var subCls = cls;
+						_Object$keys = Object.keys(superCls[kind]);
 	
-	
-						if (supercls.name === 'MeasurableLocationType') {
-							console.log(supercls.name, cls.name);
+						if (!(_Object$keys && (typeof _Object$keys[Symbol.iterator] === 'function' || Array.isArray(_Object$keys)))) {
+							throw new TypeError('Expected _Object$keys to be iterable, got ' + _inspect(_Object$keys));
 						}
 	
-						_Object$entries2 = Object.entries(supercls[kind]);
-	
-						if (!(_Object$entries2 && (typeof _Object$entries2[Symbol.iterator] === 'function' || Array.isArray(_Object$entries2)))) {
-							throw new TypeError('Expected _Object$entries2 to be iterable, got ' + _inspect(_Object$entries2));
-						}
-	
-						var _iteratorNormalCompletion13 = true;
-						var _didIteratorError13 = false;
-						var _iteratorError13 = undefined;
+						var _iteratorNormalCompletion14 = true;
+						var _didIteratorError14 = false;
+						var _iteratorError14 = undefined;
 	
 						try {
-							for (var _iterator13 = _Object$entries2[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-								var _Object$entries2;
+							for (var _iterator14 = _Object$keys[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+								var _Object$keys;
 	
-								var _step13$value = _slicedToArray(_step13.value, 2);
+								var key = _step14.value;
 	
-								var key = _step13$value[0];
-								var superDesc = _step13$value[1];
-	
-								var subDesc = cls[kind][key];
+								var superDesc = superCls[kind][key];
+								var subDesc = subCls[kind][key];
+								this._mergeSuperclassField(superCls, newCls, kind, customMerge);
 								if ((0, _isUndefined2.default)(subDesc)) {
-									cls[kind][key] = superDesc;
+									subCls[kind][key] = superDesc;
+									_Field.Field.augmentClass(subCls, key);
 								} else if ((0, _isEqual2.default)(subDesc, superDesc)) {
 									continue;
 								} else {
@@ -4222,16 +4251,16 @@ return /******/ (function(modules) { // webpackBootstrap
 								}
 							}
 						} catch (err) {
-							_didIteratorError13 = true;
-							_iteratorError13 = err;
+							_didIteratorError14 = true;
+							_iteratorError14 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion13 && _iterator13.return) {
-									_iterator13.return();
+								if (!_iteratorNormalCompletion14 && _iterator14.return) {
+									_iterator14.return();
 								}
 							} finally {
-								if (_didIteratorError13) {
-									throw _iteratorError13;
+								if (_didIteratorError14) {
+									throw _iteratorError14;
 								}
 							}
 						}
@@ -4250,20 +4279,97 @@ return /******/ (function(modules) { // webpackBootstrap
 						}
 					}
 				}
+	
+				_cls$extendedBy = cls.extendedBy;
+	
+				if (!(_cls$extendedBy && (typeof _cls$extendedBy[Symbol.iterator] === 'function' || Array.isArray(_cls$extendedBy)))) {
+					throw new TypeError('Expected _cls$extendedBy to be iterable, got ' + _inspect(_cls$extendedBy));
+				}
+	
+				var _iteratorNormalCompletion13 = true;
+				var _didIteratorError13 = false;
+				var _iteratorError13 = undefined;
+	
+				try {
+					for (var _iterator13 = _cls$extendedBy[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+						var _cls$extendedBy;
+	
+						var _subCls = _step13.value;
+	
+						var _superCls = cls;
+						_Object$keys2 = Object.keys(_superCls[kind]);
+	
+						if (!(_Object$keys2 && (typeof _Object$keys2[Symbol.iterator] === 'function' || Array.isArray(_Object$keys2)))) {
+							throw new TypeError('Expected _Object$keys2 to be iterable, got ' + _inspect(_Object$keys2));
+						}
+	
+						var _iteratorNormalCompletion15 = true;
+						var _didIteratorError15 = false;
+						var _iteratorError15 = undefined;
+	
+						try {
+							for (var _iterator15 = _Object$keys2[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+								var _Object$keys2;
+	
+								var _key2 = _step15.value;
+	
+								var _superDesc = _superCls[kind][_key2];
+								var _subDesc = _subCls[kind][_key2];
+								if ((0, _isUndefined2.default)(_subDesc)) {
+									_subCls[kind][_key2] = _superDesc;
+									_Field.Field.augmentClass(_subCls, _key2);
+								} else if ((0, _isEqual2.default)(_subDesc, _superDesc)) {
+									// do nothing
+								} else {
+									Object.assign(_subDesc, customMerge(_superDesc, _subDesc));
+								}
+							}
+						} catch (err) {
+							_didIteratorError15 = true;
+							_iteratorError15 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion15 && _iterator15.return) {
+									_iterator15.return();
+								}
+							} finally {
+								if (_didIteratorError15) {
+									throw _iteratorError15;
+								}
+							}
+						}
+	
+						this._mergeSuperclassField(_subCls, newCls, kind, customMerge);
+					}
+				} catch (err) {
+					_didIteratorError13 = true;
+					_iteratorError13 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion13 && _iterator13.return) {
+							_iterator13.return();
+						}
+					} finally {
+						if (_didIteratorError13) {
+							throw _iteratorError13;
+						}
+					}
+				}
 			}
 		}, {
 			key: 'mergeSuperclassFields',
 			value: function mergeSuperclassFields(cls) {
-				this._mergeSuperclassField(cls, 'properties', function (superDesc, subDesc) {
+	
+				this._mergeSuperclassField(cls, cls, 'properties', function (superDesc, subDesc) {
 					var _rec5 = new _powerAssertRecorder(),
 					    _rec6 = new _powerAssertRecorder();
 	
-					(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt((0, _isUndefined2.default)(_rec5._capt(_rec5._capt(subDesc, 'arguments/0/left/arguments/0/object').type, 'arguments/0/left/arguments/0')), 'arguments/0/left') || _rec5._capt(_rec5._capt(_rec5._capt(subDesc, 'arguments/0/right/left/object').type, 'arguments/0/right/left') === _rec5._capt(_rec5._capt(superDesc, 'arguments/0/right/right/object').type, 'arguments/0/right/right'), 'arguments/0/right'), 'arguments/0'), {
-						content: 'assert(isUndefined(subDesc.type) || subDesc.type === superDesc.type)',
+					(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt(_rec5._capt(subDesc, 'arguments/0/left/object').key, 'arguments/0/left') === _rec5._capt(_rec5._capt(superDesc, 'arguments/0/right/object').key, 'arguments/0/right'), 'arguments/0'), {
+						content: 'assert(subDesc.key === superDesc.key)',
 						filepath: 'src/Module.js',
-						line: 231,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"CallExpression","callee":{"type":"Identifier","name":"isUndefined","range":[7,18]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[19,26]},"property":{"type":"Identifier","name":"type","range":[27,31]},"computed":false,"range":[19,31]}],"range":[7,32]},"right":{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[36,43]},"property":{"type":"Identifier","name":"type","range":[44,48]},"computed":false,"range":[36,48]},"right":{"type":"MemberExpression","object":{"type":"Identifier","name":"superDesc","range":[53,62]},"property":{"type":"Identifier","name":"type","range":[63,67]},"computed":false,"range":[53,67]},"range":[36,67]},"range":[7,67]}],"range":[0,68]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"isUndefined","range":[7,18]},{"type":{"label":"("},"range":[18,19]},{"type":{"label":"name"},"value":"subDesc","range":[19,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"type","range":[27,31]},{"type":{"label":")"},"range":[31,32]},{"type":{"label":"||"},"value":"||","range":[33,35]},{"type":{"label":"name"},"value":"subDesc","range":[36,43]},{"type":{"label":"."},"range":[43,44]},{"type":{"label":"name"},"value":"type","range":[44,48]},{"type":{"label":"==/!="},"value":"===","range":[49,52]},{"type":{"label":"name"},"value":"superDesc","range":[53,62]},{"type":{"label":"."},"range":[62,63]},{"type":{"label":"name"},"value":"type","range":[63,67]},{"type":{"label":")"},"range":[67,68]}]',
+						line: 277,
+						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[7,14]},"property":{"type":"Identifier","name":"key","range":[15,18]},"computed":false,"range":[7,18]},"right":{"type":"MemberExpression","object":{"type":"Identifier","name":"superDesc","range":[23,32]},"property":{"type":"Identifier","name":"key","range":[33,36]},"computed":false,"range":[23,36]},"range":[7,36]}],"range":[0,37]}',
+						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"subDesc","range":[7,14]},{"type":{"label":"."},"range":[14,15]},{"type":{"label":"name"},"value":"key","range":[15,18]},{"type":{"label":"==/!="},"value":"===","range":[19,22]},{"type":{"label":"name"},"value":"superDesc","range":[23,32]},{"type":{"label":"."},"range":[32,33]},{"type":{"label":"name"},"value":"key","range":[33,36]},{"type":{"label":")"},"range":[36,37]}]',
 						visitorKeys: _powerAssertVisitorKeys
 					}));
 					// We're assuming that the only kind of non-trivial merging
@@ -4278,17 +4384,17 @@ return /******/ (function(modules) { // webpackBootstrap
 							throw new TypeError('Expected _superDesc$oneOf to be iterable, got ' + _inspect(_superDesc$oneOf));
 						}
 	
-						var _iteratorNormalCompletion14 = true;
-						var _didIteratorError14 = false;
-						var _iteratorError14 = undefined;
+						var _iteratorNormalCompletion16 = true;
+						var _didIteratorError16 = false;
+						var _iteratorError16 = undefined;
 	
 						try {
-							for (var _iterator14 = _superDesc$oneOf[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+							for (var _iterator16 = _superDesc$oneOf[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
 								var _context2;
 	
 								var _superDesc$oneOf;
 	
-								var disjunct = _step14.value;
+								var disjunct = _step16.value;
 	
 								if (_typeof(subDesc.value) === disjunct.type || (_context2 = subDesc.value, _isInteger2.default).call(_context2) && disjunct.type === 'integer' || (0, _isEqual2.default)(subDesc.value, disjunct.value)) {
 									singleSuperDesc = _extends({}, superDesc, disjunct);
@@ -4297,16 +4403,16 @@ return /******/ (function(modules) { // webpackBootstrap
 								}
 							}
 						} catch (err) {
-							_didIteratorError14 = true;
-							_iteratorError14 = err;
+							_didIteratorError16 = true;
+							_iteratorError16 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion14 && _iterator14.return) {
-									_iterator14.return();
+								if (!_iteratorNormalCompletion16 && _iterator16.return) {
+									_iterator16.return();
 								}
 							} finally {
-								if (_didIteratorError14) {
-									throw _iteratorError14;
+								if (_didIteratorError16) {
+									throw _iteratorError16;
 								}
 							}
 						}
@@ -4316,39 +4422,43 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec6._expr(_rec6._capt(singleSuperDesc, 'arguments/0'), {
 						content: 'assert(singleSuperDesc)',
 						filepath: 'src/Module.js',
-						line: 251,
+						line: 297,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"Identifier","name":"singleSuperDesc","range":[7,22]}],"range":[0,23]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"singleSuperDesc","range":[7,22]},{"type":{"label":")"},"range":[22,23]}]',
 						visitorKeys: _powerAssertVisitorKeys
 					}));
 					return singleSuperDesc;
 				});
-				this._mergeSuperclassField(cls, 'relationships', function (superDesc, subDesc) {
+	
+				this._mergeSuperclassField(cls, cls, 'relationships', function (superDesc, subDesc) {
 					var _rec7 = new _powerAssertRecorder();
 	
 					(0, _powerAssert2.default)(_rec7._expr(_rec7._capt(_rec7._capt(_rec7._capt(superDesc, 'arguments/0/callee/object/object').class, 'arguments/0/callee/object').hasSubclass(_rec7._capt(_rec7._capt(subDesc, 'arguments/0/arguments/0/object').class, 'arguments/0/arguments/0')), 'arguments/0'), {
 						content: 'assert(superDesc.class.hasSubclass(subDesc.class))',
 						filepath: 'src/Module.js',
-						line: 255,
+						line: 302,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"superDesc","range":[7,16]},"property":{"type":"Identifier","name":"class","range":[17,22]},"computed":false,"range":[7,22]},"property":{"type":"Identifier","name":"hasSubclass","range":[23,34]},"computed":false,"range":[7,34]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[35,42]},"property":{"type":"Identifier","name":"class","range":[43,48]},"computed":false,"range":[35,48]}],"range":[7,49]}],"range":[0,50]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"superDesc","range":[7,16]},{"type":{"label":"."},"range":[16,17]},{"type":{"label":"class"},"value":"class","range":[17,22]},{"type":{"label":"."},"range":[22,23]},{"type":{"label":"name"},"value":"hasSubclass","range":[23,34]},{"type":{"label":"("},"range":[34,35]},{"type":{"label":"name"},"value":"subDesc","range":[35,42]},{"type":{"label":"."},"range":[42,43]},{"type":{"label":"class"},"value":"class","range":[43,48]},{"type":{"label":")"},"range":[48,49]},{"type":{"label":")"},"range":[49,50]}]',
 						visitorKeys: _powerAssertVisitorKeys
 					}));
 					return _extends({}, superDesc);
 				});
-				this._mergeSuperclassField(cls, 'relationshipShortcuts', function (superDesc, subDesc) {
+	
+				this._mergeSuperclassField(cls, cls, 'relationshipShortcuts', function (superDesc, subDesc) {
 					var _rec8 = new _powerAssertRecorder();
 	
 					(0, _powerAssert2.default)(_rec8._expr(_rec8._capt(_rec8._capt(_rec8._capt(superDesc, 'arguments/0/callee/object/object').class, 'arguments/0/callee/object').hasSubclass(_rec8._capt(_rec8._capt(subDesc, 'arguments/0/arguments/0/object').class, 'arguments/0/arguments/0')), 'arguments/0'), {
 						content: 'assert(superDesc.class.hasSubclass(subDesc.class))',
 						filepath: 'src/Module.js',
-						line: 259,
+						line: 307,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"superDesc","range":[7,16]},"property":{"type":"Identifier","name":"class","range":[17,22]},"computed":false,"range":[7,22]},"property":{"type":"Identifier","name":"hasSubclass","range":[23,34]},"computed":false,"range":[7,34]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"subDesc","range":[35,42]},"property":{"type":"Identifier","name":"class","range":[43,48]},"computed":false,"range":[35,48]}],"range":[7,49]}],"range":[0,50]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"superDesc","range":[7,16]},{"type":{"label":"."},"range":[16,17]},{"type":{"label":"class"},"value":"class","range":[17,22]},{"type":{"label":"."},"range":[22,23]},{"type":{"label":"name"},"value":"hasSubclass","range":[23,34]},{"type":{"label":"("},"range":[34,35]},{"type":{"label":"name"},"value":"subDesc","range":[35,42]},{"type":{"label":"."},"range":[42,43]},{"type":{"label":"class"},"value":"class","range":[43,48]},{"type":{"label":")"},"range":[48,49]},{"type":{"label":")"},"range":[49,50]}]',
 						visitorKeys: _powerAssertVisitorKeys
 					}));
 					return _extends({}, superDesc);
 				});
+	
+				// TODO: for sides of a relationship (after splitting / merging all relevant domains)
 			}
 		}, {
 			key: 'mergeSameNameResources',
