@@ -67,8 +67,6 @@ describe("integrated workflow", () => {
 		expect(blood).to.have.a.property('href').which.is.null;
 		expect(blood).to.have.a.property('class', 'MaterialType');
 		expect(blood).to.have.a.property('name', "blood");
-		expect(blood).to.have.a.property('measurables');
-		expect(blood).to.have.a.property('measurableProviders');
 		
 		await blood.commit();
 
