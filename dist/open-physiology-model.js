@@ -6646,7 +6646,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		extends: _typed.Typed,
 	
-		extendedBy: [Lyph, _lyphs.Border, _lyphs.Node, _processes.Process]
+		extendedBy: [_lyphs.Lyph, _lyphs.Border, _lyphs.Node, _processes.Process]
 	
 	}); /////////////////////////////////////////////////////////////////////////////
 	

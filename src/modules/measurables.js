@@ -1,11 +1,11 @@
 import {qualitySchema} from '../util/schemas';
 import TypedModule     from '../TypedModule';
 
-import resources, {Resource, IsRelatedTo}  from './resources';
-import typed,     {Typed}                  from './typed';
-import lyphs,     {Material, Border, Node} from './lyphs';
-import processes, {Process}                from './processes';
-import {dimensionalitySchema} from "../util/schemas";
+import resources, {Resource, IsRelatedTo}        from './resources';
+import typed,     {Typed}                        from './typed';
+import lyphs,     {Lyph, Material, Border, Node} from './lyphs';
+import processes, {Process}                      from './processes';
+import {dimensionalitySchema}                    from "../util/schemas";
 
 
 const M = new TypedModule('measurables', [resources, typed, lyphs, processes]);
