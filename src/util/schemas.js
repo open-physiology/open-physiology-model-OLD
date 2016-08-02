@@ -94,3 +94,10 @@ export const distributionSchemaOr = (otherSchema) => ({
 		otherSchema
 	]
 });
+
+export const dimensionalitySchema = {
+	type: 'object',
+	patternProperties: {
+		'[a-zA-Z0-9 ]+': { type: 'integer' }
+	}
+};

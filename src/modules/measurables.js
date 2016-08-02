@@ -5,6 +5,7 @@ import resources, {Resource, IsRelatedTo}  from './resources';
 import typed,     {Typed}                  from './typed';
 import lyphs,     {Material, Border, Node} from './lyphs';
 import processes, {Process}                from './processes';
+import {dimensionalitySchema} from "../util/schemas";
 
 
 const M = new TypedModule('measurables', [resources, typed, lyphs, processes]);
@@ -37,14 +38,18 @@ export const MeasuresMaterial = M.RELATIONSHIP({
 	extends: IsRelatedTo,
 	
 	singular: "measures material",
-
+	
 	1: [Measurable.Type, '0..*', { anchors: true, covariant: true, key: 'materials' }],
 	2: [Material.Type,   '0..*',                                                     ],
+	
+	properties: {
+		'dimensionality': { ...dimensionalitySchema }
+	},
 
 });
 
 
-export const MeasurableLocation = M.TYPED_RESOURCE({
+export const MeasurableLocation = M.TYPED_RESOURCE({////////////////////////////
 	
 	name: 'MeasurableLocation',
 	
@@ -52,9 +57,10 @@ export const MeasurableLocation = M.TYPED_RESOURCE({
 	
 	extends: Typed,
 	
-	extendedBy: [Material, Border, Node, Process]
+	extendedBy: [Lyph, Border, Node, Process]
 	
-});
+});/////////////////////////////////////////////////////////////////////////////
+
 
 export const HasMeasurable = M.RELATIONSHIP({
 
