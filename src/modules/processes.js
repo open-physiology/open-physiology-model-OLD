@@ -2,12 +2,13 @@ import TypedModule                   from '../TypedModule';
 import {arrayContainsValue}          from '../util/misc';
 import {enumArraySchema, enumSchema} from '../util/schemas';
 
-import resources, {IsRelatedTo}          from './resources';
-import typed,     {Typed}                from './typed';
-import lyphs,     {Material, Lyph, Node} from './lyphs';
+import resources, {IsRelatedTo} from './resources';
+import typed,     {Typed}       from './typed';
+import materials, {Material}    from './materials';
+import lyphs,     {Lyph, Node}  from './lyphs';
 
 
-const M = new TypedModule('processes', [resources, typed, lyphs]);
+const M = new TypedModule('processes', [resources, typed, materials, lyphs]);
 export default M;
 
 

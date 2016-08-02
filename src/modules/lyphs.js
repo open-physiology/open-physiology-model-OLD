@@ -13,61 +13,18 @@ import {
 
 import resources, {Resource, IsRelatedTo} from './resources';
 import typed,     {Typed}                 from './typed';
+import materials, {Material}              from './materials';
 
 
-const M = new TypedModule('lyphs', [resources, typed]);
+const M = new TypedModule('lyphs', [resources, typed, materials]);
 export default M;
-
-
-export const Material = M.TYPED_RESOURCE({//////////////////////////////////////
-
-	name: 'Material',
-	
-	extends: Typed,
-
-	singular: "material"
-
-});/////////////////////////////////////////////////////////////////////////////
-export const MaterialType     = Material.Type;
-export const MaterialTemplate = Material.Template;
-
-
-export const ContainsMaterial = M.RELATIONSHIP({
-
-	name: 'ContainsMaterial',
-
-	extends: IsRelatedTo,
-
-	singular: "contains material",
-
-	1: [Material.Type, '0..*', { anchors: true, key: 'materials' }],
-	2: [Material.Type, '0..*'                                     ],
-
-	noCycles: true,
-
-});
-
-export const InheritsAllMaterialsFrom = M.RELATIONSHIP({
-
-	name: 'InheritsAllMaterialsFrom',
-
-	singular: "inherits all materials from",
-
-	extends: IsRelatedTo,
-
-	1: [Material.Type, '0..*', { anchors: true, key: 'materialProviders' }],
-	2: [Material.Type, '0..*'                                             ],
-
-	noCycles: true,
-
-});
 
 
 export const Lyph = M.TYPED_RESOURCE({//////////////////////////////////////////
 
 	name: 'Lyph',
 
-	extends: Material,
+	extends: Typed,
 
 	singular: "lyph",
 
@@ -90,6 +47,36 @@ export const Lyph = M.TYPED_RESOURCE({//////////////////////////////////////////
 export const LyphType     = Lyph.Type;
 export const LyphTemplate = Lyph.Template;
 
+
+export const ContainsMaterial = M.RELATIONSHIP({
+	
+	name: 'ContainsMaterial',
+	
+	extends: IsRelatedTo,
+	
+	singular: "contains material",
+	
+	1: [Lyph.Type,     '0..*', { anchors: true, key: 'materials' }],
+	2: [Material.Type, '0..*'                                     ],
+	
+	noCycles: true,
+	
+});
+
+export const InheritsAllMaterialsFrom = M.RELATIONSHIP({
+	
+	name: 'InheritsAllMaterialsFrom',
+	
+	singular: "inherits all materials from",
+	
+	extends: IsRelatedTo,
+	
+	1: [Lyph.Type,     '0..*', { anchors: true, key: 'materialProviders' }],
+	2: [Material.Type, '0..*'                                             ],
+	
+	noCycles: true,
+	
+});
 
 export const HasPart = M.RELATIONSHIP({
 

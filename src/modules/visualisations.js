@@ -1,14 +1,15 @@
 import TypedModule                                          from '../TypedModule';
 import {identifierRegex, rationalNumberSchema, angleSchema} from '../util/schemas';
 
-import resources,   {Resource, IsRelatedTo}                                      from './resources';
-import lyphs,       {Material, Lyph, CylindricalLyph, Border, Coalescence, Node} from './lyphs';
-import typed,       {Typed}                                                      from './typed';
-import processes,   {Process}                                                    from './processes';
-import measurables, {Measurable, Causality}                                      from './measurables';
+import resources,   {Resource, IsRelatedTo}                            from './resources';
+import materials,   {Material}                                         from './materials';
+import lyphs,       {Lyph, CylindricalLyph, Border, Coalescence, Node} from './lyphs';
+import typed,       {Typed}                                            from './typed';
+import processes,   {Process}                                          from './processes';
+import measurables, {Measurable, Causality}                            from './measurables';
 
 
-const M = new TypedModule('visualisations', [resources, lyphs, typed, processes, measurables]);
+const M = new TypedModule('visualisations', [resources, materials, lyphs, typed, processes, measurables]);
 export default M;
 
 

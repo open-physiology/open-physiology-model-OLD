@@ -1,17 +1,18 @@
 import {qualitySchema} from '../util/schemas';
 import TypedModule     from '../TypedModule';
 
-import resources, {Resource, IsRelatedTo}  from './resources';
-import typed,     {Typed}                  from './typed';
-import lyphs,     {Material, Border, Node} from './lyphs';
-import processes, {Process}                from './processes';
+import resources, {IsRelatedTo}  from './resources';
+import typed,     {Typed}        from './typed';
+import materials, {Material}     from './materials';
+import lyphs,     {Border, Node} from './lyphs';
+import processes, {Process}      from './processes';
 
 
-const M = new TypedModule('measurables', [resources, typed, lyphs, processes]);
+const M = new TypedModule('measurables', [resources, typed, materials, lyphs, processes]);
 export default M;
 
 
-export const Measurable = M.TYPED_RESOURCE({/////////////////////////////////////////////////////////////////
+export const Measurable = M.TYPED_RESOURCE({////////////////////////////////////
 
 	name: 'Measurable',
 	
@@ -25,7 +26,7 @@ export const Measurable = M.TYPED_RESOURCE({////////////////////////////////////
 		}
 	}
 
-});//////////////////////////////////////////////////////////////////////////
+});/////////////////////////////////////////////////////////////////////////////
 export const MeasurableType     = Measurable.Type;
 export const MeasurableTemplate = Measurable.Template;
 
@@ -85,7 +86,7 @@ export const InheritsAllMeasurablesFrom = M.RELATIONSHIP({
 });
 
 
-export const Causality = M.TYPED_RESOURCE({/////////////////////////////////////////////////////////////////
+export const Causality = M.TYPED_RESOURCE({/////////////////////////////////////
 
 	name: 'Causality',
 	
@@ -94,7 +95,7 @@ export const Causality = M.TYPED_RESOURCE({/////////////////////////////////////
 	singular: "causality",
 	plural:   "causalities",
 
-});//////////////////////////////////////////////////////////////////////////
+});/////////////////////////////////////////////////////////////////////////////
 export const CausalityType     = Causality.Type;
 export const CausalityTemplate = Causality.Template;
 
