@@ -598,30 +598,6 @@ export class RelShortcut1Field extends Field {
 			deferObservable(() => owner[$$fields][desc.key].p('value'))
 				::waitUntilConstructed();
 		
-		
-		
-		// if (owner.constructor.name === 'BorderTemplate') {
-		// 	console.log(
-		// 		owner[$$fields][desc.key][$$value],
-		// 		this[$$value],
-		// 		initialValue
-		// 	);
-		// }
-		
-		
-		// TODO: make this more general, with subscriptions
-		if (!owner[$$fields][desc.key][$$value] && this[$$value]) {
-			
-			owner[$$fields][desc.key].set(desc.relationshipClass.new({
-				[desc.side]:       owner,
-				[desc.other.side]: this[$$value]
-			}));
-		}
-		
-		
-		
-		
-		
 		/* keep this value up to date with new sides of new relationships */
 		correspondingRelValue
 			::filter(rel => rel)
