@@ -6,8 +6,10 @@ const { default: module, ...exportedClasses } = exports;
 describe("'lyphs' Module", () => {
 	
 	const {
+		MaterialType,
 		LyphType,
 		CylindricalLyphType,
+		MaterialTemplate,
 		LyphTemplate,
 		CylindricalLyphTemplate
     } = exportedClasses;
@@ -15,6 +17,7 @@ describe("'lyphs' Module", () => {
 	it("exports the expected classes", () => {
 
 		expect(exportedClasses).to.contain.typedResources(
+			'Material',
 			'Lyph',
 			'CylindricalLyph',
 			'Border',
@@ -47,15 +50,19 @@ describe("'lyphs' Module", () => {
 
 	it("exports classes that can be instantiated", async () => {
 		
-		let lyphType                = LyphType.new();
-		let lyphTemplate            = LyphTemplate.new({ type: lyphType });
-		let cylindricalLyphType     = CylindricalLyphType.new();
-		let cylindricalLyphTemplate = CylindricalLyphTemplate.new({ type: cylindricalLyphType });
+		let materialType            = await MaterialType.new();
+		let materialTemplate        = await MaterialTemplate.new({ type: materialType });
+		let lyphType                = await LyphType.new();
+		let lyphTemplate            = await LyphTemplate.new({ type: lyphType });
+		let cylindricalLyphType     = await CylindricalLyphType.new();
+		let cylindricalLyphTemplate = await CylindricalLyphTemplate.new({ type: cylindricalLyphType });
 		
-		expect(lyphType               ).to.be.an.instanceof(                         LyphType    );
-		expect(lyphTemplate           ).to.be.an.instanceof(                         LyphTemplate);
-		expect(cylindricalLyphType    ).to.be.an.instanceof(CylindricalLyphType    , LyphType    );
-		expect(cylindricalLyphTemplate).to.be.an.instanceof(CylindricalLyphTemplate, LyphTemplate);
+		expect(materialType           ).to.be.an.instanceof(                                       MaterialType    );
+		expect(materialTemplate       ).to.be.an.instanceof(                                       MaterialTemplate);
+		expect(lyphType               ).to.be.an.instanceof(                         LyphType    , MaterialType    );
+		expect(lyphTemplate           ).to.be.an.instanceof(                         LyphTemplate, MaterialTemplate);
+		expect(cylindricalLyphType    ).to.be.an.instanceof(CylindricalLyphType    , LyphType    , MaterialType    );
+		expect(cylindricalLyphTemplate).to.be.an.instanceof(CylindricalLyphTemplate, LyphTemplate, MaterialTemplate);
 
 	});
 	
