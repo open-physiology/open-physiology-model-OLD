@@ -3313,6 +3313,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			oneOf: [boundedNormalDistributionSchema, uniformDistributionSchema, otherSchema]
 		};
 	};
+	
+	var dimensionalitySchema = exports.dimensionalitySchema = {
+		type: 'object',
+		patternProperties: {
+			'[a-zA-Z0-9 ]+': { type: 'integer' }
+		}
+	};
 
 /***/ },
 /* 59 */
@@ -6623,11 +6630,15 @@ return /******/ (function(modules) { // webpackBootstrap
 		singular: "measures material",
 	
 		1: [Measurable.Type, '0..*', { anchors: true, covariant: true, key: 'materials' }],
-		2: [_lyphs.Material.Type, '0..*']
+		2: [_lyphs.Material.Type, '0..*'],
+	
+		properties: {
+			'dimensionality': _extends({}, _schemas.dimensionalitySchema)
+		}
 	
 	});
 	
-	var MeasurableLocation = exports.MeasurableLocation = M.TYPED_RESOURCE({
+	var MeasurableLocation = exports.MeasurableLocation = M.TYPED_RESOURCE({ ////////////////////////////
 	
 		name: 'MeasurableLocation',
 	
@@ -6635,9 +6646,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		extends: _typed.Typed,
 	
-		extendedBy: [_lyphs.Material, _lyphs.Border, _lyphs.Node, _processes.Process]
+		extendedBy: [Lyph, _lyphs.Border, _lyphs.Node, _processes.Process]
 	
-	});
+	}); /////////////////////////////////////////////////////////////////////////////
+	
 	
 	var HasMeasurable = exports.HasMeasurable = M.RELATIONSHIP({
 	
@@ -11046,22 +11058,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				return owner[$$fields][desc.key].p('value');
 			}), waitUntilConstructed).call(_context8);
 	
-			// if (owner.constructor.name === 'BorderTemplate') {
-			// 	console.log(
-			// 		owner[$$fields][desc.key][$$value],
-			// 		this[$$value],
-			// 		initialValue
-			// 	);
-			// }
-	
-	
-			// TODO: make this more general, with subscriptions
-			if (!owner[$$fields][desc.key][$$value] && _this7[$$value]) {
-				var _desc$relationshipCla3;
-	
-				owner[$$fields][desc.key].set(desc.relationshipClass.new((_desc$relationshipCla3 = {}, _defineProperty(_desc$relationshipCla3, desc.side, owner), _defineProperty(_desc$relationshipCla3, desc.other.side, _this7[$$value]), _desc$relationshipCla3)));
-			}
-	
 			/* keep this value up to date with new sides of new relationships */
 			(_context8 = _filter.filter.call(correspondingRelValue, function (rel) {
 				return rel;
@@ -11072,11 +11068,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			/* keep the relationship up to date */
 			(0, _merge.merge)(_this7.p('value'), correspondingRelValue).subscribe(function (scValue, relValue) {
 				if (!relValue && scValue) {
-					var _desc$relationshipCla4;
+					var _desc$relationshipCla3;
 	
 					// console.log(''+owner, key, desc.key, ''+scValue);
 					// console.log(desc.relationshipClass.name);
-					owner[$$fields][desc.key].set(desc.relationshipClass.new((_desc$relationshipCla4 = {}, _defineProperty(_desc$relationshipCla4, desc.side, owner), _defineProperty(_desc$relationshipCla4, desc.other.side, scValue), _desc$relationshipCla4)));
+					owner[$$fields][desc.key].set(desc.relationshipClass.new((_desc$relationshipCla3 = {}, _defineProperty(_desc$relationshipCla3, desc.side, owner), _defineProperty(_desc$relationshipCla3, desc.other.side, scValue), _desc$relationshipCla3)));
 				} else if (relValue && !scValue) {
 					rel[$$fields][desc.other.side].set(null);
 				} else if (relValue && scValue && scValue !== rel[$$fields][desc.other.side][$$value]) {
@@ -11110,7 +11106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec13._expr(_rec13._capt(_rec13._capt(!_rec13._capt(notGiven, 'arguments/0/left/argument'), 'arguments/0/left') || _rec13._capt(_rec13._capt(_rec13._capt(_rec13._capt(this[_rec13._capt($$desc, 'arguments/0/right/left/object/object/property')], 'arguments/0/right/left/object/object').cardinality, 'arguments/0/right/left/object').min, 'arguments/0/right/left') === 0, 'arguments/0/right'), 'arguments/0'), {
 						content: 'assert(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`\n\t\t\t\tNo value \'${ val }\' given for required field ${ this[$$owner].constructor.name }#${ this[$$key] }.\n\t\t\t`)',
 						filepath: 'src/Field.js',
-						line: 666,
+						line: 642,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"UnaryExpression","operator":"!","argument":{"type":"Identifier","name":"notGiven","range":[8,16]},"prefix":true,"range":[7,16]},"right":{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[20,24]},"property":{"type":"Identifier","name":"$$desc","range":[25,31]},"computed":true,"range":[20,32]},"property":{"type":"Identifier","name":"cardinality","range":[33,44]},"computed":false,"range":[20,44]},"property":{"type":"Identifier","name":"min","range":[45,48]},"computed":false,"range":[20,48]},"right":{"type":"NumericLiteral","value":0,"range":[53,54]},"range":[20,54]},"range":[7,54]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[56,64]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tNo value \'","cooked":"\\n\\t\\t\\t\\tNo value \'"},"tail":false,"range":[65,14]},{"type":"TemplateElement","value":{"raw":"\' given for required field ","cooked":"\' given for required field "},"tail":false,"range":[22,49]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[84,85]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t","cooked":".\\n\\t\\t\\t"},"tail":true,"range":[101,3]}],"expressions":[{"type":"Identifier","name":"val","range":[17,20]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[52,56]},"property":{"type":"Identifier","name":"$$owner","range":[57,64]},"computed":true,"range":[52,65]},"property":{"type":"Identifier","name":"constructor","range":[66,77]},"computed":false,"range":[52,77]},"property":{"type":"Identifier","name":"name","range":[78,82]},"computed":false,"range":[52,82]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[88,92]},"property":{"type":"Identifier","name":"$$key","range":[93,98]},"computed":true,"range":[88,99]}],"range":[64,4]},"range":[56,4]}],"range":[0,5]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"name"},"value":"notGiven","range":[8,16]},{"type":{"label":"||"},"value":"||","range":[17,19]},{"type":{"label":"this"},"value":"this","range":[20,24]},{"type":{"label":"["},"range":[24,25]},{"type":{"label":"name"},"value":"$$desc","range":[25,31]},{"type":{"label":"]"},"range":[31,32]},{"type":{"label":"."},"range":[32,33]},{"type":{"label":"name"},"value":"cardinality","range":[33,44]},{"type":{"label":"."},"range":[44,45]},{"type":{"label":"name"},"value":"min","range":[45,48]},{"type":{"label":"==/!="},"value":"===","range":[49,52]},{"type":{"label":"num"},"value":0,"range":[53,54]},{"type":{"label":","},"range":[54,55]},{"type":{"label":"name"},"value":"humanMsg","range":[56,64]},{"type":{"label":"`"},"range":[64,65]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tNo value \'","range":[65,14]},{"type":{"label":"${"},"range":[14,16]},{"type":{"label":"name"},"value":"val","range":[17,20]},{"type":{"label":"}"},"range":[21,22]},{"type":{"label":"template"},"value":"\' given for required field ","range":[22,49]},{"type":{"label":"${"},"range":[49,51]},{"type":{"label":"this"},"value":"this","range":[52,56]},{"type":{"label":"["},"range":[56,57]},{"type":{"label":"name"},"value":"$$owner","range":[57,64]},{"type":{"label":"]"},"range":[64,65]},{"type":{"label":"."},"range":[65,66]},{"type":{"label":"name"},"value":"constructor","range":[66,77]},{"type":{"label":"."},"range":[77,78]},{"type":{"label":"name"},"value":"name","range":[78,82]},{"type":{"label":"}"},"range":[83,84]},{"type":{"label":"template"},"value":"#","range":[84,85]},{"type":{"label":"${"},"range":[85,87]},{"type":{"label":"this"},"value":"this","range":[88,92]},{"type":{"label":"["},"range":[92,93]},{"type":{"label":"name"},"value":"$$key","range":[93,98]},{"type":{"label":"]"},"range":[98,99]},{"type":{"label":"}"},"range":[100,101]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[101,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
 						visitorKeys: _powerAssertVisitorKeys
@@ -11155,7 +11151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec14._expr(_rec14._capt(_rec14._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/Field.js',
-					line: 696,
+					line: 672,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[7,10]},"property":{"type":"Identifier","name":"isResource","range":[11,21]},"computed":false,"range":[7,21]}],"range":[0,22]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"cls","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"isResource","range":[11,21]},{"type":{"label":")"},"range":[21,22]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -11270,7 +11266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						(0, _powerAssert2.default)(_rec15._expr(_rec15._capt(_rec15._capt(_rec15._capt(_rel, 'arguments/0/left/object')[_rec15._capt(_rec15._capt(desc, 'arguments/0/left/property/object').side, 'arguments/0/left/property')], 'arguments/0/left') === _this8, 'arguments/0'), {
 							content: 'assert(rel[desc.side] === this)',
 							filepath: 'src/Field.js',
-							line: 764,
+							line: 740,
 							ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"Identifier","name":"rel","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"desc","range":[11,15]},"property":{"type":"Identifier","name":"side","range":[16,20]},"computed":false,"range":[11,20]},"computed":true,"range":[7,21]},"right":{"type":"ThisExpression","range":[26,30]},"range":[7,30]}],"range":[0,31]}',
 							tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"rel","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"desc","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"side","range":[16,20]},{"type":{"label":"]"},"range":[20,21]},{"type":{"label":"==/!="},"value":"===","range":[22,25]},{"type":{"label":"this"},"value":"this","range":[26,30]},{"type":{"label":")"},"range":[30,31]}]',
 							visitorKeys: _powerAssertVisitorKeys
@@ -11310,7 +11306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec16._expr(_rec16._capt(!_rec16._capt(_rec16._capt(this[_rec16._capt($$desc, 'arguments/0/argument/object/property')], 'arguments/0/argument/object').readonly, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this[$$desc].readonly)',
 					filepath: 'src/Field.js',
-					line: 778,
+					line: 754,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$desc","range":[13,19]},"computed":true,"range":[8,20]},"property":{"type":"Identifier","name":"readonly","range":[21,29]},"computed":false,"range":[8,29]},"prefix":true,"range":[7,29]}],"range":[0,30]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$desc","range":[13,19]},{"type":{"label":"]"},"range":[19,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"readonly","range":[21,29]},{"type":{"label":")"},"range":[29,30]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -11328,7 +11324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec17._expr(_rec17._capt(_rec17._capt(val, 'arguments/0/object')[_rec17._capt(_rec17._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
 					content: 'assert(val[Symbol.iterator], humanMsg`\n\t\t\tThe value ${ val } given for ${ this[$$owner].constructor.name }#${ this[$$key] }\n\t\t\tis not an iterable collection (like array or set).\n\t\t`)',
 					filepath: 'src/Field.js',
-					line: 784,
+					line: 760,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"Symbol","range":[11,17]},"property":{"type":"Identifier","name":"iterator","range":[18,26]},"computed":false,"range":[11,26]},"computed":true,"range":[7,27]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[29,37]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe value ","cooked":"\\n\\t\\t\\tThe value "},"tail":false,"range":[38,13]},{"type":"TemplateElement","value":{"raw":" given for ","cooked":" given for "},"tail":false,"range":[21,32]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[67,68]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","cooked":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t"},"tail":true,"range":[84,2]}],"expressions":[{"type":"Identifier","name":"val","range":[16,19]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[35,39]},"property":{"type":"Identifier","name":"$$owner","range":[40,47]},"computed":true,"range":[35,48]},"property":{"type":"Identifier","name":"constructor","range":[49,60]},"computed":false,"range":[35,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[35,65]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[71,75]},"property":{"type":"Identifier","name":"$$key","range":[76,81]},"computed":true,"range":[71,82]}],"range":[37,3]},"range":[29,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"Symbol","range":[11,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"iterator","range":[18,26]},{"type":{"label":"]"},"range":[26,27]},{"type":{"label":","},"range":[27,28]},{"type":{"label":"name"},"value":"humanMsg","range":[29,37]},{"type":{"label":"`"},"range":[37,38]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe value ","range":[38,13]},{"type":{"label":"${"},"range":[13,15]},{"type":{"label":"name"},"value":"val","range":[16,19]},{"type":{"label":"}"},"range":[20,21]},{"type":{"label":"template"},"value":" given for ","range":[21,32]},{"type":{"label":"${"},"range":[32,34]},{"type":{"label":"this"},"value":"this","range":[35,39]},{"type":{"label":"["},"range":[39,40]},{"type":{"label":"name"},"value":"$$owner","range":[40,47]},{"type":{"label":"]"},"range":[47,48]},{"type":{"label":"."},"range":[48,49]},{"type":{"label":"name"},"value":"constructor","range":[49,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"#","range":[67,68]},{"type":{"label":"${"},"range":[68,70]},{"type":{"label":"this"},"value":"this","range":[71,75]},{"type":{"label":"["},"range":[75,76]},{"type":{"label":"name"},"value":"$$key","range":[76,81]},{"type":{"label":"]"},"range":[81,82]},{"type":{"label":"}"},"range":[83,84]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","range":[84,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -11344,7 +11340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec18._expr(_rec18._capt((_context11 = _size2.default.call(val), _inRange2.default).call(_context11, _rec18._capt(min, 'arguments/0/arguments/0'), _rec18._capt(_rec18._capt(max, 'arguments/0/arguments/1/left') + 1, 'arguments/0/arguments/1')), 'arguments/0'), {
 						content: 'assert(val::size()::inRange(min, max + 1))',
 						filepath: 'src/Field.js',
-						line: 790,
+						line: 766,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"callee":{"type":"Identifier","name":"size","range":[12,16]},"range":[7,16]},"arguments":[],"range":[7,18]},"callee":{"type":"Identifier","name":"inRange","range":[20,27]},"range":[7,27]},"arguments":[{"type":"Identifier","name":"min","range":[28,31]},{"type":"BinaryExpression","operator":"+","left":{"type":"Identifier","name":"max","range":[33,36]},"right":{"type":"NumericLiteral","value":1,"range":[39,40]},"range":[33,40]}],"range":[7,41]}],"range":[0,42]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"::"},"value":"::","range":[10,12]},{"type":{"label":"name"},"value":"size","range":[12,16]},{"type":{"label":"("},"range":[16,17]},{"type":{"label":")"},"range":[17,18]},{"type":{"label":"::"},"value":"::","range":[18,20]},{"type":{"label":"name"},"value":"inRange","range":[20,27]},{"type":{"label":"("},"range":[27,28]},{"type":{"label":"name"},"value":"min","range":[28,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"max","range":[33,36]},{"type":{"label":"+/-"},"value":"+","range":[37,38]},{"type":{"label":"num"},"value":1,"range":[39,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":")"},"range":[41,42]}]',
 						visitorKeys: _powerAssertVisitorKeys
@@ -11422,7 +11418,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec19._expr(_rec19._capt(_rec19._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/Field.js',
-					line: 829,
+					line: 805,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[7,10]},"property":{"type":"Identifier","name":"isResource","range":[11,21]},"computed":false,"range":[7,21]}],"range":[0,22]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"cls","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"isResource","range":[11,21]},{"type":{"label":")"},"range":[21,22]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -11524,9 +11520,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					return rel[$$fields][desc.side][$$value] === owner && rel[$$fields][desc.other.side][$$value] === newRes;
 				});
 				if (!rel) {
-					var _desc$relationshipCla5;
+					var _desc$relationshipCla4;
 	
-					correspondingRelField.add(desc.relationshipClass.new((_desc$relationshipCla5 = {}, _defineProperty(_desc$relationshipCla5, desc.side, owner), _defineProperty(_desc$relationshipCla5, desc.other.side, newRes), _desc$relationshipCla5)));
+					correspondingRelField.add(desc.relationshipClass.new((_desc$relationshipCla4 = {}, _defineProperty(_desc$relationshipCla4, desc.side, owner), _defineProperty(_desc$relationshipCla4, desc.other.side, newRes), _desc$relationshipCla4)));
 				}
 			});
 	
@@ -11582,7 +11578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec20._expr(_rec20._capt(!_rec20._capt(_rec20._capt(this[_rec20._capt($$desc, 'arguments/0/argument/object/property')], 'arguments/0/argument/object').readonly, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this[$$desc].readonly)',
 					filepath: 'src/Field.js',
-					line: 924,
+					line: 900,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$desc","range":[13,19]},"computed":true,"range":[8,20]},"property":{"type":"Identifier","name":"readonly","range":[21,29]},"computed":false,"range":[8,29]},"prefix":true,"range":[7,29]}],"range":[0,30]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$desc","range":[13,19]},{"type":{"label":"]"},"range":[19,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"readonly","range":[21,29]},{"type":{"label":")"},"range":[29,30]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -11600,7 +11596,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec21._expr(_rec21._capt(_rec21._capt(val, 'arguments/0/object')[_rec21._capt(_rec21._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
 					content: 'assert(val[Symbol.iterator], humanMsg`\n\t\t\tThe value ${ val } given for ${ this[$$owner].constructor.name }#${ this[$$key] }\n\t\t\tis not an iterable collection (like array or set).\n\t\t`)',
 					filepath: 'src/Field.js',
-					line: 930,
+					line: 906,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"Symbol","range":[11,17]},"property":{"type":"Identifier","name":"iterator","range":[18,26]},"computed":false,"range":[11,26]},"computed":true,"range":[7,27]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[29,37]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe value ","cooked":"\\n\\t\\t\\tThe value "},"tail":false,"range":[38,13]},{"type":"TemplateElement","value":{"raw":" given for ","cooked":" given for "},"tail":false,"range":[21,32]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[67,68]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","cooked":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t"},"tail":true,"range":[84,2]}],"expressions":[{"type":"Identifier","name":"val","range":[16,19]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[35,39]},"property":{"type":"Identifier","name":"$$owner","range":[40,47]},"computed":true,"range":[35,48]},"property":{"type":"Identifier","name":"constructor","range":[49,60]},"computed":false,"range":[35,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[35,65]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[71,75]},"property":{"type":"Identifier","name":"$$key","range":[76,81]},"computed":true,"range":[71,82]}],"range":[37,3]},"range":[29,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"Symbol","range":[11,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"iterator","range":[18,26]},{"type":{"label":"]"},"range":[26,27]},{"type":{"label":","},"range":[27,28]},{"type":{"label":"name"},"value":"humanMsg","range":[29,37]},{"type":{"label":"`"},"range":[37,38]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe value ","range":[38,13]},{"type":{"label":"${"},"range":[13,15]},{"type":{"label":"name"},"value":"val","range":[16,19]},{"type":{"label":"}"},"range":[20,21]},{"type":{"label":"template"},"value":" given for ","range":[21,32]},{"type":{"label":"${"},"range":[32,34]},{"type":{"label":"this"},"value":"this","range":[35,39]},{"type":{"label":"["},"range":[39,40]},{"type":{"label":"name"},"value":"$$owner","range":[40,47]},{"type":{"label":"]"},"range":[47,48]},{"type":{"label":"."},"range":[48,49]},{"type":{"label":"name"},"value":"constructor","range":[49,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"#","range":[67,68]},{"type":{"label":"${"},"range":[68,70]},{"type":{"label":"this"},"value":"this","range":[71,75]},{"type":{"label":"["},"range":[75,76]},{"type":{"label":"name"},"value":"$$key","range":[76,81]},{"type":{"label":"]"},"range":[81,82]},{"type":{"label":"}"},"range":[83,84]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","range":[84,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -11616,7 +11612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _powerAssert2.default)(_rec22._expr(_rec22._capt((_context15 = _size2.default.call(val), _inRange2.default).call(_context15, _rec22._capt(min, 'arguments/0/arguments/0'), _rec22._capt(_rec22._capt(max, 'arguments/0/arguments/1/left') + 1, 'arguments/0/arguments/1')), 'arguments/0'), {
 						content: 'assert(val::size()::inRange(min, max + 1))',
 						filepath: 'src/Field.js',
-						line: 936,
+						line: 912,
 						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"callee":{"type":"Identifier","name":"size","range":[12,16]},"range":[7,16]},"arguments":[],"range":[7,18]},"callee":{"type":"Identifier","name":"inRange","range":[20,27]},"range":[7,27]},"arguments":[{"type":"Identifier","name":"min","range":[28,31]},{"type":"BinaryExpression","operator":"+","left":{"type":"Identifier","name":"max","range":[33,36]},"right":{"type":"NumericLiteral","value":1,"range":[39,40]},"range":[33,40]}],"range":[7,41]}],"range":[0,42]}',
 						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"::"},"value":"::","range":[10,12]},{"type":{"label":"name"},"value":"size","range":[12,16]},{"type":{"label":"("},"range":[16,17]},{"type":{"label":")"},"range":[17,18]},{"type":{"label":"::"},"value":"::","range":[18,20]},{"type":{"label":"name"},"value":"inRange","range":[20,27]},{"type":{"label":"("},"range":[27,28]},{"type":{"label":"name"},"value":"min","range":[28,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"max","range":[33,36]},{"type":{"label":"+/-"},"value":"+","range":[37,38]},{"type":{"label":"num"},"value":1,"range":[39,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":")"},"range":[41,42]}]',
 						visitorKeys: _powerAssertVisitorKeys
