@@ -30,7 +30,7 @@ export const HasAsRoot = M.RELATIONSHIP({
 	
 	singular: "has as root",
 
-	1: [OmegaTree.Type, '1..*', { anchors: true, covariant: true, key: 'root' }],
+	1: [OmegaTree.Type, '0..*', { anchors: true, covariant: true, key: 'root' }],
 	2: [Node.Template,  '0..*',                                                ],
 
 	// TODO: CONSTRAINT: all root nodes must be on a plus-border or minus-border

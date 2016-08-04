@@ -19,10 +19,16 @@ describe("integrated workflow", () => {
 		let gathered_MaterialType = new Set;
 		let gathered_Type         = new Set;
 		let gathered_Resource     = new Set;
+		let committed_MaterialType = new Set;
+		let committed_Type         = new Set;
+		let committed_Resource     = new Set;
 		
 		MaterialType.p('all').subscribe((all) => { gathered_MaterialType = all });
 		Type        .p('all').subscribe((all) => { gathered_Type         = all });
 		Resource    .p('all').subscribe((all) => { gathered_Resource     = all });
+		MaterialType.p('allCommitted').subscribe((all) => { committed_MaterialType = all });
+		Type        .p('allCommitted').subscribe((all) => { committed_Type         = all });
+		Resource    .p('allCommitted').subscribe((all) => { committed_Resource     = all });
 		
 		expect([...gathered_MaterialType]).to.eql([]);
 		expect([...gathered_Type        ]).to.eql([]);
@@ -31,20 +37,38 @@ describe("integrated workflow", () => {
 		let blood = MaterialType.new({
 			name: "blood"
 		});
-		await blood.commit();
 		
+		
+		expect([...committed_MaterialType]).to.eql([]);
+		expect([...committed_Type        ]).to.eql([]);
+		expect([...committed_Resource    ]).to.eql([]);
 		expect([...gathered_MaterialType]).to.eql([blood]);
 		expect([...gathered_Type        ]).to.eql([blood]);
 		expect([...gathered_Resource    ]).to.eql([blood]);
 		
+		await blood.commit();
+		
+		expect([...committed_MaterialType]).to.eql([blood]);
+		expect([...committed_Type        ]).to.eql([blood]);
+		expect([...committed_Resource    ]).to.eql([blood]);
+		
 		let water = MaterialType.new({
 			name: "water"
 		});
-		await water.commit();
+		
+		expect([...committed_MaterialType]).to.eql([blood]);
+		expect([...committed_Type        ]).to.eql([blood]);
+		expect([...committed_Resource    ]).to.eql([blood]);
 		
 		expect([...gathered_MaterialType]).to.eql([blood, water]);
 		expect([...gathered_Type        ]).to.eql([blood, water]);
 		expect([...gathered_Resource    ]).to.eql([blood, water]);
+		
+		await water.commit();
+		
+		expect([...committed_MaterialType]).to.eql([blood, water]);
+		expect([...committed_Type        ]).to.eql([blood, water]);
+		expect([...committed_Resource    ]).to.eql([blood, water]);
 		
 		expect([...MaterialType.getAll()]).to.eql([blood, water]);
 		expect([...Type        .getAll()]).to.eql([blood, water]);

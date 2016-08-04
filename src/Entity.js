@@ -14,10 +14,12 @@ import 'rxjs/add/operator/do';
 
 const $$cache            = Symbol('$$cache'           );
 const $$cacheSet         = Symbol('$$cacheSet'        );
+const $$allEntities      = Symbol('$$allEntities'     );
 const $$singletonObject  = Symbol('$$singletonObject' );
 const $$newEntitySubject = Symbol('$$newEntitySubject');
 const $$deleted          = Symbol('$$deleted'         );
 const $$allSubject       = Symbol('$$allSubject'      );
+const $$allCommittedSubject = Symbol('$$allCommittedSubject');
 
 ////////////////////////////////////////////////////////////////
 
@@ -69,6 +71,9 @@ export default class Entity extends ValueTracker {
 						case 'all': {
 							return this[$$allSubject]; // TODO
 						}
+						case 'allCommitted': {
+							return this[$$allCommittedSubject]; // TODO
+						}
 						default: assert(false, humanMsg`
 							The ${name} property does not exist on ${this.name}.
 						`);
@@ -80,13 +85,27 @@ export default class Entity extends ValueTracker {
 		/* maintaining <Class>.p('all') */
 		{
 			let allEntitiesOfNewClass = new ObservableSet();
+			Entity[$$allEntities].e('add')
+				::filter(::EntitySubclass.hasInstance)
+				.subscribe(allEntitiesOfNewClass.e('add'));
+			Entity[$$allEntities].e('delete')
+				::filter(::EntitySubclass.hasInstance)
+				.subscribe(allEntitiesOfNewClass.e('delete'));
+			Object.defineProperty(EntitySubclass, $$allSubject, {
+				value: allEntitiesOfNewClass.p('value')
+			});
+		}
+		
+		/* maintaining <Class>.p('all') */
+		{
+			let allEntitiesOfNewClass = new ObservableSet();
 			Entity[$$cacheSet].e('add')
 				::filter(::EntitySubclass.hasInstance)
 				.subscribe(allEntitiesOfNewClass.e('add'));
 			Entity[$$cacheSet].e('delete')
 				::filter(::EntitySubclass.hasInstance)
 				.subscribe(allEntitiesOfNewClass.e('delete'));
-			Object.defineProperty(EntitySubclass, $$allSubject, {
+			Object.defineProperty(EntitySubclass, $$allCommittedSubject, {
 				value: allEntitiesOfNewClass.p('value')
 			});
 		}
@@ -160,7 +179,7 @@ export default class Entity extends ValueTracker {
 	}
 	
 	static getAll() {
-		return new Set([...this[$$cacheSet]].filter(::this.hasInstance));
+		return new Set([...this[$$allEntities]].filter(::this.hasInstance));
 	}
 	
 	static getSingleton() {
@@ -220,6 +239,9 @@ export default class Entity extends ValueTracker {
 		
 		Field.initializeEntity(this, initialValues);
 		
+		Entity[$$allEntities].add(this);
+		
+		
 		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 	}
 	
@@ -275,7 +297,8 @@ export default class Entity extends ValueTracker {
 }
 
 Entity::assign({
-	[$$cache]     : {},
-	[$$cacheSet]  : new ObservableSet(),
-	[$$allSubject]: new BehaviorSubject(new Set())
+	[$$cache]      : {},
+	[$$cacheSet]   : new ObservableSet(),
+	[$$allEntities]: new ObservableSet(),
+	[$$allSubject] : new BehaviorSubject(new Set())
 });

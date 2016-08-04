@@ -23146,10 +23146,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var $$cache = Symbol('$$cache');
 	var $$cacheSet = Symbol('$$cacheSet');
+	var $$allEntities = Symbol('$$allEntities');
 	var $$singletonObject = Symbol('$$singletonObject');
 	var $$newEntitySubject = Symbol('$$newEntitySubject');
 	var $$deleted = Symbol('$$deleted');
 	var $$allSubject = Symbol('$$allSubject');
+	var $$allCommittedSubject = Symbol('$$allCommittedSubject');
 	
 	////////////////////////////////////////////////////////////////
 	
@@ -23267,6 +23269,10 @@ return /******/ (function(modules) { // webpackBootstrap
 								{
 									return this[$$allSubject]; // TODO
 								}
+							case 'allCommitted':
+								{
+									return this[$$allCommittedSubject]; // TODO
+								}
 							default:
 								(0, _powerAssert2.default)(false, (0, _misc.humanMsg)(_templateObject, name, this.name));
 						}
@@ -23278,10 +23284,22 @@ return /******/ (function(modules) { // webpackBootstrap
 					var _context;
 	
 					var allEntitiesOfNewClass = new _ObservableSet2.default();
-					(_context = Entity[$$cacheSet].e('add'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(allEntitiesOfNewClass.e('add'));
-					(_context = Entity[$$cacheSet].e('delete'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(allEntitiesOfNewClass.e('delete'));
+					(_context = Entity[$$allEntities].e('add'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(allEntitiesOfNewClass.e('add'));
+					(_context = Entity[$$allEntities].e('delete'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(allEntitiesOfNewClass.e('delete'));
 					Object.defineProperty(EntitySubclass, $$allSubject, {
 						value: allEntitiesOfNewClass.p('value')
+					});
+				}
+	
+				/* maintaining <Class>.p('all') */
+				{
+					var _context2;
+	
+					var _allEntitiesOfNewClass = new _ObservableSet2.default();
+					(_context2 = Entity[$$cacheSet].e('add'), _filter.filter).call(_context2, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(_allEntitiesOfNewClass.e('add'));
+					(_context2 = Entity[$$cacheSet].e('delete'), _filter.filter).call(_context2, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(_allEntitiesOfNewClass.e('delete'));
+					Object.defineProperty(EntitySubclass, $$allCommittedSubject, {
+						value: _allEntitiesOfNewClass.p('value')
 					});
 				}
 	
@@ -23312,7 +23330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'get',
 			value: function get(href) {
-				var _context2;
+				var _context3;
 	
 				var _rec2 = new _powerAssertRecorder();
 	
@@ -23326,7 +23344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					throw new TypeError('Value of argument "options" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(options));
 				}
 	
-				if ((_context2 = href, _isObject2.default).call(_context2)) {
+				if ((_context3 = href, _isObject2.default).call(_context3)) {
 					href = { href: href };
 				}
 				var entity = void 0;
@@ -23340,7 +23358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(this.hasInstance(_rec2._capt(entity, 'arguments/0/arguments/0')), 'arguments/0'), {
 					content: 'assert(this.hasInstance(entity), humanMsg`\n\t\t\tThe entity at \'${ JSON.stringify(href) }\' is not\n\t\t\tof class \'${ this.name }\'\n\t\t\tbut of class \'${ entity.constructor.name }\'.\n\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 154,
+					line: 173,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"hasInstance","range":[12,23]},"computed":false,"range":[7,23]},"arguments":[{"type":"Identifier","name":"entity","range":[24,30]}],"range":[7,31]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[33,41]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe entity at \'","cooked":"\\n\\t\\t\\tThe entity at \'"},"tail":false,"range":[42,18]},{"type":"TemplateElement","value":{"raw":"\' is not\\n\\t\\t\\tof class \'","cooked":"\' is not\\n\\t\\t\\tof class \'"},"tail":false,"range":[43,13]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\tbut of class \'","cooked":"\'\\n\\t\\t\\tbut of class \'"},"tail":false,"range":[27,17]},{"type":"TemplateElement","value":{"raw":"\'.\\n\\t\\t","cooked":"\'.\\n\\t\\t"},"tail":true,"range":[45,2]}],"expressions":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[21,25]},"property":{"type":"Identifier","name":"stringify","range":[26,35]},"computed":false,"range":[21,35]},"arguments":[{"type":"Identifier","name":"href","range":[36,40]}],"range":[21,41]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[16,20]},"property":{"type":"Identifier","name":"name","range":[21,25]},"computed":false,"range":[16,25]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"entity","range":[20,26]},"property":{"type":"Identifier","name":"constructor","range":[27,38]},"computed":false,"range":[20,38]},"property":{"type":"Identifier","name":"name","range":[39,43]},"computed":false,"range":[20,43]}],"range":[41,3]},"range":[33,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"hasInstance","range":[12,23]},{"type":{"label":"("},"range":[23,24]},{"type":{"label":"name"},"value":"entity","range":[24,30]},{"type":{"label":")"},"range":[30,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"humanMsg","range":[33,41]},{"type":{"label":"`"},"range":[41,42]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe entity at \'","range":[42,18]},{"type":{"label":"${"},"range":[18,20]},{"type":{"label":"name"},"value":"JSON","range":[21,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"stringify","range":[26,35]},{"type":{"label":"("},"range":[35,36]},{"type":{"label":"name"},"value":"href","range":[36,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":"\' is not\\n\\t\\t\\tof class \'","range":[43,13]},{"type":{"label":"${"},"range":[13,15]},{"type":{"label":"this"},"value":"this","range":[16,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"name","range":[21,25]},{"type":{"label":"}"},"range":[26,27]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\tbut of class \'","range":[27,17]},{"type":{"label":"${"},"range":[17,19]},{"type":{"label":"name"},"value":"entity","range":[20,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"\'.\\n\\t\\t","range":[45,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -23350,7 +23368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'getAll',
 			value: function getAll() {
-				return new Set([].concat(_toConsumableArray(this[$$cacheSet])).filter(this.hasInstance.bind(this)));
+				return new Set([].concat(_toConsumableArray(this[$$allEntities])).filter(this.hasInstance.bind(this)));
 			}
 		}, {
 			key: 'getSingleton',
@@ -23360,7 +23378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(this.singleton, 'arguments/0'), {
 					content: 'assert(this.singleton, humanMsg`\n\t\t\tThe \'${ this.name }\' class is not a singleton class.\n\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 167,
+					line: 186,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"singleton","range":[12,21]},"computed":false,"range":[7,21]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[23,31]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\tThe \'"},"tail":false,"range":[32,8]},{"type":"TemplateElement","value":{"raw":"\' class is not a singleton class.\\n\\t\\t","cooked":"\' class is not a singleton class.\\n\\t\\t"},"tail":true,"range":[22,2]}],"expressions":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[11,15]},"property":{"type":"Identifier","name":"name","range":[16,20]},"computed":false,"range":[11,20]}],"range":[31,3]},"range":[23,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"singleton","range":[12,21]},{"type":{"label":","},"range":[21,22]},{"type":{"label":"name"},"value":"humanMsg","range":[23,31]},{"type":{"label":"`"},"range":[31,32]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe \'","range":[32,8]},{"type":{"label":"${"},"range":[8,10]},{"type":{"label":"this"},"value":"this","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"name","range":[16,20]},{"type":{"label":"}"},"range":[21,22]},{"type":{"label":"template"},"value":"\' class is not a singleton class.\\n\\t\\t","range":[22,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -23377,12 +23395,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function () {
 				var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee(href) {
 					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-					return regeneratorRuntime.wrap(function _callee$(_context3) {
+					return regeneratorRuntime.wrap(function _callee$(_context4) {
 						while (1) {
-							switch (_context3.prev = _context3.next) {
+							switch (_context4.prev = _context4.next) {
 								case 0:
 									if (href != null && typeof href.href === 'string' || typeof href === 'string' || typeof href === 'number') {
-										_context3.next = 2;
+										_context4.next = 2;
 										break;
 									}
 	
@@ -23390,7 +23408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 								case 2:
 									if (_instanceof(options, Object)) {
-										_context3.next = 4;
+										_context4.next = 4;
 										break;
 									}
 	
@@ -23398,7 +23416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 								case 4:
 								case 'end':
-									return _context3.stop();
+									return _context4.stop();
 							}
 						}
 					}, _callee, this);
@@ -23439,6 +23457,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			});
 	
 			_Field.Field.initializeEntity(_this, initialValues);
+	
+			Entity[$$allEntities].add(_this);
 	
 			// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 			return _this;
@@ -23485,11 +23505,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function () {
 				var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
 					var newId, opts;
-					return regeneratorRuntime.wrap(function _callee2$(_context4) {
+					return regeneratorRuntime.wrap(function _callee2$(_context5) {
 						while (1) {
-							switch (_context4.prev = _context4.next) {
+							switch (_context5.prev = _context5.next) {
 								case 0:
-									_context4.next = 2;
+									_context5.next = 2;
 									return this.field_commit();
 	
 								case 2:
@@ -23510,7 +23530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 								case 4:
 								case 'end':
-									return _context4.stop();
+									return _context5.stop();
 							}
 						}
 					}, _callee2, this);
@@ -23561,7 +23581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(!_rec._capt(_rec._capt(this.context, 'arguments/0/argument/object').abstract, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this.context.abstract, humanMsg`\n\t\t\t\tCannot instantiate the abstract\n\t\t\t\tclass ${ this.context.name }.\n\t\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 111,
+					line: 130,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"context","range":[13,20]},"computed":false,"range":[8,20]},"property":{"type":"Identifier","name":"abstract","range":[21,29]},"computed":false,"range":[8,29]},"prefix":true,"range":[7,29]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[31,39]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","cooked":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass "},"tail":false,"range":[40,10]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t","cooked":".\\n\\t\\t\\t"},"tail":true,"range":[32,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[13,17]},"property":{"type":"Identifier","name":"context","range":[18,25]},"computed":false,"range":[13,25]},"property":{"type":"Identifier","name":"name","range":[26,30]},"computed":false,"range":[13,30]}],"range":[39,4]},"range":[31,4]}],"range":[0,5]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"."},"range":[12,13]},{"type":{"label":"name"},"value":"context","range":[13,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"abstract","range":[21,29]},{"type":{"label":","},"range":[29,30]},{"type":{"label":"name"},"value":"humanMsg","range":[31,39]},{"type":{"label":"`"},"range":[39,40]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","range":[40,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"this"},"value":"this","range":[13,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"context","range":[18,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"name","range":[26,30]},{"type":{"label":"}"},"range":[31,32]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[32,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -23572,12 +23592,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'commit',
 			value: function () {
 				var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-					return regeneratorRuntime.wrap(function _callee3$(_context5) {
+					return regeneratorRuntime.wrap(function _callee3$(_context6) {
 						while (1) {
-							switch (_context5.prev = _context5.next) {
+							switch (_context6.prev = _context6.next) {
 								case 0:
 								case 'end':
-									return _context5.stop();
+									return _context6.stop();
 							}
 						}
 					}, _callee3, this);
@@ -23616,7 +23636,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Entity;
 	
 	
-	_misc.assign.call(Entity, (_assign$call = {}, _defineProperty(_assign$call, $$cache, {}), _defineProperty(_assign$call, $$cacheSet, new _ObservableSet2.default()), _defineProperty(_assign$call, $$allSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _assign$call));
+	_misc.assign.call(Entity, (_assign$call = {}, _defineProperty(_assign$call, $$cache, {}), _defineProperty(_assign$call, $$cacheSet, new _ObservableSet2.default()), _defineProperty(_assign$call, $$allEntities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$allSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _assign$call));
 	
 	function _inspect(input, depth) {
 		var maxDepth = 4;
@@ -24635,7 +24655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		singular: "has as root",
 	
-		1: [OmegaTree.Type, '1..*', { anchors: true, covariant: true, key: 'root' }],
+		1: [OmegaTree.Type, '0..*', { anchors: true, covariant: true, key: 'root' }],
 		2: [_lyphs.Node.Template, '0..*']
 	
 	});
@@ -24768,7 +24788,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.PresentsModel = exports.CausalityArrow = exports.MeasurableGlyph = exports.ProcessEdge = exports.NodeGlyph = exports.CoalescenceRectangle = exports.BorderLine = exports.CylindricalLyphRectangle = exports.LyphRectangle = exports.MaterialGlyph = exports.LyphCanvas = exports.ContainsArtefact = exports.Dim0Container = exports.Dim1Container = exports.Dim2Container = exports.Dim0Artefact = exports.Dim1Artefact = exports.Dim2Artefact = exports.Artefact = exports.PrescribesStyleFor = exports.Theme = undefined;
+	exports.PresentsModel = exports.CausalityArrow = exports.MeasurableGlyph = exports.ProcessEdge = exports.NodeGlyph = exports.CoalescenceRectangle = exports.BorderLine = exports.CylindricalLyphRectangle = exports.LyphArtefact = exports.LyphRectangle = exports.MaterialGlyph = exports.LyphCanvas = exports.ContainsArtefact = exports.Dim0Container = exports.Dim1Container = exports.Dim2Container = exports.Dim0Artefact = exports.Dim1Artefact = exports.Dim2Artefact = exports.Artefact = exports.PrescribesStyleFor = exports.Theme = undefined;
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -25004,6 +25024,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	}); /////////////////////////////////////////////////////////////////////////////
 	
 	
+	var LyphArtefact = exports.LyphArtefact = M.RESOURCE({ ////////////////////////////////////////
+	
+		name: 'LyphArtefact',
+	
+		extends: Dim2Container,
+		extendedBy: [LyphCanvas, LyphRectangle],
+	
+		singular: "lyph artefact"
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	
+	
 	var CylindricalLyphRectangle = exports.CylindricalLyphRectangle = M.RESOURCE({ ////////////////////////////
 	
 		name: 'CylindricalLyphRectangle',
@@ -25081,7 +25113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}); /////////////////////////////////////////////////////////////////////////////
 	
 	
-	var _M$RELATIONSHIP3 = M.RELATIONSHIP([[Artefact, _typed.Typed.Type], [LyphCanvas, _lyphs.Lyph.Type], [MaterialGlyph, _lyphs.Material.Type], [LyphRectangle, _lyphs.Lyph.Type], [CylindricalLyphRectangle, _lyphs.CylindricalLyph.Type], [BorderLine, _lyphs.Border.Type], [NodeGlyph, _lyphs.Node.Type], [ProcessEdge, _processes.Process.Type], [MeasurableGlyph, _measurables.Measurable.Type], [CausalityArrow, _measurables.Causality.Type], [CoalescenceRectangle, _lyphs.Coalescence]].map(function (_ref) {
+	var _M$RELATIONSHIP3 = M.RELATIONSHIP([[Artefact, _typed.Typed.Type], [MaterialGlyph, _lyphs.Material.Type], [LyphArtefact, _lyphs.Lyph.Type], [CylindricalLyphRectangle, _lyphs.CylindricalLyph.Type], [BorderLine, _lyphs.Border.Type], [NodeGlyph, _lyphs.Node.Type], [ProcessEdge, _processes.Process.Type], [MeasurableGlyph, _measurables.Measurable.Type], [CausalityArrow, _measurables.Causality.Type], [CoalescenceRectangle, _lyphs.Coalescence]].map(function (_ref) {
 		var _ref2 = _slicedToArray(_ref, 2);
 	
 		var ArtefactClass = _ref2[0];
