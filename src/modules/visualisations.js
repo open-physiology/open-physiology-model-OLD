@@ -211,6 +211,17 @@ export const LyphRectangle = M.RESOURCE({///////////////////////////////////////
 });/////////////////////////////////////////////////////////////////////////////
 
 
+export const LyphArtefact = M.RESOURCE({////////////////////////////////////////
+	
+	name: 'LyphArtefact',
+	
+	extends: Dim2Container,
+	extendedBy: [LyphCanvas, LyphRectangle],
+	
+	singular: "lyph artefact"
+	
+});/////////////////////////////////////////////////////////////////////////////
+
 
 export const CylindricalLyphRectangle = M.RESOURCE({////////////////////////////
 
@@ -292,9 +303,8 @@ export const CausalityArrow = M.RESOURCE({//////////////////////////////////////
 
 export const [PresentsModel] = M.RELATIONSHIP([
 	[Artefact,                 Typed          .Type],
-	[LyphCanvas,               Lyph           .Type],
 	[MaterialGlyph,            Material       .Type],
-	[LyphRectangle,            Lyph           .Type],
+	[LyphArtefact,             Lyph           .Type],
 	[CylindricalLyphRectangle, CylindricalLyph.Type],
 	[BorderLine,               Border         .Type],
 	[NodeGlyph,                Node           .Type],

@@ -60,6 +60,8 @@ export const MeasurableLocation = M.TYPED_RESOURCE({////////////////////////////
 	extendedBy: [Lyph, Border, Node, Process]
 	
 });/////////////////////////////////////////////////////////////////////////////
+export const MeasurableLocationType     = MeasurableLocation.Type;
+export const MeasurableLocationTemplate = MeasurableLocation.Template;
 
 
 export const HasMeasurable = M.RELATIONSHIP({

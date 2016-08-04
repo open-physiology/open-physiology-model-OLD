@@ -2,6 +2,7 @@ import includes      from 'lodash-bound/includes';
 import isArray       from 'lodash-bound/isArray';
 import isString      from 'lodash-bound/isString';
 import set           from 'lodash-bound/set';
+import entries       from 'lodash-bound/entries';
 import ldIsEqual     from 'lodash/isEqual';
 import assert        from 'power-assert';
 
@@ -33,10 +34,10 @@ export default class ValueTracker {
 		this[$$properties] = {};
 
 		/* add the events and properties added with ES7 annotations */
-		for (let [key, options] of Object.entries(this.constructor[$$events] || {})) {
+		for (let [key, options] of (this.constructor[$$events] || {})::entries()) {
 			this.newEvent(key, options);
 		}
-		for (let [key, options] of Object.entries(this.constructor[$$properties] || {})) {
+		for (let [key, options] of (this.constructor[$$properties] || {})::entries()) {
 			this.newProperty(key, options);
 		}
 	}

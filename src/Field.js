@@ -6,7 +6,6 @@ import {takeUntil}                from 'rxjs/operator/takeUntil';
 import {switchMap}                from 'rxjs/operator/switchMap';
 import {take}                     from 'rxjs/operator/take';
 import {startWith}                from 'rxjs/operator/startWith';
-import {mergeMap}                 from 'rxjs/operator/mergeMap';
 import {defer as deferObservable} from 'rxjs/observable/defer';
 import {merge}                    from 'rxjs/observable/merge';
 import {concat}                   from 'rxjs/observable/concat';
@@ -18,13 +17,16 @@ import pick        from 'lodash-bound/pick';
 import isString    from 'lodash-bound/isString';
 import isArray     from 'lodash-bound/isArray';
 import isFunction  from 'lodash-bound/isFunction';
-import isUndefined from 'lodash/isUndefined';
+import isUndefined from 'lodash-bound/isUndefined';
+import objKeys     from 'lodash-bound/keys';
+import objValues   from 'lodash-bound/values';
+import objEntries  from 'lodash-bound/entries';
 
 import assert from 'power-assert';
 
 import ValueTracker,  {event, property}           from "./util/ValueTracker";
 import ObservableSet, {setEquals, copySetContent} from './util/ObservableSet';
-import {humanMsg} from "./util/misc";
+import {humanMsg, assign} from "./util/misc";
 
 const $$owner    = Symbol('$$owner');
 const $$key      = Symbol('$$key');
@@ -76,27 +78,27 @@ export class Field extends ValueTracker {
 			field_set:      { value(key, value, options) { return this[$$fields][key].set(value, options) } },
 			field_commit:   { async value(keys) {
 				if (keys::isString()) { return await this[$$fields][keys].commit() }
-				if (isUndefined(keys)) { keys = Object.keys(this[$$fields]) }
+				if (keys::isUndefined()) { keys = this[$$fields]::objKeys() }
 				assert(isArray.call(keys));
 				return await Promise.all(keys.map(::this.field_commit));
 				// TODO: commit all fields in a single transaction?
 			}},
 			field_rollback: { value(keys) {
 				if (keys::isString()) { return this[$$fields][keys].rollback() }
-				if (isUndefined(keys)) { keys = Object.keys(this[$$fields]) }
+				if (keys::isUndefined()) { keys = this[$$fields]::objKeys() }
 				assert(isArray.call(keys));
 				keys.forEach(::this.field_rollback);
 				// TODO: rollback all fields in a single transaction?
 			}},
 			field_getJSON: { value() {
 				let result = {};
-				for (let [key, field] of Object.entries(this[$$fields])) {
+				for (let [key, field] of this[$$fields]::objEntries()) {
 					result[key] = field.getJSON();
 				}
 				return result;
 			}},
 			field_setJSON: { value(data = {}) {
-				for (let [key, value] of Object.entries(data)) {
+				for (let [key, value] of data::objEntries()) {
 					this[$$fields][key].setJSON(value);
 				}
 			}},
@@ -148,10 +150,10 @@ export class Field extends ValueTracker {
 				FieldClass
 			};
 		}
-		for (let entry of Object.values(entries)) {
+		for (let entry of entries::objValues()) {
 			entry.related = entries::pick(entry.relatedKeys);
 		}
-		for (let entry of Object.values(entries)) {
+		for (let entry of entries::objValues()) {
 			let {FieldClass} = entry;
 			delete entry.FieldClass;
 			delete entry.relatedKeys;
@@ -218,7 +220,7 @@ export class Field extends ValueTracker {
 		
 		for (let [guard, value] of alternatives) {
 			if (guard::isFunction() ? guard() : guard) {
-				if (isUndefined(value)) { return }
+				if (value::isUndefined()) { return }
 				let val = value::isFunction() ? value() : value;
 				if (this.constructor.isEqual(this[$$value], val)) { return }
 				this.validate(val, ['initialize', 'set']);
@@ -287,7 +289,7 @@ export class PropertyField extends Field {
 	}
 	
 	static entriesIn(cls) {
-		return Object.entries(cls.properties)
+		return cls.properties::objEntries()
 		             .map(([key, desc])=>({
 			             key,
 			             desc,
@@ -305,7 +307,7 @@ export class PropertyField extends Field {
 		const { owner, key, desc, initialValue } = options;
 		
 		/* sanity checks */
-		assert(isUndefined(desc.value) || isUndefined(initialValue), humanMsg`
+		assert(desc.value::isUndefined() || initialValue::isUndefined(), humanMsg`
 			You tried to manually assign a value ${JSON.stringify(initialValue)}
 			to ${owner.constructor.name}#${key},
 			but it already has a fixed value of ${JSON.stringify(desc.value)}.
@@ -313,7 +315,7 @@ export class PropertyField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[!isUndefined(initialValue), initialValue],
+			[!initialValue::isUndefined(), initialValue],
 			['default' in desc,          desc.default],
 			['value'   in desc,          desc.value  ],
 			[!desc.required]
@@ -323,7 +325,7 @@ export class PropertyField extends Field {
 	validate(val, stages = []) {
 		
 		if (stages.includes('commit')) {
-			assert(!this[$$desc].required || !isUndefined(val), humanMsg`
+			assert(!this[$$desc].required || !val::isUndefined(), humanMsg`
 			    No value given for required field '${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
 		}
@@ -368,10 +370,10 @@ export class SideField extends Field {
 	static entriesIn(cls) {
 		if (!cls.isRelationship) { return [] }
 		return [
-			{ key: 1, cls, desc: cls.domains[0][1], relatedKeys: [2] },
-			{ key: 2, cls, desc: cls.domains[0][2], relatedKeys: [1] }
+			{ key: 1, cls, desc: cls.domainPairs[0][1], relatedKeys: [2] },
+			{ key: 2, cls, desc: cls.domainPairs[0][2], relatedKeys: [1] }
 		];
-		// TODO: unify multiple overlapping domains when needed
+		// TODO: unify multiple overlapping domainPairs when needed
 	}
 	
 	
@@ -385,9 +387,9 @@ export class SideField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[!isUndefined(initialValue), initialValue                   ],
-			[desc.class.singleton,       ::desc.other.class.getSingleton],
-			[desc.options.auto,          ::desc.other.class.new         ]
+			[!initialValue::isUndefined(), initialValue                       ],
+			[desc.resourceClass.singleton, ::desc.codomain.resourceClass.getSingleton],
+			[desc.options.auto,            ::desc.codomain.resourceClass.new         ]
 		);
 		
 		/* if one side becomes null, then so does the other, */
@@ -395,7 +397,7 @@ export class SideField extends Field {
 		this.p('value')
 			::waitUntilConstructed()
 			::filter(v=>v===null)
-			.subscribe(owner[$$fields][desc.other.side]);
+			.subscribe(owner[$$fields][desc.codomain.keyInRelationship]);
 		
 		/* when a side changes, let the relevant resources know */
 		this.p('value')
@@ -404,11 +406,11 @@ export class SideField extends Field {
 			::pairwise()
 			.subscribe(([prev, curr]) => {
 				if (desc.cardinality.max === 1) {
-					if (prev) { prev[$$fields][desc.key][$$value] = null          }
-					if (curr) { curr[$$fields][desc.key][$$value] = this[$$owner] }
+					if (prev) { prev[$$fields][desc.keyInResource][$$value] = null          }
+					if (curr) { curr[$$fields][desc.keyInResource][$$value] = this[$$owner] }
 				} else {
-					if (prev) { prev[$$fields][desc.key][$$value].delete(this[$$owner]) }
-					if (curr) { curr[$$fields][desc.key][$$value].add   (this[$$owner]) }
+					if (prev) { prev[$$fields][desc.keyInResource][$$value].delete(this[$$owner]) }
+					if (curr) { curr[$$fields][desc.keyInResource][$$value].add   (this[$$owner]) }
 				}
 			});
 		
@@ -417,13 +419,13 @@ export class SideField extends Field {
 	
 	validate(val, stages = []) {
 		if (stages.includes('commit')) {
-			assert(!isUndefined(val), humanMsg`
+			assert(!val::isUndefined(), humanMsg`
 			    No resource specified for side ${this[$$key]} of
 				this '${this[$$owner].constructor.name}'.
 			`);
 		}
 		/* the value must be of the proper domain */
-		if (!(isUndefined(val) || this[$$desc].class.hasInstance(val))) {
+		if (!(val::isUndefined() || this[$$desc].resourceClass.hasInstance(val))) {
 			throw new Error(humanMsg`
 				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
@@ -457,12 +459,12 @@ export class Rel1Field extends Field {
 	
 	static entriesIn(cls) {
 		if (!cls.isResource) { return [] }
-		return Object.entries(cls.relationships)
+		return cls.relationships::objEntries()
 		             .filter(([,desc]) => desc.cardinality.max === 1)
 		             .map(([key, desc]) => ({
 		                 key,
 		                 desc,
-		                 relatedKeys: desc.options.key ? [desc.options.key] : []
+		                 relatedKeys: desc.shortcutKey ? [desc.shortcutKey] : []
 		             }));
 	}
 	
@@ -476,23 +478,23 @@ export class Rel1Field extends Field {
 		const { owner, key, desc, initialValue, waitUntilConstructed, related } = options;
 		
 		/* you cannot give a value as an actual relation and as a shortcut at the same time */
-		let givenShortcutInitialValue = related::get([desc.options.key, 'initialValue']);
-		assert(!(initialValue || desc.other.class.singleton) || !givenShortcutInitialValue, humanMsg`
-			You cannot set the fields '${key}' and '${desc.options.key}'
+		let givenShortcutInitialValue = related::get([desc.shortcutKey, 'initialValue']);
+		assert(!initialValue || !givenShortcutInitialValue, humanMsg`
+			You cannot set the fields '${key}' and '${desc.shortcutKey}'
 			at the same time for a ${this.constructor.singular}.
 		`);
 		
 		/* set the initial value */
 		this[$$initSet](
 			[initialValue,               initialValue                       ],
-			[desc.other.class.singleton, () => desc.relationshipClass.new({ //
-				[desc.side]:       this[$$owner],                           //
-				[desc.other.side]: desc.other.class.getSingleton()          //
+			[desc.codomain.resourceClass.singleton, () => desc.relationshipClass.new({ //
+				[desc.keyInRelationship]          :       this[$$owner],                           //
+				[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.getSingleton()          //
 			})                                                              ],
 			[givenShortcutInitialValue],
 			[desc.options.auto, () => desc.relationshipClass.new({          //
-				[desc.side]:       this[$$owner],                           //
-				[desc.other.side]: desc.other.class.new()                   //
+				[desc.keyInRelationship]          :       this[$$owner],                           //
+				[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.new()                   //
 			})                                                              ],
 			[desc.cardinality.min === 0, null                               ]
 		);
@@ -503,15 +505,15 @@ export class Rel1Field extends Field {
 			::startWith(null)
 			::pairwise()
 			.subscribe(([prev, curr]) => {
-				if (prev) { prev[$$fields][desc.side].set(null) }
-				if (curr) { curr[$$fields][desc.side].set(this) }
+				if (prev) { prev[$$fields][desc.keyInRelationship].set(null) }
+				if (curr) { curr[$$fields][desc.keyInRelationship].set(this) }
 			});
 		
 		/* set the value of this field to null when the relationship replaces this resource */
 		this.p('value')
 			::waitUntilConstructed()
 			::filter(v=>v)
-			::switchMap((newRel) => newRel[$$fields][desc.side].p('value'))
+			::switchMap((newRel) => newRel[$$fields][desc.keyInRelationship].p('value'))
 			::filter((res) => res !== owner)
 			::map(()=>null)
 			.subscribe( this.p('value') );
@@ -519,7 +521,7 @@ export class Rel1Field extends Field {
 	
 	validate(val, stages = []) {
 		
-		const notGiven = val === null || isUndefined(val);
+		const notGiven = val === null || val::isUndefined();
 		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
@@ -566,12 +568,12 @@ export class RelShortcut1Field extends Field {
 	
 	static entriesIn(cls) {
 		if (!cls.isResource) { return [] }
-		return Object.entries(cls.relationshipShortcuts)
+		return cls.relationshipShortcuts::objEntries()
 		             .filter(([,rel]) => rel.cardinality.max === 1)
 		             .map(([key, desc]) => ({
 			             key,
 			             desc,
-			             relatedKeys: desc.key ? [desc.key] : []
+			             relatedKeys: desc.keyInResource ? [desc.keyInResource] : []
 		             }));
 	}
 	
@@ -595,13 +597,13 @@ export class RelShortcut1Field extends Field {
 		// forgiving. The constraint checks are done on the other constructor.
 		
 		const correspondingRelValue =
-			deferObservable(() => owner[$$fields][desc.key].p('value'))
+			deferObservable(() => owner[$$fields][desc.keyInResource].p('value'))
 				::waitUntilConstructed();
 		
 		/* keep this value up to date with new sides of new relationships */
 		correspondingRelValue
 			::filter(rel => rel)
-			::switchMap(rel => rel[$$fields][desc.other.side].p('value'))
+			::switchMap(rel => rel[$$fields][desc.codomain.keyInRelationship].p('value'))
 			.subscribe( this.p('value') );
 		
 		/* keep the relationship up to date */
@@ -610,17 +612,17 @@ export class RelShortcut1Field extends Field {
 			correspondingRelValue
 		).subscribe((scValue, relValue) => {
 			if (!relValue && scValue) {
-				// console.log(''+owner, key, desc.key, ''+scValue);
+				// console.log(''+owner, key, desc.keyInResource, ''+scValue);
 				// console.log(desc.relationshipClass.name);
-				owner[$$fields][desc.key].set(desc.relationshipClass.new({
-					[desc.side]:       owner,
-					[desc.other.side]: scValue
+				owner[$$fields][desc.keyInResource].set(desc.relationshipClass.new({
+					[desc.keyInRelationship]          :       owner,
+					[desc.codomain.keyInRelationship]: scValue
 				}));
 			} else if (relValue && !scValue) {
-				rel[$$fields][desc.other.side].set(null);
-			} else if (relValue && scValue && scValue !== rel[$$fields][desc.other.side][$$value]) {
-				// rel[$$fields][desc.key].set(scValue);
-				rel[$$fields][desc.other.side].set(scValue);
+				rel[$$fields][desc.codomain.keyInRelationship].set(null);
+			} else if (relValue && scValue && scValue !== rel[$$fields][desc.codomain.keyInRelationship][$$value]) {
+				// rel[$$fields][desc.keyInResource].set(scValue);
+				rel[$$fields][desc.codomain.keyInRelationship].set(scValue);
 			}
 		});
 		
@@ -629,13 +631,13 @@ export class RelShortcut1Field extends Field {
 		// 	.subscribe((rel) => {
 		// 		this.p('value')
 		// 			::takeUntil(correspondingRelValue::filter(r => r !== rel))
-		// 			.subscribe( rel[$$fields][desc.other.side].p('value') );
+		// 			.subscribe( rel[$$fields][desc.other.keyInRelationship].p('value') );
 		// 	});
 	}
 		
 	validate(val, stages = []) {
 		
-		const notGiven = val === null || isUndefined(val);
+		const notGiven = val === null || val::isUndefined();
 		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
@@ -645,7 +647,7 @@ export class RelShortcut1Field extends Field {
 		}
 		
 		/* the value must be of the proper domain */
-		if (!(notGiven || this[$$desc].other.class.hasInstance(val))) {
+		if (!(notGiven || this[$$desc].codomain.resourceClass.hasInstance(val))) {
 			throw new Error(humanMsg`
 				Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
@@ -683,13 +685,13 @@ export class Rel$Field extends Field {
 	
 	static entriesIn(cls) {
 		if (!cls.isResource) { return [] }
-		return Object.entries(cls.relationships)
-		             .filter(([,rel]) => rel.cardinality.max > 1)
-		             .map(([key, desc]) => ({
-				         key,
-				         desc,
-				         relatedKeys: desc.options.key ? [desc.options.key] : []
-		             }));
+		return cls.relationships::objEntries()
+			.filter(([,rel]) => rel.cardinality.max > 1)
+			.map(([key, desc]) => ({
+				key,
+				desc,
+				relatedKeys: desc.shortcutKey ? [desc.shortcutKey] : []
+			}));
 	}
 	
 	static isEqual: setEquals;
@@ -713,7 +715,7 @@ export class Rel$Field extends Field {
 		this[$$value].e('add')
 			::waitUntilConstructed()
 			.subscribe((addedRel) => {
-				addedRel[$$fields][desc.side].set(this[$$owner]);
+				addedRel[$$fields][desc.keyInRelationship].set(this[$$owner]);
 			});
 		this[$$value].e('delete')
 			::waitUntilConstructed()
@@ -722,7 +724,7 @@ export class Rel$Field extends Field {
 		/* decouple a relationship when it decouples from this resource */
 		this[$$value].e('add')
 			::waitUntilConstructed()
-			::switchMap(newRel => newRel[$$fields][desc.side].p('value')
+			::switchMap(newRel => newRel[$$fields][desc.keyInRelationship].p('value')
 				::filter(res => res !== owner)
 				::map(() => newRel)
 			).subscribe( this[$$value].e('delete') );
@@ -734,17 +736,17 @@ export class Rel$Field extends Field {
 				//     :   then go get it
 				//     : - It may also be a description of a new relationship;
 				//     :   then create it
-				if (!rel[$$fields][desc.side].get()) {
-					rel[$$fields][desc.side].set(this);
+				if (!rel[$$fields][desc.keyInRelationship].get()) {
+					rel[$$fields][desc.keyInRelationship].set(this);
 				}
-				assert(rel[desc.side] === this);
+				assert(rel[desc.keyInRelationship] === this);
 				
 				this[$$pristine].add(rel);
 				this[$$value]   .add(rel);
 			}
 		} else if (desc.cardinality.min === 0) {
 			// OK, this field is optional
-		} else if (related[desc.options.key] && related[desc.options.key].initialValue) {
+		} else if (related[desc.shortcutKey] && related[desc.shortcutKey].initialValue) {
 			// OK, a shortcut was given
 		}
 		// missing required field is checked in validation
@@ -816,12 +818,12 @@ export class RelShortcut$Field extends Field {
 	
 	static entriesIn(cls) {
 		if (!cls.isResource) { return [] }
-		return Object.entries(cls.relationshipShortcuts)
+		return cls.relationshipShortcuts::objEntries()
 		             .filter(([,rel]) => rel.cardinality.max > 1)
 		             .map(([key, desc]) => ({
 				         key,
 				         desc,
-				         relatedKeys: desc.key ? [desc.key] : []
+				         relatedKeys: desc.keyInResource ? [desc.keyInResource] : []
 		             }));
 	}
 	
@@ -845,21 +847,21 @@ export class RelShortcut$Field extends Field {
 			.subscribe(this.p('value'));
 		
 		/* syncing with relationship field */
-		const correspondingRelField = owner[$$fields][desc.key][$$value];
+		const correspondingRelField = owner[$$fields][desc.keyInResource][$$value];
 		correspondingRelField.e('add')
 			::waitUntilConstructed()
 			.subscribe((newRel) => {
-				let newRelDisconnected = newRel[$$fields][desc.side].p('value')
+				let newRelDisconnected = newRel[$$fields][desc.keyInRelationship].p('value')
 					::filter(v => v !== owner)
 					::take(1);
-				newRel[$$fields][desc.other.side].p('value')
+				newRel[$$fields][desc.codomain.keyInRelationship].p('value')
 					::takeUntil(newRelDisconnected)
 					::startWith(null)::pairwise().subscribe(([prev, curr]) => {
 						if (prev) { this[$$value].delete(prev) }
 						if (curr) { this[$$value].add   (curr) }
 					});
 				newRelDisconnected.subscribe(() => {
-					this[$$value].delete(newRel[$$fields][desc.other.side][$$value]);
+					this[$$value].delete(newRel[$$fields][desc.codomain.keyInRelationship][$$value]);
 				});
 			});
 		
@@ -868,12 +870,12 @@ export class RelShortcut$Field extends Field {
 			::waitUntilConstructed()
 			.subscribe((newRes) => {
 				let rel = [...correspondingRelField]
-					.find(rel => rel[$$fields][desc.side]      [$$value] === owner &&
-					             rel[$$fields][desc.other.side][$$value] === newRes);
+					.find(rel => rel[$$fields][desc.keyInRelationship]      [$$value] === owner &&
+					             rel[$$fields][desc.codomain.keyInRelationship][$$value] === newRes);
 				if (!rel) {
 					correspondingRelField.add(desc.relationshipClass.new({
-						[desc.side]:       owner,
-						[desc.other.side]: newRes
+						[desc.keyInRelationship]          :       owner,
+						[desc.codomain.keyInRelationship]: newRes
 					}));
 				}
 			});
@@ -890,7 +892,7 @@ export class RelShortcut$Field extends Field {
 			}
 		} else if (desc.cardinality.min === 0) {
 			// OK, this field is optional
-		} else if (related[desc.key].initialValue) {
+		} else if (related[desc.keyInResource].initialValue) {
 			// OK, a non-shortcut value was given
 		}
 		// possible missing required value is checked in validate method
@@ -916,7 +918,7 @@ export class RelShortcut$Field extends Field {
 	
 	validateElement(element) {
 		/* the value must be of the proper domain */
-		if (!this[$$desc].other.class.hasInstance(element)) {
+		if (!this[$$desc].codomain.resourceClass.hasInstance(element)) {
 			throw new Error(humanMsg`
 				Invalid value ${element} given as element for
 				${this[$$owner].constructor.name}#${this[$$key]}.

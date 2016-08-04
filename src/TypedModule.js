@@ -6,6 +6,7 @@ import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
 import isArray   from 'lodash-bound/isArray';
+import {IsRelatedTo} from "./modules/resources";
 
 /**
  * Typed Modules allow to more easily create related
@@ -86,8 +87,9 @@ export default class TypedModule extends Module {
 				
 				name: 'HasType',
 				
-				extends:    superClasses.map(sc => sc.HasType),
-				extendedBy: subClasses  .map(sc => sc.HasType),
+				extends: IsRelatedTo,
+				// extends:    superClasses.map(sc => sc.HasType), // can this work?
+				// extendedBy: subClasses  .map(sc => sc.HasType),
 				
 				singular: 'has type',
 				

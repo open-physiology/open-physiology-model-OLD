@@ -382,7 +382,21 @@ export const NodeType     = Node.Type;
 export const NodeTemplate = Node.Template;
 
 
-export const [HasNode] = M.RELATIONSHIP([Lyph, Border].map(Class => ({
+export const NodeLocation = M.TYPED_RESOURCE({//////////////////////////////////
+	
+	name: 'NodeLocation',
+	
+	extends:    Typed,
+	extendedBy: [Lyph, Border],
+	
+	singular: "node location",
+	
+});/////////////////////////////////////////////////////////////////////////////
+export const NodeLocationType     = NodeLocation.Type;
+export const NodeLocationTemplate = NodeLocation.Template;
+
+
+export const HasNode = M.RELATIONSHIP({
 
 	name: 'HasNode',
 
@@ -390,7 +404,7 @@ export const [HasNode] = M.RELATIONSHIP([Lyph, Border].map(Class => ({
 
 	extends: IsRelatedTo,
 
-	1: [Class.Type,    '0..*', { anchors: true, covariant: true, key: 'nodes' }],
-	2: [Node.Template, '0..*',                                                 ],
+	1: [NodeLocation.Type, '0..*', { anchors: true, covariant: true, key: 'nodes' }],
+	2: [Node.Template,     '0..*',                                                 ],
 
-})));
+});

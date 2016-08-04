@@ -16,10 +16,6 @@ describe("integrated workflow", () => {
 		//     : We need to make it more modular.
 		
 		
-		MaterialType.p('all').subscribe(::console.log);
-		
-		
-		
 		let gathered_MaterialType = new Set;
 		let gathered_Type         = new Set;
 		let gathered_Resource     = new Set;

@@ -37,27 +37,52 @@ export const ProcessTemplate = Process.Template;
 
 
 export const [FlowsTo] = M.RELATIONSHIP([{
-
+	
 	name: 'FlowsTo',
-
+	
 	extends: IsRelatedTo,
-
+	
 	singular: "flows to",
-
+	
 	1: [Node.Template,    '0..*', {                key: 'outgoingProcesses' }],
 	2: [Process.Template, '1..1', { anchors: true, key: 'source'            }],
-
+	
 }, {
-
+	
 	name: 'FlowsTo',
-
+	
 	extends: IsRelatedTo,
-
+	
 	singular: "flows to",
-
+	
 	1: [Process.Template, '1..1', { anchors: true, key: 'target'            }],
 	2: [Node.Template,    '0..*', {                key: 'incomingProcesses' }],
+	
+}]);
 
+
+export const [provisional_FlowsTo] = M.RELATIONSHIP([{
+	
+	name: 'provisional_FlowsTo',
+	
+	extends: IsRelatedTo,
+	
+	singular: "flows to",
+	
+	1: [Lyph.Template,    '0..*', {                key: 'outgoingProcesses' }],
+	2: [Process.Template, '1..1', { anchors: true, key: 'sourceLyph'        }],
+	
+}, {
+	
+	name: 'provisional_FlowsTo',
+	
+	extends: IsRelatedTo,
+	
+	singular: "flows to",
+	
+	1: [Process.Template, '1..1', { anchors: true, key: 'targetLyph'        }],
+	2: [Node.Template,    '0..*', {                key: 'incomingProcesses' }],
+	
 }]);
 
 

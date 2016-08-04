@@ -27,7 +27,7 @@ export default function resourceCheckingPlugin(chai/*, utils*/) {
 		this.branch().contains.properties({
 			isRelationship: true,
 			name          : name,
-			domains       : undefined
+			domainPairs   : undefined
 		});
 	});
 

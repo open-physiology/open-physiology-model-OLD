@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import zip         from 'lodash/zip';
-import isUndefined from 'lodash/isUndefined';
+import isUndefined from 'lodash-bound/isUndefined';
 import trim        from 'lodash-bound/trim';
 import isString    from 'lodash-bound/isString';
 import isArray     from 'lodash-bound/isArray';
@@ -26,22 +26,15 @@ export const humanMsg = (strings, ...values) => {
 	return result::trim();
 };
 
-export const inspect = (obj, options = {}) => {
-	console.log(util.inspect(obj, Object.assign({
-		colors: true,
-		depth:  2
-	}, options)));
-};
-
 export function mapOptionalArray(val, fn) {
-	if (isUndefined(val)) { return [] }
+	if (val::isUndefined()) { return [] }
 	let isArr = val::isArray();
 	val = (isArr ? val : [val]).map(fn);
 	return isArr ? val : val[0];
 }
 
 export function arrayify(val) {
-	if (isUndefined(val)) { return [] }
+	if (val::isUndefined()) { return [] }
 	if (val::isArray()) { return val }
 	return [val];
 }
@@ -63,6 +56,12 @@ export function parseCardinality(val) {
 	return {min, max};
 }
 
+export function stringifyCardinality(cardinality, {abbreviate} = {}) {
+	return (cardinality.min === cardinality.max && abbreviate)
+		? `   ${cardinality.min}`
+		: `${cardinality.min}..${cardinality.max === Infinity ? '*' : cardinality.max}`;
+}
+
 export function normalizeToRange(val) {
 	if (val::isNumber())       { val = {min: val, max: val} }
 	else if (!val::isObject()) { val = {}                   }
@@ -72,7 +71,7 @@ export function normalizeToRange(val) {
 }
 
 export function setDefault(obj, key, val) {
-	if (isUndefined(obj[key])) {
+	if (obj[key]::isUndefined()) {
 		obj[key] = val;
 	}
 }
@@ -82,3 +81,12 @@ export const sw = (val, {autoInvoke = true} = {}) => (map) => {
 	if (autoInvoke && result::isFunction()) { result = result() }
 	return result;
 };
+
+// the lodash _.assign doesn't handle symbol keys
+export function assign(...sources) {
+	return Object.assign(this, ...sources);
+}
+
+export function constructMap() {
+	return new Map(this);
+}

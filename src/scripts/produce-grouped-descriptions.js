@@ -1,6 +1,8 @@
 import M from '../index';
 
-import padEnd from 'lodash-bound/padEnd';
+import padEnd  from 'lodash-bound/padEnd';
+import entries from 'lodash-bound/entries';
+import size    from 'lodash-bound/size';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -16,7 +18,7 @@ for (let [,cls] of M.classes) {
 		entries.largestKeySize = 0;
 		
 		/* properties */
-		for (let [key, desc] of Object.entries(cls.properties)) {
+		for (let [key, desc] of cls.properties::entries()) {
 			
 			entries.largestKeySize = Math.max(key.length, entries.largestKeySize);
 			let entry = { key };
@@ -31,29 +33,26 @@ for (let [,cls] of M.classes) {
 			}
 		}
 		/* relationships */
-		for (let [key, desc] of Object.entries(cls.relationships || {})) {
+		for (let [key, desc] of (cls.relationships || {})::entries()) {
 			
 			entries.largestKeySize = Math.max(key.length, entries.largestKeySize);
 			let entry = { key, op: ':' };
 			entries.push(entry);
 			
-			let cardinality = (desc) => (desc.cardinality.min === desc.cardinality.max
-				? `   ${desc.cardinality.min}`
-				: `${desc.cardinality.min}..${desc.cardinality.max === Infinity ? '*' : desc.cardinality.max}`);
+			let cardinality = (desc) => stringifyCardinality(desc.cardinality, {abbreviate: true});
 			let arrow = (desc === desc.relationshipClass[1] ? '-->' : '<--');
 			
-			entry.desc = `(${cardinality(desc.other)})${arrow}(${cardinality(desc)})  ${desc.other.class.name}`;
+			entry.desc = `(${cardinality(desc.codomain)})${arrow}(${cardinality(desc)})  ${desc.codomain.resourceClass.name}`;
 			
 			if (desc.options.anchors  ) { entry.desc += ' [anchors]'                   }
 			if (desc.options.sustains ) { entry.desc += ' [sustains]'                  }
 			if (desc.options.covariant) { entry.desc += ' [covariant]'                 }
-			if (desc.options.key      ) { entry.desc += ` [key='${desc.options.key}']` }
-			if (desc.properties && Object.keys(desc.properties).length > 0) {
-				
+			if (desc.shortcutKey      ) { entry.desc += ` [key='${desc.shortcutKey}']` }
+			if (desc.properties && desc.properties::size() > 0) {
 				entry.sub = [];
 				entry.sub.largestKeySize = 0;
 				
-				for (let [pKey, pDesc] of Object.entries(desc.properties)) {
+				for (let [pKey, pDesc] of desc.properties::entries()) {
 					
 					entry.sub.largestKeySize = Math.max(pKey.length, entry.sub.largestKeySize);
 					let sub = { key: pKey };
@@ -94,6 +93,7 @@ for (let [,cls] of M.classes) {
 
 
 import fs from 'fs';
+import {stringifyCardinality} from "../util/misc";
 fs.writeFile('grouped-descriptions.txt', output, (err) => {
 	if(err) { return console.log(err) }
 	console.log("File saved: grouped-descriptions.txt");

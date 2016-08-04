@@ -4,14 +4,13 @@ import uniqueId   from 'lodash/uniqueId';
 import assert     from 'power-assert';
 
 import ObservableSet from './util/ObservableSet';
-import {humanMsg} from "./util/misc";
+import {humanMsg, assign} from "./util/misc";
 import {Field} from "./Field";
 import ValueTracker, {event, property} from "./util/ValueTracker";
 import {tracker} from './changes/Change';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {filter} from 'rxjs/operator/filter';
 import 'rxjs/add/operator/do';
-import {map} from 'rxjs/operator/map';
 
 const $$cache            = Symbol('$$cache'           );
 const $$cacheSet         = Symbol('$$cacheSet'        );
@@ -33,21 +32,18 @@ export default class Entity extends ValueTracker {
 		const {name, ...rest} = config;
 		
 		/* create the new class */
-		const EntitySubclass = class extends Entity {};
+		// using Function constructor to give the class a dynamic name
+		// http://stackoverflow.com/a/9947842/681588
+		const EntitySubclass = new Function('Entity', `
+			'use strict';
+			return class ${name} extends Entity {};
+		`)(Entity);
 		
-		/* populate it with  */
-		Object.assign(EntitySubclass, rest);
+		/* populate it with the rest of the configuration data */
+		EntitySubclass::assign(rest);
 		
 		Object.defineProperties(EntitySubclass, {
-			/**
-			 * Set the name property of this class to
-			 * the name given in the configuration.
-			 **/
 			name: { value: name },
-			/**
-			 * Implement the `instanceof` operator to support
-			 * our own flavor of multiple inheritance.
-			 **/
 			[Symbol.hasInstance]: {
 				value(instance) { return this.hasInstance(instance) }
 			},
@@ -94,7 +90,6 @@ export default class Entity extends ValueTracker {
 				value: allEntitiesOfNewClass.p('value')
 			});
 		}
-		
 		
 		return EntitySubclass;
 	}
@@ -207,7 +202,7 @@ export default class Entity extends ValueTracker {
 	get [Symbol.toStringTag]() { return this.constructor.name }
 	
 	constructor(
-		values:  Object = {},
+		initialValues:  Object = {},
 		options: Object = {}
 	) {
 		
@@ -217,13 +212,13 @@ export default class Entity extends ValueTracker {
 			
 		}
 		
-		values::defaults({
-			id: null,
-			href: null,
+		initialValues::defaults({
+			id:    null,
+			href:  null,
 			class: this.constructor.name
 		});
 		
-		Field.initializeEntity(this, values);
+		Field.initializeEntity(this, initialValues);
 		
 		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 	}
@@ -279,7 +274,7 @@ export default class Entity extends ValueTracker {
 
 }
 
-Object.assign(Entity, {
+Entity::assign({
 	[$$cache]     : {},
 	[$$cacheSet]  : new ObservableSet(),
 	[$$allSubject]: new BehaviorSubject(new Set())
