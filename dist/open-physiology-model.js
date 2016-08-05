@@ -7223,7 +7223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		singular: "flows to",
 	
 		1: [_lyphs.Node.Template, '0..*', { key: 'outgoingProcesses' }],
-		2: [Process.Template, '1..1', { anchors: true, key: 'source' }]
+		2: [Process.Template, '0..1', { anchors: true, key: 'source' }]
 	
 	}, {
 	
@@ -7233,7 +7233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		singular: "flows to",
 	
-		1: [Process.Template, '1..1', { anchors: true, key: 'target' }],
+		1: [Process.Template, '0..1', { anchors: true, key: 'target' }],
 		2: [_lyphs.Node.Template, '0..*', { key: 'incomingProcesses' }]
 	
 	}]);
@@ -7252,7 +7252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		singular: "flows to",
 	
 		1: [_lyphs.Lyph.Template, '0..*', { key: 'outgoingProcesses' }],
-		2: [Process.Template, '1..1', { anchors: true, key: 'sourceLyph' }]
+		2: [Process.Template, '0..1', { anchors: true, key: 'sourceLyph' }]
 	
 	}, {
 	
@@ -7262,7 +7262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		singular: "flows to",
 	
-		1: [Process.Template, '1..1', { anchors: true, key: 'targetLyph' }],
+		1: [Process.Template, '0..1', { anchors: true, key: 'targetLyph' }],
 		2: [_lyphs.Lyph.Template, '0..*', { key: 'incomingProcesses' }]
 	
 	}]);
