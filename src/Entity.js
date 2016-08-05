@@ -186,6 +186,11 @@ export default class Entity extends ValueTracker {
 		return new Set([...this[$$allCommittedEntities]].filter(::this.hasInstance));
 	}
 	
+	static newOrSingleton() {
+		if (this.singleton) { return this.getSingleton() }
+		return this.new();
+	}
+	
 	static getSingleton() {
 		assert(this.singleton, humanMsg`
 			The '${this.name}' class is not a singleton class.

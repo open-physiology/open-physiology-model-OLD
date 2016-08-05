@@ -11,7 +11,8 @@ describe("'lyphs' Module", () => {
 		CylindricalLyphType,
 		MaterialTemplate,
 		LyphTemplate,
-		CylindricalLyphTemplate
+		CylindricalLyphTemplate,
+		BorderTemplate
     } = exportedClasses;
 	
 	it("exports the expected classes", () => {
@@ -50,12 +51,12 @@ describe("'lyphs' Module", () => {
 
 	it("exports classes that can be instantiated", async () => {
 		
-		let materialType            = await MaterialType.new();
-		let materialTemplate        = await MaterialTemplate.new({ type: materialType });
-		let lyphType                = await LyphType.new();
-		let lyphTemplate            = await LyphTemplate.new({ type: lyphType });
-		let cylindricalLyphType     = await CylindricalLyphType.new();
-		let cylindricalLyphTemplate = await CylindricalLyphTemplate.new({ type: cylindricalLyphType });
+		let materialType            = MaterialType.new();
+		let materialTemplate        = MaterialTemplate.new({ type: materialType });
+		let lyphType                = LyphType.new();
+		let lyphTemplate            = LyphTemplate.new({ type: lyphType });
+		let cylindricalLyphType     = CylindricalLyphType.new();
+		let cylindricalLyphTemplate = CylindricalLyphTemplate.new({ type: cylindricalLyphType });
 		
 		expect(materialType           ).to.be.an.instanceof(                                       MaterialType    );
 		expect(materialTemplate       ).to.be.an.instanceof(                                       MaterialTemplate);
@@ -63,6 +64,16 @@ describe("'lyphs' Module", () => {
 		expect(lyphTemplate           ).to.be.an.instanceof(                         LyphTemplate, MaterialTemplate);
 		expect(cylindricalLyphType    ).to.be.an.instanceof(CylindricalLyphType    , LyphType    , MaterialType    );
 		expect(cylindricalLyphTemplate).to.be.an.instanceof(CylindricalLyphTemplate, LyphTemplate, MaterialTemplate);
+		
+		expect(lyphType.innerBorder).to.be.an.instanceof(BorderTemplate);
+		expect(lyphType.outerBorder).to.be.an.instanceof(BorderTemplate);
+		expect(lyphType.minusBorder).to.be.undefined;
+		expect(lyphType.plusBorder ).to.be.undefined;
+		
+		expect(cylindricalLyphType.innerBorder).to.be.an.instanceof(BorderTemplate);
+		expect(cylindricalLyphType.outerBorder).to.be.an.instanceof(BorderTemplate);
+		expect(cylindricalLyphType.minusBorder).to.be.an.instanceof(BorderTemplate);
+		expect(cylindricalLyphType.plusBorder ).to.be.an.instanceof(BorderTemplate);
 
 	});
 	

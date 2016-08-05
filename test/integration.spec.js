@@ -158,23 +158,4 @@ describe("integrated workflow", () => {
 		
 	});
 	
-	it("can create lyph-types with borders", async () => {
-		
-		// let lyph1 =
-		
-		let border1 = BorderType.new({ name: 'My Border' });
-		await border1.commit();
-		
-		let borderTmpl = BorderTemplate.new({ name: 'My tmpl', type: border1 });
-		await borderTmpl.commit();
-		
-		
-		// expect(lyph1).to.have.property('innerBorder').that.is.an.instanceof(BorderTemplate);
-		
-		// TODO: fix a single relationship domain for each relationship/shortcut field
-		//     : this would create a specific 'desc' for each side of each relationship.
-		//     : Among other things, specific HasType for each pair of typed classes.
-		
-	});
-	
 });

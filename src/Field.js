@@ -7,7 +7,7 @@ import {switchMap}                from 'rxjs/operator/switchMap';
 import {take}                     from 'rxjs/operator/take';
 import {startWith}                from 'rxjs/operator/startWith';
 import {defer as deferObservable} from 'rxjs/observable/defer';
-import {merge}                    from 'rxjs/observable/merge';
+import {combineLatest}            from 'rxjs/observable/combineLatest';
 import {concat}                   from 'rxjs/observable/concat';
 
 import inRange     from 'lodash-bound/inRange';
@@ -188,9 +188,9 @@ export class Field extends ValueTracker {
 	constructor({ owner, key, desc, setValueThroughSignal = true }) {
 		super();
 		owner[$$fields][key] = this;
-		this[$$owner]  = owner;
-		this[$$key]    = key;
-		this[$$desc]   = desc;
+		this[$$owner] = owner;
+		this[$$key]   = key;
+		this[$$desc]  = desc;
 		if (setValueThroughSignal) {
 			// allow signal-push to change value
 			this.p('value').subscribe(::this.set);
@@ -406,11 +406,11 @@ export class SideField extends Field {
 			::pairwise()
 			.subscribe(([prev, curr]) => {
 				if (desc.cardinality.max === 1) {
-					if (prev) { prev[$$fields][desc.keyInResource][$$value] = null          }
-					if (curr) { curr[$$fields][desc.keyInResource][$$value] = this[$$owner] }
+					if (prev) { prev[$$fields][desc.keyInResource].set(null)          }
+					if (curr) { curr[$$fields][desc.keyInResource].set(this[$$owner]) }
 				} else {
-					if (prev) { prev[$$fields][desc.keyInResource][$$value].delete(this[$$owner]) }
-					if (curr) { curr[$$fields][desc.keyInResource][$$value].add   (this[$$owner]) }
+					if (prev) { prev[$$fields][desc.keyInResource].get().delete(this[$$owner]) }
+					if (curr) { curr[$$fields][desc.keyInResource].get().add   (this[$$owner]) }
 				}
 			});
 		
@@ -486,17 +486,13 @@ export class Rel1Field extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[initialValue,               initialValue                       ],
-			[desc.codomain.resourceClass.singleton, () => desc.relationshipClass.new({ //
-				[desc.keyInRelationship]         : this[$$owner],                           //
-				[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.getSingleton()          //
-			})                                                              ],
-			[givenShortcutInitialValue],
-			[desc.options.auto, () => desc.relationshipClass.new({          //
-				[desc.keyInRelationship]          :       this[$$owner],                           //
-				[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.new()                   //
-			})                                                              ],
-			[desc.cardinality.min === 0, null                               ]
+			[initialValue, initialValue],
+			[givenShortcutInitialValue ],
+			[desc.options.auto, () => desc.relationshipClass.new({                                    //
+					[desc.keyInRelationship]         : this[$$owner],                                 //
+					[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.newOrSingleton()   //
+				})],
+			[desc.cardinality.min === 0, null]
 		);
 		
 		/* keep the relationship up to date with changes here */
@@ -505,8 +501,8 @@ export class Rel1Field extends Field {
 			::startWith(null)
 			::pairwise()
 			.subscribe(([prev, curr]) => {
-				if (prev) { prev[$$fields][desc.keyInRelationship].set(null) }
-				if (curr) { curr[$$fields][desc.keyInRelationship].set(this) }
+				if (prev) { prev[$$fields][desc.keyInRelationship].set(null)          }
+				if (curr) { curr[$$fields][desc.keyInRelationship].set(this[$$owner]) }
 			});
 		
 		/* set the value of this field to null when the relationship replaces this resource */
@@ -559,7 +555,9 @@ export class RelShortcut1Field extends Field {
 		Object.defineProperty(cls.prototype, key, {
 			get() { return this[$$fields][key].get() },
 			...(readonly ? undefined : {
-				set(val) { this[$$fields][key].set(val)}
+				set(val) {
+					this[$$fields][key].set(val)
+				}
 			}),
 			enumerable:   true,
 			configurable: false
@@ -607,22 +605,20 @@ export class RelShortcut1Field extends Field {
 			.subscribe( this.p('value') );
 		
 		/* keep the relationship up to date */
-		merge(
+		combineLatest(
 			this.p('value'),
 			correspondingRelValue
-		).subscribe((scValue, relValue) => {
+		).subscribe(([scValue, relValue]) => {
 			if (!relValue && scValue) {
-				// console.log(''+owner, key, desc.keyInResource, ''+scValue);
-				// console.log(desc.relationshipClass.name);
 				owner[$$fields][desc.keyInResource].set(desc.relationshipClass.new({
-					[desc.keyInRelationship]          :       owner,
+					[desc.keyInRelationship]         : owner,
 					[desc.codomain.keyInRelationship]: scValue
 				}));
 			} else if (relValue && !scValue) {
-				rel[$$fields][desc.codomain.keyInRelationship].set(null);
-			} else if (relValue && scValue && scValue !== rel[$$fields][desc.codomain.keyInRelationship][$$value]) {
+				relValue[$$fields][desc.codomain.keyInRelationship].set(null);
+			} else if (relValue && scValue && scValue !== relValue[$$fields][desc.codomain.keyInRelationship][$$value]) {
 				// rel[$$fields][desc.keyInResource].set(scValue);
-				rel[$$fields][desc.codomain.keyInRelationship].set(scValue);
+				relValue[$$fields][desc.codomain.keyInRelationship].set(scValue);
 			}
 		});
 		
@@ -730,7 +726,7 @@ export class Rel$Field extends Field {
 			).subscribe( this[$$value].e('delete') );
 		
 		/* handle initial values */
-		if (initialValue !== undefined) {
+		if (initialValue && initialValue[Symbol.iterator]) {
 			for (let rel of initialValue) {
 				// TODO: - rel may be a reference to an existing relationship;
 				//     :   then go get it
@@ -744,12 +740,11 @@ export class Rel$Field extends Field {
 				this[$$pristine].add(rel);
 				this[$$value]   .add(rel);
 			}
+		} else if (related::get([desc.shortcutKey, 'initialValue'])) {
+			// OK, a shortcut was given
 		} else if (desc.cardinality.min === 0) {
 			// OK, this field is optional
-		} else if (related[desc.shortcutKey] && related[desc.shortcutKey].initialValue) {
-			// OK, a shortcut was given
 		}
-		// missing required field is checked in validation
 	}
 	
 	set(newValue) {
@@ -890,12 +885,7 @@ export class RelShortcut$Field extends Field {
 				this[$$pristine].add(res);
 				this[$$value]   .add(res);
 			}
-		} else if (desc.cardinality.min === 0) {
-			// OK, this field is optional
-		} else if (related[desc.keyInResource].initialValue) {
-			// OK, a non-shortcut value was given
 		}
-		// possible missing required value is checked in validate method
 	}
 	
 	set(newValue) {
