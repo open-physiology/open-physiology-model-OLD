@@ -13,7 +13,7 @@ import {filter} from 'rxjs/operator/filter';
 import 'rxjs/add/operator/do';
 
 const $$cache            = Symbol('$$cache'           );
-const $$cacheSet         = Symbol('$$cacheSet'        );
+const $$allCommittedEntities         = Symbol('$$allCommittedEntities'        );
 const $$allEntities      = Symbol('$$allEntities'     );
 const $$singletonObject  = Symbol('$$singletonObject' );
 const $$newEntitySubject = Symbol('$$newEntitySubject');
@@ -99,10 +99,10 @@ export default class Entity extends ValueTracker {
 		/* maintaining <Class>.p('all') */
 		{
 			let allEntitiesOfNewClass = new ObservableSet();
-			Entity[$$cacheSet].e('add')
+			Entity[$$allCommittedEntities].e('add')
 				::filter(::EntitySubclass.hasInstance)
 				.subscribe(allEntitiesOfNewClass.e('add'));
-			Entity[$$cacheSet].e('delete')
+			Entity[$$allCommittedEntities].e('delete')
 				::filter(::EntitySubclass.hasInstance)
 				.subscribe(allEntitiesOfNewClass.e('delete'));
 			Object.defineProperty(EntitySubclass, $$allCommittedSubject, {
@@ -182,12 +182,19 @@ export default class Entity extends ValueTracker {
 		return new Set([...this[$$allEntities]].filter(::this.hasInstance));
 	}
 	
+	static getAllCommitted() {
+		return new Set([...this[$$allCommittedEntities]].filter(::this.hasInstance));
+	}
+	
 	static getSingleton() {
 		assert(this.singleton, humanMsg`
 			The '${this.name}' class is not a singleton class.
 		`);
 		if (!this[$$singletonObject]) {
-			this[$$singletonObject] = this.new();
+			this[$$singletonObject] = this.new({
+				name: 'Border Type'
+			});
+			this[$$singletonObject].commit();
 			// TODO: make sure that the singleton object is always loaded,
 			//     : so this can be done synchronously
 		}
@@ -278,7 +285,7 @@ export default class Entity extends ValueTracker {
 			this.set('id',    newId,             opts);
 			this.set('href', `cache://${newId}`, opts);
 			Entity[$$cache][this.href] = this;
-			Entity[$$cacheSet].add(this);
+			Entity[$$allCommittedEntities].add(this);
 		}
 		
 		this.e('commit').next(this);
@@ -298,7 +305,7 @@ export default class Entity extends ValueTracker {
 
 Entity::assign({
 	[$$cache]      : {},
-	[$$cacheSet]   : new ObservableSet(),
+	[$$allCommittedEntities]   : new ObservableSet(),
 	[$$allEntities]: new ObservableSet(),
 	[$$allSubject] : new BehaviorSubject(new Set())
 });

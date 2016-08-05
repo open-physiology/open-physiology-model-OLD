@@ -488,7 +488,7 @@ export class Rel1Field extends Field {
 		this[$$initSet](
 			[initialValue,               initialValue                       ],
 			[desc.codomain.resourceClass.singleton, () => desc.relationshipClass.new({ //
-				[desc.keyInRelationship]          :       this[$$owner],                           //
+				[desc.keyInRelationship]         : this[$$owner],                           //
 				[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.getSingleton()          //
 			})                                                              ],
 			[givenShortcutInitialValue],

@@ -23145,7 +23145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	var $$cache = Symbol('$$cache');
-	var $$cacheSet = Symbol('$$cacheSet');
+	var $$allCommittedEntities = Symbol('$$allCommittedEntities');
 	var $$allEntities = Symbol('$$allEntities');
 	var $$singletonObject = Symbol('$$singletonObject');
 	var $$newEntitySubject = Symbol('$$newEntitySubject');
@@ -23296,8 +23296,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					var _context2;
 	
 					var _allEntitiesOfNewClass = new _ObservableSet2.default();
-					(_context2 = Entity[$$cacheSet].e('add'), _filter.filter).call(_context2, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(_allEntitiesOfNewClass.e('add'));
-					(_context2 = Entity[$$cacheSet].e('delete'), _filter.filter).call(_context2, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(_allEntitiesOfNewClass.e('delete'));
+					(_context2 = Entity[$$allCommittedEntities].e('add'), _filter.filter).call(_context2, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(_allEntitiesOfNewClass.e('add'));
+					(_context2 = Entity[$$allCommittedEntities].e('delete'), _filter.filter).call(_context2, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(_allEntitiesOfNewClass.e('delete'));
 					Object.defineProperty(EntitySubclass, $$allCommittedSubject, {
 						value: _allEntitiesOfNewClass.p('value')
 					});
@@ -23371,6 +23371,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				return new Set([].concat(_toConsumableArray(this[$$allEntities])).filter(this.hasInstance.bind(this)));
 			}
 		}, {
+			key: 'getAllCommitted',
+			value: function getAllCommitted() {
+				return new Set([].concat(_toConsumableArray(this[$$allCommittedEntities])).filter(this.hasInstance.bind(this)));
+			}
+		}, {
 			key: 'getSingleton',
 			value: function getSingleton() {
 				var _rec3 = new _powerAssertRecorder();
@@ -23378,13 +23383,16 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(this.singleton, 'arguments/0'), {
 					content: 'assert(this.singleton, humanMsg`\n\t\t\tThe \'${ this.name }\' class is not a singleton class.\n\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 186,
+					line: 190,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"singleton","range":[12,21]},"computed":false,"range":[7,21]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[23,31]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\tThe \'"},"tail":false,"range":[32,8]},{"type":"TemplateElement","value":{"raw":"\' class is not a singleton class.\\n\\t\\t","cooked":"\' class is not a singleton class.\\n\\t\\t"},"tail":true,"range":[22,2]}],"expressions":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[11,15]},"property":{"type":"Identifier","name":"name","range":[16,20]},"computed":false,"range":[11,20]}],"range":[31,3]},"range":[23,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"singleton","range":[12,21]},{"type":{"label":","},"range":[21,22]},{"type":{"label":"name"},"value":"humanMsg","range":[23,31]},{"type":{"label":"`"},"range":[31,32]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe \'","range":[32,8]},{"type":{"label":"${"},"range":[8,10]},{"type":{"label":"this"},"value":"this","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"name","range":[16,20]},{"type":{"label":"}"},"range":[21,22]},{"type":{"label":"template"},"value":"\' class is not a singleton class.\\n\\t\\t","range":[22,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
 				}), (0, _misc.humanMsg)(_templateObject3, this.name));
 				if (!this[$$singletonObject]) {
-					this[$$singletonObject] = this.new();
+					this[$$singletonObject] = this.new({
+						name: 'Border Type'
+					});
+					this[$$singletonObject].commit();
 					// TODO: make sure that the singleton object is always loaded,
 					//     : so this can be done synchronously
 				}
@@ -23523,7 +23531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 										this.set('id', newId, opts);
 										this.set('href', 'cache://' + newId, opts);
 										Entity[$$cache][this.href] = this;
-										Entity[$$cacheSet].add(this);
+										Entity[$$allCommittedEntities].add(this);
 									}
 	
 									this.e('commit').next(this);
@@ -23636,7 +23644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Entity;
 	
 	
-	_misc.assign.call(Entity, (_assign$call = {}, _defineProperty(_assign$call, $$cache, {}), _defineProperty(_assign$call, $$cacheSet, new _ObservableSet2.default()), _defineProperty(_assign$call, $$allEntities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$allSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _assign$call));
+	_misc.assign.call(Entity, (_assign$call = {}, _defineProperty(_assign$call, $$cache, {}), _defineProperty(_assign$call, $$allCommittedEntities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$allEntities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$allSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _assign$call));
 	
 	function _inspect(input, depth) {
 		var maxDepth = 4;

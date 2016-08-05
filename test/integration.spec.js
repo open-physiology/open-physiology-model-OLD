@@ -64,15 +64,19 @@ describe("integrated workflow", () => {
 		expect([...gathered_Type        ]).to.eql([blood, water]);
 		expect([...gathered_Resource    ]).to.eql([blood, water]);
 		
+		expect([...MaterialType.getAll()]).to.eql([blood, water]);
+		expect([...Type        .getAll()]).to.eql([blood, water]);
+		expect([...Resource    .getAll()]).to.eql([blood, water]);
+		
 		await water.commit();
 		
 		expect([...committed_MaterialType]).to.eql([blood, water]);
 		expect([...committed_Type        ]).to.eql([blood, water]);
 		expect([...committed_Resource    ]).to.eql([blood, water]);
 		
-		expect([...MaterialType.getAll()]).to.eql([blood, water]);
-		expect([...Type        .getAll()]).to.eql([blood, water]);
-		expect([...Resource    .getAll()]).to.eql([blood, water]);
+		expect([...MaterialType.getAllCommitted()]).to.eql([blood, water]);
+		expect([...Type        .getAllCommitted()]).to.eql([blood, water]);
+		expect([...Resource    .getAllCommitted()]).to.eql([blood, water]);
 				
 	});
 	
