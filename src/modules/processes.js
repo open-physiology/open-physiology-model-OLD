@@ -81,7 +81,7 @@ export const [provisional_FlowsTo] = M.RELATIONSHIP([{
 	singular: "flows to",
 	
 	1: [Process.Template, '1..1', { anchors: true, key: 'targetLyph'        }],
-	2: [Node.Template,    '0..*', {                key: 'incomingProcesses' }],
+	2: [Lyph.Template,    '0..*', {                key: 'incomingProcesses' }],
 	
 }]);
 

@@ -7263,7 +7263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		singular: "flows to",
 	
 		1: [Process.Template, '1..1', { anchors: true, key: 'targetLyph' }],
-		2: [_lyphs.Node.Template, '0..*', { key: 'incomingProcesses' }]
+		2: [_lyphs.Lyph.Template, '0..*', { key: 'incomingProcesses' }]
 	
 	}]);
 	
