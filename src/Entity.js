@@ -291,8 +291,6 @@ export default class Entity extends ValueTracker {
 		Entity[$$entities].add(this);
 	}
 	
-	// isDeleted() { return !!this[$$deleted] } // TODO: remove
-	
 	//noinspection JSDuplicatedDeclaration // temporary, to suppress warning due to Webstorm bug; TODO: report bug
 	get(key)               { return this.fields[key].get()             }
 	set(key, val, options) { return this.fields[key].set(val, options) }
@@ -305,7 +303,7 @@ export default class Entity extends ValueTracker {
 		
 		/* commit each field individually */ // TODO: commit all in a single transaction?
 		if (keysToCommit::size() === 0) { keysToCommit = this.fields::_keys() }
-		await Promise.all(keysToCommit.map((key) => { this.fields[key].commit() }));
+		await Promise.all(keysToCommit.map((key) => this.fields[key].commit()));
 		
 		/* setting up as a committed entity */
 		// TODO: remove when the server actually does this

@@ -4,11 +4,10 @@ import {Resource, IsRelatedTo}   from '../src/modules/resources';
 import {Type, Template, HasType} from '../src/modules/typed';
 import {Process} from '../src/modules/processes';
 import {MaterialType, MaterialTemplate, ContainsMaterial, MeasurableType} from '../src/index';
-import {LyphType, BorderType, BorderTemplate} from '../src/modules/lyphs';
+import {Lyph, CylindricalLyph} from '../src/modules/lyphs';
+import {OmegaTree} from '../src/modules/omegaTrees';
 
 describe("integrated workflow", () => {
-	
-	
 	
 	it("can track available entities with a stream per class", async () => {
 		// TODO: These tests have to come first, because otherwise the global
@@ -155,6 +154,28 @@ describe("integrated workflow", () => {
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.a('number');
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 		
+	});
+	
+	it("(regression test: HasType[2] set to null?)", async () => {
+		
+		let lyphType = CylindricalLyph.Type.new();
+		lyphType.commit();
+		
+		let omegaTree = OmegaTree.Type.new();
+		
+		let lyphTemplate1 = CylindricalLyph.Template.new({ type: lyphType });
+		omegaTree.elements.add(lyphTemplate1);
+		
+		let lyphTemplate2 = CylindricalLyph.Template.new({ type: lyphType });
+		omegaTree.elements.add(lyphTemplate2);
+		
+		await lyphTemplate1.commit();
+		await lyphTemplate2.commit();
+		await omegaTree.commit();
+		
+		expect([...omegaTree.elements]).to.eql([lyphTemplate1, lyphTemplate2]);
+		
+		// TODO: ask Natallia about bug; can't make this fail
 		
 	});
 	

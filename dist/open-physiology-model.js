@@ -22790,8 +22790,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				Entity[$$entities].add(this);
 			}
 	
-			// isDeleted() { return !!this[$$deleted] } // TODO: remove
-	
 			//noinspection JSDuplicatedDeclaration // temporary, to suppress warning due to Webstorm bug; TODO: report bug
 	
 		}, {
@@ -22831,7 +22829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 									}
 									_context7.next = 4;
 									return Promise.all(keysToCommit.map(function (key) {
-										_this2.fields[key].commit();
+										return _this2.fields[key].commit();
 									}));
 	
 								case 4:
