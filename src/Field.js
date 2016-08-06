@@ -379,21 +379,22 @@ export class SideField extends Field {
 		const notGiven = val::isNull() || val::isUndefined();
 		
 		if (stages.includes('commit')) {
+			/* if there's a minimum cardinality, a value must have been given */
 			assert(!notGiven, humanMsg`
 			    No resource specified for side ${this[$$key]} of
 				this '${this[$$owner].constructor.name}'.
 			`);
 		}
-		console.log(val);
 		
 		/* the value must be of the proper domain */
 		if (!(notGiven || this[$$desc].resourceClass.hasInstance(val))) {
-			console.log(val);
-			
 			throw new Error(humanMsg`
 				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
+		
+		// TODO: these should not be assertions, but proper constraint-checks,
+		//     : recording errors, possibly allowing them temporarily, etc.
 	}
 	
 }
