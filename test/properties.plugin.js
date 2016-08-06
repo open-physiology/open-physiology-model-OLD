@@ -5,7 +5,7 @@ import genericPlugin from './generic.plugin';
 export default function propertiesPlugin(chai/*, utils*/) {
 	chai.use(genericPlugin);
 
-	var Assertion = chai.Assertion;
+	let Assertion = chai.Assertion;
 
 	Assertion.addMethod('properties', function (props) {
 		for (let key of Object.keys(props)) {

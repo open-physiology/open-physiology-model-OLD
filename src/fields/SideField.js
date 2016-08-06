@@ -11,7 +11,7 @@ import {defineProperty} from 'bound-native-methods';
 
 import assert from 'power-assert';
 
-import {humanMsg, assign} from "../util/misc";
+import {humanMsg} from "../util/misc";
 
 import {Field} from './Field';
 
@@ -20,11 +20,8 @@ import {
 	$$owner,
 	$$key,
 	$$desc,
-	$$value,
-	$$pristine,
 	$$initSet,
 	$$entriesIn,
-	$$initialized
 } from './symbols';
 
 

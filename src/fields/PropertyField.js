@@ -1,5 +1,6 @@
 import isUndefined from 'lodash-bound/isUndefined';
 import entries     from 'lodash-bound/entries';
+import keys        from 'lodash-bound/keys';
 
 import {defineProperty} from 'bound-native-methods';
 
@@ -52,11 +53,11 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 	
 	static [$$entriesIn](cls) {
 		return cls.properties::entries()
-		             .map(([key, desc])=>({
-			             key,
-			             desc,
-			             relatedKeys: []
-		             }));
+			.map(([key, desc])=>({
+				key,
+				desc,
+				relatedKeys: []
+			}));
 	}
 	
 	

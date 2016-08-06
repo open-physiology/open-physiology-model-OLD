@@ -82,9 +82,13 @@ export class Field extends ValueTracker {
 				};
 			}
 		}
+		
+		/* add related descriptions to each description */
 		for (let entry of keyDescs::values()) {
 			entry.related = keyDescs::pick(entry.relatedKeys);
 		}
+		
+		/* create a field for each description */
 		for (let entry of keyDescs::values()) {
 			let {FieldClass} = entry;
 			delete entry.FieldClass;

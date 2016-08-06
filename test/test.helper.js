@@ -9,11 +9,11 @@ import resourceCheckingPlugin from './resourceChecking.plugin';
 import matchPatternPlugin     from 'chai-match-pattern';
 import chaiAsPromised         from 'chai-as-promised';
 
+chai.use(chaiAsPromised); // keep this as the first plugin or it messes up other plugins
 chai.use(genericPlugin);
 chai.use(propertiesPlugin);
 chai.use(resourceCheckingPlugin);
 chai.use(matchPatternPlugin);
-chai.use(chaiAsPromised);
 
 import mocha from 'mocha';
 export const describe   = mocha.describe   || (global || window).describe;

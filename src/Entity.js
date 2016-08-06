@@ -256,10 +256,10 @@ export default class Entity extends ValueTracker {
 		Field.initializeEntity(this, initialValues);
 		
 		/* entity is pristine if all its fields are pristine */
-		this.pSubject('isPristine').subscribe(combineLatest(
+		combineLatest(
 			...this.fields::values().map(f=>f.p('isPristine')),
 			(...fieldPristines) => fieldPristines.every(v=>!!v)
-		));
+		).subscribe(this.pSubject('isPristine'));
 		
 		Entity[$$entities].add(this);
 		

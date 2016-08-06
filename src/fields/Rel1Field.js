@@ -84,10 +84,14 @@ Field[$$registerFieldClass](class Rel1Field extends Field {
 		this[$$initSet](
 			[initialValue, initialValue],
 			[givenShortcutInitialValue ],
-			[desc.options.auto, () => desc.relationshipClass.new({                                    //
-					[desc.keyInRelationship]         : this[$$owner],                                 //
-					[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.newOrSingleton()   //
-				})],
+			[desc.options.auto, () => {
+				let result = desc.relationshipClass.new({
+					[desc.keyInRelationship]         : this[$$owner],
+					[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.newOrSingleton()
+				});
+				
+				return result;
+			}],
 			[desc.cardinality.min === 0, null]
 		);
 		

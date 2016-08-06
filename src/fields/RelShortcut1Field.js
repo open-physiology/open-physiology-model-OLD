@@ -8,6 +8,7 @@ import 'rxjs/add/operator/do';
 import isUndefined from 'lodash-bound/isUndefined';
 import isNull      from 'lodash-bound/isNull';
 import entries     from 'lodash-bound/entries';
+import isObject    from 'lodash-bound/isObject';
 
 import {defineProperty} from 'bound-native-methods';
 
@@ -24,6 +25,7 @@ import {
 	$$desc,
 	$$initSet,
 	$$entriesIn,
+	$$value,
 } from './symbols';
 
 Field[$$registerFieldClass](class RelShortcut1Field extends Field {
@@ -54,12 +56,12 @@ Field[$$registerFieldClass](class RelShortcut1Field extends Field {
 	static [$$entriesIn](cls) {
 		if (!cls.isResource) { return [] }
 		return cls.relationshipShortcuts::entries()
-		             .filter(([,rel]) => rel.cardinality.max === 1)
-		             .map(([key, desc]) => ({
-			             key,
-			             desc,
-			             relatedKeys: desc.keyInResource ? [desc.keyInResource] : []
-		             }));
+             .filter(([,rel]) => rel.cardinality.max === 1)
+             .map(([key, desc]) => ({
+	             key,
+	             desc,
+	             relatedKeys: desc.keyInResource ? [desc.keyInResource] : []
+             }));
 	}
 	
 	
@@ -87,50 +89,35 @@ Field[$$registerFieldClass](class RelShortcut1Field extends Field {
 		
 		/* keep this value up to date with new sides of new relationships */
 		correspondingRelValue
-			::filter(rel => rel)
+			::filter(v=>v)
 			::switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
 			.subscribe( this.p('value') );
-		
+	
 		/* keep the relationship up to date */
-		this.p('value').do((v) => {
-			console.log('---', owner.constructor.name);
-			if (owner.constructor.name === 'CylindricalLyphTemplate') {
-				console.log(''+v);
-			}
-		})::withLatestFrom(correspondingRelValue::startWith(null)).do((v) => {
-			if (owner.constructor.name === 'CylindricalLyphTemplate') {
-				console.log(''+v[0], ''+v[1]);
-			}
-		}).subscribe(([scValue, relValue]) => {
-			
-			if (owner.constructor.name === 'CylindricalLyphTemplate') {
-				console.log(scValue, relValue);
-			}
-			
-			if (relValue) {
-				relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
-			} else {
-				owner.fields[desc.keyInResource].set(desc.relationshipClass.new({
-					[desc.keyInRelationship]         : owner,
-					[desc.codomain.keyInRelationship]: scValue
-				}));
-			}
-		});
+		this.p('value')::waitUntilConstructed()::withLatestFrom( correspondingRelValue::startWith(null) )
+			.subscribe(([scValue, relValue]) => {
+				if (relValue) {
+					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
+				} else {
+					owner.fields[desc.keyInResource].set(desc.relationshipClass.new({
+						[desc.keyInRelationship]         : owner,
+						[desc.codomain.keyInRelationship]: scValue
+					}));
+				}
+			});
 	}
 		
 	validate(val, stages = []) {
 		
-		const notGiven = val::isNull() || val::isUndefined();
-		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
-			assert(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`
+			assert(val::isObject() || this[$$desc].cardinality.min === 0, humanMsg`
 				No value given for required field ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
 		
-		/* the value must be of the proper domain */
-		if (!(notGiven || this[$$desc].codomain.resourceClass.hasInstance(val))) {
+		/* a given value must always be of the proper domain */
+		if (val::isObject() && !this[$$desc].codomain.resourceClass.hasInstance(val)) {
 			throw new Error(humanMsg`
 				Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
@@ -141,4 +128,4 @@ Field[$$registerFieldClass](class RelShortcut1Field extends Field {
 		
 	}
 	
-})
+});

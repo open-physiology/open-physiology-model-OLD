@@ -9,7 +9,7 @@ import {OmegaTree} from '../src/modules/omegaTrees';
 
 describe("integrated workflow", () => {
 	
-	xit("can track available entities with a stream per class", async () => {
+	it("can track available entities with a stream per class", async () => {
 		// TODO: These tests have to come first, because otherwise the global
 		//     : caches of the classes are already populated.
 		//     : We need to make it more modular.
@@ -79,7 +79,7 @@ describe("integrated workflow", () => {
 				
 	});
 	
-	xit("can create new 'MaterialType's and link them", async () => {
+	it("can create new 'MaterialType's and link them", async () => {
 		
 		let blood = MaterialType.new({
 			name: "blood"
@@ -156,7 +156,7 @@ describe("integrated workflow", () => {
 		
 	});
 	
-	xit("(regression test: HasType[2] set to null?)", async () => {
+	it("(regression test: HasType[2] set to null?)", async () => {
 		
 		let lyphType = CylindricalLyph.Type.new();
 		lyphType.commit();
