@@ -10,7 +10,7 @@ import assert   from 'power-assert';
 
 import ObservableSet         from './util/ObservableSet';
 import {humanMsg}            from './util/misc';
-import {Field}               from './Field';
+import {Field}               from './fields/fields';
 import ValueTracker, {event, property} from './util/ValueTracker';
 import {tracker}             from './changes/Change';
 import {BehaviorSubject}     from 'rxjs/BehaviorSubject';

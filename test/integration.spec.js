@@ -9,7 +9,7 @@ import {OmegaTree} from '../src/modules/omegaTrees';
 
 describe("integrated workflow", () => {
 	
-	it("can track available entities with a stream per class", async () => {
+	xit("can track available entities with a stream per class", async () => {
 		// TODO: These tests have to come first, because otherwise the global
 		//     : caches of the classes are already populated.
 		//     : We need to make it more modular.
@@ -79,7 +79,7 @@ describe("integrated workflow", () => {
 				
 	});
 	
-	it("can create new 'MaterialType's and link them", async () => {
+	xit("can create new 'MaterialType's and link them", async () => {
 		
 		let blood = MaterialType.new({
 			name: "blood"
@@ -156,7 +156,7 @@ describe("integrated workflow", () => {
 		
 	});
 	
-	it("(regression test: HasType[2] set to null?)", async () => {
+	xit("(regression test: HasType[2] set to null?)", async () => {
 		
 		let lyphType = CylindricalLyph.Type.new();
 		lyphType.commit();
@@ -194,12 +194,17 @@ describe("integrated workflow", () => {
 		
 		expect(lyphTemplate1.type).to.equal(lyphType2);
 		
-		
 		lyphTemplate1.type = undefined;
 		
+		expect(lyphTemplate1.type).to.equal(null);
 		
-		// TODO: ask Natallia about bug; can't make this fail
-		
+	});
+	
+	it("(regression test 2: )", async () => {
+		let renalH = CylindricalLyph.Type.new({ name: "Renal hilum" });
+		await renalH.commit();
+		let t1 = CylindricalLyph.Template.new({ name: "T: Renal hilum", type: renalH });
+		await expect(t1.commit()).to.not.be.rejected;
 	});
 	
 });

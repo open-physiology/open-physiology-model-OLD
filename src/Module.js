@@ -25,7 +25,7 @@ import {
 } from './util/misc';
 
 import Entity  from './Entity';
-import {Field} from './Field';
+import {Field} from './fields/fields';
 
 
 const $$processedFor              = Symbol('$$processedFor');
