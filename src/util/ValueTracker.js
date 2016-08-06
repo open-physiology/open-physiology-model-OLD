@@ -1,11 +1,12 @@
-import includes      from 'lodash-bound/includes';
-import isArray       from 'lodash-bound/isArray';
-import isString      from 'lodash-bound/isString';
-import isFunction    from 'lodash-bound/isFunction';
-import set           from 'lodash-bound/set';
-import _entries      from 'lodash-bound/entries';
-import ldIsEqual     from 'lodash/isEqual';
-import assert        from 'power-assert';
+import includes   from 'lodash-bound/includes';
+import isArray    from 'lodash-bound/isArray';
+import isString   from 'lodash-bound/isString';
+import set        from 'lodash-bound/set';
+import entries    from 'lodash-bound/entries';
+
+import _isEqual from 'lodash/isEqual';
+
+import assert from 'power-assert';
 
 import {Subject}              from 'rxjs/Subject';
 import {BehaviorSubject}      from 'rxjs/BehaviorSubject';
@@ -40,10 +41,10 @@ export default class ValueTracker {
 		this[$$currentValues]      = {};
 
 		/* add the events and properties added with ES7 annotations */
-		for (let [key, options] of (this.constructor[$$events] || {})::_entries()) {
+		for (let [key, options] of (this.constructor[$$events] || {})::entries()) {
 			this.newEvent(key, options);
 		}
-		for (let [key, options] of (this.constructor[$$properties] || {})::_entries()) {
+		for (let [key, options] of (this.constructor[$$properties] || {})::entries()) {
 			this.newProperty(key, options);
 		}
 	}
@@ -98,7 +99,7 @@ export default class ValueTracker {
 	 */
 	newProperty(name, {
 		readonly = false,
-		isEqual  = ldIsEqual,
+		isEqual  = _isEqual,
 		isValid  = ()=>true,
 		initial
 	} = {}) {

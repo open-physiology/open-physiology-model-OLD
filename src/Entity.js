@@ -1,12 +1,11 @@
 import isObject from 'lodash-bound/isObject';
 import defaults from 'lodash-bound/defaults';
-import isString from 'lodash-bound/isString';
-import isArray from 'lodash-bound/isArray';
-import size from 'lodash-bound/size';
-import _keys from 'lodash-bound/keys';
-import _values from 'lodash-bound/values';
-import isUndefined from 'lodash-bound/isUndefined';
-import uniqueId from 'lodash/uniqueId';
+import size     from 'lodash-bound/size';
+import keys     from 'lodash-bound/keys';
+import values   from 'lodash-bound/values';
+
+import _uniqueId from 'lodash/uniqueId';
+
 import assert   from 'power-assert';
 
 import ObservableSet         from './util/ObservableSet';
@@ -141,12 +140,12 @@ export default class Entity extends ValueTracker {
 	};
 	
 	static new(
-		values  : Object = {},
-	    options : Object = {}
+		vlas:    Object = {},
+	    options: Object = {}
 	): this {
 		return new this.Change_new(
 			this,
-			{ ...values },
+			{ ...vlas },
 			{ ...options, new: true }
 		).run();
 	}
@@ -258,7 +257,7 @@ export default class Entity extends ValueTracker {
 		
 		/* entity is pristine if all its fields are pristine */
 		this.pSubject('isPristine').subscribe(combineLatest(
-			...this.fields::_values().map(f=>f.p('isPristine')),
+			...this.fields::values().map(f=>f.p('isPristine')),
 			(...fieldPristines) => fieldPristines.every(v=>!!v)
 		));
 		
@@ -302,14 +301,14 @@ export default class Entity extends ValueTracker {
 		
 		
 		/* commit each field individually */ // TODO: commit all in a single transaction?
-		if (keysToCommit::size() === 0) { keysToCommit = this.fields::_keys() }
+		if (keysToCommit::size() === 0) { keysToCommit = this.fields::keys() }
 		await Promise.all(keysToCommit.map((key) => this.fields[key].commit()));
 		
 		/* setting up as a committed entity */
 		// TODO: remove when the server actually does this
 		if (this.get('id') === null) {
 			/* id and href are set here until actual server communication is set up */
-			const newId   = parseInt(uniqueId());
+			const newId   = parseInt(_uniqueId());
 			const newHref = `cache://${newId}`;
 			const opts = { ignoreReadonly: true, updatePristine: true };
 			this.set('id',   newId,   opts);
@@ -329,7 +328,7 @@ export default class Entity extends ValueTracker {
 	}
 	
 	rollback(...keysToRollback) {
-		if (keysToRollback::size() === 0) { keysToRollback = this.fields::_keys() }
+		if (keysToRollback::size() === 0) { keysToRollback = this.fields::keys() }
 		keysToRollback.map((key) => { this.fields[key].rollback() });
 		this.e('rollback').next(this);
 	}

@@ -163,17 +163,40 @@ describe("integrated workflow", () => {
 		
 		let omegaTree = OmegaTree.Type.new();
 		
-		let lyphTemplate1 = CylindricalLyph.Template.new({ type: lyphType });
+		let lyphTemplate1 = CylindricalLyph.Template.new();
+		
+		lyphTemplate1.p('type').subscribe((type) => {
+			console.log(''+type);
+		});
+		
 		omegaTree.elements.add(lyphTemplate1);
 		
-		let lyphTemplate2 = CylindricalLyph.Template.new({ type: lyphType });
+		let lyphTemplate2 = CylindricalLyph.Template.new();
 		omegaTree.elements.add(lyphTemplate2);
+		
+		lyphTemplate1.type = lyphType;
+		lyphTemplate2.type = lyphType;
 		
 		await lyphTemplate1.commit();
 		await lyphTemplate2.commit();
 		await omegaTree.commit();
 		
 		expect([...omegaTree.elements]).to.eql([lyphTemplate1, lyphTemplate2]);
+		
+		expect(lyphTemplate1.type).to.equal(lyphType);
+		expect(lyphTemplate2.type).to.equal(lyphType);
+		
+		
+		let lyphType2 = CylindricalLyph.Type.new();
+		lyphType2.commit();
+		
+		lyphTemplate1.type = lyphType2;
+		
+		expect(lyphTemplate1.type).to.equal(lyphType2);
+		
+		
+		lyphTemplate1.type = undefined;
+		
 		
 		// TODO: ask Natallia about bug; can't make this fail
 		

@@ -2,7 +2,6 @@
 // Schema Data Types                                                          //
 ////////////////////////////////////////////////////////////////////////////////
 
-import zip         from 'lodash/zip';
 import isUndefined from 'lodash-bound/isUndefined';
 import trim        from 'lodash-bound/trim';
 import isString    from 'lodash-bound/isString';
@@ -10,8 +9,10 @@ import isArray     from 'lodash-bound/isArray';
 import isNumber    from 'lodash-bound/isNumber';
 import isObject    from 'lodash-bound/isObject';
 import isFunction  from 'lodash-bound/isFunction';
-import assert      from 'power-assert';
 
+import _zip from 'lodash/zip';
+
+import assert from 'power-assert';
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,9 +21,9 @@ export const arrayContainsValue = (array, value) => array.includes(value);
 
 export const simpleSpaced = (str) => str.replace(/\s+/mg, ' ');
 
-export const humanMsg = (strings, ...values) => {
+export const humanMsg = (strings, ...vals) => {
 	let result = strings[0];
-	for (let [val, str] of zip(values, strings.slice(1))) {
+	for (let [val, str] of _zip(vals, strings.slice(1))) {
 		result += val + simpleSpaced(str);
 	}
 	return result::trim();

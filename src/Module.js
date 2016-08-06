@@ -4,12 +4,15 @@ import isUndefined from 'lodash-bound/isUndefined';
 import isInteger   from 'lodash-bound/isInteger';
 import defaults    from 'lodash-bound/defaults';
 import assignWith  from 'lodash-bound/assignWith';
-import _keys       from 'lodash-bound/keys';
-import _values     from 'lodash-bound/values';
-import _entries    from 'lodash-bound/entries';
-import isEqual     from 'lodash/isEqual';
-import assert      from 'power-assert';
-import Graph       from 'graph.js/dist/graph.js';
+import keys       from 'lodash-bound/keys';
+import values     from 'lodash-bound/values';
+import entries    from 'lodash-bound/entries';
+
+import _isEqual from 'lodash/isEqual';
+
+import assert from 'power-assert';
+
+import Graph from 'graph.js/dist/graph.js';
 
 import {assign, defineProperty} from 'bound-native-methods';
 
@@ -143,7 +146,7 @@ export default class Module {
 			['patternProperties', 'pattern']
 		]) {
 			config::defaults({ [pKey]: {} });
-			for (let [k, desc] of config[pKey]::_entries()) {
+			for (let [k, desc] of config[pKey]::entries()) {
 				desc[kKey] = k;
 			}
 		}
@@ -232,7 +235,7 @@ export default class Module {
 	
 	resolveRelationshipDomains(cls) {
 		for (let domainPair of cls.domainPairs) {
-			for (let domain of domainPair::_values()) {
+			for (let domain of domainPair::values()) {
 				this[$$processRelationshipDomain](domain);
 			}
 		}
@@ -360,13 +363,13 @@ export default class Module {
 			cls[$$processedFor][kind].add(newCls);
 			
 			function mergeBetween(superCls, subCls) {
-				for (let key of superCls[kind]::_keys()) {
+				for (let key of superCls[kind]::keys()) {
 					let superDesc = superCls[kind][key];
 					let subDesc   = subCls[kind][key];
 					if (subDesc::isUndefined()) {
 						subCls[kind][key] = superDesc;
 						Field.augmentClass(subCls, key);
-					} else if (isEqual(subDesc, superDesc)) {
+					} else if (_isEqual(subDesc, superDesc)) {
 						continue;
 					} else {
 						subCls[kind][key] = customMerge(superDesc, subDesc);
@@ -396,9 +399,9 @@ export default class Module {
 			if (superDesc.type::isUndefined() && superDesc.oneOf) {
 				assert(superDesc.oneOf.length > 0);
 				for (let disjunct of superDesc.oneOf) {
-					if (typeof subDesc.value === disjunct.type                    ||
+					if (typeof subDesc.value === disjunct.type ||
 					    subDesc.value::isInteger() && disjunct.type === 'integer' ||
-					    isEqual(subDesc.value, disjunct.value)
+					    _isEqual(subDesc.value, disjunct.value)
 					) {
 						singleSuperDesc = { ...superDesc, ...disjunct };
 						delete singleSuperDesc.oneOf;
@@ -434,7 +437,7 @@ export default class Module {
 				case 'extendedBy': return new Set([...vOld, ...vNew]);
 				case 'properties':
 				case 'patternProperties': return {}::assignWith(vOld, vNew, (pOld, pNew, pKey) => {
-					assert(pOld::isUndefined() || isEqual(pOld, pNew), humanMsg`
+					assert(pOld::isUndefined() || _isEqual(pOld, pNew), humanMsg`
 						Cannot merge property descriptions for ${OldClass.name}#${key}.
 						
 						1) ${JSON.stringify(pOld)}
@@ -444,7 +447,7 @@ export default class Module {
 					return pOld::isUndefined() ? pNew : pOld;
 				});
 				default: {
-					assert(vOld::isUndefined() || vNew::isUndefined() || isEqual(vOld, vNew), humanMsg`
+					assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), humanMsg`
 						Cannot merge ${OldClass.name}.${key} = ${JSON.stringify(vOld)}
 						        with ${JSON.stringify(vNew)}.
 					`);
@@ -464,7 +467,7 @@ export default class Module {
 				case 'domainPairs': return [...vOld, ...vNew];
 				case 'properties':
 				case 'patternProperties': return {}::assignWith(vOld, vNew, (pOld, pNew, pKey) => {
-					assert(pOld::isUndefined() || isEqual(pOld, pNew), humanMsg`
+					assert(pOld::isUndefined() || _isEqual(pOld, pNew), humanMsg`
 						Cannot merge property descriptions for ${OldClass.name}#${key}.
 						
 						1) ${JSON.stringify(pOld)}
@@ -474,7 +477,7 @@ export default class Module {
 					return pOld::isUndefined() ? pNew : pOld;
 				});
 				default: {
-					assert(vOld::isUndefined() || vNew::isUndefined() || isEqual(vOld, vNew), humanMsg`
+					assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), humanMsg`
 						Cannot merge ${OldClass.name}.${key} = ${JSON.stringify(vOld)}
 						        with ${JSON.stringify(vNew)}.
 					`);
