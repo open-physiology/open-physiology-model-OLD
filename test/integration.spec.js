@@ -14,10 +14,9 @@ describe("integrated workflow", () => {
 		//     : caches of the classes are already populated.
 		//     : We need to make it more modular.
 		
-		
-		let gathered_MaterialType = new Set;
-		let gathered_Type         = new Set;
-		let gathered_Resource     = new Set;
+		let gathered_MaterialType  = new Set;
+		let gathered_Type          = new Set;
+		let gathered_Resource      = new Set;
 		let committed_MaterialType = new Set;
 		let committed_Type         = new Set;
 		let committed_Resource     = new Set;
