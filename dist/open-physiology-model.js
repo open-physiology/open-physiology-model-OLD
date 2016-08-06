@@ -196,7 +196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// 7.1.15 ToLength
-	var toInteger = __webpack_require__(44)
+	var toInteger = __webpack_require__(45)
 	  , min       = Math.min;
 	module.exports = function(it){
 	  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
@@ -233,7 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var dP         = __webpack_require__(8)
-	  , createDesc = __webpack_require__(43);
+	  , createDesc = __webpack_require__(44);
 	module.exports = __webpack_require__(7) ? function(object, key, value){
 	  return dP.f(object, key, createDesc(1, value));
 	} : function(object, key, value){
@@ -694,7 +694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var pIE            = __webpack_require__(85)
-	  , createDesc     = __webpack_require__(43)
+	  , createDesc     = __webpack_require__(44)
 	  , toIObject      = __webpack_require__(18)
 	  , toPrimitive    = __webpack_require__(32)
 	  , has            = __webpack_require__(11)
@@ -1441,12 +1441,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    , $typed              = __webpack_require__(109)
 	    , $buffer             = __webpack_require__(156)
 	    , ctx                 = __webpack_require__(35)
-	    , anInstance          = __webpack_require__(41)
-	    , propertyDesc        = __webpack_require__(43)
+	    , anInstance          = __webpack_require__(42)
+	    , propertyDesc        = __webpack_require__(44)
 	    , hide                = __webpack_require__(13)
 	    , redefineAll         = __webpack_require__(57)
 	    , isInteger           = __webpack_require__(143)
-	    , toInteger           = __webpack_require__(44)
+	    , toInteger           = __webpack_require__(45)
 	    , toLength            = __webpack_require__(9)
 	    , toIndex             = __webpack_require__(59)
 	    , toPrimitive         = __webpack_require__(32)
@@ -1968,6 +1968,122 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.Typed = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = undefined;
+	
+	var _schemas = __webpack_require__(68);
+	
+	var _Module = __webpack_require__(79);
+	
+	var _Module2 = _interopRequireDefault(_Module);
+	
+	var _resources = __webpack_require__(28);
+	
+	var _resources2 = _interopRequireDefault(_resources);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	////////////////////////////////////////////////////////////////////////////////
+	// Type / Template classes                                                    //
+	////////////////////////////////////////////////////////////////////////////////
+	
+	
+	var M = new _Module2.default('typed', [_resources2.default]);
+	exports.default = M;
+	var Type = exports.Type = M.RESOURCE({ ////////////////////////////////////////////////
+	
+		name: 'Type',
+	
+		extends: _resources.Resource,
+	
+		singular: "type"
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	
+	
+	var IsSubtypeOf = exports.IsSubtypeOf = M.RELATIONSHIP({
+	
+		name: 'IsSubtypeOf',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "is subtype of",
+	
+		1: [Type, '0..*', { key: 'subtypes' }],
+		2: [Type, '0..*', { anchors: true, key: 'supertypes' }],
+	
+		noCycles: true
+	
+	});
+	
+	var Template = exports.Template = M.RESOURCE({ ////////////////////////////////////////////
+	
+		name: 'Template',
+	
+		extends: _resources.Resource,
+	
+		singular: "template",
+	
+		properties: {
+			'cardinalityBase': {
+				oneOf: [_schemas.distributionSchema, { type: 'integer', minimum: 1 }],
+				default: 1
+			}
+		}
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	
+	
+	var HasCardinalityMultipliedByThatOf = exports.HasCardinalityMultipliedByThatOf = M.RELATIONSHIP({
+	
+		name: 'HasCardinalityMultipliedByThatOf',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "has cardinality multiplied by that of",
+	
+		1: [Template, '0..*', { anchors: true, key: 'cardinalityMultipliers' }],
+		2: [Template, '0..*'],
+	
+		noCycles: true
+	
+	});
+	
+	var HasType = exports.HasType = M.RELATIONSHIP({
+	
+		name: 'HasType',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "has type",
+	
+		1: [Template, '1..1', { anchors: true, key: 'type' }],
+		2: [Type, '0..*']
+	
+	});
+	
+	var Typed = exports.Typed = M.OBJECT({ /////////////////////////////////////////////////
+	
+		name: 'Typed',
+	
+		abstract: true,
+	
+		singular: "typed resource",
+	
+		Type: Type,
+		Template: Template,
+		HasType: HasType
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+
+/***/ },
+/* 41 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1992,7 +2108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports) {
 
 	module.exports = function(it, Constructor, name, forbiddenField){
@@ -2002,7 +2118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var META     = __webpack_require__(60)('meta')
@@ -2060,7 +2176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports) {
 
 	module.exports = function(bitmap, value){
@@ -2073,7 +2189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports) {
 
 	// 7.1.4 ToInteger
@@ -2084,7 +2200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseHas = __webpack_require__(248),
@@ -2146,7 +2262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2291,7 +2407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Observable.js.map
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2359,7 +2475,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(14);
 	
-	var _symbols = __webpack_require__(48);
+	var _symbols = __webpack_require__(49);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2977,7 +3093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2995,122 +3111,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $$initSet = exports.$$initSet = Symbol('$$initSet');
 	var $$entriesIn = exports.$$entriesIn = Symbol('$$entriesIn');
 	var $$initialized = exports.$$initialized = Symbol('$$initialized');
-
-/***/ },
-/* 49 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.Typed = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = undefined;
-	
-	var _schemas = __webpack_require__(68);
-	
-	var _Module = __webpack_require__(79);
-	
-	var _Module2 = _interopRequireDefault(_Module);
-	
-	var _resources = __webpack_require__(28);
-	
-	var _resources2 = _interopRequireDefault(_resources);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	////////////////////////////////////////////////////////////////////////////////
-	// Type / Template classes                                                    //
-	////////////////////////////////////////////////////////////////////////////////
-	
-	
-	var M = new _Module2.default('typed', [_resources2.default]);
-	exports.default = M;
-	var Type = exports.Type = M.RESOURCE({ ////////////////////////////////////////////////
-	
-		name: 'Type',
-	
-		extends: _resources.Resource,
-	
-		singular: "type"
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	
-	
-	var IsSubtypeOf = exports.IsSubtypeOf = M.RELATIONSHIP({
-	
-		name: 'IsSubtypeOf',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "is subtype of",
-	
-		1: [Type, '0..*', { key: 'subtypes' }],
-		2: [Type, '0..*', { anchors: true, key: 'supertypes' }],
-	
-		noCycles: true
-	
-	});
-	
-	var Template = exports.Template = M.RESOURCE({ ////////////////////////////////////////////
-	
-		name: 'Template',
-	
-		extends: _resources.Resource,
-	
-		singular: "template",
-	
-		properties: {
-			'cardinalityBase': {
-				oneOf: [_schemas.distributionSchema, { type: 'integer', minimum: 1 }],
-				default: 1
-			}
-		}
-	
-	}); /////////////////////////////////////////////////////////////////////////////
-	
-	
-	var HasCardinalityMultipliedByThatOf = exports.HasCardinalityMultipliedByThatOf = M.RELATIONSHIP({
-	
-		name: 'HasCardinalityMultipliedByThatOf',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "has cardinality multiplied by that of",
-	
-		1: [Template, '0..*', { anchors: true, key: 'cardinalityMultipliers' }],
-		2: [Template, '0..*'],
-	
-		noCycles: true
-	
-	});
-	
-	var HasType = exports.HasType = M.RELATIONSHIP({
-	
-		name: 'HasType',
-	
-		extends: _resources.IsRelatedTo,
-	
-		singular: "has type",
-	
-		1: [Template, '1..1', { anchors: true, key: 'type' }],
-		2: [Type, '0..*']
-	
-	});
-	
-	var Typed = exports.Typed = M.OBJECT({ /////////////////////////////////////////////////
-	
-		name: 'Typed',
-	
-		abstract: true,
-	
-		singular: "typed resource",
-	
-		Type: Type,
-		Template: Template,
-		HasType: HasType
-	
-	}); /////////////////////////////////////////////////////////////////////////////
 
 /***/ },
 /* 50 */
@@ -3244,7 +3244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var toInteger = __webpack_require__(44)
+	var toInteger = __webpack_require__(45)
 	  , max       = Math.max
 	  , min       = Math.min;
 	module.exports = function(index, length){
@@ -3328,7 +3328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	var do_1 = __webpack_require__(703);
 	Observable_1.Observable.prototype.do = do_1._do;
 	//# sourceMappingURL=do.js.map
@@ -4045,7 +4045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module3 = _interopRequireDefault(_Module2);
 	
-	var _typed = __webpack_require__(49);
+	var _typed = __webpack_require__(40);
 	
 	var _misc = __webpack_require__(14);
 	
@@ -4559,7 +4559,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var root_1 = __webpack_require__(124);
 	var isArray_1 = __webpack_require__(123);
 	var isPromise_1 = __webpack_require__(711);
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	var iterator_1 = __webpack_require__(707);
 	var InnerSubscriber_1 = __webpack_require__(692);
 	var symbol_observable_1 = __webpack_require__(286);
@@ -6028,7 +6028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(49);
+	var _typed = __webpack_require__(40);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -6650,7 +6650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	var ScalarObservable_1 = __webpack_require__(276);
 	var EmptyObservable_1 = __webpack_require__(184);
 	var isScheduler_1 = __webpack_require__(93);
@@ -6981,9 +6981,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , $export           = __webpack_require__(1)
 	  , redefine          = __webpack_require__(16)
 	  , redefineAll       = __webpack_require__(57)
-	  , meta              = __webpack_require__(42)
+	  , meta              = __webpack_require__(43)
 	  , forOf             = __webpack_require__(72)
-	  , anInstance        = __webpack_require__(41)
+	  , anInstance        = __webpack_require__(42)
 	  , isObject          = __webpack_require__(5)
 	  , fails             = __webpack_require__(4)
 	  , $iterDetect       = __webpack_require__(104)
@@ -7635,7 +7635,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	var Subscriber_1 = __webpack_require__(27);
 	var Subscription_1 = __webpack_require__(183);
 	var ObjectUnsubscribedError_1 = __webpack_require__(282);
@@ -7895,7 +7895,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(49);
+	var _typed = __webpack_require__(40);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -8055,7 +8055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(49);
+	var _typed = __webpack_require__(40);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -8769,7 +8769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	var $defineProperty = __webpack_require__(8)
-	  , createDesc      = __webpack_require__(43);
+	  , createDesc      = __webpack_require__(44);
 	
 	module.exports = function(object, index, value){
 	  if(index in object)$defineProperty.f(object, index, createDesc(0, value));
@@ -8873,7 +8873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	var create         = __webpack_require__(54)
-	  , descriptor     = __webpack_require__(43)
+	  , descriptor     = __webpack_require__(44)
 	  , setToStringTag = __webpack_require__(73)
 	  , IteratorPrototype = {};
 	
@@ -9084,7 +9084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var toInteger = __webpack_require__(44)
+	var toInteger = __webpack_require__(45)
 	  , defined   = __webpack_require__(25);
 	// true  -> String#at
 	// false -> String#codePointAt
@@ -9120,7 +9120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var toInteger = __webpack_require__(44)
+	var toInteger = __webpack_require__(45)
 	  , defined   = __webpack_require__(25);
 	
 	module.exports = function repeat(count){
@@ -9231,8 +9231,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , hide           = __webpack_require__(13)
 	  , redefineAll    = __webpack_require__(57)
 	  , fails          = __webpack_require__(4)
-	  , anInstance     = __webpack_require__(41)
-	  , toInteger      = __webpack_require__(44)
+	  , anInstance     = __webpack_require__(42)
+	  , toInteger      = __webpack_require__(45)
 	  , toLength       = __webpack_require__(9)
 	  , gOPN           = __webpack_require__(55).f
 	  , dP             = __webpack_require__(8).f
@@ -10465,7 +10465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var fn = __webpack_require__(45);
+	var fn = __webpack_require__(46);
 	
 	module.exports = function keys() {
 	  return fn.apply(undefined, [this].concat(Array.prototype.slice.apply(arguments)));
@@ -11226,7 +11226,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -11668,7 +11668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 	
-	var _Field = __webpack_require__(47);
+	var _Field = __webpack_require__(48);
 	
 	Object.keys(_Field).forEach(function (key) {
 	  if (key === "default") return;
@@ -11699,7 +11699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(49);
+	var _typed = __webpack_require__(40);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -14152,14 +14152,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , hide        = __webpack_require__(13)
 	  , redefineAll = __webpack_require__(57)
 	  , ctx         = __webpack_require__(35)
-	  , anInstance  = __webpack_require__(41)
+	  , anInstance  = __webpack_require__(42)
 	  , defined     = __webpack_require__(25)
 	  , forOf       = __webpack_require__(72)
 	  , $iterDefine = __webpack_require__(145)
 	  , step        = __webpack_require__(221)
 	  , setSpecies  = __webpack_require__(58)
 	  , DESCRIPTORS = __webpack_require__(7)
-	  , fastKey     = __webpack_require__(42).fastKey
+	  , fastKey     = __webpack_require__(43).fastKey
 	  , SIZE        = DESCRIPTORS ? '_s' : 'size';
 	
 	var getEntry = function(that, key){
@@ -14310,10 +14310,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	var redefineAll       = __webpack_require__(57)
-	  , getWeak           = __webpack_require__(42).getWeak
+	  , getWeak           = __webpack_require__(43).getWeak
 	  , anObject          = __webpack_require__(2)
 	  , isObject          = __webpack_require__(5)
-	  , anInstance        = __webpack_require__(41)
+	  , anInstance        = __webpack_require__(42)
 	  , forOf             = __webpack_require__(72)
 	  , createArrayMethod = __webpack_require__(29)
 	  , $has              = __webpack_require__(11)
@@ -14693,7 +14693,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var each         = __webpack_require__(29)(0)
 	  , redefine     = __webpack_require__(16)
-	  , meta         = __webpack_require__(42)
+	  , meta         = __webpack_require__(43)
 	  , assign       = __webpack_require__(223)
 	  , weak         = __webpack_require__(218)
 	  , isObject     = __webpack_require__(5)
@@ -19273,7 +19273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseValues = __webpack_require__(594),
-	    keys = __webpack_require__(45);
+	    keys = __webpack_require__(46);
 	
 	/**
 	 * Creates an array of the own enumerable string keyed property values of `object`.
@@ -19596,7 +19596,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -22709,9 +22709,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(14);
 	
-	var _Field2 = __webpack_require__(47);
+	var _Field2 = __webpack_require__(48);
 	
-	var _symbols = __webpack_require__(48);
+	var _symbols = __webpack_require__(49);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -22906,9 +22906,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(14);
 	
-	var _Field2 = __webpack_require__(47);
+	var _Field2 = __webpack_require__(48);
 	
-	var _symbols = __webpack_require__(48);
+	var _symbols = __webpack_require__(49);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -23341,9 +23341,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(14);
 	
-	var _Field2 = __webpack_require__(47);
+	var _Field2 = __webpack_require__(48);
 	
-	var _symbols = __webpack_require__(48);
+	var _symbols = __webpack_require__(49);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -23593,9 +23593,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(14);
 	
-	var _Field2 = __webpack_require__(47);
+	var _Field2 = __webpack_require__(48);
 	
-	var _symbols = __webpack_require__(48);
+	var _symbols = __webpack_require__(49);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -24028,9 +24028,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(14);
 	
-	var _Field2 = __webpack_require__(47);
+	var _Field2 = __webpack_require__(48);
 	
-	var _symbols = __webpack_require__(48);
+	var _symbols = __webpack_require__(49);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -24256,9 +24256,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(14);
 	
-	var _Field2 = __webpack_require__(47);
+	var _Field2 = __webpack_require__(48);
 	
-	var _symbols = __webpack_require__(48);
+	var _symbols = __webpack_require__(49);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -24430,7 +24430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.PresentsModel = exports.CausalityArrow = exports.MeasurableGlyph = exports.ProcessEdge = exports.NodeGlyph = exports.CoalescenceRectangle = exports.BorderLine = exports.CylindricalLyphRectangle = exports.LyphRectangle = exports.MaterialGlyph = exports.LyphCanvas = exports.ContainsArtefact = exports.Dim0Container = exports.Dim1Container = exports.Dim2Container = exports.Dim0Artefact = exports.Dim1Artefact = exports.Dim2Artefact = exports.Artefact = exports.PrescribesStyleFor = exports.Theme = exports.InvolvesPublication = exports.Publication = exports.InvolvesClinicalIndex = exports.EncompassesClinicalIndex = exports.ClinicalIndex = exports.InvolvesMeasurable = exports.Correlation = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.Causes = exports.CausalityTemplate = exports.CausalityType = exports.InheritsAllMeasurablesFrom = exports.HasMeasurable = exports.MeasurableLocationTemplate = exports.MeasurableLocationType = exports.MeasuresMaterial = exports.MeasurableTemplate = exports.MeasurableType = exports.InheritsAllChannelsFrom = exports.HasChannel = exports.TransportsMaterial = exports.ConveysProcess = exports.FlowsTo = exports.ProcessTemplate = exports.ProcessType = exports.HasElement = exports.GroupTemplate = exports.GroupType = exports.HasNode = exports.NodeTemplate = exports.NodeType = exports.CoalescesThroughLayer = exports.CoalescesWith = exports.Coalescence = exports.HasPlusBorder = exports.HasMinusBorder = exports.HasOuterBorder = exports.HasInnerBorder = exports.BorderTemplate = exports.BorderType = exports.InheritsAllSegmentsFrom = exports.HasSegment = exports.CylindricalLyphTemplate = exports.CylindricalLyphType = exports.InheritsAllLayersFrom = exports.InheritsAllPatchesFrom = exports.InheritsAllPartsFrom = exports.HasPatch = exports.HasLayer = exports.HasPart = exports.LyphTemplate = exports.LyphType = exports.InheritsAllMaterialsFrom = exports.ContainsMaterial = exports.MaterialTemplate = exports.MaterialType = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = exports.CorrespondsTo = exports.IsExternallyRelatedTo = exports.ExternalResource = exports.IsRelatedTo = exports.Resource = undefined;
+	exports.HasTreeParent_PROVISIONAL = exports.OmegaTreePart_PROVISIONAL = exports.PresentsModel = exports.CausalityArrow = exports.MeasurableGlyph = exports.ProcessEdge = exports.NodeGlyph = exports.CoalescenceRectangle = exports.BorderLine = exports.CylindricalLyphRectangle = exports.LyphRectangle = exports.MaterialGlyph = exports.LyphCanvas = exports.ContainsArtefact = exports.Dim0Container = exports.Dim1Container = exports.Dim2Container = exports.Dim0Artefact = exports.Dim1Artefact = exports.Dim2Artefact = exports.Artefact = exports.PrescribesStyleFor = exports.Theme = exports.InvolvesPublication = exports.Publication = exports.InvolvesClinicalIndex = exports.EncompassesClinicalIndex = exports.ClinicalIndex = exports.InvolvesMeasurable = exports.Correlation = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.Causes = exports.CausalityTemplate = exports.CausalityType = exports.InheritsAllMeasurablesFrom = exports.HasMeasurable = exports.MeasurableLocationTemplate = exports.MeasurableLocationType = exports.MeasuresMaterial = exports.MeasurableTemplate = exports.MeasurableType = exports.InheritsAllChannelsFrom = exports.HasChannel = exports.TransportsMaterial = exports.ConveysProcess = exports.FlowsTo = exports.ProcessTemplate = exports.ProcessType = exports.HasElement = exports.GroupTemplate = exports.GroupType = exports.HasNode = exports.NodeTemplate = exports.NodeType = exports.CoalescesThroughLayer = exports.CoalescesWith = exports.Coalescence = exports.HasPlusBorder = exports.HasMinusBorder = exports.HasOuterBorder = exports.HasInnerBorder = exports.BorderTemplate = exports.BorderType = exports.InheritsAllSegmentsFrom = exports.HasSegment = exports.CylindricalLyphTemplate = exports.CylindricalLyphType = exports.InheritsAllLayersFrom = exports.InheritsAllPatchesFrom = exports.InheritsAllPartsFrom = exports.HasPatch = exports.HasLayer = exports.HasPart = exports.LyphTemplate = exports.LyphType = exports.InheritsAllMaterialsFrom = exports.ContainsMaterial = exports.MaterialTemplate = exports.MaterialType = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = exports.CorrespondsTo = exports.IsExternallyRelatedTo = exports.ExternalResource = exports.IsRelatedTo = exports.Resource = undefined;
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -24440,7 +24440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _typed = __webpack_require__(49);
+	var _typed = __webpack_require__(40);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -24608,6 +24608,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var MeasurableGlyph = classesObject.MeasurableGlyph;
 	var CausalityArrow = classesObject.CausalityArrow;
 	var PresentsModel = classesObject.PresentsModel;
+	var OmegaTreePart_PROVISIONAL = classesObject.OmegaTreePart_PROVISIONAL;
+	var HasTreeParent_PROVISIONAL = classesObject.HasTreeParent_PROVISIONAL;
 	
 	// export * from './modules/resources';
 	// export * from './modules/typed';
@@ -24708,6 +24710,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.MeasurableGlyph = MeasurableGlyph;
 	exports.CausalityArrow = CausalityArrow;
 	exports.PresentsModel = PresentsModel;
+	exports.OmegaTreePart_PROVISIONAL = OmegaTreePart_PROVISIONAL;
+	exports.HasTreeParent_PROVISIONAL = HasTreeParent_PROVISIONAL;
 
 	function _inspect(input, depth) {
 		var maxDepth = 4;
@@ -24791,7 +24795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.OmegaTree = undefined;
+	exports.HasTreeParent_PROVISIONAL = exports.OmegaTreePart_PROVISIONAL = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.OmegaTree = undefined;
 	
 	var _TypedModule = __webpack_require__(67);
 	
@@ -24800,6 +24804,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _resources = __webpack_require__(28);
 	
 	var _resources2 = _interopRequireDefault(_resources);
+	
+	var _typed = __webpack_require__(40);
+	
+	var _typed2 = _interopRequireDefault(_typed);
 	
 	var _groups = __webpack_require__(191);
 	
@@ -24811,7 +24819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var M = new _TypedModule2.default('omegaTrees', [_resources2.default, _groups2.default, _lyphs2.default]);
+	var M = new _TypedModule2.default('omegaTrees', [_resources2.default, _typed2.default, _groups2.default, _lyphs2.default]);
 	exports.default = M;
 	var OmegaTree = exports.OmegaTree = M.TYPED_RESOURCE({ /////////////////////////////////////
 	
@@ -24835,6 +24843,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		1: [OmegaTree.Type, '0..*', { anchors: true, covariant: true, key: 'root' }],
 		2: [_lyphs.Node.Template, '0..*']
+	
+	});
+	
+	var OmegaTreePart_PROVISIONAL = exports.OmegaTreePart_PROVISIONAL = M.TYPED_RESOURCE({ /////////////////////
+	
+		name: 'OmegaTreePart',
+	
+		extends: _typed.Typed,
+		extendedBy: [_lyphs.CylindricalLyph, OmegaTree],
+	
+		singular: "omega tree part"
+	
+	}); /////////////////////////////////////////////////////////////////////////////
+	
+	
+	var HasTreeParent_PROVISIONAL = exports.HasTreeParent_PROVISIONAL = M.RELATIONSHIP({
+	
+		name: 'HasTreeParent',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "has tree-parent",
+	
+		1: [OmegaTreePart_PROVISIONAL.Template, '0..1', { key: 'treeParent' }],
+		2: [OmegaTreePart_PROVISIONAL.Template, '0..*', { key: 'treeChildren' }],
+	
+		noCycles: true
 	
 	});
 
@@ -24986,7 +25021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
 	
-	var _typed = __webpack_require__(49);
+	var _typed = __webpack_require__(40);
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
@@ -25493,7 +25528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -25510,7 +25545,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -25527,7 +25562,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -25546,7 +25581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -25566,7 +25601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -25583,7 +25618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -25603,7 +25638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -25623,7 +25658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _functionGenerator = __webpack_require__(40);
+	var _functionGenerator = __webpack_require__(41);
 	
 	var _functionGenerator2 = _interopRequireDefault(_functionGenerator);
 	
@@ -26550,7 +26585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var $export       = __webpack_require__(1)
 	  , toIObject     = __webpack_require__(18)
-	  , toInteger     = __webpack_require__(44)
+	  , toInteger     = __webpack_require__(45)
 	  , toLength      = __webpack_require__(9)
 	  , $native       = [].lastIndexOf
 	  , NEGATIVE_ZERO = !!$native && 1 / [1].lastIndexOf(1, -0) < 0;
@@ -26839,7 +26874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var dP         = __webpack_require__(8).f
-	  , createDesc = __webpack_require__(43)
+	  , createDesc = __webpack_require__(44)
 	  , has        = __webpack_require__(11)
 	  , FProto     = Function.prototype
 	  , nameRE     = /^\s*function ([^ (]*)/
@@ -27321,8 +27356,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	var $export      = __webpack_require__(1)
-	  , anInstance   = __webpack_require__(41)
-	  , toInteger    = __webpack_require__(44)
+	  , anInstance   = __webpack_require__(42)
+	  , toInteger    = __webpack_require__(45)
 	  , aNumberValue = __webpack_require__(211)
 	  , repeat       = __webpack_require__(153)
 	  , $toFixed     = 1..toFixed
@@ -27496,7 +27531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 19.1.2.5 Object.freeze(O)
 	var isObject = __webpack_require__(5)
-	  , meta     = __webpack_require__(42).onFreeze;
+	  , meta     = __webpack_require__(43).onFreeze;
 	
 	__webpack_require__(31)('freeze', function($freeze){
 	  return function freeze(it){
@@ -27608,7 +27643,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 19.1.2.15 Object.preventExtensions(O)
 	var isObject = __webpack_require__(5)
-	  , meta     = __webpack_require__(42).onFreeze;
+	  , meta     = __webpack_require__(43).onFreeze;
 	
 	__webpack_require__(31)('preventExtensions', function($preventExtensions){
 	  return function preventExtensions(it){
@@ -27622,7 +27657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 19.1.2.17 Object.seal(O)
 	var isObject = __webpack_require__(5)
-	  , meta     = __webpack_require__(42).onFreeze;
+	  , meta     = __webpack_require__(43).onFreeze;
 	
 	__webpack_require__(31)('seal', function($seal){
 	  return function seal(it){
@@ -27684,7 +27719,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , isObject           = __webpack_require__(5)
 	  , anObject           = __webpack_require__(2)
 	  , aFunction          = __webpack_require__(15)
-	  , anInstance         = __webpack_require__(41)
+	  , anInstance         = __webpack_require__(42)
 	  , forOf              = __webpack_require__(72)
 	  , setProto           = __webpack_require__(107).set
 	  , speciesConstructor = __webpack_require__(150)
@@ -28256,7 +28291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , getPrototypeOf = __webpack_require__(21)
 	  , has            = __webpack_require__(11)
 	  , $export        = __webpack_require__(1)
-	  , createDesc     = __webpack_require__(43)
+	  , createDesc     = __webpack_require__(44)
 	  , anObject       = __webpack_require__(2)
 	  , isObject       = __webpack_require__(5);
 	
@@ -28824,7 +28859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , DESCRIPTORS    = __webpack_require__(7)
 	  , $export        = __webpack_require__(1)
 	  , redefine       = __webpack_require__(16)
-	  , META           = __webpack_require__(42).KEY
+	  , META           = __webpack_require__(43).KEY
 	  , $fails         = __webpack_require__(4)
 	  , shared         = __webpack_require__(108)
 	  , setToStringTag = __webpack_require__(73)
@@ -28838,7 +28873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , anObject       = __webpack_require__(2)
 	  , toIObject      = __webpack_require__(18)
 	  , toPrimitive    = __webpack_require__(32)
-	  , createDesc     = __webpack_require__(43)
+	  , createDesc     = __webpack_require__(44)
 	  , _create        = __webpack_require__(54)
 	  , gOPNExt        = __webpack_require__(225)
 	  , $GOPD          = __webpack_require__(20)
@@ -29497,7 +29532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , OBSERVABLE  = __webpack_require__(6)('observable')
 	  , aFunction   = __webpack_require__(15)
 	  , anObject    = __webpack_require__(2)
-	  , anInstance  = __webpack_require__(41)
+	  , anInstance  = __webpack_require__(42)
 	  , redefineAll = __webpack_require__(57)
 	  , hide        = __webpack_require__(13)
 	  , forOf       = __webpack_require__(72)
@@ -34487,7 +34522,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseFor = __webpack_require__(573),
-	    keys = __webpack_require__(45);
+	    keys = __webpack_require__(46);
 	
 	/**
 	 * The base implementation of `_.forOwn` without support for iteratee shorthands.
@@ -35517,7 +35552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseHas = __webpack_require__(248),
-	    keys = __webpack_require__(45);
+	    keys = __webpack_require__(46);
 	
 	/** Used to compose bitmasks for comparison styles. */
 	var PARTIAL_COMPARE_FLAG = 2;
@@ -35653,7 +35688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isStrictComparable = __webpack_require__(260),
-	    keys = __webpack_require__(45);
+	    keys = __webpack_require__(46);
 	
 	/**
 	 * Gets the property names, values, and compare flags of `object`.
@@ -36760,7 +36795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var copyObject = __webpack_require__(252),
 	    createAssigner = __webpack_require__(253),
-	    keys = __webpack_require__(45);
+	    keys = __webpack_require__(46);
 	
 	/**
 	 * This method is like `_.assign` except that it accepts `customizer`
@@ -37572,7 +37607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    isArrayLike = __webpack_require__(89),
 	    isObjectLike = __webpack_require__(63),
 	    isString = __webpack_require__(90),
-	    keys = __webpack_require__(45),
+	    keys = __webpack_require__(46),
 	    stringSize = __webpack_require__(641);
 	
 	/** `Object#toString` result references. */
@@ -37625,7 +37660,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var createToPairs = __webpack_require__(600),
-	    keys = __webpack_require__(45);
+	    keys = __webpack_require__(46);
 	
 	/**
 	 * Creates an array of own enumerable string keyed-value pairs for `object`
@@ -42939,7 +42974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	var subscribeToResult_1 = __webpack_require__(78);
 	var OuterSubscriber_1 = __webpack_require__(77);
 	/**
@@ -43037,7 +43072,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(46);
+	var Observable_1 = __webpack_require__(47);
 	var noop_1 = __webpack_require__(712);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.

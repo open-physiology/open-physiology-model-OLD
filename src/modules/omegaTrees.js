@@ -1,11 +1,12 @@
 import TypedModule from '../TypedModule';
 
-import resources, {IsRelatedTo} from './resources';
-import groups,    {Group}       from './groups';
-import lyphs,     {Node}        from './lyphs';
+import resources, {IsRelatedTo}           from './resources';
+import typed,     {Typed}                 from './typed';
+import groups,    {Group}                 from './groups';
+import lyphs,     {CylindricalLyph, Node} from './lyphs';
 
 
-const M = new TypedModule('omegaTrees', [resources, groups, lyphs]);
+const M = new TypedModule('omegaTrees', [resources, typed, groups, lyphs]);
 export default M;
 
 
@@ -34,5 +35,33 @@ export const HasAsRoot = M.RELATIONSHIP({
 	2: [Node.Template,  '0..*',                                                ],
 
 	// TODO: CONSTRAINT: all root nodes must be on a plus-border or minus-border
+	
+});
+
+
+export const OmegaTreePart_PROVISIONAL = M.TYPED_RESOURCE({/////////////////////
+	
+	name: 'OmegaTreePart',
+	
+	extends: Typed,
+	extendedBy: [CylindricalLyph, OmegaTree],
+	
+	singular: "omega tree part",
+	
+});/////////////////////////////////////////////////////////////////////////////
+
+
+export const HasTreeParent_PROVISIONAL = M.RELATIONSHIP({
+	
+	name: 'HasTreeParent',
+	
+	extends: IsRelatedTo,
+	
+	singular: "has tree-parent",
+	
+	1: [OmegaTreePart_PROVISIONAL.Template, '0..1', { key: 'treeParent'   }],
+	2: [OmegaTreePart_PROVISIONAL.Template, '0..*', { key: 'treeChildren' }],
+	
+	noCycles: true
 	
 });
