@@ -67,24 +67,6 @@ export class Field extends ValueTracker {
 		if (cls[$$initialized]) { return }
 		cls[$$initialized] = true;
 		
-		// TODO: remove .field() method when Natallia has stopped using it.
-		cls.prototype::defineProperties({
-			field: { value(key) {
-				console.error(humanMsg`
-					Natallia: Using 'item.field(key)' is deprecated.
-					Please use 'item.fields[key]' instead. Because
-					'item.fields' is a simple object, you can use it
-					to iterate over all fields with 'Object.keys()'
-					and the like. Let me know when you're no longer
-					using 'item.field(key)'.
-				`);
-				assert(this.fields[key], humanMsg`
-					This entity does not have a '${key}' field.
-				`);
-				return this.fields[key];
-			}}
-		});
-		
 	}
 	
 	static initializeEntity(owner, initialValues) {
