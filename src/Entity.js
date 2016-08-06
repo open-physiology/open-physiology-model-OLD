@@ -1,27 +1,39 @@
-import isObject   from 'lodash-bound/isObject';
-import defaults   from 'lodash-bound/defaults';
-import uniqueId   from 'lodash/uniqueId';
-import assert     from 'power-assert';
+import isObject from 'lodash-bound/isObject';
+import defaults from 'lodash-bound/defaults';
+import isString from 'lodash-bound/isString';
+import isArray from 'lodash-bound/isArray';
+import size from 'lodash-bound/size';
+import _keys from 'lodash-bound/keys';
+import _values from 'lodash-bound/values';
+import isUndefined from 'lodash-bound/isUndefined';
+import uniqueId from 'lodash/uniqueId';
+import assert   from 'power-assert';
 
-import ObservableSet from './util/ObservableSet';
-import {humanMsg, assign} from "./util/misc";
-import {Field} from "./Field";
-import ValueTracker, {event, property} from "./util/ValueTracker";
-import {tracker} from './changes/Change';
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {filter} from 'rxjs/operator/filter';
-import 'rxjs/add/operator/do';
+import ObservableSet         from './util/ObservableSet';
+import {humanMsg}            from './util/misc';
+import {Field}               from './Field';
+import ValueTracker, {event, property} from './util/ValueTracker';
+import {tracker}             from './changes/Change';
+import {BehaviorSubject}     from 'rxjs/BehaviorSubject';
+import {filter}              from 'rxjs/operator/filter';
+import {merge}               from 'rxjs/observable/merge';
+import {map}                 from 'rxjs/operator/map';
+import {combineLatest}       from 'rxjs/observable/combineLatest';
+import                            'rxjs/add/operator/do';
 
-const $$cache            = Symbol('$$cache'           );
-const $$allCommittedEntities         = Symbol('$$allCommittedEntities'        );
-const $$allEntities      = Symbol('$$allEntities'     );
-const $$singletonObject  = Symbol('$$singletonObject' );
-const $$newEntitySubject = Symbol('$$newEntitySubject');
-const $$deleted          = Symbol('$$deleted'         );
-const $$allSubject       = Symbol('$$allSubject'      );
-const $$allCommittedSubject = Symbol('$$allCommittedSubject');
+import {defineProperties, defineProperty, assign} from 'bound-native-methods';
 
-////////////////////////////////////////////////////////////////
+const $$committedEntitiesByHref  = Symbol('$$committedEntitiesByHref');
+const $$committedEntities        = Symbol('$$committedEntities'      );
+const $$entities                 = Symbol('$$allEntities'            );
+const $$singletonObject          = Symbol('$$singletonObject'        );
+const $$newEntitySubject         = Symbol('$$newEntitySubject'       );
+const $$deleted                  = Symbol('$$deleted'                );
+const $$entitiesSubject          = Symbol('$$allSubject'             );
+const $$committedEntitiesSubject = Symbol('$$allCommittedSubject'    );
+const $$set                      = Symbol('$$set');
+
+////////////////////////////////////////////////////////////////////////////////
 
 export default class Entity extends ValueTracker {
 	
@@ -41,10 +53,9 @@ export default class Entity extends ValueTracker {
 			return class ${name} extends Entity {};
 		`)(Entity);
 		
-		/* populate it with the rest of the configuration data */
+		/* populate it with the necessary data and behavior */
 		EntitySubclass::assign(rest);
-		
-		Object.defineProperties(EntitySubclass, {
+		EntitySubclass::defineProperties({
 			name: { value: name },
 			[Symbol.hasInstance]: {
 				value(instance) { return this.hasInstance(instance) }
@@ -69,10 +80,10 @@ export default class Entity extends ValueTracker {
 				value(name) {
 					switch (name) {
 						case 'all': {
-							return this[$$allSubject]; // TODO
+							return this[$$entitiesSubject]; // TODO
 						}
 						case 'allCommitted': {
-							return this[$$allCommittedSubject]; // TODO
+							return this[$$committedEntitiesSubject]; // TODO
 						}
 						default: assert(false, humanMsg`
 							The ${name} property does not exist on ${this.name}.
@@ -82,32 +93,15 @@ export default class Entity extends ValueTracker {
 			}
 		});
 		
-		/* maintaining <Class>.p('all') */
-		{
-			let allEntitiesOfNewClass = new ObservableSet();
-			Entity[$$allEntities].e('add')
-				::filter(::EntitySubclass.hasInstance)
-				.subscribe(allEntitiesOfNewClass.e('add'));
-			Entity[$$allEntities].e('delete')
-				::filter(::EntitySubclass.hasInstance)
-				.subscribe(allEntitiesOfNewClass.e('delete'));
-			Object.defineProperty(EntitySubclass, $$allSubject, {
-				value: allEntitiesOfNewClass.p('value')
-			});
-		}
-		
-		/* maintaining <Class>.p('all') */
-		{
-			let allEntitiesOfNewClass = new ObservableSet();
-			Entity[$$allCommittedEntities].e('add')
-				::filter(::EntitySubclass.hasInstance)
-				.subscribe(allEntitiesOfNewClass.e('add'));
-			Entity[$$allCommittedEntities].e('delete')
-				::filter(::EntitySubclass.hasInstance)
-				.subscribe(allEntitiesOfNewClass.e('delete'));
-			Object.defineProperty(EntitySubclass, $$allCommittedSubject, {
-				value: allEntitiesOfNewClass.p('value')
-			});
+		/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
+		for (let [$$set, $$subject] of [
+			[$$entities,          $$entitiesSubject         ],
+			[$$committedEntities, $$committedEntitiesSubject]
+		]) {
+			const localSet = new ObservableSet();
+			Entity[$$set].e('add'   )::filter(::EntitySubclass.hasInstance).subscribe(localSet.e('add'   ));
+			Entity[$$set].e('delete')::filter(::EntitySubclass.hasInstance).subscribe(localSet.e('delete'));
+			EntitySubclass::defineProperty($$subject, { value: localSet.p('value') });
 		}
 		
 		return EntitySubclass;
@@ -163,8 +157,8 @@ export default class Entity extends ValueTracker {
 	): this {
 		if (href::isObject()) { href = {href} }
 		let entity;
-		if (href in Entity[$$cache]) {
-			entity = Entity[$$cache][href];
+		if (href in Entity[$$committedEntitiesByHref]) {
+			entity = Entity[$$committedEntitiesByHref][href];
 		} else {
 			// We're assuming that this is solely a synchronous method call,
 			// so we can't query the server here.
@@ -179,11 +173,11 @@ export default class Entity extends ValueTracker {
 	}
 	
 	static getAll() {
-		return new Set([...this[$$allEntities]].filter(::this.hasInstance));
+		return new Set([...this[$$entities]].filter(::this.hasInstance));
 	}
 	
 	static getAllCommitted() {
-		return new Set([...this[$$allCommittedEntities]].filter(::this.hasInstance));
+		return new Set([...this[$$committedEntities]].filter(::this.hasInstance));
 	}
 	
 	static newOrSingleton() {
@@ -223,6 +217,9 @@ export default class Entity extends ValueTracker {
 	@event() deleteEvent;
 	@event() commitEvent;
 	@event() rollbackEvent;
+	@property({ initial: false, readonly: true }) isDeleted;
+	@property({ initial: true,  readonly: true }) isPristine;
+	@property({ initial: false, readonly: true }) isNew;
 	
 	
 	///////////////////////////////
@@ -233,14 +230,22 @@ export default class Entity extends ValueTracker {
 	get [Symbol.toStringTag]() { return this.constructor.name }
 	
 	constructor(
-		initialValues:  Object = {},
-		options: Object = {}
+		initialValues: Object = {},
+		options:       Object = {}
 	) {
 		
-		super({ deleteEventName: 'delete' });
+		super();
+		
+		super.setValueTrackerOptions({
+			takeUntil: combineLatest(
+				this.p('isDeleted'), this.p('isPristine'), this.p('isNew'),
+				(isDeleted, isPristine, isNew) => isDeleted && (isPristine || isNew)
+			)::filter(isGone => isGone),
+			filterAllBy: () => this.isDeleted.getValue()
+		});
 		
 		if (this.constructor.singleton) {
-			
+			// TODO
 		}
 		
 		initialValues::defaults({
@@ -251,7 +256,13 @@ export default class Entity extends ValueTracker {
 		
 		Field.initializeEntity(this, initialValues);
 		
-		Entity[$$allEntities].add(this);
+		/* entity is pristine if all its fields are pristine */
+		this.pSubject('isPristine').subscribe(combineLatest(
+			...this.fields::_values().map(f=>f.p('isPristine')),
+			(...fieldPristines) => fieldPristines.every(v=>!!v)
+		));
+		
+		Entity[$$entities].add(this);
 		
 		
 		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
@@ -267,50 +278,79 @@ export default class Entity extends ValueTracker {
 		//     : that also allows undo. This will replace storing 'pristine' ops.
 		//     : (This is the Command design pattern.)
 		
-		if (this[$$deleted]) { return }
-		this[$$deleted] = true;
-		this.e('delete').next(this);
+		if (this.isDeleted) { return }
+		this.pSubject('isDeleted') .next(true);
+		this.pSubject('isPristine').next(false);
+		Entity[$$entities].delete(this);
 	}
 	
-	isDeleted() { return !!this[$$deleted] }
+	undelete() {
+		if (!this.isDeleted) { return }
+		this.pSubject('isDeleted') .next(false);
+		this.pSubject('isPristine').next(false);
+		Entity[$$entities].add(this);
+	}
 	
-	//noinspection JSDuplicatedDeclaration // temporary, to suppress warning due to Webstorm bug
-	get(key)               { return this.field_get(key)               }
-	set(key, val, options) { return this.field_set(key, val, options) }
+	// isDeleted() { return !!this[$$deleted] } // TODO: remove
 	
-	async commit() {
-		
-		await this.field_commit();
-		
-		// setting up id and href here until actual server communication is set up
-		// TODO: remove when the server actually does this
-		if (this.get('id') === null) {
-			const newId = parseInt(uniqueId());
-			const opts = { ignoreReadonly: true, updatePristine: true };
-			this.set('id',    newId,             opts);
-			this.set('href', `cache://${newId}`, opts);
-			Entity[$$cache][this.href] = this;
-			Entity[$$allCommittedEntities].add(this);
+	//noinspection JSDuplicatedDeclaration // temporary, to suppress warning due to Webstorm bug; TODO: report bug
+	get(key)               { return this.fields[key].get()             }
+	set(key, val, options) { return this.fields[key].set(val, options) }
+	
+	async commit(...keysToCommit) {
+		if (this.isDeleted) {
+			// TODO
 		}
 		
-		this.e('commit').next(this);
+		
+		/* commit each field individually */ // TODO: commit all in a single transaction?
+		if (keysToCommit::size() === 0) { keysToCommit = this.fields::_keys() }
+		await Promise.all(keysToCommit.map((key) => { this.fields[key].commit() }));
+		
+		/* setting up as a committed entity */
+		// TODO: remove when the server actually does this
+		if (this.get('id') === null) {
+			/* id and href are set here until actual server communication is set up */
+			const newId   = parseInt(uniqueId());
+			const newHref = `cache://${newId}`;
+			const opts = { ignoreReadonly: true, updatePristine: true };
+			this.set('id',   newId,   opts);
+			this.set('href', newHref, opts);
+			
+			/* after it's first committed, it's no longer new */
+			this.pSubject('isNew').next(false);
+			
+			/* maintain caches */
+			Entity[$$committedEntitiesByHref][newHref] = this;
+			Entity[$$committedEntities].add(this);
+		}
+		
+		/* directly after a commit, it's pristine */
+		this.pSubject('isPristine').next(true);
+		
 	}
 	
-	rollback() {
-		this.field_rollback();
+	rollback(...keysToRollback) {
+		if (keysToRollback::size() === 0) { keysToRollback = this.fields::_keys() }
+		keysToRollback.map((key) => { this.fields[key].rollback() });
 		this.e('rollback').next(this);
 	}
 	
 	p(key, t) {
 		// Provide easier access to field property observables
-		return this.field(key) ? this.field(key).p('value', t) : super.p(key, t);
+		return (this.fields && this.fields[key])
+			? this.fields[key].p('value', t)
+			: super.p(key, t);
 	}
 
 }
 
 Entity::assign({
-	[$$cache]      : {},
-	[$$allCommittedEntities]   : new ObservableSet(),
-	[$$allEntities]: new ObservableSet(),
-	[$$allSubject] : new BehaviorSubject(new Set())
+	[$$entities]                : new ObservableSet(),
+	[$$entitiesSubject]         : new BehaviorSubject(new Set()),
+	
+	[$$committedEntities]       : new ObservableSet(),
+	[$$committedEntitiesSubject]: new BehaviorSubject(new Set()),
+	
+	[$$committedEntitiesByHref] : {}
 });

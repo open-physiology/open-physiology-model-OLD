@@ -1,39 +1,28 @@
 'use strict';
 
 import isUndefined from 'lodash-bound/isUndefined';
-import isEqual     from 'lodash/isEqual';
-import isArray     from 'lodash-bound/isArray';
 import isInteger   from 'lodash-bound/isInteger';
-import isString    from 'lodash-bound/isString';
 import defaults    from 'lodash-bound/defaults';
 import assignWith  from 'lodash-bound/assignWith';
 import _keys       from 'lodash-bound/keys';
 import _values     from 'lodash-bound/values';
 import _entries    from 'lodash-bound/entries';
-import filter      from 'lodash-bound/filter';
-import size        from 'lodash-bound/size';
-import groupBy     from 'lodash-bound/groupBy';
-import toPairs     from 'lodash-bound/toPairs';
-import inRange     from 'lodash-bound/inRange';
-import without     from 'lodash-bound/without';
-import map         from 'lodash-bound/map';
-import union       from 'lodash/union';
+import isEqual     from 'lodash/isEqual';
 import assert      from 'power-assert';
 import Graph       from 'graph.js/dist/graph.js';
 
-import AsciiTable from 'ascii-table';
+import {assign, defineProperty} from 'bound-native-methods';
 
 import {
 	humanMsg,
 	mapOptionalArray,
 	parseCardinality,
 	arrayify,
-	assign
+	stringifyCardinality
 } from './util/misc';
 
 import Entity  from './Entity';
 import {Field} from './Field';
-import {stringifyCardinality} from "./util/misc";
 
 
 const $$processedFor              = Symbol('$$processedFor');
@@ -52,8 +41,8 @@ const $$processRelationshipDomain = Symbol('$$processRelationshipDomain');
 
 export default class Module {
 	
-	classes : Graph = new Graph; // vertices: name                   -> class
-	                             // edges:    [superclass, subclass] -> undefined
+	classes : Graph = new Graph(); // vertices: name                   -> class
+	                               // edges:    [superclass, subclass] -> undefined
 
 	constructor(name, dependencies = []) {
 		/* store the module name */
@@ -78,7 +67,7 @@ export default class Module {
 		}
 		
 		/* merge in the dependencies */
-		// there should be no conflicts from this point
+		// there should be no name clashes from this point
 		for (let dependency of dependencies) {
 			this.classes.mergeIn(dependency.classes);
 		}
@@ -225,7 +214,7 @@ export default class Module {
 					
 					shortcutKey      : options.key
 				});
-				Object.defineProperty(domain, Symbol.toStringTag, {
+				domain::defineProperty(Symbol.toStringTag, {
 					get() {
 						return humanMsg`
 							${this.resourceClass.name}

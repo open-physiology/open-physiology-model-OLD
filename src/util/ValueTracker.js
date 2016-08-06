@@ -1,8 +1,9 @@
 import includes      from 'lodash-bound/includes';
 import isArray       from 'lodash-bound/isArray';
 import isString      from 'lodash-bound/isString';
+import isFunction    from 'lodash-bound/isFunction';
 import set           from 'lodash-bound/set';
-import entries       from 'lodash-bound/entries';
+import _entries      from 'lodash-bound/entries';
 import ldIsEqual     from 'lodash/isEqual';
 import assert        from 'power-assert';
 
@@ -14,10 +15,13 @@ import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged';
 import {filter}               from 'rxjs/operator/filter';
 import {takeUntil}            from 'rxjs/operator/takeUntil';
 
-const $$events     =      Symbol('$$events');
-const $$properties =      Symbol('$$properties');
-const $$initialize =      Symbol('$$initialize');
-const $$deleteEventName = Symbol('$$deleteEventName');
+const $$events             = Symbol('$$events');
+const $$properties         = Symbol('$$properties');
+const $$settableProperties = Symbol('$$settableProperties');
+const $$initialize         = Symbol('$$initialize');
+const $$takeUntil          = Symbol('$$takeUntil');
+const $$filterBy           = Symbol('$$filterBy');
+const $$currentValues      = Symbol('$$currentValues');
 
 /**
  * Use this as a subclass (or just mix it in) to provide support for
@@ -30,20 +34,28 @@ export default class ValueTracker {
 
 	[$$initialize]() {
 		if (this[$$events]) { return }
-		this[$$events]     = {};
-		this[$$properties] = {};
+		this[$$events]             = {};
+		this[$$properties]         = {};
+		this[$$settableProperties] = {};
+		this[$$currentValues]      = {};
 
 		/* add the events and properties added with ES7 annotations */
-		for (let [key, options] of (this.constructor[$$events] || {})::entries()) {
+		for (let [key, options] of (this.constructor[$$events] || {})::_entries()) {
 			this.newEvent(key, options);
 		}
-		for (let [key, options] of (this.constructor[$$properties] || {})::entries()) {
+		for (let [key, options] of (this.constructor[$$properties] || {})::_entries()) {
 			this.newProperty(key, options);
 		}
 	}
 	
-	constructor({ deleteEventName = null } = {}) {
-		this[$$deleteEventName] = deleteEventName;
+	constructor() {
+		this[$$takeUntil] = never();
+		this[$$filterBy]  = (()=>true);
+	}
+	
+	setValueTrackerOptions({ takeUntil = never(), filterBy = (()=>true) }) {
+		this[$$takeUntil] = takeUntil;
+		this[$$filterBy]  = filterBy;
 		this[$$initialize]();
 	}
 	
@@ -59,17 +71,14 @@ export default class ValueTracker {
 		this[$$initialize]();
 
 		/* is the event name already taken? */
-		assert(() => !this[$$events][name],
+		assert(!this[$$events][name],
 			`There is already an event '${name}' on this object.`);
-		assert(() => !this[$$properties][name],
+		assert(!this[$$properties][name],
 			`There is already a property '${name}' on this object.`);
 		
 		this[$$events][name] = new Subject()
-			::takeUntil(this.e(this[$$deleteEventName]));
-		
-		// this[$$events][name].subscribe((v) => {
-		// 	console.log(this.constructor.name, `[[[${name}]]]`, v);
-		// });
+			::takeUntil(this[$$takeUntil])
+			::filter   (this[$$filterBy] );
 		
 		return this[$$events][name];
 	}
@@ -79,16 +88,16 @@ export default class ValueTracker {
 	 *
 	 * @public
 	 * @method
-	 * @param  {String}                   name           - the name of the new property
-	 * @param  {Boolean}                 [settable=true] - whether the value can be manually set
-	 * @param  {function(*,*):Boolean}   [isEqual]       - a predicate function by which to test for duplicate values
-	 * @param  {function(*):Boolean}     [isValid]       - a predicate function to validate a given value
-	 * @param  {*}                       [initial]       - the initial value of this property
+	 * @param  {String}                   name            - the name of the new property
+	 * @param  {Boolean}                 [readonly=false] - whether the value can be manually set
+	 * @param  {function(*,*):Boolean}   [isEqual]        - a predicate function by which to test for duplicate values
+	 * @param  {function(*):Boolean}     [isValid]        - a predicate function to validate a given value
+	 * @param  {*}                       [initial]        - the initial value of this property
 	 *
 	 * @return {BehaviorSubject} - the property associated with the given name
 	 */
 	newProperty(name, {
-		settable = true,
+		readonly = false,
 		isEqual  = ldIsEqual,
 		isValid  = ()=>true,
 		initial
@@ -96,36 +105,39 @@ export default class ValueTracker {
 		this[$$initialize]();
 
 		/* is the property name already taken? */
-		assert(() => !this[$$events][name],
+		assert(!this[$$events][name],
 			`There is already an event '${name}' on this object.`);
-		assert(() => !this[$$properties][name],
+		assert(!this[$$properties][name],
 			`There is already a property '${name}' on this object.`);
 
 		/* if isValid is an array, check for inclusion */
 		if (isValid::isArray()) {
 			let options = isValid;
-			isValid = (v) => options::includes(v)
+			isValid = options::includes;
 		}
-
-		/* bind functions to their proper context */
-		isValid = this::isValid;
-		isEqual = this::isEqual;
-
-		/* define the bus which manages the property */
-		this[$$properties][name] = new BehaviorSubject(initial)
-			::takeUntil           (this.e(this[$$deleteEventName]))
-			::filter              (isValid)
-			::distinctUntilChanged(isEqual);
 		
-		// this[$$properties][name].subscribe((v) => {
-		// 	console.log(this.constructor.name, `[[[${name}]]]`, v);
-		// });
+		/* define the bus which manages the property */
+		this[$$settableProperties][name] = new BehaviorSubject(initial)
+			::filter              (this[$$filterBy] )
+			::filter              (this::isValid    )
+			::takeUntil           (this[$$takeUntil])
+			::distinctUntilChanged(this::isEqual    );
+		if (readonly) {
+			this[$$properties][name] = this[$$settableProperties][name].asObservable();
+		} else {
+			this[$$properties][name] = this[$$settableProperties][name];
+		}
+		
+		/* keep track of current value */
+		this[$$properties][name].subscribe((v) => {
+			this[$$currentValues][name] = v;
+		});
 		
 		/* create event version of the property */
-		this[$$events][name] = this[$$properties][name].asObservable();
+		this[$$events][name] = this[$$settableProperties][name].asObservable();
 		
 		/* return property */
-		return this[$$properties][name];
+		return this[$$settableProperties][name];
 	}
 
 	/**
@@ -141,7 +153,7 @@ export default class ValueTracker {
 		this[$$initialize]();
 		return this[$$events][name] || never();
 	}
-
+	
 	/**
 	 * Retrieve a property by name.
 	 *
@@ -156,31 +168,42 @@ export default class ValueTracker {
 		if (nameOrDeps::isArray()) {
 			return combineLatest(nameOrDeps.map(n => this.p(n)), optionalTransformer);
 		} else if (nameOrDeps::isString()) {
-			return this[$$properties][nameOrDeps] || (
-				console.warning(`
-					Returning 'Observable::never()' for non-existent
-					property ${this.constructor.name}#${nameOrDeps}.
-				`),
-				never()
-			);
+			assert(this[$$properties][nameOrDeps], `No property '${nameOrDeps}' exists.`);
+			return this[$$properties][nameOrDeps];
 		}
+	}
+	
+	/**
+	 * Retrieve a property by name. This returns as a Subject
+	 * regardless of 'readonly' option, only to be used by
+	 * the 'owner' of the property.
+	 *
+	 * @public
+	 * @method
+	 * @param  {String} name     - the name of the property to retrieve
+	 * @return {BehaviorSubject} - the property associated with the given name
+	 */
+	pSubject(name) {
+		this[$$initialize]();
+		return this[$$settableProperties][name];
 	}
 
 };
 
 export const property = (options = {}) => (target, key) => {
 	target::set(['constructor', $$properties, key], options);
-	let {settable = true} = options;
-	return Object.assign({
-		get() { return this.p(key).get() }
-	}, settable && {
-		set(value) { this.p(key).set(value) }
-	});
+	return {
+		get() { return this[$$currentValues][key] },
+		...(!options.readonly && {
+			set(value) { this.p(key).set(value) }
+		})
+	};
 };
 
 export const event = (options = {}) => (target, key) => {
 	let match = key.match(/^(\w+)Event$/);
 	assert(match);
-	target::set(['constructor', $$events, match[1]], options);
-	return { get() { return this.e(match[1]) } };
+	let name = match[1];
+	target::set(['constructor', $$events, name], options);
+	return { get() { return this.e(name) } };
 };

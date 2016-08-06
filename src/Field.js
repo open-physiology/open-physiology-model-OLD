@@ -18,9 +18,12 @@ import isString    from 'lodash-bound/isString';
 import isArray     from 'lodash-bound/isArray';
 import isFunction  from 'lodash-bound/isFunction';
 import isUndefined from 'lodash-bound/isUndefined';
+import isNull      from 'lodash-bound/isNull';
 import objKeys     from 'lodash-bound/keys';
 import objValues   from 'lodash-bound/values';
 import objEntries  from 'lodash-bound/entries';
+
+import {defineProperties, defineProperty} from 'bound-native-methods';
 
 import assert from 'power-assert';
 
@@ -35,15 +38,7 @@ const $$value    = Symbol('$$value');
 const $$pristine = Symbol('$$pristine');
 const $$initSet  = Symbol('$$initSet');
 
-const $$fields = Symbol('$$fields');
-
 const $$initialized = Symbol('$$initialized');
-
-
-
-// TODO: handle destruction of objects, and use it also to stop subscriptions
-
-
 
 export class Field extends ValueTracker {
 	
@@ -72,61 +67,33 @@ export class Field extends ValueTracker {
 		if (cls[$$initialized]) { return }
 		cls[$$initialized] = true;
 		
-		/* create instance properties related to fields */
-		Object.defineProperties(cls.prototype, {
-			field_get:      { value(key)                 { return this[$$fields][key].get()               } },
-			field_set:      { value(key, value, options) { return this[$$fields][key].set(value, options) } },
-			field_commit:   { async value(keys) {
-				if (keys::isString()) { return await this[$$fields][keys].commit() }
-				if (keys::isUndefined()) { keys = this[$$fields]::objKeys() }
-				assert(isArray.call(keys));
-				return await Promise.all(keys.map(::this.field_commit));
-				// TODO: commit all fields in a single transaction?
-			}},
-			field_rollback: { value(keys) {
-				if (keys::isString()) { return this[$$fields][keys].rollback() }
-				if (keys::isUndefined()) { keys = this[$$fields]::objKeys() }
-				assert(isArray.call(keys));
-				keys.forEach(::this.field_rollback);
-				// TODO: rollback all fields in a single transaction?
-			}},
-			field_getJSON: { value() {
-				let result = {};
-				for (let [key, field] of this[$$fields]::objEntries()) {
-					result[key] = field.getJSON();
-				}
-				return result;
-			}},
-			field_setJSON: { value(data = {}) {
-				for (let [key, value] of data::objEntries()) {
-					this[$$fields][key].setJSON(value);
-				}
-			}},
+		// TODO: remove .field() method when Natallia has stopped using it.
+		cls.prototype::defineProperties({
 			field: { value(key) {
-				assert(this[$$fields][key], humanMsg`
+				console.error(humanMsg`
+					Natallia: Using 'item.field(key)' is deprecated.
+					Please use 'item.fields[key]' instead. Because
+					'item.fields' is a simple object, you can use it
+					to iterate over all fields with 'Object.keys()'
+					and the like. Let me know when you're no longer
+					using 'item.field(key)'.
+				`);
+				assert(this.fields[key], humanMsg`
 					This entity does not have a '${key}' field.
 				`);
-				return Object.assign(...[
-					'e',
-				    'p',
-				    'get',
-				    'set',
-				    'validate',
-				    'commit',
-				    'rollback'
-				].map(m => ({ [m]: ::this[$$fields][key][m] })));
+				return this.fields[key];
 			}}
 		});
 		
 	}
 	
 	static initializeEntity(owner, initialValues) {
-		if (owner[$$fields]) { return }
-		owner[$$fields] = {};
+		if (owner.fields) { return }
+		owner::defineProperty('fields', { value: {} });
 		
 		/* allow specific field-init code to wait until all fields are initialized */
-		let constructing = new Subject;
-		let waitUntilConstructed = function() {
+		const constructing = new Subject();
+		const waitUntilConstructed = function() {
 			return concat(constructing, this);
 		};
 		
@@ -171,8 +138,10 @@ export class Field extends ValueTracker {
 	// events & properties //
 	/////////////////////////
 	
-	@event()    commitEvent;
-	@event()    rollbackEvent;
+	@event() commitEvent;
+	@event() rollbackEvent;
+	
+	@property({ initial: true, readonly: true }) isPristine;
 	@property() value;
 	
 	
@@ -182,12 +151,12 @@ export class Field extends ValueTracker {
 	
 	//noinspection JSDuplicatedDeclaration // (to suppress Webstorm bug)
 	get [Symbol.toStringTag]() {
-		return `Field: ${this[$$owner].constructor.name} # ${this[$$key]}`;
+		return `Field: ${this[$$owner].constructor.name}#${this[$$key]}`;
 	}
 	
 	constructor({ owner, key, desc, setValueThroughSignal = true }) {
 		super();
-		owner[$$fields][key] = this;
+		owner.fields[key] = this;
 		this[$$owner] = owner;
 		this[$$key]   = key;
 		this[$$desc]  = desc;
@@ -195,6 +164,9 @@ export class Field extends ValueTracker {
 			// allow signal-push to change value
 			this.p('value').subscribe(::this.set);
 		}
+		this.p('value')
+			::map(v => this.constructor.isEqual(v, this[$$pristine]))
+			.subscribe( this.pSubject('isPristine') );
 	}
 	
 	//noinspection JSDuplicatedDeclaration // (to suppress warning due to Webstorm bug)
@@ -203,16 +175,13 @@ export class Field extends ValueTracker {
 	set(val, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
 		if (!this.constructor.isEqual(this[$$value], val)) {
 			assert(ignoreReadonly || !this[$$desc].readonly, humanMsg`
-				Tried to set the readonly field '${this[$$owner].constructor.name}#${this[$$key]}'.
+				Tried to set the readonly field
+				'${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
-			if (!ignoreValidation) {
-				this.validate(val, ['set']);
-			}
-			if (updatePristine) {
-				this[$$pristine] = val;
-			}
+			if (!ignoreValidation) { this.validate(val, ['set']) }
+			if (updatePristine)    { this[$$pristine] = val      }
 			this[$$value] = val;
-			this.p('value').next(val);
+			this.pSubject('value').next(val);
 		}
 	}
 	
@@ -235,21 +204,26 @@ export class Field extends ValueTracker {
 		
 	}
 	
+	isInvalid(val) {
+		try {
+			let valueToValidate = val::isUndefined() ? this[$$value] : val;
+			this.validate(valueToValidate, ['set', 'commit']);
+			return false;
+		} catch (err) {
+			return err;
+		}
+	}
+	
 	validate(val, stages = []) {}
 	
 	async commit() {
 		this.validate(this[$$value], ['commit']);
 		this[$$pristine] = this[$$value];
-		this.e('commit').next(this[$$value]);
+		this.pSubject('isPristine').next(true);
 	}
 	
 	rollback() {
 		this.set(this[$$pristine]);
-		this.e('rollback').next(this[$$value]);
-	}
-	
-	isPristine() {
-		return this.constructor.isEqual(this[$$value], this[$$pristine]);
 	}
 	
 }
@@ -278,10 +252,10 @@ export class PropertyField extends Field {
 	
 	static initClass({ cls, key, desc: {readonly} }) {
 		if (cls.prototype.hasOwnProperty(key)) { return }
-		Object.defineProperty(cls.prototype, key, {
-			get() { return this[$$fields][key].get() },
+		cls.prototype::defineProperty(key, {
+			get() { return this.fields[key].get() },
 			...(readonly ? undefined : {
-				set(val) { this[$$fields][key].set(val)}
+				set(val) { this.fields[key].set(val)}
 			}),
 			enumerable:   true,
 			configurable: false
@@ -316,8 +290,8 @@ export class PropertyField extends Field {
 		/* set the initial value */
 		this[$$initSet](
 			[!initialValue::isUndefined(), initialValue],
-			['default' in desc,          desc.default],
-			['value'   in desc,          desc.value  ],
+			['default' in desc,            desc.default],
+			['value'   in desc,            desc.value  ],
 			[!desc.required]
 		);
 	}
@@ -326,7 +300,8 @@ export class PropertyField extends Field {
 		
 		if (stages.includes('commit')) {
 			assert(!this[$$desc].required || !val::isUndefined(), humanMsg`
-			    No value given for required field '${this[$$owner].constructor.name}#${this[$$key]}'.
+			    No value given for required field
+			    '${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
 		}
 		
@@ -357,10 +332,10 @@ export class SideField extends Field {
 	static initClass({ cls, key, desc: {readonly} }) {
 		assert(cls.isRelationship);
 		if (cls.prototype.hasOwnProperty(key)) { return }
-		Object.defineProperty(cls.prototype, key, {
-			get() { return this[$$fields][key].get() },
+		cls.prototype::defineProperty(key, {
+			get() { return this.fields[key].get() },
 			...(readonly ? undefined : {
-				set(val) { this[$$fields][key].set(val)}
+				set(val) { this.fields[key].set(val)}
 			}),
 			enumerable:   true,
 			configurable: false
@@ -397,7 +372,7 @@ export class SideField extends Field {
 		this.p('value')
 			::waitUntilConstructed()
 			::filter(v=>v===null)
-			.subscribe(owner[$$fields][desc.codomain.keyInRelationship]);
+			.subscribe(owner.fields[desc.codomain.keyInRelationship]);
 		
 		/* when a side changes, let the relevant resources know */
 		this.p('value')
@@ -406,11 +381,11 @@ export class SideField extends Field {
 			::pairwise()
 			.subscribe(([prev, curr]) => {
 				if (desc.cardinality.max === 1) {
-					if (prev) { prev[$$fields][desc.keyInResource].set(null)          }
-					if (curr) { curr[$$fields][desc.keyInResource].set(this[$$owner]) }
+					if (prev) { prev.fields[desc.keyInResource].set(null)          }
+					if (curr) { curr.fields[desc.keyInResource].set(this[$$owner]) }
 				} else {
-					if (prev) { prev[$$fields][desc.keyInResource].get().delete(this[$$owner]) }
-					if (curr) { curr[$$fields][desc.keyInResource].get().add   (this[$$owner]) }
+					if (prev) { prev.fields[desc.keyInResource].get().delete(this[$$owner]) }
+					if (curr) { curr.fields[desc.keyInResource].get().add   (this[$$owner]) }
 				}
 			});
 		
@@ -447,10 +422,10 @@ export class Rel1Field extends Field {
 	static initClass({ cls, key, desc: {readonly} }) {
 		assert(cls.isResource);
 		if (cls.prototype.hasOwnProperty(key)) { return }
-		Object.defineProperty(cls.prototype, key, {
-			get() { return this[$$fields][key].get() },
+		cls.prototype::defineProperty(key, {
+			get() { return this.fields[key].get() },
 			...(readonly ? undefined : {
-				set(val) { this[$$fields][key].set(val) }
+				set(val) { this.fields[key].set(val) }
 			}),
 			enumerable:   true,
 			configurable: false
@@ -501,15 +476,15 @@ export class Rel1Field extends Field {
 			::startWith(null)
 			::pairwise()
 			.subscribe(([prev, curr]) => {
-				if (prev) { prev[$$fields][desc.keyInRelationship].set(null)          }
-				if (curr) { curr[$$fields][desc.keyInRelationship].set(this[$$owner]) }
+				if (prev) { prev.fields[desc.keyInRelationship].set(null)          } // TODO: delete relationship
+				if (curr) { curr.fields[desc.keyInRelationship].set(this[$$owner]) } //     : setting side to null is always error
 			});
 		
 		/* set the value of this field to null when the relationship replaces this resource */
 		this.p('value')
 			::waitUntilConstructed()
 			::filter(v=>v)
-			::switchMap((newRel) => newRel[$$fields][desc.keyInRelationship].p('value'))
+			::switchMap((newRel) => newRel.fields[desc.keyInRelationship].p('value'))
 			::filter((res) => res !== owner)
 			::map(()=>null)
 			.subscribe( this.p('value') );
@@ -517,7 +492,7 @@ export class Rel1Field extends Field {
 	
 	validate(val, stages = []) {
 		
-		const notGiven = val === null || val::isUndefined();
+		const notGiven = val::isNull() || val::isUndefined();
 		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
@@ -552,11 +527,11 @@ export class RelShortcut1Field extends Field {
 	static initClass({ key, cls, desc: {readonly} }) {
 		assert(cls.isResource);
 		if (cls.prototype.hasOwnProperty(key)) { return }
-		Object.defineProperty(cls.prototype, key, {
-			get() { return this[$$fields][key].get() },
+		cls.prototype::defineProperty(key, {
+			get() { return this.fields[key].get() },
 			...(readonly ? undefined : {
 				set(val) {
-					this[$$fields][key].set(val)
+					this.fields[key].set(val)
 				}
 			}),
 			enumerable:   true,
@@ -595,13 +570,13 @@ export class RelShortcut1Field extends Field {
 		// forgiving. The constraint checks are done on the other constructor.
 		
 		const correspondingRelValue =
-			deferObservable(() => owner[$$fields][desc.keyInResource].p('value'))
+			deferObservable(() => owner.fields[desc.keyInResource].p('value'))
 				::waitUntilConstructed();
 		
 		/* keep this value up to date with new sides of new relationships */
 		correspondingRelValue
 			::filter(rel => rel)
-			::switchMap(rel => rel[$$fields][desc.codomain.keyInRelationship].p('value'))
+			::switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
 			.subscribe( this.p('value') );
 		
 		/* keep the relationship up to date */
@@ -610,15 +585,15 @@ export class RelShortcut1Field extends Field {
 			correspondingRelValue
 		).subscribe(([scValue, relValue]) => {
 			if (!relValue && scValue) {
-				owner[$$fields][desc.keyInResource].set(desc.relationshipClass.new({
+				owner.fields[desc.keyInResource].set(desc.relationshipClass.new({
 					[desc.keyInRelationship]         : owner,
 					[desc.codomain.keyInRelationship]: scValue
 				}));
 			} else if (relValue && !scValue) {
-				relValue[$$fields][desc.codomain.keyInRelationship].set(null);
-			} else if (relValue && scValue && scValue !== relValue[$$fields][desc.codomain.keyInRelationship][$$value]) {
-				// rel[$$fields][desc.keyInResource].set(scValue);
-				relValue[$$fields][desc.codomain.keyInRelationship].set(scValue);
+				relValue.fields[desc.codomain.keyInRelationship].set(null);
+			} else if (relValue && scValue && scValue !== relValue.fields[desc.codomain.keyInRelationship][$$value]) {
+				// rel.fields[desc.keyInResource].set(scValue);
+				relValue.fields[desc.codomain.keyInRelationship].set(scValue);
 			}
 		});
 		
@@ -627,7 +602,7 @@ export class RelShortcut1Field extends Field {
 		// 	.subscribe((rel) => {
 		// 		this.p('value')
 		// 			::takeUntil(correspondingRelValue::filter(r => r !== rel))
-		// 			.subscribe( rel[$$fields][desc.other.keyInRelationship].p('value') );
+		// 			.subscribe( rel.fields[desc.other.keyInRelationship].p('value') );
 		// 	});
 	}
 		
@@ -669,10 +644,10 @@ export class Rel$Field extends Field {
 	static initClass({ cls, key, desc: {readonly} }) {
 		assert(cls.isResource);
 		if (cls.prototype.hasOwnProperty(key)) { return }
-		Object.defineProperty(cls.prototype, key, {
-			get() { return this[$$fields][key].get() },
+		cls.prototype::defineProperty(key, {
+			get() { return this.fields[key].get() },
 			...(readonly ? undefined : {
-				set(val) { this[$$fields][key].set(val)}
+				set(val) { this.fields[key].set(val)}
 			}),
 			enumerable:   true,
 			configurable: false
@@ -701,8 +676,8 @@ export class Rel$Field extends Field {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, related } = options;
 		
-		Object.defineProperty(this, $$pristine, { value: new Set           });
-		Object.defineProperty(this, $$value,    { value: new ObservableSet });
+		this::defineProperty($$pristine, { value: new Set           });
+		this::defineProperty($$value,    { value: new ObservableSet });
 		
 		/* emit 'value' signals (but note that setValueThroughSignal = false) */
 		this[$$value].p('value')::waitUntilConstructed().subscribe(this.p('value'));
@@ -711,7 +686,7 @@ export class Rel$Field extends Field {
 		this[$$value].e('add')
 			::waitUntilConstructed()
 			.subscribe((addedRel) => {
-				addedRel[$$fields][desc.keyInRelationship].set(this[$$owner]);
+				addedRel.fields[desc.keyInRelationship].set(this[$$owner]);
 			});
 		this[$$value].e('delete')
 			::waitUntilConstructed()
@@ -720,7 +695,7 @@ export class Rel$Field extends Field {
 		/* decouple a relationship when it decouples from this resource */
 		this[$$value].e('add')
 			::waitUntilConstructed()
-			::switchMap(newRel => newRel[$$fields][desc.keyInRelationship].p('value')
+			::switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value')
 				::filter(res => res !== owner)
 				::map(() => newRel)
 			).subscribe( this[$$value].e('delete') );
@@ -732,8 +707,8 @@ export class Rel$Field extends Field {
 				//     :   then go get it
 				//     : - It may also be a description of a new relationship;
 				//     :   then create it
-				if (!rel[$$fields][desc.keyInRelationship].get()) {
-					rel[$$fields][desc.keyInRelationship].set(this);
+				if (!rel.fields[desc.keyInRelationship].get()) {
+					rel.fields[desc.keyInRelationship].set(this);
 				}
 				assert(rel[desc.keyInRelationship] === this);
 				
@@ -747,9 +722,10 @@ export class Rel$Field extends Field {
 		}
 	}
 	
-	set(newValue) {
-		assert(!this[$$desc].readonly);
-		this.validate(newValue, ['set']);
+	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
+		assert(ignoreReadonly || !this[$$desc].readonly);
+		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
+		if (updatePristine)    { copySetContent(this[$$pristine], newValue) }
 		copySetContent(this[$$value], newValue);
 	}
 	
@@ -801,10 +777,10 @@ export class RelShortcut$Field extends Field {
 	static initClass({ key, cls, desc: {readonly} }) {
 		assert(cls.isResource);
 		if (cls.prototype.hasOwnProperty(key)) { return }
-		Object.defineProperty(cls.prototype, key, {
-			get() { return this[$$fields][key].get() },
+		cls.prototype::defineProperty(key, {
+			get() { return this.fields[key].get() },
 			...(readonly ? undefined : {
-				set(val) { this[$$fields][key].set(val)}
+				set(val) { this.fields[key].set(val)}
 			}),
 			enumerable:   true,
 			configurable: false
@@ -842,21 +818,21 @@ export class RelShortcut$Field extends Field {
 			.subscribe(this.p('value'));
 		
 		/* syncing with relationship field */
-		const correspondingRelField = owner[$$fields][desc.keyInResource][$$value];
+		const correspondingRelField = owner.fields[desc.keyInResource][$$value];
 		correspondingRelField.e('add')
 			::waitUntilConstructed()
 			.subscribe((newRel) => {
-				let newRelDisconnected = newRel[$$fields][desc.keyInRelationship].p('value')
+				let newRelDisconnected = newRel.fields[desc.keyInRelationship].p('value')
 					::filter(v => v !== owner)
 					::take(1);
-				newRel[$$fields][desc.codomain.keyInRelationship].p('value')
+				newRel.fields[desc.codomain.keyInRelationship].p('value')
 					::takeUntil(newRelDisconnected)
 					::startWith(null)::pairwise().subscribe(([prev, curr]) => {
 						if (prev) { this[$$value].delete(prev) }
 						if (curr) { this[$$value].add   (curr) }
 					});
 				newRelDisconnected.subscribe(() => {
-					this[$$value].delete(newRel[$$fields][desc.codomain.keyInRelationship][$$value]);
+					this[$$value].delete(newRel.fields[desc.codomain.keyInRelationship][$$value]);
 				});
 			});
 		
@@ -865,8 +841,8 @@ export class RelShortcut$Field extends Field {
 			::waitUntilConstructed()
 			.subscribe((newRes) => {
 				let rel = [...correspondingRelField]
-					.find(rel => rel[$$fields][desc.keyInRelationship]      [$$value] === owner &&
-					             rel[$$fields][desc.codomain.keyInRelationship][$$value] === newRes);
+					.find(rel => rel.fields[desc.keyInRelationship]      [$$value] === owner &&
+					             rel.fields[desc.codomain.keyInRelationship][$$value] === newRes);
 				if (!rel) {
 					correspondingRelField.add(desc.relationshipClass.new({
 						[desc.keyInRelationship]          :       owner,
@@ -888,9 +864,11 @@ export class RelShortcut$Field extends Field {
 		}
 	}
 	
-	set(newValue) {
-		assert(!this[$$desc].readonly);
-		this.validate(newValue, ['set']);
+	
+	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
+		assert(ignoreReadonly || !this[$$desc].readonly);
+		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
+		if (updatePristine)    { copySetContent(this[$$pristine], newValue) }
 		copySetContent(this[$$value], newValue);
 	}
 	

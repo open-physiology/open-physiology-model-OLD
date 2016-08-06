@@ -12,6 +12,8 @@ import isObject    from 'lodash-bound/isObject';
 import isFunction  from 'lodash-bound/isFunction';
 import assert      from 'power-assert';
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 export const arrayContainsValue = (array, value) => array.includes(value);
@@ -81,12 +83,3 @@ export const sw = (val, {autoInvoke = true} = {}) => (map) => {
 	if (autoInvoke && result::isFunction()) { result = result() }
 	return result;
 };
-
-// the lodash _.assign doesn't handle symbol keys
-export function assign(...sources) {
-	return Object.assign(this, ...sources);
-}
-
-export function constructMap() {
-	return new Map(this);
-}

@@ -14,7 +14,9 @@
       <w>lodash</w>
       <w>manies</w>
       <w>measurables</w>
+      <w>natallia</w>
       <w>polyfill</w>
+      <w>pristines</w>
       <w>rdep</w>
       <w>subclassing</w>
       <w>subcls</w>
@@ -22,6 +24,7 @@
       <w>tmpl</w>
       <w>typecheck</w>
       <w>unassert</w>
+      <w>undelete</w>
       <w>xdescribe</w>
     </words>
   </dictionary>
