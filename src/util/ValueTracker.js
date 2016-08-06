@@ -1,8 +1,8 @@
-import includes   from 'lodash-bound/includes';
-import isArray    from 'lodash-bound/isArray';
-import isString   from 'lodash-bound/isString';
-import set        from 'lodash-bound/set';
-import entries    from 'lodash-bound/entries';
+import includes from 'lodash-bound/includes';
+import isArray  from 'lodash-bound/isArray';
+import isString from 'lodash-bound/isString';
+import set      from 'lodash-bound/set';
+import entries  from 'lodash-bound/entries';
 
 import _isEqual from 'lodash/isEqual';
 
@@ -15,6 +15,7 @@ import {combineLatest}        from 'rxjs/operator/combineLatest';
 import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged';
 import {filter}               from 'rxjs/operator/filter';
 import {takeUntil}            from 'rxjs/operator/takeUntil';
+import {skip}                 from 'rxjs/operator/skip';
 
 const $$events             = Symbol('$$events');
 const $$properties         = Symbol('$$properties');
@@ -112,22 +113,15 @@ export default class ValueTracker {
 			`There is already a property '${name}' on this object.`);
 
 		/* if isValid is an array, check for inclusion */
-		if (isValid::isArray()) {
-			let options = isValid;
-			isValid = options::includes;
-		}
+		if (isValid::isArray()) { isValid = isValid::includes }
 		
 		/* define the bus which manages the property */
-		this[$$settableProperties][name] = new BehaviorSubject(initial)
+		let subject = this[$$settableProperties][name] = new BehaviorSubject(initial)
 			::filter              (this[$$filterBy] )
 			::filter              (this::isValid    )
 			::takeUntil           (this[$$takeUntil])
 			::distinctUntilChanged(this::isEqual    );
-		if (readonly) {
-			this[$$properties][name] = this[$$settableProperties][name].asObservable();
-		} else {
-			this[$$properties][name] = this[$$settableProperties][name];
-		}
+		this[$$properties][name] = readonly ? subject.asObservable() : subject;
 		
 		/* keep track of current value */
 		this[$$properties][name].subscribe((v) => {
@@ -135,7 +129,8 @@ export default class ValueTracker {
 		});
 		
 		/* create event version of the property */
-		this[$$events][name] = this[$$settableProperties][name].asObservable();
+		this[$$events][name] = subject.asObservable()
+			::skip(1); // skip 'current value' on subscribe
 		
 		/* return property */
 		return this[$$settableProperties][name];
