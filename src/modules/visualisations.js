@@ -41,6 +41,10 @@ export const PrescribesStyleFor = M.RELATIONSHIP({
 });
 
 
+////////////////////////////
+//// Artefact Hierarchy ////
+////////////////////////////
+
 export const Artefact = M.RESOURCE({////////////////////////////////////////////
 
 	name: 'Artefact',
@@ -52,7 +56,6 @@ export const Artefact = M.RESOURCE({////////////////////////////////////////////
 
 });/////////////////////////////////////////////////////////////////////////////
 
-
 export const Dim2Artefact = M.RESOURCE({////////////////////////////////////////
 
 	name: 'Dim2Artefact',
@@ -60,12 +63,7 @@ export const Dim2Artefact = M.RESOURCE({////////////////////////////////////////
 	extends:  Artefact,
 	abstract: true,
 
-	singular: "2-dimensional artefact",
-
-	properties: {
-		'width':  { ...rationalNumberSchema, required: true },
-		'height': { ...rationalNumberSchema, required: true }
-	}
+	singular: "2-dimensional artefact"
 
 });/////////////////////////////////////////////////////////////////////////////
 
@@ -76,11 +74,7 @@ export const Dim1Artefact = M.RESOURCE({////////////////////////////////////////
 	extends:  Dim2Artefact,
 	abstract: true,
 
-	singular: "1-dimensional artefact",
-
-	properties: {
-		'height': { value: 0 }
-	}
+	singular: "1-dimensional artefact"
 
 });/////////////////////////////////////////////////////////////////////////////
 
@@ -91,20 +85,31 @@ export const Dim0Artefact = M.RESOURCE({////////////////////////////////////////
 	extends:  Dim1Artefact,
 	abstract: true,
 
-	singular: "0-dimensional artefact",
-
-	properties: {
-		'width': { value: 0 }
-	}
+	singular: "0-dimensional artefact"
 
 });/////////////////////////////////////////////////////////////////////////////
 
+
+//////////////////////////////////////
+//// Artefact Container Hierarchy ////
+//////////////////////////////////////
+
+export const ArtefactContainer = M.RESOURCE({///////////////////////////////////
+	
+	name: 'ArtefactContainer',
+	
+	extends:  Artefact,
+	abstract: true,
+	
+	singular: "artefact container",
+	
+});/////////////////////////////////////////////////////////////////////////////
 
 export const Dim2Container = M.RESOURCE({///////////////////////////////////////
 
 	name: 'Dim2Container',
 
-	extends:  Dim2Artefact,
+	extends:  [ArtefactContainer, Dim2Artefact],
 	abstract: true,
 
 	singular: "2-dimensional container",
@@ -115,7 +120,7 @@ export const Dim1Container = M.RESOURCE({///////////////////////////////////////
 
 	name: 'Dim1Container',
 
-	extends:  Dim1Artefact,
+	extends:  [ArtefactContainer, Dim1Artefact],
 	abstract: true,
 
 	singular: "1-dimensional container"
@@ -126,7 +131,7 @@ export const Dim0Container = M.RESOURCE({///////////////////////////////////////
 
 	name: 'Dim0Container',
 
-	extends:  Dim0Artefact,
+	extends:  [ArtefactContainer, Dim0Artefact],
 	abstract: true,
 
 	singular: "0-dimensional container"
@@ -134,47 +139,114 @@ export const Dim0Container = M.RESOURCE({///////////////////////////////////////
 });/////////////////////////////////////////////////////////////////////////////
 
 
-export const [ContainsArtefact] = M.RELATIONSHIP([{
+/////////////////////////////////////////////////////
+//// Artefact Containment Relationship Hierarchy ////
+/////////////////////////////////////////////////////
 
+export const ContainsArtefact = M.RELATIONSHIP({
+	
 	name: 'ContainsArtefact',
-
+	
+	abstract: true,
+	
 	extends: IsRelatedTo,
-
+	
 	singular: "contains artefact",
+	
+	1: [ArtefactContainer, '0..*', { anchors: true, key: 'children' }],
+	2: [Artefact,          '0..1', {                key: 'parent'   }]
+	
+});
 
+/* in 2-dimensional containers */
+const ContainsArtefact_22 = M.RELATIONSHIP({
+	
+	name: 'ContainsArtefact_22',
+	
+	extends: ContainsArtefact,
+	
 	1: [Dim2Container, '0..*', { anchors: true, key: 'children' }],
 	2: [Dim2Artefact,  '0..1', {                key: 'parent'   }],
-
+	
 	properties: {
 		'x':        { ...rationalNumberSchema,    required: true },
 		'y':        { ...rationalNumberSchema,    required: true },
-		'rotation': { ...angleSchema, default: 0, required: true }
-	}
-
-}, {
-
-	name: 'ContainsArtefact',
-
-	extends: IsRelatedTo,
-
-	1: [Dim1Container, '0..*', { anchors: true, key: 'children' }],
-	2: [Dim1Artefact,  '0..1', {                key: 'parent'   }],
-
-	properties: {
-		'x': { ...rationalNumberSchema, required: true }
+		'rotation': { ...angleSchema, default: 0, required: true },
+		'width':    { ...rationalNumberSchema,    required: true },
+		'height':   { ...rationalNumberSchema,    required: true }
 	}
 	
-}, {
+});
+const ContainsArtefact_21 = M.RELATIONSHIP({
+	
+	name: 'ContainsArtefact_21',
+	
+	extends: ContainsArtefact_22,
+	
+	1: [Dim2Container, '0..*', { anchors: true, key: 'children' }],
+	2: [Dim1Artefact,  '0..1', {                key: 'parent'   }],
+	
+	properties: { 'height': { value: 0 } }
+	
+});
+const ContainsArtefact_20 = M.RELATIONSHIP({
+	
+	name: 'ContainsArtefact_20',
+	
+	extends: ContainsArtefact_21,
+	
+	1: [Dim2Container, '0..*', { anchors: true, key: 'children' }],
+	2: [Dim0Artefact,  '0..1', {                key: 'parent'   }],
+	
+	properties: { 'width': { value: 0 } }
+	
+});
 
-	name: 'ContainsArtefact',
+/* in 1-dimensional containers */
+const ContainsArtefact_11 = M.RELATIONSHIP({
+	
+	name: 'ContainsArtefact_11',
+	
+	extends: ContainsArtefact,
+	
+	1: [Dim1Container, '0..*', { anchors: true, key: 'children' }],
+	2: [Dim1Artefact,  '0..1', {                key: 'parent'   }],
+	
+	properties: {
+		'x':        { ...rationalNumberSchema, required: true },
+		'width':    { ...rationalNumberSchema, required: true }
+	}
+	
+});
+const ContainsArtefact_10 = M.RELATIONSHIP({
+	
+	name: 'ContainsArtefact_10',
+	
+	extends: ContainsArtefact_11,
+	
+	1: [Dim1Container, '0..*', { anchors: true, key: 'children' }],
+	2: [Dim0Artefact,  '0..1', {                key: 'parent'   }],
+	
+	properties: { 'width': { value: 0 } }
+	
+});
 
-	extends: IsRelatedTo,
+/* containment in 0-dimensional containers */
+const ContainsArtefact_00 = M.RELATIONSHIP({
+
+	name: 'ContainsArtefact_00',
+
+	extends: ContainsArtefact,
 
 	1: [Dim0Container, '0..*', { anchors: true, key: 'children' }],
-	2: [Dim0Artefact,  '0..1', {                key: 'parent'   }],
+	2: [Dim0Artefact,  '0..1', {                key: 'parent'   }]
 
-}]);
+});
 
+
+////////////////////////////
+//// Specific Artefacts ////
+////////////////////////////
 
 export const LyphCanvas = M.RESOURCE({//////////////////////////////////////////
 
@@ -187,8 +259,6 @@ export const LyphCanvas = M.RESOURCE({//////////////////////////////////////////
 
 });/////////////////////////////////////////////////////////////////////////////
 
-
-
 export const MaterialGlyph = M.RESOURCE({///////////////////////////////////////
 
 	name: 'MaterialGlyph',
@@ -199,7 +269,6 @@ export const MaterialGlyph = M.RESOURCE({///////////////////////////////////////
 
 });/////////////////////////////////////////////////////////////////////////////
 
-
 export const LyphRectangle = M.RESOURCE({///////////////////////////////////////
 
 	name: 'LyphRectangle',
@@ -209,7 +278,6 @@ export const LyphRectangle = M.RESOURCE({///////////////////////////////////////
 	singular: "lyph rectangle"
 
 });/////////////////////////////////////////////////////////////////////////////
-
 
 export const LyphArtefact = M.RESOURCE({////////////////////////////////////////
 	
@@ -222,7 +290,6 @@ export const LyphArtefact = M.RESOURCE({////////////////////////////////////////
 	
 });/////////////////////////////////////////////////////////////////////////////
 
-
 export const CylindricalLyphRectangle = M.RESOURCE({////////////////////////////
 
 	name: 'CylindricalLyphRectangle',
@@ -232,7 +299,6 @@ export const CylindricalLyphRectangle = M.RESOURCE({////////////////////////////
 	singular: "cylindrical lyph rectangle"
 
 });/////////////////////////////////////////////////////////////////////////////
-
 
 export const BorderLine = M.RESOURCE({//////////////////////////////////////////
 
@@ -244,7 +310,6 @@ export const BorderLine = M.RESOURCE({//////////////////////////////////////////
 
 });/////////////////////////////////////////////////////////////////////////////
 
-
 export const CoalescenceRectangle = M.RESOURCE({////////////////////////////////
 
 	name: 'CoalescenceRectangle',
@@ -254,7 +319,6 @@ export const CoalescenceRectangle = M.RESOURCE({////////////////////////////////
 	singular: "coalescence rectangle"
 
 });/////////////////////////////////////////////////////////////////////////////
-
 
 export const NodeGlyph = M.RESOURCE({///////////////////////////////////////////
 
@@ -266,8 +330,6 @@ export const NodeGlyph = M.RESOURCE({///////////////////////////////////////////
 
 });/////////////////////////////////////////////////////////////////////////////
 
-
-
 export const ProcessEdge = M.RESOURCE({/////////////////////////////////////////
 
 	name: 'ProcessEdge',
@@ -277,7 +339,6 @@ export const ProcessEdge = M.RESOURCE({/////////////////////////////////////////
 	singular: "process edge"
 
 });/////////////////////////////////////////////////////////////////////////////
-
 
 export const MeasurableGlyph = M.RESOURCE({/////////////////////////////////////
 
@@ -289,7 +350,6 @@ export const MeasurableGlyph = M.RESOURCE({/////////////////////////////////////
 
 });/////////////////////////////////////////////////////////////////////////////
 
-
 export const CausalityArrow = M.RESOURCE({//////////////////////////////////////
 
 	name: 'CausalityArrow',
@@ -300,6 +360,10 @@ export const CausalityArrow = M.RESOURCE({//////////////////////////////////////
 
 });/////////////////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////
+//// Model - Artefact Relationships ////
+////////////////////////////////////////
 
 export const [PresentsModel] = M.RELATIONSHIP([
 	[Artefact,                 Typed          .Type],

@@ -439,9 +439,7 @@ export default class Module {
 				case 'patternProperties': return {}::assignWith(vOld, vNew, (pOld, pNew, pKey) => {
 					assert(pOld::isUndefined() || _isEqual(pOld, pNew), humanMsg`
 						Cannot merge property descriptions for ${OldClass.name}#${key}.
-						
 						1) ${JSON.stringify(pOld)}
-						
 						2) ${JSON.stringify(pNew)}
 					`);
 					return pOld::isUndefined() ? pNew : pOld;
