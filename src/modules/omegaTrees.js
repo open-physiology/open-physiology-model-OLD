@@ -65,3 +65,17 @@ export const HasTreeParent_PROVISIONAL = M.RELATIONSHIP({
 	noCycles: true
 	
 });
+
+
+export const HasTreePart_PROVISIONAL = M.RELATIONSHIP({
+	
+	name: 'HasTreePart',
+	
+	extends: IsRelatedTo,
+	
+	singular: "has tree-part",
+	
+	1: [OmegaTree.Type,                     '0..*', { anchors: true, key: 'treeParts' }],
+	2: [OmegaTreePart_PROVISIONAL.Template, '0..*',                                    ],
+	
+});

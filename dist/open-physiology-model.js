@@ -24795,7 +24795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.HasTreeParent_PROVISIONAL = exports.OmegaTreePart_PROVISIONAL = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.OmegaTree = undefined;
+	exports.HasTreePart_PROVISIONAL = exports.HasTreeParent_PROVISIONAL = exports.OmegaTreePart_PROVISIONAL = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.OmegaTree = undefined;
 	
 	var _TypedModule = __webpack_require__(67);
 	
@@ -24870,6 +24870,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		2: [OmegaTreePart_PROVISIONAL.Template, '0..*', { key: 'treeChildren' }],
 	
 		noCycles: true
+	
+	});
+	
+	var HasTreePart_PROVISIONAL = exports.HasTreePart_PROVISIONAL = M.RELATIONSHIP({
+	
+		name: 'HasTreePart',
+	
+		extends: _resources.IsRelatedTo,
+	
+		singular: "has tree-part",
+	
+		1: [OmegaTree.Type, '0..*', { anchors: true, key: 'treeParts' }],
+		2: [OmegaTreePart_PROVISIONAL.Template, '0..*']
 	
 	});
 
