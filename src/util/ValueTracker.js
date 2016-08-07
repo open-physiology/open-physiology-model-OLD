@@ -11,11 +11,14 @@ import assert from 'power-assert';
 import {Subject}              from 'rxjs/Subject';
 import {BehaviorSubject}      from 'rxjs/BehaviorSubject';
 import {never}                from 'rxjs/observable/never';
-import {combineLatest}        from 'rxjs/operator/combineLatest';
+import {combineLatest}        from 'rxjs/observable/combineLatest';
 import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged';
 import {filter}               from 'rxjs/operator/filter';
 import {takeUntil}            from 'rxjs/operator/takeUntil';
 import {skip}                 from 'rxjs/operator/skip';
+import {map}                  from 'rxjs/operator/map';
+import {withLatestFrom}       from 'rxjs/operator/withLatestFrom';
+import 'rxjs/add/operator/do';
 
 const $$events             = Symbol('$$events');
 const $$properties         = Symbol('$$properties');
@@ -156,13 +159,16 @@ export default class ValueTracker {
 	 * @public
 	 * @method
 	 * @param  {String|Array} nameOrDeps          - the name of the property to retrieve, or a list of active dependencies for a derived property
+	 * @param  {Array?}       optionalPassiveDeps - an optional list of passive dependencies for a derived property
 	 * @param  {Function?}    optionalTransformer - an optional function to map the dependencies to a new value for the derived property
 	 * @return {BehaviorSubject | Observable} - the property associated with the given name or an observable of combined properties
 	 */
-	p(nameOrDeps, optionalTransformer) {
+	p(nameOrDeps, optionalPassiveDeps = [], optionalTransformer = (...args)=>args) {
 		this[$$initialize]();
 		if (nameOrDeps::isArray()) {
-			return combineLatest(nameOrDeps.map(n => this.p(n)), optionalTransformer);
+			return combineLatest(...nameOrDeps         .map(::this.p))
+				::withLatestFrom(...optionalPassiveDeps.map(::this.p),
+					(active, ...passive) => optionalTransformer(...active, ...passive));
 		} else if (nameOrDeps::isString()) {
 			assert(this[$$properties][nameOrDeps], `No property '${nameOrDeps}' exists.`);
 			return this[$$properties][nameOrDeps];
@@ -191,7 +197,7 @@ export const property = (options = {}) => (target, key) => {
 	return {
 		get() { return this[$$currentValues][key] },
 		...(!options.readonly && {
-			set(value) { this.p(key).set(value) }
+			set(value) { this.p(key).next(value) }
 		})
 	};
 };
