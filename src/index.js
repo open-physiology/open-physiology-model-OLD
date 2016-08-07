@@ -117,8 +117,8 @@ export const {
 	MeasurableGlyph,
 	CausalityArrow,
 	PresentsModel,
-	OmegaTreePart_PROVISIONAL,
-	HasTreeParent_PROVISIONAL
+	OmegaTreePart,
+	HasTreeParent
 } = classesObject;
 
 // export * from './modules/resources';

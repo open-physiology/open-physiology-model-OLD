@@ -39,7 +39,7 @@ export const HasAsRoot = M.RELATIONSHIP({
 });
 
 
-export const OmegaTreePart_PROVISIONAL = M.TYPED_RESOURCE({/////////////////////
+export const OmegaTreePart = M.TYPED_RESOURCE({/////////////////////
 	
 	name: 'OmegaTreePart',
 	
@@ -51,7 +51,7 @@ export const OmegaTreePart_PROVISIONAL = M.TYPED_RESOURCE({/////////////////////
 });/////////////////////////////////////////////////////////////////////////////
 
 
-export const HasTreeParent_PROVISIONAL = M.RELATIONSHIP({
+export const HasTreeParent = M.RELATIONSHIP({
 	
 	name: 'HasTreeParent',
 	
@@ -59,15 +59,15 @@ export const HasTreeParent_PROVISIONAL = M.RELATIONSHIP({
 	
 	singular: "has tree-parent",
 	
-	1: [OmegaTreePart_PROVISIONAL.Template, '0..1', { key: 'treeParent'   }],
-	2: [OmegaTreePart_PROVISIONAL.Template, '0..*', { key: 'treeChildren' }],
+	1: [OmegaTreePart.Template, '0..1', { key: 'treeParent'   }],
+	2: [OmegaTreePart.Template, '0..*', { key: 'treeChildren' }],
 	
 	noCycles: true
 	
 });
 
 
-export const HasTreePart_PROVISIONAL = M.RELATIONSHIP({
+export const HasTreePart = M.RELATIONSHIP({
 	
 	name: 'HasTreePart',
 	
@@ -75,7 +75,7 @@ export const HasTreePart_PROVISIONAL = M.RELATIONSHIP({
 	
 	singular: "has tree-part",
 	
-	1: [OmegaTree.Type,                     '0..*', { anchors: true, key: 'treeParts' }],
-	2: [OmegaTreePart_PROVISIONAL.Template, '0..*',                                    ],
+	1: [OmegaTree.Type,         '0..*', { anchors: true, key: 'parts' }],
+	2: [OmegaTreePart.Template, '0..*',                                ],
 	
 });
