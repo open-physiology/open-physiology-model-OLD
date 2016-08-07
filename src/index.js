@@ -118,7 +118,9 @@ export const {
 	CausalityArrow,
 	PresentsModel,
 	OmegaTreePart,
-	HasTreeParent
+	HasTreeParent,
+	OmegaTreePartType,
+	OmegaTreePartTemplate
 } = classesObject;
 
 // export * from './modules/resources';

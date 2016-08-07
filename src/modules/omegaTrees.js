@@ -51,6 +51,8 @@ export const OmegaTreePart = M.TYPED_RESOURCE({/////////////////////
 	singular: "omega tree part",
 	
 });/////////////////////////////////////////////////////////////////////////////
+export const OmegaTreePartType     = OmegaTreePart.Type;
+export const OmegaTreePartTemplate = OmegaTreePart.Template;
 
 
 export const HasTreeParent = M.RELATIONSHIP({

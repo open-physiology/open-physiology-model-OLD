@@ -24430,7 +24430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.HasTreeParent = exports.OmegaTreePart = exports.PresentsModel = exports.CausalityArrow = exports.MeasurableGlyph = exports.ProcessEdge = exports.NodeGlyph = exports.CoalescenceRectangle = exports.BorderLine = exports.CylindricalLyphRectangle = exports.LyphRectangle = exports.MaterialGlyph = exports.LyphCanvas = exports.ContainsArtefact = exports.Dim0Container = exports.Dim1Container = exports.Dim2Container = exports.Dim0Artefact = exports.Dim1Artefact = exports.Dim2Artefact = exports.Artefact = exports.PrescribesStyleFor = exports.Theme = exports.InvolvesPublication = exports.Publication = exports.InvolvesClinicalIndex = exports.EncompassesClinicalIndex = exports.ClinicalIndex = exports.InvolvesMeasurable = exports.Correlation = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.Causes = exports.CausalityTemplate = exports.CausalityType = exports.InheritsAllMeasurablesFrom = exports.HasMeasurable = exports.MeasurableLocationTemplate = exports.MeasurableLocationType = exports.MeasuresMaterial = exports.MeasurableTemplate = exports.MeasurableType = exports.InheritsAllChannelsFrom = exports.HasChannel = exports.TransportsMaterial = exports.ConveysProcess = exports.FlowsTo = exports.ProcessTemplate = exports.ProcessType = exports.HasElement = exports.GroupTemplate = exports.GroupType = exports.HasNode = exports.NodeTemplate = exports.NodeType = exports.CoalescesThroughLayer = exports.CoalescesWith = exports.Coalescence = exports.HasPlusBorder = exports.HasMinusBorder = exports.HasOuterBorder = exports.HasInnerBorder = exports.BorderTemplate = exports.BorderType = exports.InheritsAllSegmentsFrom = exports.HasSegment = exports.CylindricalLyphTemplate = exports.CylindricalLyphType = exports.InheritsAllLayersFrom = exports.InheritsAllPatchesFrom = exports.InheritsAllPartsFrom = exports.HasPatch = exports.HasLayer = exports.HasPart = exports.LyphTemplate = exports.LyphType = exports.InheritsAllMaterialsFrom = exports.ContainsMaterial = exports.MaterialTemplate = exports.MaterialType = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = exports.CorrespondsTo = exports.IsExternallyRelatedTo = exports.ExternalResource = exports.IsRelatedTo = exports.Resource = undefined;
+	exports.OmegaTreePartTemplate = exports.OmegaTreePartType = exports.HasTreeParent = exports.OmegaTreePart = exports.PresentsModel = exports.CausalityArrow = exports.MeasurableGlyph = exports.ProcessEdge = exports.NodeGlyph = exports.CoalescenceRectangle = exports.BorderLine = exports.CylindricalLyphRectangle = exports.LyphRectangle = exports.MaterialGlyph = exports.LyphCanvas = exports.ContainsArtefact = exports.Dim0Container = exports.Dim1Container = exports.Dim2Container = exports.Dim0Artefact = exports.Dim1Artefact = exports.Dim2Artefact = exports.Artefact = exports.PrescribesStyleFor = exports.Theme = exports.InvolvesPublication = exports.Publication = exports.InvolvesClinicalIndex = exports.EncompassesClinicalIndex = exports.ClinicalIndex = exports.InvolvesMeasurable = exports.Correlation = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.Causes = exports.CausalityTemplate = exports.CausalityType = exports.InheritsAllMeasurablesFrom = exports.HasMeasurable = exports.MeasurableLocationTemplate = exports.MeasurableLocationType = exports.MeasuresMaterial = exports.MeasurableTemplate = exports.MeasurableType = exports.InheritsAllChannelsFrom = exports.HasChannel = exports.TransportsMaterial = exports.ConveysProcess = exports.FlowsTo = exports.ProcessTemplate = exports.ProcessType = exports.HasElement = exports.GroupTemplate = exports.GroupType = exports.HasNode = exports.NodeTemplate = exports.NodeType = exports.CoalescesThroughLayer = exports.CoalescesWith = exports.Coalescence = exports.HasPlusBorder = exports.HasMinusBorder = exports.HasOuterBorder = exports.HasInnerBorder = exports.BorderTemplate = exports.BorderType = exports.InheritsAllSegmentsFrom = exports.HasSegment = exports.CylindricalLyphTemplate = exports.CylindricalLyphType = exports.InheritsAllLayersFrom = exports.InheritsAllPatchesFrom = exports.InheritsAllPartsFrom = exports.HasPatch = exports.HasLayer = exports.HasPart = exports.LyphTemplate = exports.LyphType = exports.InheritsAllMaterialsFrom = exports.ContainsMaterial = exports.MaterialTemplate = exports.MaterialType = exports.HasType = exports.HasCardinalityMultipliedByThatOf = exports.Template = exports.IsSubtypeOf = exports.Type = exports.CorrespondsTo = exports.IsExternallyRelatedTo = exports.ExternalResource = exports.IsRelatedTo = exports.Resource = undefined;
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -24610,6 +24610,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var PresentsModel = classesObject.PresentsModel;
 	var OmegaTreePart = classesObject.OmegaTreePart;
 	var HasTreeParent = classesObject.HasTreeParent;
+	var OmegaTreePartType = classesObject.OmegaTreePartType;
+	var OmegaTreePartTemplate = classesObject.OmegaTreePartTemplate;
 	
 	// export * from './modules/resources';
 	// export * from './modules/typed';
@@ -24712,6 +24714,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.PresentsModel = PresentsModel;
 	exports.OmegaTreePart = OmegaTreePart;
 	exports.HasTreeParent = HasTreeParent;
+	exports.OmegaTreePartType = OmegaTreePartType;
+	exports.OmegaTreePartTemplate = OmegaTreePartTemplate;
 
 	function _inspect(input, depth) {
 		var maxDepth = 4;
@@ -24795,7 +24799,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.HasTreePart = exports.HasTreeParent = exports.OmegaTreePart = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.OmegaTree = undefined;
+	exports.HasTreePart = exports.HasTreeParent = exports.OmegaTreePartTemplate = exports.OmegaTreePartType = exports.OmegaTreePart = exports.HasAsRoot = exports.OmegaTreeTemplate = exports.OmegaTreeType = exports.OmegaTree = undefined;
 	
 	var _TypedModule = __webpack_require__(67);
 	
@@ -24858,7 +24862,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		singular: "omega tree part"
 	
 	}); /////////////////////////////////////////////////////////////////////////////
-	
+	var OmegaTreePartType = exports.OmegaTreePartType = OmegaTreePart.Type;
+	var OmegaTreePartTemplate = exports.OmegaTreePartTemplate = OmegaTreePart.Template;
 	
 	var HasTreeParent = exports.HasTreeParent = M.RELATIONSHIP({
 	
