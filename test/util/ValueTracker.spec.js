@@ -4,10 +4,6 @@ import ValueTracker, {property} from '../../src/util/ValueTracker';
 
 import {Observable} from "rxjs/Observable";
 
-import * as x from "rxjs/testing/TestScheduler";
-
-console.log(Object.keys(x));
-
 describe("ValueTracker class", () => {
 	
 	let TestObject;
