@@ -43,6 +43,8 @@ export const OmegaTreePart = M.TYPED_RESOURCE({/////////////////////
 	
 	name: 'OmegaTreePart',
 	
+	abstract: true,
+	
 	extends: Typed,
 	extendedBy: [CylindricalLyph, OmegaTree],
 	

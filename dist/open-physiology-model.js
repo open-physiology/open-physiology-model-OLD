@@ -24850,6 +24850,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		name: 'OmegaTreePart',
 	
+		abstract: true,
+	
 		extends: _typed.Typed,
 		extendedBy: [_lyphs.CylindricalLyph, OmegaTree],
 	

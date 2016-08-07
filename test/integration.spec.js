@@ -1,9 +1,9 @@
 import {xdescribe, describe, it, expect} from './test.helper';
+import {MaterialType, MaterialTemplate, ContainsMaterial, MeasurableType} from '../src/index';
 
 import {Resource, IsRelatedTo}   from '../src/modules/resources';
 import {Type, Template, HasType} from '../src/modules/typed';
 import {Process} from '../src/modules/processes';
-import {MaterialType, MaterialTemplate, ContainsMaterial, MeasurableType} from '../src/index';
 import {Lyph, CylindricalLyph} from '../src/modules/lyphs';
 import {OmegaTree} from '../src/modules/omegaTrees';
 
@@ -35,7 +35,6 @@ describe("integrated workflow", () => {
 		let blood = MaterialType.new({
 			name: "blood"
 		});
-		
 		
 		expect([...committed_MaterialType]).to.eql([]);
 		expect([...committed_Type        ]).to.eql([]);
@@ -199,11 +198,26 @@ describe("integrated workflow", () => {
 		
 	});
 	
-	it("(regression test 2: )", async () => {
+	it("(regression test 2: setting type in initializer fails at commit)", async () => {
 		let renalH = CylindricalLyph.Type.new({ name: "Renal hilum" });
 		await renalH.commit();
 		let t1 = CylindricalLyph.Template.new({ name: "T: Renal hilum", type: renalH });
 		await expect(t1.commit()).to.not.be.rejected;
+	});
+	
+	it("(regression test 3: Missing 'treeParent' field in CylindricalLyphTemplate)", async () => {
+		let lyphType     = CylindricalLyph.Type.new({});
+		let lyphTemplate = CylindricalLyph.Template.new({ type: lyphType });
+		
+		expect(lyphTemplate.fields).to.have.a.property('treeParent');
+		expect(lyphTemplate)       .to.have.a.property('treeParent');
+		
+		let treeType     = OmegaTree.Type.new();
+		let treeTemplate = OmegaTree.Template.new({ type: treeType });
+		lyphTemplate.treeParent = treeTemplate;
+		
+		expect([...treeTemplate.treeChildren]).to.include(lyphTemplate);
+		
 	});
 	
 });
