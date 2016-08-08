@@ -22,6 +22,8 @@ import                            'rxjs/add/operator/do';
 
 import {defineProperties, defineProperty, assign} from 'bound-native-methods';
 
+import babelHelpers from './util/babel-helpers';
+
 const $$committedEntitiesByHref  = Symbol('$$committedEntitiesByHref');
 const $$committedEntities        = Symbol('$$committedEntities'      );
 const $$entities                 = Symbol('$$allEntities'            );
@@ -30,7 +32,8 @@ const $$newEntitySubject         = Symbol('$$newEntitySubject'       );
 const $$deleted                  = Symbol('$$deleted'                );
 const $$entitiesSubject          = Symbol('$$allSubject'             );
 const $$committedEntitiesSubject = Symbol('$$allCommittedSubject'    );
-const $$set                      = Symbol('$$set');
+const $$set                      = Symbol('$$set'                    );
+const $$PreferredClass           = Symbol('$$PreferredClass'         );
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -47,9 +50,19 @@ export default class Entity extends ValueTracker {
 		/* create the new class */
 		// using Function constructor to give the class a dynamic name
 		// http://stackoverflow.com/a/9947842/681588
+		// (and using babel-technique to build it, rather than using class
+		// expression, so that it can be extended by babel-compiled code)
 		const EntitySubclass = new Function('Entity', `
 			'use strict';
-			return class ${name} extends Entity {};
+			${babelHelpers}
+			return function (_Entity) {
+				_inherits(${name}, _Entity);
+				function ${name}() {
+					_classCallCheck(this, ${name});
+					return _possibleConstructorReturn(this, Object.getPrototypeOf(${name}).apply(this, arguments));
+				}
+				return ${name};
+			}(Entity);
 		`)(Entity);
 		
 		/* populate it with the necessary data and behavior */
@@ -67,27 +80,55 @@ export default class Entity extends ValueTracker {
 			},
 			hasSubclass: {
 				value(otherClass) {
-					if (!otherClass) { return false }
-					if (otherClass === this) { return true }
-					for (let SubClass of this.extendedBy) {
-						if (SubClass.hasSubclass(otherClass)) { return true }
+					// For both sides of this, there are two possibilities:
+					// 1) the class is derived by this library
+					// 2) the class is an extension of such
+					// We need to check both possibilities.
+					const isExtension = c => (c && c.__proto__ !== Entity);
+					if (isExtension(this)) {
+						// 'this' is an extension
+						while (isExtension(otherClass) && otherClass !== this) {
+							otherClass = otherClass.__proto__;
+						}
+						return otherClass === this;
+					} else {
+						while (isExtension(otherClass)) {
+							// 'otherClass' is an extension
+							otherClass = otherClass.__proto__;
+						}
+						if (!otherClass) { return false }
+						// both 'this' and 'otherClass' are library-derived
+						if (otherClass === this) { return true  }
+						for (let SubClass of this.extendedBy) {
+							if (SubClass.hasSubclass(otherClass)) { return true }
+						}
+						return false;
 					}
-					return false;
 				}
 			},
 			p: {
 				value(name) {
 					switch (name) {
-						case 'all': {
-							return this[$$entitiesSubject]; // TODO
-						}
-						case 'allCommitted': {
-							return this[$$committedEntitiesSubject]; // TODO
-						}
+						case 'all':          return this[$$entitiesSubject];
+						case 'allCommitted': return this[$$committedEntitiesSubject];
 						default: assert(false, humanMsg`
 							The ${name} property does not exist on ${this.name}.
 						`);
 					}
+				}
+			},
+			[$$PreferredClass]: {
+				value: EntitySubclass,
+				configurable: true
+			},
+			supersede: {
+				value(factory: (OriginalClass: Class<this>) => Class<this>): Class<this> {
+					let SupersedingClass = factory(this[$$PreferredClass]);
+					this::defineProperty($$PreferredClass, {
+						value:        SupersedingClass,
+						configurable: true
+					});
+					return SupersedingClass;
 				}
 			}
 		});
@@ -117,6 +158,7 @@ export default class Entity extends ValueTracker {
 			super(options);
 			this.context       = context;
 			this.initialValues = props;
+			this.options       = options;
 		}
 
 		run() {
@@ -124,9 +166,17 @@ export default class Entity extends ValueTracker {
 				Cannot instantiate the abstract
 				class ${this.context.name}.
 			`);
-			return new this.context(
+			const PreferredClass = this.context[$$PreferredClass];
+			// if (PreferredClass === this.context) {
+			// 	console.log(PreferredClass);
+			// 	let test = new PreferredClass();
+			// }
+			
+			console.log(this.context.name, PreferredClass.name);
+			
+			return new PreferredClass(
 				{ ...this.initialValues },
-				{ ...this.options, new: true }
+				{ ...this.options, allowInvokingConstructor: true, new: true }
 			);
 		}
 
@@ -140,14 +190,10 @@ export default class Entity extends ValueTracker {
 	};
 	
 	static new(
-		vlas:    Object = {},
+		vals:    Object = {},
 	    options: Object = {}
 	): this {
-		return new this.Change_new(
-			this,
-			{ ...vlas },
-			{ ...options, new: true }
-		).run();
+		return (new this.Change_new(this, vals, options)).run();
 	}
 	
 	static get(
@@ -229,12 +275,12 @@ export default class Entity extends ValueTracker {
 	get [Symbol.toStringTag]() { return this.constructor.name }
 	
 	constructor(
-		initialValues: Object = {},
-		options:       Object = {}
+		initialValues: Object                = {},
+		{ allowInvokingConstructor = false } = {}
 	) {
 		
+		/* initialize value tracking */
 		super();
-		
 		super.setValueTrackerOptions({
 			takeUntil: combineLatest(
 				this.p('isDeleted'), this.p('isPristine'), this.p('isNew'),
@@ -243,16 +289,26 @@ export default class Entity extends ValueTracker {
 			filterAllBy: () => this.isDeleted.getValue()
 		});
 		
+		/* make sure this constructor was invoked under proper conditions */
+		assert(allowInvokingConstructor, humanMsg`
+			Do not use 'new ${this.constructor.name}(...args)'.
+			Instead, use '${this.constructor.name}.new(...args)'.
+		`);
+		assert(this.constructor === this.constructor[$$PreferredClass]);
+		
+		/* Treating singleton classes specially? Or do we double-check singleton-ness here? */
 		if (this.constructor.singleton) {
 			// TODO
 		}
 		
+		/* set defaults for the core initial field values */
 		initialValues::defaults({
 			id:    null,
 			href:  null,
 			class: this.constructor.name
 		});
 		
+		/* initialize all fields in this entity */
 		Field.initializeEntity(this, initialValues);
 		
 		/* entity is pristine if all its fields are pristine */
@@ -261,10 +317,11 @@ export default class Entity extends ValueTracker {
 			(...fieldPristines) => fieldPristines.every(v=>!!v)
 		).subscribe(this.pSubject('isPristine'));
 		
+		/* register this entity */
 		Entity[$$entities].add(this);
 		
-		
 		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
+		
 	}
 	
 	delete() {

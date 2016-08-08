@@ -3,16 +3,16 @@ import {MaterialType, MaterialTemplate, ContainsMaterial, MeasurableType} from '
 
 import {Resource, IsRelatedTo}   from '../src/modules/resources';
 import {Type, Template, HasType} from '../src/modules/typed';
-import {Process} from '../src/modules/processes';
-import {Lyph, CylindricalLyph} from '../src/modules/lyphs';
-import {OmegaTree} from '../src/modules/omegaTrees';
+import {Process}                 from '../src/modules/processes';
+import {Lyph, CylindricalLyph}   from '../src/modules/lyphs';
+import {OmegaTree}               from '../src/modules/omegaTrees';
 
 describe("integrated workflow", () => {
 	
 	it("can track available entities with a stream per class", async () => {
 		// TODO: These tests have to come first, because otherwise the global
 		//     : caches of the classes are already populated.
-		//     : We need to make it more modular.
+		//     : We need to make modules more modular. (yeah)
 		
 		let gathered_MaterialType  = new Set;
 		let gathered_Type          = new Set;
