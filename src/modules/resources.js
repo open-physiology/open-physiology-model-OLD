@@ -1,7 +1,6 @@
 import {idSchema, uriSchema, identifierSchema} from '../util/schemas';
 import Module                                  from '../Module';
 
-
 const M = new Module('resources');
 export default M;
 

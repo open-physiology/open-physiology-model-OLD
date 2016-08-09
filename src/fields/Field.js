@@ -196,3 +196,27 @@ export class Field extends ValueTracker {
 	}
 	
 }
+
+export class RelField extends Field {
+	
+	/////////////////////////
+	// events & properties //
+	/////////////////////////
+	
+	@property({ readonly: true }) possibleValues;
+	
+	
+	//////////////
+	// instance //
+	//////////////
+	
+	constructor(options) {
+		super(options);
+		const { desc } = options;
+		
+		/* manage the 'possibleValues' property */
+		desc.codomain.resourceClass.p('all')
+		    .subscribe(this.pSubject('possibleValues'));
+	}
+	
+}

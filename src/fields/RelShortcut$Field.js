@@ -17,7 +17,7 @@ import assert from 'power-assert';
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
 import {humanMsg, assign} from "../util/misc";
 
-import {Field} from './Field';
+import {Field, RelField} from './Field';
 
 import {
 	$$registerFieldClass,
@@ -30,7 +30,7 @@ import {
 } from './symbols';
 
 
-Field[$$registerFieldClass](class RelShortcut$Field extends Field {
+Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 	
 	// this[$$owner] instanceof Resource
 	// this[$$key]   instanceof "materials" | "parts" | "incomingProcesses" | ...
@@ -75,8 +75,8 @@ Field[$$registerFieldClass](class RelShortcut$Field extends Field {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, related } = options;
 		
-		this[$$pristine] = new Set();
-		this[$$value]    = new ObservableSet();
+		this::defineProperty($$pristine, { value: new Set           });
+		this::defineProperty($$value,    { value: new ObservableSet });
 
 		/* emit 'value' signals (but note that setValueThroughSignal = false) */
 		this[$$value].p('value')

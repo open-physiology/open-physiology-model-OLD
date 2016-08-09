@@ -16,6 +16,8 @@ export default M;
 export const Type = M.RESOURCE({////////////////////////////////////////////////
 
 	name: 'Type',
+	
+	abstract: true,
 
 	extends: Resource,
 
@@ -27,6 +29,8 @@ export const Type = M.RESOURCE({////////////////////////////////////////////////
 export const IsSubtypeOf = M.RELATIONSHIP({
 
 	name: 'IsSubtypeOf',
+	
+	abstract: true,
 
 	extends: IsRelatedTo,
 	
@@ -43,6 +47,8 @@ export const IsSubtypeOf = M.RELATIONSHIP({
 export const Template = M.RESOURCE({////////////////////////////////////////////
 
 	name: 'Template',
+	
+	abstract: true,
 
 	extends: Resource,
 
@@ -80,6 +86,8 @@ export const HasCardinalityMultipliedByThatOf = M.RELATIONSHIP({
 export const HasType = M.RELATIONSHIP({
 
 	name: 'HasType',
+	
+	// abstract: true, // not while the concrete versions of HasType are also called HasType
 
 	extends: IsRelatedTo,
 	
@@ -94,6 +102,8 @@ export const HasType = M.RELATIONSHIP({
 export const Typed = M.OBJECT({/////////////////////////////////////////////////
 
 	name: 'Typed',
+	
+	isTypedResource: true,
 
 	abstract: true,
 
@@ -101,6 +111,7 @@ export const Typed = M.OBJECT({/////////////////////////////////////////////////
 
 	Type,
 	Template,
-	HasType
+	HasType,
+	IsSubtypeOf
 
 });/////////////////////////////////////////////////////////////////////////////

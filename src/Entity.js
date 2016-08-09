@@ -84,6 +84,7 @@ export default class Entity extends ValueTracker {
 					// 1) the class is derived by this library
 					// 2) the class is an extension of such
 					// We need to check both possibilities.
+					// We assume there is no subclass cycle.
 					const isExtension = c => (c && c.__proto__ !== Entity);
 					if (isExtension(this)) {
 						// 'this' is an extension
@@ -98,7 +99,7 @@ export default class Entity extends ValueTracker {
 						}
 						if (!otherClass) { return false }
 						// both 'this' and 'otherClass' are library-derived
-						if (otherClass === this) { return true  }
+						if (otherClass === this) { return true }
 						for (let SubClass of this.extendedBy) {
 							if (SubClass.hasSubclass(otherClass)) { return true }
 						}
@@ -166,15 +167,7 @@ export default class Entity extends ValueTracker {
 				Cannot instantiate the abstract
 				class ${this.context.name}.
 			`);
-			const PreferredClass = this.context[$$PreferredClass];
-			// if (PreferredClass === this.context) {
-			// 	console.log(PreferredClass);
-			// 	let test = new PreferredClass();
-			// }
-			
-			console.log(this.context.name, PreferredClass.name);
-			
-			return new PreferredClass(
+			return new this.context[$$PreferredClass](
 				{ ...this.initialValues },
 				{ ...this.options, allowInvokingConstructor: true, new: true }
 			);

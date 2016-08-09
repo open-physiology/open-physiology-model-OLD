@@ -1,5 +1,5 @@
-import Module                       from './Module';
-import {Typed}                      from './modules/typed';
+import Module,                      from './Module';
+import {Typed, Type, IsSubtypeOf}   from './modules/typed';
 import {humanMsg, mapOptionalArray} from './util/misc';
 
 import defaults  from 'lodash-bound/defaults';
@@ -85,11 +85,20 @@ export default class TypedModule extends Module {
 			
 			const NewHasType = this.RELATIONSHIP({
 				
-				name: 'HasType',
+				name: `HasType`,
 				
 				extends: IsRelatedTo,
 				// extends:    superClasses.map(sc => sc.HasType), // can this work?
 				// extendedBy: subClasses  .map(sc => sc.HasType),
+				
+				// TODO: in order to give call this `${conf.name}_HasType`,
+				//     : and maintain a proper class hierarchy, we'll need
+				//     : to allow someone to set `-->HasType` on an entity,
+				//     : and recognize this as also setting `-->${conf.name}_HasType`,
+				//     : because of the 1..1 cardinality on the whole domain hierarchy.
+				//     : Alternatively, we may want to allow a class to be identified
+				//     : by more than just the name. We wouldn't want
+				//     : `-->${conf.name}_HasType` to be visible as a settable field.
 				
 				singular: 'has type',
 				
@@ -98,12 +107,30 @@ export default class TypedModule extends Module {
 				
 			});
 			
+			const NewIsSubtypeOf = this.RELATIONSHIP({
+				
+				name: `IsSubtypeOf`,
+				
+				extends: IsRelatedTo,
+				// extends:    superClasses.map(sc => sc.IsSubtypeOf), // can this work?
+				// extendedBy: subClasses  .map(sc => sc.IsSubtypeOf), // see TODO above
+				
+				singular: "is subtype of",
+				
+				1: [Type, '0..*', {                key: 'subtypes'   }],
+				2: [Type, '0..*', { anchors: true, key: 'supertypes' }],
+				
+				noCycles: true
+				
+			});
+			
 			return {
 				...conf,
 				isTypedResource: true,
 				Type:            NewType,
 				Template:        NewTemplate,
-				HasType:         NewHasType
+				HasType:         NewHasType,
+				IsSubtypeOf:     NewIsSubtypeOf
 			};
 		});
 

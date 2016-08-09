@@ -15,7 +15,7 @@ import assert from 'power-assert';
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
 import {humanMsg, assign} from "../util/misc";
 
-import {Field} from './Field';
+import {Field, RelField} from './Field';
 
 import {
 	$$registerFieldClass,
@@ -28,7 +28,7 @@ import {
 } from './symbols';
 
 
-Field[$$registerFieldClass](class Rel$Field extends Field {
+Field[$$registerFieldClass](class Rel$Field extends RelField {
 	
 	// this[$$owner] instanceof Resource
 	// this[$$key]   instanceof "-->ContainsMaterial" | "-->HasPart" | "<--FlowsTo" | ...

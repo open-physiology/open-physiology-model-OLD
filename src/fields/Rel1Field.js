@@ -18,7 +18,7 @@ import assert from 'power-assert';
 
 import {humanMsg, assign} from "../util/misc";
 
-import {Field} from './Field';
+import {Field, RelField} from './Field';
 
 import {
 	$$registerFieldClass,
@@ -30,7 +30,7 @@ import {
 } from './symbols';
 
 
-Field[$$registerFieldClass](class Rel1Field extends Field {
+Field[$$registerFieldClass](class Rel1Field extends RelField {
 	
 	// this[$$owner] instanceof Resource
 	// this[$$key]   instanceof "-->HasInnerBorder" | "<--HasPlusBorder" | ...

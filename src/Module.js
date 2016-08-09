@@ -4,9 +4,14 @@ import isUndefined from 'lodash-bound/isUndefined';
 import isInteger   from 'lodash-bound/isInteger';
 import defaults    from 'lodash-bound/defaults';
 import assignWith  from 'lodash-bound/assignWith';
-import keys       from 'lodash-bound/keys';
-import values     from 'lodash-bound/values';
-import entries    from 'lodash-bound/entries';
+import keys        from 'lodash-bound/keys';
+import values      from 'lodash-bound/values';
+import entries     from 'lodash-bound/entries';
+import fromPairs   from 'lodash-bound/fromPairs';
+import map         from 'lodash-bound/map';
+import at          from 'lodash-bound/at';
+import uniq        from 'lodash-bound/uniq';
+import flatten     from 'lodash-bound/flatten';
 
 import _isEqual from 'lodash/isEqual';
 
@@ -42,7 +47,16 @@ const $$processRelationshipDomain = Symbol('$$processRelationshipDomain');
 // TODO: folding properties into subclasses
 // TODO: folding multiple 1,2 pairs into same-name relationships and subclass relationships
 
+
 export default class Module {
+	
+	static create(name, dependencies, fn) {
+		return () => {
+			let module = new this(name, dependencies.map(m => m()));
+			fn(module, [...module.classes.vertices()]::fromPairs());
+			return module;
+		}
+	}
 	
 	classes : Graph = new Graph(); // vertices: name                   -> class
 	                               // edges:    [superclass, subclass] -> undefined
@@ -55,29 +69,84 @@ export default class Module {
 		// Why? Because we need the first class reference returned for a given name
 		// to be the permanent reference for that name from then on. Dependent
 		// modules can merge into it, but independent ones would cause trouble.
-		let names = {};
+		let classNameToDep = {};
+		let moduleNameToClassNameToClass = {};
 		for (let dep of dependencies) {
 			for (let [clsName, cls] of dep.classes) {
-				if (names[clsName] && names[clsName].cls !== cls) {
-					throw new Error(humanMsg`
-						The modules '${dep.name}' and '${names[clsName].dep.name}'
-						independently define a class '${clsName}'.
-						(Both are being imported by the module '${this.name}'.)
-					`);
+				if (classNameToDep[clsName] && classNameToDep[clsName].cls !== cls) {
+					if (classNameToDep[clsName].cls.module.name === cls.module.name) {
+						// dependency diamond; we'll have to choose one valid origin and
+						// find/replace all classes with the wrong origin
+					} else {
+						throw new Error(humanMsg`
+							The modules '${dep.name}' and '${classNameToDep[clsName].dep.name}'
+							independently define a class '${clsName}'.
+							(Both are being imported by the module '${this.name}'.)
+						`);
+					}
+				} else {
+					classNameToDep[clsName] = {dep, cls};
 				}
-				names[clsName] = {dep, cls};
 			}
 		}
 		
 		/* merge in the dependencies */
 		// there should be no name clashes from this point
-		for (let dependency of dependencies) {
+		for (let dependency of classNameToDep::values()::map('dep')::uniq()) {
 			this.classes.mergeIn(dependency.classes);
 		}
+		
+		/* check for cycles */
+		let cycle = this.classes.cycle();
+		if (cycle) {
+			throw new Error(humanMsg`
+				A subclass cycle has been introduced by processing
+				the dependencies of the '${name}' module:
+				${ [...cycle, cycle[0]].join(' --> ') }.
+			`);
+		}
+		
+		/* search/replace classes with the wrong origin */
+		const normalize = (ref, setVal) => {
+			if (classNameToDep[ref.name] && classNameToDep[ref.name].cls !== ref) {
+				setVal(classNameToDep[ref.name].cls);
+			}
+		};
+		for (let [,cls] of this.classes.vertices()) {
+			if (cls.isTypedResource) {
+				
+				// TODO?
+				
+			} else {
+				for (let s of ['extends', 'extendedBy']) {
+					for (let ref of cls[s]) {
+						normalize(ref, (newRef) => {
+							cls[s].delete(ref);
+							cls[s].add(newRef);
+						});
+					}
+				}
+				if (cls.isRelationship) {
+					for (let domain of cls.domainPairs::map(p => p::at([1, 2]))::flatten()) {
+						if (!domain) {
+							console.log(cls.domainPairs[0][1]);
+							console.log(cls.domainPairs[0][2]);
+						}
+						for (let key of ['resourceClass', 'relationshipClass']) {
+							normalize(domain[key], (newRef) => {
+								domain[key] = newRef;
+							});
+						}
+					}
+				}
+			}
+		}
+		
 	}
 
 	OBJECT(config) {
 		return mapOptionalArray(config, (conf) => {
+			conf.module = this;
 			this.register(conf);
 			return conf;
 		});
@@ -86,6 +155,7 @@ export default class Module {
 	RESOURCE(config) {
 		return mapOptionalArray(config, (conf) => {
 			conf.isResource = true;
+			conf.module = this;
 			this.basicNormalization                      (conf                    );
 			let constructor = this.mergeSameNameResources(Entity.createClass(conf));
 			this.register                                (constructor             );
@@ -99,6 +169,7 @@ export default class Module {
 	RELATIONSHIP(config) {
 		return mapOptionalArray(config, (conf) => {
 			conf.isRelationship = true;
+			conf.module = this;
 			this.basicNormalization                      (conf);
 			let constructor = Entity.createClass         (conf);
 			this.normalizeRelationshipSides              (constructor);
@@ -351,6 +422,16 @@ export default class Module {
 			this.classes.addEdge(cls.name, extender.name);
 			extender.extends.add(cls);
 		}
+		
+		/* check for cycles */
+		let cycle = this.classes.cycle();
+		if (cycle) {
+			throw new Error(humanMsg`
+				A subclass cycle has been introduced while registering
+				the ${cls.name} class:
+				${[...cycle, cycle[0]].join(' --> ')}.
+			`);
+		}
 	}
 	
 	mergeSuperclassFields(cls) : void {
@@ -433,13 +514,16 @@ export default class Module {
 		if (!OldClass) { return NewClass }
 		return OldClass::assignWith(NewClass, (vOld, vNew, key) => {
 			switch (key) {
+				case 'module': return vOld;
 				case 'extends':
 				case 'extendedBy': return new Set([...vOld, ...vNew]);
 				case 'properties':
 				case 'patternProperties': return {}::assignWith(vOld, vNew, (pOld, pNew, pKey) => {
 					assert(pOld::isUndefined() || _isEqual(pOld, pNew), humanMsg`
 						Cannot merge property descriptions for ${OldClass.name}#${key}.
+						
 						1) ${JSON.stringify(pOld)}
+						
 						2) ${JSON.stringify(pNew)}
 					`);
 					return pOld::isUndefined() ? pNew : pOld;
@@ -460,6 +544,7 @@ export default class Module {
 		if (!OldClass) { return NewClass }
 		return OldClass::assignWith(NewClass, (vOld, vNew, key) => {
 			switch (key) {
+				case 'module': return vOld;
 				case 'extends':
 				case 'extendedBy':  return new Set([...vOld, ...vNew]);
 				case 'domainPairs': return [...vOld, ...vNew];

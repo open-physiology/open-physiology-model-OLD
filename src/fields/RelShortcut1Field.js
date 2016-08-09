@@ -5,8 +5,6 @@ import {withLatestFrom}           from 'rxjs/operator/withLatestFrom';
 import {defer as deferObservable} from 'rxjs/observable/defer';
 import 'rxjs/add/operator/do';
 
-import isUndefined from 'lodash-bound/isUndefined';
-import isNull      from 'lodash-bound/isNull';
 import entries     from 'lodash-bound/entries';
 import isObject    from 'lodash-bound/isObject';
 
@@ -16,7 +14,7 @@ import assert from 'power-assert';
 
 import {humanMsg, assign} from "../util/misc";
 
-import {Field} from './Field';
+import {Field, RelField} from './Field';
 
 import {
 	$$registerFieldClass,
@@ -28,7 +26,7 @@ import {
 	$$value,
 } from './symbols';
 
-Field[$$registerFieldClass](class RelShortcut1Field extends Field {
+Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 	
 	// this[$$owner] instanceof Resource
 	// this[$$key]   instanceof "innerBorder" | "plusBorder" | ...
