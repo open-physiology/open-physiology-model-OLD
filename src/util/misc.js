@@ -9,6 +9,8 @@ import isArray     from 'lodash-bound/isArray';
 import isNumber    from 'lodash-bound/isNumber';
 import isObject    from 'lodash-bound/isObject';
 import isFunction  from 'lodash-bound/isFunction';
+import isSet       from 'lodash-bound/isSet';
+import isWeakSet   from 'lodash-bound/isWeakSet';
 
 import _zip from 'lodash/zip';
 
@@ -36,9 +38,9 @@ export function mapOptionalArray(val, fn) {
 	return isArr ? val : val[0];
 }
 
-export function arrayify(val) {
+export function wrapInArray(val) {
 	if (val::isUndefined()) { return [] }
-	if (val::isArray()) { return val }
+	if (val::isArray() || val::isSet() || val::isWeakSet()) { return [...val] }
 	return [val];
 }
 

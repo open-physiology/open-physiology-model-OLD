@@ -16,7 +16,6 @@
   "env": {
     "development": {
       "plugins": [
-        "typecheck",
         ["espower", { "embedAst": true }]
       ]
     },

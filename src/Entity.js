@@ -313,6 +313,7 @@ export default class Entity extends ValueTracker {
 		/* register this entity */
 		Entity[$$entities].add(this);
 		
+		
 		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 		
 	}

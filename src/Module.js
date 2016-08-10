@@ -25,7 +25,7 @@ import {
 	humanMsg,
 	mapOptionalArray,
 	parseCardinality,
-	arrayify,
+	wrapInArray,
 	stringifyCardinality
 } from './util/misc';
 
@@ -51,102 +51,37 @@ const $$processRelationshipDomain = Symbol('$$processRelationshipDomain');
 export default class Module {
 	
 	static create(name, dependencies, fn) {
-		return () => {
-			let module = new this(name, dependencies.map(m => m()));
-			fn(module, [...module.classes.vertices()]::fromPairs());
-			return module;
-		}
+		let moduleFactory = (memory = {
+			modules: new Map(),
+			classes: new Graph()
+		}) => {
+			if (!memory.modules.has(name)) {
+				let module = new this(name, dependencies.map(m => m(memory)), memory.classes);
+				memory.modules.set(name, module);
+				if (fn) {
+					fn(module, [...module.classes.vertices()]::fromPairs());
+				}
+			}
+			return memory.modules.get(name);
+		};
+		return moduleFactory;
 	}
 	
-	classes : Graph = new Graph(); // vertices: name                   -> class
-	                               // edges:    [superclass, subclass] -> undefined
+	classes : Graph; // vertices: name                   -> class
+	                 // edges:    [superclass, subclass] -> undefined
 
-	constructor(name, dependencies = []) {
+	constructor(name, dependencies = [], graph = new Graph()) {
+		/* set storage graph */
+		this.classes = graph;
+		
 		/* store the module name */
 		this.name = name;
-		
-		/* first, make sure there are no name clashes between independent modules */
-		// Why? Because we need the first class reference returned for a given name
-		// to be the permanent reference for that name from then on. Dependent
-		// modules can merge into it, but independent ones would cause trouble.
-		let classNameToDep = {};
-		let moduleNameToClassNameToClass = {};
-		for (let dep of dependencies) {
-			for (let [clsName, cls] of dep.classes) {
-				if (classNameToDep[clsName] && classNameToDep[clsName].cls !== cls) {
-					if (classNameToDep[clsName].cls.module.name === cls.module.name) {
-						// dependency diamond; we'll have to choose one valid origin and
-						// find/replace all classes with the wrong origin
-					} else {
-						throw new Error(humanMsg`
-							The modules '${dep.name}' and '${classNameToDep[clsName].dep.name}'
-							independently define a class '${clsName}'.
-							(Both are being imported by the module '${this.name}'.)
-						`);
-					}
-				} else {
-					classNameToDep[clsName] = {dep, cls};
-				}
-			}
-		}
-		
-		/* merge in the dependencies */
-		// there should be no name clashes from this point
-		for (let dependency of classNameToDep::values()::map('dep')::uniq()) {
-			this.classes.mergeIn(dependency.classes);
-		}
-		
-		/* check for cycles */
-		let cycle = this.classes.cycle();
-		if (cycle) {
-			throw new Error(humanMsg`
-				A subclass cycle has been introduced by processing
-				the dependencies of the '${name}' module:
-				${ [...cycle, cycle[0]].join(' --> ') }.
-			`);
-		}
-		
-		/* search/replace classes with the wrong origin */
-		const normalize = (ref, setVal) => {
-			if (classNameToDep[ref.name] && classNameToDep[ref.name].cls !== ref) {
-				setVal(classNameToDep[ref.name].cls);
-			}
-		};
-		for (let [,cls] of this.classes.vertices()) {
-			if (cls.isTypedResource) {
-				
-				// TODO?
-				
-			} else {
-				for (let s of ['extends', 'extendedBy']) {
-					for (let ref of cls[s]) {
-						normalize(ref, (newRef) => {
-							cls[s].delete(ref);
-							cls[s].add(newRef);
-						});
-					}
-				}
-				if (cls.isRelationship) {
-					for (let domain of cls.domainPairs::map(p => p::at([1, 2]))::flatten()) {
-						if (!domain) {
-							console.log(cls.domainPairs[0][1]);
-							console.log(cls.domainPairs[0][2]);
-						}
-						for (let key of ['resourceClass', 'relationshipClass']) {
-							normalize(domain[key], (newRef) => {
-								domain[key] = newRef;
-							});
-						}
-					}
-				}
-			}
-		}
-		
 	}
 
 	OBJECT(config) {
 		return mapOptionalArray(config, (conf) => {
 			conf.module = this;
+			this.basicNormalization(conf);
 			this.register(conf);
 			return conf;
 		});
@@ -208,7 +143,7 @@ export default class Module {
 		/* normalizing extends/extendedBy */
 		for (let key of ['extends', 'extendedBy']) {
 			config::defaults({ [key]: [] });
-			config[key] = new Set( arrayify(config[key]) );
+			config[key] = new Set( wrapInArray(config[key]) );
 		}
 		
 		/* normalize properties */
@@ -225,6 +160,11 @@ export default class Module {
 		/* sanity checks */
 		for (let key of ['extends', 'extendedBy']) {
 			for (let other of config[key]) {
+				
+				if (!other) {
+					console.log(config);
+				}
+				
 				assert(this.classes.hasVertex(other.name), humanMsg`
 					The '${config.name}' class is being processed
 					by module '${this.name}', but it extends a '${other.name}'
@@ -274,6 +214,11 @@ export default class Module {
 				   [ [  [1        , pair[1]],  [2          , pair[2] ]  ] ,
 			         [  [2        , pair[2]],  [1          , pair[1] ]  ] ]) {
 				let [resourceClass, cardinality, options = {}] = givenDomainPair[domainKey];
+				
+				if (!resourceClass) {
+					console.log(givenDomainPair);
+				}
+				
 				domain::assign({
 					codomain         : codomain,
 					
@@ -320,6 +265,10 @@ export default class Module {
 			keyInResource,
 			shortcutKey
 		} = referenceDomain;
+		
+		if (!resourceClass) {
+			console.log(referenceDomain::entries());
+		}
 		
 		// const relSinks = relationshipClass::(function findSinks() {
 		// 	if (this.extendedBy::size() === 0) { return [this] }
@@ -412,13 +361,14 @@ export default class Module {
 	register(cls) : void {
 		/* register the class in this module */
 		this.classes.ensureVertex(cls.name, cls);
+		this.classes[cls.name] = cls;
 		
 		/* add subclassing edges and cross-register sub/superclasses */
-		for (let extendee of cls.extends || []) {
+		for (let extendee of (cls.extends) || []) {
 			this.classes.addEdge(extendee.name, cls.name);
 			extendee.extendedBy.add(cls);
 		}
-		for (let extender of cls.extendedBy || []) {
+		for (let extender of (cls.extendedBy) || []) {
 			this.classes.addEdge(cls.name, extender.name);
 			extender.extends.add(cls);
 		}
@@ -472,6 +422,8 @@ export default class Module {
 				
 		mergeFieldKind(cls, cls, 'properties', (superDesc, subDesc) => {
 			assert(subDesc.key === superDesc.key);
+			
+			
 			// We're assuming that the only kind of non-trivial merging
 			// right now is to give a property a specific constant value
 			// in the subclass, which has to be checked in the superclass.
@@ -496,6 +448,10 @@ export default class Module {
 		});
 		
 		mergeFieldKind(cls, cls, 'relationships', (superDesc, subDesc) => {
+			// if (!superDesc.resourceClass.hasSubclass(subDesc.resourceClass)) { // TODO: remove
+			// 	console.log(superDesc.resourceClass::keys());
+			// 	console.log(superDesc.resourceClass.module === subDesc.resourceClass.module);
+			// }
 			assert(superDesc.resourceClass.hasSubclass(subDesc.resourceClass));
 			return subDesc;
 		});
@@ -529,10 +485,14 @@ export default class Module {
 					return pOld::isUndefined() ? pNew : pOld;
 				});
 				default: {
-					assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), humanMsg`
-						Cannot merge ${OldClass.name}.${key} = ${JSON.stringify(vOld)}
-						        with ${JSON.stringify(vNew)}.
-					`);
+					if (!vOld::isUndefined() && !vNew::isUndefined() && !_isEqual(vOld, vNew)) {
+						// console.log(OldClass.name, NewClass.name);
+						throw new Error(humanMsg`
+							Cannot merge ${OldClass.name}.${key} = ${JSON.stringify(vOld)}
+							        with ${JSON.stringify(vNew)}.
+						`);
+					}
+					// assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), );
 					return vOld::isUndefined() ? vNew : vOld;
 				}
 			}

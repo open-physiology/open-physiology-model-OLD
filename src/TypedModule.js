@@ -1,12 +1,11 @@
-import Module,                      from './Module';
-import {Typed, Type, IsSubtypeOf}   from './modules/typed';
-import {humanMsg, mapOptionalArray} from './util/misc';
+import Module                       from './Module';
+import {mapOptionalArray} from './util/misc';
 
 import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
-import isArray   from 'lodash-bound/isArray';
-import {IsRelatedTo} from "./modules/resources";
+import map       from 'lodash-bound/map';
+import {wrapInArray} from "./util/misc";
 
 /**
  * Typed Modules allow to more easily create related
@@ -19,17 +18,21 @@ export default class TypedModule extends Module {
 	TYPED_RESOURCE(config) {
 		return mapOptionalArray(config, (conf) => {
 			
-			let superClasses = conf.extends || [Typed];
-			if (!superClasses::isArray()) { superClasses = [superClasses] }
+			this.basicNormalization(conf);
+			
+			let superClasses = conf.extends || [this.classes.vertexValue('Typed')];
+			superClasses = wrapInArray(superClasses);
+			// if (!superClasses::isArray()) { superClasses = [superClasses] }
 			
 			let subClasses = conf.extendedBy || [];
-			if (!subClasses::isArray()) { subClasses = [subClasses] }
+			subClasses = wrapInArray(subClasses);
+			// if (!subClasses::isArray()) { subClasses = [subClasses] }
 			
+			/* handling properties */
 			config::defaults({
 				properties: {},
 				patternProperties: {}
 			});
-			
 			const [
 				typeProperties,
 				templateProperties,
@@ -51,8 +54,8 @@ export default class TypedModule extends Module {
 				
 				name: `${conf.name}Type`,
 				
-				extends:    superClasses.map(sc => sc.Type),
-				extendedBy: subClasses  .map(sc => sc.Type),
+				extends:    superClasses::map(sc => sc.Type),
+				extendedBy: subClasses  ::map(sc => sc.Type),
 				
 				instanceSingular: conf.singular,
 				instancePlural:   conf.plural || `${conf.singular}s`,
@@ -70,8 +73,8 @@ export default class TypedModule extends Module {
 				
 				name: `${conf.name}Template`,
 				
-				extends:    superClasses.map(sc => sc.Template),
-				extendedBy: subClasses  .map(sc => sc.Template),
+				extends:    superClasses::map(sc => sc.Template),
+				extendedBy: subClasses  ::map(sc => sc.Template),
 				
 				instanceSingular: conf.singular,
 				instancePlural:   conf.plural || `${conf.singular}s`,
@@ -87,7 +90,7 @@ export default class TypedModule extends Module {
 				
 				name: `HasType`,
 				
-				extends: IsRelatedTo,
+				extends: this.classes.vertexValue('IsRelatedTo'),
 				// extends:    superClasses.map(sc => sc.HasType), // can this work?
 				// extendedBy: subClasses  .map(sc => sc.HasType),
 				
@@ -111,27 +114,32 @@ export default class TypedModule extends Module {
 				
 				name: `IsSubtypeOf`,
 				
-				extends: IsRelatedTo,
+				extends: this.classes.vertexValue('IsRelatedTo'),
 				// extends:    superClasses.map(sc => sc.IsSubtypeOf), // can this work?
 				// extendedBy: subClasses  .map(sc => sc.IsSubtypeOf), // see TODO above
 				
 				singular: "is subtype of",
 				
-				1: [Type, '0..*', {                key: 'subtypes'   }],
-				2: [Type, '0..*', { anchors: true, key: 'supertypes' }],
+				1: [NewType, '0..*', {                key: 'subtypes'   }],
+				2: [NewType, '0..*', { anchors: true, key: 'supertypes' }],
 				
 				noCycles: true
 				
 			});
 			
-			return {
+			
+			let result = {
 				...conf,
+				module:          this,
 				isTypedResource: true,
 				Type:            NewType,
 				Template:        NewTemplate,
 				HasType:         NewHasType,
 				IsSubtypeOf:     NewIsSubtypeOf
 			};
+			this.register(result);
+			
+			return result;
 		});
 
 	}
