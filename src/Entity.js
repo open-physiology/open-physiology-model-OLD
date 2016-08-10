@@ -52,18 +52,19 @@ export default class Entity extends ValueTracker {
 		// http://stackoverflow.com/a/9947842/681588
 		// (and using babel-technique to build it, rather than using class
 		// expression, so that it can be extended by babel-compiled code)
-		const EntitySubclass = new Function('Entity', `
-			'use strict';
-			${babelHelpers};
-			return function (_Entity) {
-				_inherits(${name}, _Entity);
-				function ${name}() {
-					_classCallCheck(this, ${name});
-					return _possibleConstructorReturn(this, Object.getPrototypeOf(${name}).apply(this, arguments));
-				}
-				return ${name};
-			}(Entity);
-		`)(Entity);
+		// const EntitySubclass = new Function('Entity', `
+		// 	'use strict';
+		// 	${babelHelpers};
+		// 	return function (_Entity) {
+		// 		_inherits(${name}, _Entity);
+		// 		function ${name}() {
+		// 			_classCallCheck(this, ${name});
+		// 			return _possibleConstructorReturn(this, Object.getPrototypeOf(${name}).apply(this, arguments));
+		// 		}
+		// 		return ${name};
+		// 	}(Entity);
+		// `)(Entity);
+		const EntitySubclass = class extends Entity {};
 		
 		/* populate it with the necessary data and behavior */
 		EntitySubclass::assign(rest);

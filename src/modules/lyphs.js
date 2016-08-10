@@ -22,9 +22,6 @@ export default TypedModule.create('lyphs', [
 	Resource, IsRelatedTo, Typed
 }) => {
 	
-	
-	
-	
 	const Material = M.TYPED_RESOURCE({//////////////////////////////////////
 		
 		name: 'Material',

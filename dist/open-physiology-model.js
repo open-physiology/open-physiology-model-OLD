@@ -21158,9 +21158,31 @@ return /******/ (function(modules) { // webpackBootstrap
 				// http://stackoverflow.com/a/9947842/681588
 				// (and using babel-technique to build it, rather than using class
 				// expression, so that it can be extended by babel-compiled code)
+				// const EntitySubclass = new Function('Entity', `
+				// 	'use strict';
+				// 	${babelHelpers};
+				// 	return function (_Entity) {
+				// 		_inherits(${name}, _Entity);
+				// 		function ${name}() {
+				// 			_classCallCheck(this, ${name});
+				// 			return _possibleConstructorReturn(this, Object.getPrototypeOf(${name}).apply(this, arguments));
+				// 		}
+				// 		return ${name};
+				// 	}(Entity);
+				// `)(Entity);
 	
 	
-				var EntitySubclass = new Function('Entity', '\n\t\t\t\'use strict\';\n\t\t\t' + _babelHelpers2.default + ';\n\t\t\treturn function (_Entity) {\n\t\t\t\t_inherits(' + name + ', _Entity);\n\t\t\t\tfunction ' + name + '() {\n\t\t\t\t\t_classCallCheck(this, ' + name + ');\n\t\t\t\t\treturn _possibleConstructorReturn(this, Object.getPrototypeOf(' + name + ').apply(this, arguments));\n\t\t\t\t}\n\t\t\t\treturn ' + name + ';\n\t\t\t}(Entity);\n\t\t')(Entity);
+				var EntitySubclass = function (_Entity) {
+					_inherits(EntitySubclass, _Entity);
+	
+					function EntitySubclass() {
+						_classCallCheck(this, EntitySubclass);
+	
+						return _possibleConstructorReturn(this, Object.getPrototypeOf(EntitySubclass).apply(this, arguments));
+					}
+	
+					return EntitySubclass;
+				}(Entity);
 	
 				/* populate it with the necessary data and behavior */
 				_boundNativeMethods.assign.call(EntitySubclass, rest);
@@ -21307,7 +21329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(this.hasInstance(_rec2._capt(entity, 'arguments/0/arguments/0')), 'arguments/0'), {
 					content: 'assert(this.hasInstance(entity), humanMsg`\n\t\t\tThe entity at \'${ JSON.stringify(href) }\'\n\t\t\tis not of class \'${ this.name }\'\n\t\t\tbut of class \'${ entity.constructor.name }\'.\n\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 196,
+					line: 197,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"hasInstance","range":[12,23]},"computed":false,"range":[7,23]},"arguments":[{"type":"Identifier","name":"entity","range":[24,30]}],"range":[7,31]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[33,41]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe entity at \'","cooked":"\\n\\t\\t\\tThe entity at \'"},"tail":false,"range":[42,18]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\tis not of class \'","cooked":"\'\\n\\t\\t\\tis not of class \'"},"tail":false,"range":[43,20]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\tbut of class \'","cooked":"\'\\n\\t\\t\\tbut of class \'"},"tail":false,"range":[34,17]},{"type":"TemplateElement","value":{"raw":"\'.\\n\\t\\t","cooked":"\'.\\n\\t\\t"},"tail":true,"range":[45,2]}],"expressions":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[21,25]},"property":{"type":"Identifier","name":"stringify","range":[26,35]},"computed":false,"range":[21,35]},"arguments":[{"type":"Identifier","name":"href","range":[36,40]}],"range":[21,41]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[23,27]},"property":{"type":"Identifier","name":"name","range":[28,32]},"computed":false,"range":[23,32]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"entity","range":[20,26]},"property":{"type":"Identifier","name":"constructor","range":[27,38]},"computed":false,"range":[20,38]},"property":{"type":"Identifier","name":"name","range":[39,43]},"computed":false,"range":[20,43]}],"range":[41,3]},"range":[33,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"hasInstance","range":[12,23]},{"type":{"label":"("},"range":[23,24]},{"type":{"label":"name"},"value":"entity","range":[24,30]},{"type":{"label":")"},"range":[30,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"humanMsg","range":[33,41]},{"type":{"label":"`"},"range":[41,42]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe entity at \'","range":[42,18]},{"type":{"label":"${"},"range":[18,20]},{"type":{"label":"name"},"value":"JSON","range":[21,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"stringify","range":[26,35]},{"type":{"label":"("},"range":[35,36]},{"type":{"label":"name"},"value":"href","range":[36,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\tis not of class \'","range":[43,20]},{"type":{"label":"${"},"range":[20,22]},{"type":{"label":"this"},"value":"this","range":[23,27]},{"type":{"label":"."},"range":[27,28]},{"type":{"label":"name"},"value":"name","range":[28,32]},{"type":{"label":"}"},"range":[33,34]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\tbut of class \'","range":[34,17]},{"type":{"label":"${"},"range":[17,19]},{"type":{"label":"name"},"value":"entity","range":[20,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"\'.\\n\\t\\t","range":[45,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -21337,7 +21359,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(this.singleton, 'arguments/0'), {
 					content: 'assert(this.singleton, humanMsg`\n\t\t\tThe \'${ this.name }\' class is not a singleton class.\n\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 217,
+					line: 218,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"singleton","range":[12,21]},"computed":false,"range":[7,21]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[23,31]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\tThe \'"},"tail":false,"range":[32,8]},{"type":"TemplateElement","value":{"raw":"\' class is not a singleton class.\\n\\t\\t","cooked":"\' class is not a singleton class.\\n\\t\\t"},"tail":true,"range":[22,2]}],"expressions":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[11,15]},"property":{"type":"Identifier","name":"name","range":[16,20]},"computed":false,"range":[11,20]}],"range":[31,3]},"range":[23,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"singleton","range":[12,21]},{"type":{"label":","},"range":[21,22]},{"type":{"label":"name"},"value":"humanMsg","range":[23,31]},{"type":{"label":"`"},"range":[31,32]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe \'","range":[32,8]},{"type":{"label":"${"},"range":[8,10]},{"type":{"label":"this"},"value":"this","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"name","range":[16,20]},{"type":{"label":"}"},"range":[21,22]},{"type":{"label":"template"},"value":"\' class is not a singleton class.\\n\\t\\t","range":[22,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -21423,7 +21445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			(0, _powerAssert2.default)(_rec4._expr(_rec4._capt(allowInvokingConstructor, 'arguments/0'), {
 				content: 'assert(allowInvokingConstructor, humanMsg`\n\t\t\tDo not use \'new ${ this.constructor.name }(...args)\'.\n\t\t\tInstead, use \'${ this.constructor.name }.new(...args)\'.\n\t\t`)',
 				filepath: 'src/Entity.js',
-				line: 276,
+				line: 277,
 				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"Identifier","name":"allowInvokingConstructor","range":[7,31]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[33,41]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tDo not use \'new ","cooked":"\\n\\t\\t\\tDo not use \'new "},"tail":false,"range":[42,19]},{"type":"TemplateElement","value":{"raw":"(...args)\'.\\n\\t\\t\\tInstead, use \'","cooked":"(...args)\'.\\n\\t\\t\\tInstead, use \'"},"tail":false,"range":[45,17]},{"type":"TemplateElement","value":{"raw":".new(...args)\'.\\n\\t\\t","cooked":".new(...args)\'.\\n\\t\\t"},"tail":true,"range":[43,2]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[22,26]},"property":{"type":"Identifier","name":"constructor","range":[27,38]},"computed":false,"range":[22,38]},"property":{"type":"Identifier","name":"name","range":[39,43]},"computed":false,"range":[22,43]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[20,24]},"property":{"type":"Identifier","name":"constructor","range":[25,36]},"computed":false,"range":[20,36]},"property":{"type":"Identifier","name":"name","range":[37,41]},"computed":false,"range":[20,41]}],"range":[41,3]},"range":[33,3]}],"range":[0,4]}',
 				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"allowInvokingConstructor","range":[7,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"humanMsg","range":[33,41]},{"type":{"label":"`"},"range":[41,42]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tDo not use \'new ","range":[42,19]},{"type":{"label":"${"},"range":[19,21]},{"type":{"label":"this"},"value":"this","range":[22,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"(...args)\'.\\n\\t\\t\\tInstead, use \'","range":[45,17]},{"type":{"label":"${"},"range":[17,19]},{"type":{"label":"this"},"value":"this","range":[20,24]},{"type":{"label":"."},"range":[24,25]},{"type":{"label":"name"},"value":"constructor","range":[25,36]},{"type":{"label":"."},"range":[36,37]},{"type":{"label":"name"},"value":"name","range":[37,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":".new(...args)\'.\\n\\t\\t","range":[43,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 				visitorKeys: _powerAssertVisitorKeys
@@ -21431,7 +21453,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt(_this.constructor, 'arguments/0/left') === _rec5._capt(_rec5._capt(_rec5._capt(_this.constructor, 'arguments/0/right/left/object')[_rec5._capt($$PreferredClass, 'arguments/0/right/left/property')], 'arguments/0/right/left') || _rec5._capt(_this.constructor, 'arguments/0/right/right'), 'arguments/0/right'), 'arguments/0'), {
 				content: 'assert(this.constructor === (this.constructor[$$PreferredClass] || this.constructor))',
 				filepath: 'src/Entity.js',
-				line: 280,
+				line: 281,
 				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"constructor","range":[12,23]},"computed":false,"range":[7,23]},"right":{"type":"LogicalExpression","operator":"||","left":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[29,33]},"property":{"type":"Identifier","name":"constructor","range":[34,45]},"computed":false,"range":[29,45]},"property":{"type":"Identifier","name":"$$PreferredClass","range":[46,62]},"computed":true,"range":[29,63]},"right":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[67,71]},"property":{"type":"Identifier","name":"constructor","range":[72,83]},"computed":false,"range":[67,83]},"range":[29,83]},"range":[7,84]}],"range":[0,85]}',
 				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"constructor","range":[12,23]},{"type":{"label":"==/!="},"value":"===","range":[24,27]},{"type":{"label":"("},"range":[28,29]},{"type":{"label":"this"},"value":"this","range":[29,33]},{"type":{"label":"."},"range":[33,34]},{"type":{"label":"name"},"value":"constructor","range":[34,45]},{"type":{"label":"["},"range":[45,46]},{"type":{"label":"name"},"value":"$$PreferredClass","range":[46,62]},{"type":{"label":"]"},"range":[62,63]},{"type":{"label":"||"},"value":"||","range":[64,66]},{"type":{"label":"this"},"value":"this","range":[67,71]},{"type":{"label":"."},"range":[71,72]},{"type":{"label":"name"},"value":"constructor","range":[72,83]},{"type":{"label":")"},"range":[83,84]},{"type":{"label":")"},"range":[84,85]}]',
 				visitorKeys: _powerAssertVisitorKeys
@@ -21520,7 +21542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function () {
 				var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
 					var _context5,
-					    _this2 = this;
+					    _this3 = this;
 	
 					for (var _len2 = arguments.length, keysToCommit = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
 						keysToCommit[_key2] = arguments[_key2];
@@ -21542,7 +21564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 									}
 									_context7.next = 4;
 									return Promise.all(keysToCommit.map(function (key) {
-										return _this2.fields[key].commit();
+										return _this3.fields[key].commit();
 									}));
 	
 								case 4:
@@ -21587,7 +21609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'rollback',
 			value: function rollback() {
 				var _context8,
-				    _this3 = this;
+				    _this4 = this;
 	
 				for (var _len3 = arguments.length, keysToRollback = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
 					keysToRollback[_key3] = arguments[_key3];
@@ -21599,7 +21621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					keysToRollback = (_context9 = this.fields, _keys2.default).call(_context9);
 				}
 				keysToRollback.map(function (key) {
-					_this3.fields[key].rollback();
+					_this4.fields[key].rollback();
 				});
 				this.e('rollback').next(this);
 			}
@@ -21621,12 +21643,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_classCallCheck(this, _class3);
 	
-			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(_class3).call(this, options));
+			var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(_class3).call(this, options));
 	
-			_this4.context = context;
-			_this4.initialValues = props;
-			_this4.options = options;
-			return _this4;
+			_this5.context = context;
+			_this5.initialValues = props;
+			_this5.options = options;
+			return _this5;
 		}
 	
 		_createClass(_class3, [{
@@ -21637,7 +21659,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(!_rec._capt(_rec._capt(this.context, 'arguments/0/argument/object').abstract, 'arguments/0/argument'), 'arguments/0'), {
 					content: 'assert(!this.context.abstract, humanMsg`\n\t\t\t\tCannot instantiate the abstract\n\t\t\t\tclass ${ this.context.name }.\n\t\t\t`)',
 					filepath: 'src/Entity.js',
-					line: 157,
+					line: 158,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"context","range":[13,20]},"computed":false,"range":[8,20]},"property":{"type":"Identifier","name":"abstract","range":[21,29]},"computed":false,"range":[8,29]},"prefix":true,"range":[7,29]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[31,39]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","cooked":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass "},"tail":false,"range":[40,10]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t","cooked":".\\n\\t\\t\\t"},"tail":true,"range":[32,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[13,17]},"property":{"type":"Identifier","name":"context","range":[18,25]},"computed":false,"range":[13,25]},"property":{"type":"Identifier","name":"name","range":[26,30]},"computed":false,"range":[13,30]}],"range":[39,4]},"range":[31,4]}],"range":[0,5]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"."},"range":[12,13]},{"type":{"label":"name"},"value":"context","range":[13,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"abstract","range":[21,29]},{"type":{"label":","},"range":[29,30]},{"type":{"label":"name"},"value":"humanMsg","range":[31,39]},{"type":{"label":"`"},"range":[39,40]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","range":[40,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"this"},"value":"this","range":[13,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"context","range":[18,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"name","range":[26,30]},{"type":{"label":"}"},"range":[31,32]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[32,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
 					visitorKeys: _powerAssertVisitorKeys
