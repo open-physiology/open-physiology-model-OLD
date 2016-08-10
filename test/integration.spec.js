@@ -205,21 +205,27 @@ describe("integrated workflow", () => {
 		let t1 = CylindricalLyph.Template.new({ name: "T: Renal hilum", type: renalH });
 		await expect(t1.commit()).to.not.be.rejected;
 	});
-
+	
 	it("(regression test 3: Missing 'treeParent' field in CylindricalLyphTemplate)", async () => {
 		const {CylindricalLyph, OmegaTree} = module.classes;
 		let lyphType     = CylindricalLyph.Type.new({});
 		let lyphTemplate = CylindricalLyph.Template.new({ type: lyphType });
-
+		
 		expect(lyphTemplate.fields).to.have.a.property('treeParent');
 		expect(lyphTemplate)       .to.have.a.property('treeParent');
-
+		
 		let treeType     = OmegaTree.Type.new();
 		let treeTemplate = OmegaTree.Template.new({ type: treeType });
 		lyphTemplate.treeParent = treeTemplate;
-
+		
 		expect([...treeTemplate.treeChildren]).to.include(lyphTemplate);
-
+		
+	});
+	
+	it("(regression test 4: bla[$$PreferredClass] is not a constructor)", async () => {
+		const {ExternalResource} = module.classes;
+		let external = ExternalResource.new({ uri: 'someplace#44023987512' });
+		external.commit();
 	});
 	
 });

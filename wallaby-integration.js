@@ -21,7 +21,7 @@ module.exports = function (wallaby) {
 		
 		bootstrap: function () {
 			
-			wallaby.testFramework.timeout(5000);
+			wallaby.testFramework.timeout(10000);
 			
 			var modulePrototype = require('module').Module.prototype;
 			if (!modulePrototype._originalRequire) {
