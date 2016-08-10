@@ -227,4 +227,13 @@ describe("integrated workflow", () => {
 		
 	});
 	
+	it("(regression test 4: no property called 'root'", async () => {
+		const {OmegaTree} = module.classes;
+		
+		let tree = OmegaTree.Type.new({ name: "Tree" });
+		
+		expect(()=>tree.p('root')).not.to.throw();
+		
+	});
+	
 });
