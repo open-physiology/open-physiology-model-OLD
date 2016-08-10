@@ -1,11 +1,17 @@
 import {xdescribe, describe, it, expect} from './test.helper';
-import {LyphType, BorderTemplate} from '../src/index';
+import moduleFactory from '../src/index';
 
 describe("Entity classes", () => {
 	
+	let module;
+	beforeEach(() => { module = moduleFactory() });
+	
+	
 	it("can be superseded by custom subclasses", async () => {
 		
-		let MyLyphType = LyphType.supersede((SuperClass) => class MyLyphType extends SuperClass {
+		const {Lyph} = module.classes;
+		
+		let MyLyphType = Lyph.Type.supersede((SuperClass) => class MyLyphType extends SuperClass {
 			
 			constructor(...args) {
 				super(...args);
@@ -21,14 +27,14 @@ describe("Entity classes", () => {
 		});
 		
 		expect(MyLyphType).to.have.property('name', 'MyLyphType');
-		expect(LyphType.hasSubclass(MyLyphType)).to.be.true;
+		expect(Lyph.Type.hasSubclass(MyLyphType)).to.be.true;
 		
 		/* We create a new 'LyphType' */
-		let lyph = LyphType.new({ name: 'heart' });
+		let lyph = Lyph.Type.new({ name: 'heart' });
 		await lyph.commit();
 		
 		/* and this should actually result in a 'MyLyphType' instance */
-		expect(lyph).to.be.instanceof(LyphType, MyLyphType);
+		expect(lyph).to.be.instanceof(Lyph.Type, MyLyphType);
 		expect(lyph.answer).to.equal(42);
 		expect(lyph.getAnswer()).to.equal(42);
 		

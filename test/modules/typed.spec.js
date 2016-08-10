@@ -1,20 +1,23 @@
 import {xdescribe, describe, it, expect} from '../test.helper';
 
-import * as exports from '../../src/modules/typed';
-const { default: module, ...exportedClasses } = exports;
+import moduleFactory from '../../src/modules/typed';
+
 
 describe("'typed' Module", () => {
-
+	
+	let module;
+	beforeEach(() => { module = moduleFactory() });
+	
 	it("exports the expected classes", () => {
 
-		expect(exportedClasses).to.contain.resources(
+		expect(module.classes).to.contain.resources(
 			'Type',
 			'Template'
 		);
-		expect(exportedClasses).to.contain.typedResources(
+		expect(module.classes).to.contain.typedResources(
 			'Typed'
 		);
-		expect(exportedClasses).to.contain.relationships(
+		expect(module.classes).to.contain.relationships(
 			'IsSubtypeOf',
 			'HasCardinalityMultipliedByThatOf',
 			'HasType'

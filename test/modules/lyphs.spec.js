@@ -1,33 +1,36 @@
 import {xdescribe, describe, it, expect} from '../test.helper';
 
-import * as exports from '../../src/modules/lyphs';
-const { default: module, ...exportedClasses } = exports;
+import moduleFactory from '../../src/modules/lyphs';
+
 
 describe("'lyphs' Module", () => {
 	
-	const {
-		MaterialType,
-		LyphType,
-		CylindricalLyphType,
-		MaterialTemplate,
-		LyphTemplate,
-		CylindricalLyphTemplate,
-		BorderTemplate
-    } = exportedClasses;
+	let module;
+	beforeEach(() => { module = moduleFactory() });
 	
 	it("exports the expected classes", () => {
-
-		expect(exportedClasses).to.contain.typedResources(
+		
+		const {
+			MaterialType,
+			LyphType,
+			CylindricalLyphType,
+			MaterialTemplate,
+			LyphTemplate,
+			CylindricalLyphTemplate,
+			BorderTemplate
+		} = module.classes;
+		
+		expect(module.classes).to.contain.typedResources(
 			'Material',
 			'Lyph',
 			'CylindricalLyph',
 			'Border',
 			'Node'
 		);
-		expect(exportedClasses).to.contain.resources(
+		expect(module.classes).to.contain.resources(
 			'Coalescence'
 		);
-		expect(exportedClasses).to.contain.relationships(
+		expect(module.classes).to.contain.relationships(
 			'ContainsMaterial',
 			'InheritsAllMaterialsFrom',
 			'HasPart',
@@ -50,6 +53,16 @@ describe("'lyphs' Module", () => {
 	});
 
 	it("exports classes that can be instantiated", async () => {
+		
+		const {
+			MaterialType,
+			LyphType,
+			CylindricalLyphType,
+			MaterialTemplate,
+			LyphTemplate,
+			CylindricalLyphTemplate,
+			BorderTemplate
+		} = module.classes;
 		
 		let materialType            = MaterialType.new();
 		let materialTemplate        = MaterialTemplate.new({ type: materialType });
@@ -78,6 +91,16 @@ describe("'lyphs' Module", () => {
 	});
 	
 	it("exports classes that have the properties, relationships and relationshipShortcuts of their superclasses", () => {
+		
+		const {
+			MaterialType,
+			LyphType,
+			CylindricalLyphType,
+			MaterialTemplate,
+			LyphTemplate,
+			CylindricalLyphTemplate,
+			BorderTemplate
+		} = module.classes;
 		
 		expect(LyphType.properties           ).to.have.property('href');
 		expect(LyphType.relationships        ).to.have.property('-->ContainsMaterial');

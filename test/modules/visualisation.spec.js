@@ -1,13 +1,16 @@
 import {xdescribe, describe, it, expect} from '../test.helper';
 
-import * as exports from '../../src/modules/visualisations';
-const { default: module, ...exportedClasses } = exports;
+import moduleFactory from '../../src/modules/visualisations';
+
 
 describe("'visualisation' Module", () => {
-
+	
+	let module;
+	beforeEach(() => { module = moduleFactory() });
+	
 	it("exports the expected classes", () => {
 
-		expect(exportedClasses).to.contain.resources(
+		expect(module.classes).to.contain.resources(
 			'Theme',
 			'Artefact',
 			'Dim2Artefact',
@@ -27,7 +30,7 @@ describe("'visualisation' Module", () => {
 			'MeasurableGlyph',
 			'CausalityArrow'
 		);
-		expect(exportedClasses).to.contain.relationships(
+		expect(module.classes).to.contain.relationships(
 			'PrescribesStyleFor',
 			'PresentsModel',
 			'ContainsArtefact'

@@ -1,16 +1,19 @@
 import {xdescribe, describe, it, expect} from '../test.helper';
 
-import * as exports from '../../src/modules/processes';
-const { default: module, ...exportedClasses } = exports;
+import moduleFactory from '../../src/modules/processes';
+
 
 describe("'processes' Module", () => {
-
+	
+	let module;
+	beforeEach(() => { module = moduleFactory() });
+	
 	it("exports the expected classes", () => {
 
-		expect(exportedClasses).to.contain.typedResources(
+		expect(module.classes).to.contain.typedResources(
 			'Process'
 		);
-		expect(exportedClasses).to.contain.relationships(
+		expect(module.classes).to.contain.relationships(
 			'FlowsTo',
 			'ConveysProcess',
 			'TransportsMaterial',
