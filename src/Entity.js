@@ -122,10 +122,10 @@ export default class Entity extends ValueTracker {
 					}
 				}
 			},
-			[$$PreferredClass]: {
-				value: EntitySubclass,
-				configurable: true
-			},
+			// [$$PreferredClass]: {
+			// 	value: EntitySubclass,
+			// 	configurable: true
+			// },
 			// supersede: {
 			// 	value(factory: (OriginalClass: Class<this>) => Class<this>): Class<this> {
 			// 		let SupersedingClass = factory(this[$$PreferredClass]);
@@ -171,7 +171,7 @@ export default class Entity extends ValueTracker {
 				Cannot instantiate the abstract
 				class ${this.context.name}.
 			`);
-			return new this.context[$$PreferredClass](
+			return new this.context(
 				{ ...this.initialValues },
 				{ ...this.options, allowInvokingConstructor: true, new: true }
 			);
@@ -291,7 +291,7 @@ export default class Entity extends ValueTracker {
 			Do not use 'new ${this.constructor.name}(...args)'.
 			Instead, use '${this.constructor.name}.new(...args)'.
 		`);
-		assert(this.constructor === this.constructor[$$PreferredClass]);
+		// assert(this.constructor === this.constructor[$$PreferredClass]);
 		
 		/* Treating singleton classes specially? Or do we double-check singleton-ness here? */
 		if (this.constructor.singleton) {

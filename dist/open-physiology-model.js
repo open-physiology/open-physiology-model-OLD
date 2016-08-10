@@ -21235,9 +21235,6 @@ return /******/ (function(modules) { // webpackBootstrap
 								(0, _powerAssert2.default)(false, (0, _misc.humanMsg)(_templateObject, name, this.name));
 						}
 					}
-				}), _defineProperty(_defineProperties$cal, $$PreferredClass, {
-					value: EntitySubclass,
-					configurable: true
 				}), _defineProperties$cal));
 	
 				/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
@@ -21372,8 +21369,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-			var _rec4 = new _powerAssertRecorder(),
-			    _rec5 = new _powerAssertRecorder();
+			var _rec4 = new _powerAssertRecorder();
 	
 			/* initialize value tracking */
 	
@@ -21419,14 +21415,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"allowInvokingConstructor","range":[7,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"humanMsg","range":[33,41]},{"type":{"label":"`"},"range":[41,42]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tDo not use \'new ","range":[42,19]},{"type":{"label":"${"},"range":[19,21]},{"type":{"label":"this"},"value":"this","range":[22,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"(...args)\'.\\n\\t\\t\\tInstead, use \'","range":[45,17]},{"type":{"label":"${"},"range":[17,19]},{"type":{"label":"this"},"value":"this","range":[20,24]},{"type":{"label":"."},"range":[24,25]},{"type":{"label":"name"},"value":"constructor","range":[25,36]},{"type":{"label":"."},"range":[36,37]},{"type":{"label":"name"},"value":"name","range":[37,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":".new(...args)\'.\\n\\t\\t","range":[43,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 				visitorKeys: _powerAssertVisitorKeys
 			}), (0, _misc.humanMsg)(_templateObject4, _this.constructor.name, _this.constructor.name));
-			(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt(_this.constructor, 'arguments/0/left') === _rec5._capt(_rec5._capt(_this.constructor, 'arguments/0/right/object')[_rec5._capt($$PreferredClass, 'arguments/0/right/property')], 'arguments/0/right'), 'arguments/0'), {
-				content: 'assert(this.constructor === this.constructor[$$PreferredClass])',
-				filepath: 'src/Entity.js',
-				line: 294,
-				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"constructor","range":[12,23]},"computed":false,"range":[7,23]},"right":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[28,32]},"property":{"type":"Identifier","name":"constructor","range":[33,44]},"computed":false,"range":[28,44]},"property":{"type":"Identifier","name":"$$PreferredClass","range":[45,61]},"computed":true,"range":[28,62]},"range":[7,62]}],"range":[0,63]}',
-				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"constructor","range":[12,23]},{"type":{"label":"==/!="},"value":"===","range":[24,27]},{"type":{"label":"this"},"value":"this","range":[28,32]},{"type":{"label":"."},"range":[32,33]},{"type":{"label":"name"},"value":"constructor","range":[33,44]},{"type":{"label":"["},"range":[44,45]},{"type":{"label":"name"},"value":"$$PreferredClass","range":[45,61]},{"type":{"label":"]"},"range":[61,62]},{"type":{"label":")"},"range":[62,63]}]',
-				visitorKeys: _powerAssertVisitorKeys
-			}));
+			// assert(this.constructor === this.constructor[$$PreferredClass]);
 	
 			/* Treating singleton classes specially? Or do we double-check singleton-ness here? */
 			if (_this.constructor.singleton) {}
@@ -21633,7 +21622,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"."},"range":[12,13]},{"type":{"label":"name"},"value":"context","range":[13,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"abstract","range":[21,29]},{"type":{"label":","},"range":[29,30]},{"type":{"label":"name"},"value":"humanMsg","range":[31,39]},{"type":{"label":"`"},"range":[39,40]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","range":[40,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"this"},"value":"this","range":[13,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"context","range":[18,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"name","range":[26,30]},{"type":{"label":"}"},"range":[31,32]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[32,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
 					visitorKeys: _powerAssertVisitorKeys
 				}), (0, _misc.humanMsg)(_templateObject5, this.context.name));
-				return new this.context[$$PreferredClass](_extends({}, this.initialValues), _extends({}, this.options, { allowInvokingConstructor: true, new: true }));
+				return new this.context(_extends({}, this.initialValues), _extends({}, this.options, { allowInvokingConstructor: true, new: true }));
 			}
 		}, {
 			key: 'commit',
