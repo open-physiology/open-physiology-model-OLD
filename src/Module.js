@@ -382,6 +382,8 @@ export default class Module {
 				${[...cycle, cycle[0]].join(' --> ')}.
 			`);
 		}
+		
+		return cls;
 	}
 	
 	mergeSuperclassFields(cls) : void {

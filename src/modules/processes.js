@@ -26,8 +26,8 @@ export default TypedModule.create('processes', [
 		
 		properties: {
 			'transportPhenomenon': {
-				Template: { ...enumSchema     ('advection', 'diffusion'), required: true                      },
 				Type:     { ...enumArraySchema('advection', 'diffusion'), default: ['advection', 'diffusion'] },
+				Template: { ...enumSchema     ('advection', 'diffusion'), required: true                      },
 				typeCheck: arrayContainsValue
 			},
 			'species': {

@@ -152,6 +152,16 @@ describe("integrated workflow", () => {
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 
 	});
+	
+	it("can give default types to templates", async () => {
+		const {Lyph} = module.classes;
+		let heart = Lyph.Template.new({ name: 'heart' });
+		
+		expect(heart.type).to.be.instanceof(Lyph.Type);
+		expect(heart.type).to.equal(Lyph.Type.getUniversalType());
+		
+		expect(Lyph.Type.getUniversalType()).to.equal(Lyph.getUniversalType());
+	});
 
 	it("(regression test: HasType[2] set to null?)", async () => {
 		const {OmegaTree, CylindricalLyph, ContainsMaterial} = module.classes;
@@ -162,10 +172,6 @@ describe("integrated workflow", () => {
 		let omegaTree = OmegaTree.Type.new();
 
 		let lyphTemplate1 = CylindricalLyph.Template.new();
-
-		lyphTemplate1.p('type').subscribe((type) => {
-			console.log(''+type);
-		});
 
 		omegaTree.elements.add(lyphTemplate1);
 
@@ -183,7 +189,6 @@ describe("integrated workflow", () => {
 
 		expect(lyphTemplate1.type).to.equal(lyphType);
 		expect(lyphTemplate2.type).to.equal(lyphType);
-
 
 		let lyphType2 = CylindricalLyph.Type.new();
 		lyphType2.commit();
@@ -220,12 +225,6 @@ describe("integrated workflow", () => {
 		
 		expect([...treeTemplate.treeChildren]).to.include(lyphTemplate);
 		
-	});
-	
-	it("(regression test 4: bla[$$PreferredClass] is not a constructor)", async () => {
-		const {ExternalResource} = module.classes;
-		let external = ExternalResource.new({ uri: 'someplace#44023987512' });
-		external.commit();
 	});
 	
 });

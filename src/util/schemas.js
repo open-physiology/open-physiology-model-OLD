@@ -62,6 +62,11 @@ export const rangeSchema = {
 	}
 };
 
+export const rangeDefault = {
+	'min': -Infinity,
+	'max':  Infinity
+};
+
 export const boundedNormalDistributionSchema = {
 	type: 'object',
 	properties: {

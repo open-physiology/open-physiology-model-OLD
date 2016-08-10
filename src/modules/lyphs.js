@@ -13,6 +13,7 @@ import {
 
 import resources from './resources';
 import typed     from './typed';
+import {rangeDefault} from "../util/schemas";
 
 
 export default TypedModule.create('lyphs', [
@@ -81,15 +82,15 @@ export default TypedModule.create('lyphs', [
 				Type: { type: 'string' }
 			},
 			'thickness': {
-				Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }) },
-				Template: { ...oneOf({ type: 'number' }, { ...distributionSchema }) },
+				Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }), default: rangeDefault },
+				Template: { ...oneOf({ type: 'number' }, { ...distributionSchema })                        },
 				typeCheck(t, v) {
 					t = normalizeToRange(t);
 					v = normalizeToRange(v);
 					return t.min <= v.min && v.max <= t.max;
 				}
 			}
-		},
+		}
 		
 	});/////////////////////////////////////////////////////////////////////////////
 	const LyphType     = Lyph.Type;
@@ -206,8 +207,8 @@ export default TypedModule.create('lyphs', [
 		
 		properties: {
 			'length': {
-				Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }) },
-				Template: { ...oneOf({ type: 'number' }, { ...distributionSchema }) },
+				Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }), default: rangeDefault },
+				Template: { ...oneOf({ type: 'number' }, { ...distributionSchema })                        },
 				typeCheck(t, v) {
 					t = normalizeToRange(t);
 					v = normalizeToRange(v);
@@ -279,8 +280,8 @@ export default TypedModule.create('lyphs', [
 		
 		properties: {
 			nature: {
-				Template: { ...enumSchema     ('open', 'closed'), default: 'open', required: true },
 				Type:     { ...enumArraySchema('open', 'closed'), value: ['open', 'closed']       },
+				Template: { ...enumSchema     ('open', 'closed'), default: 'open', required: true },
 				typeCheck: arrayContainsValue
 			}
 		},
@@ -390,6 +391,8 @@ export default TypedModule.create('lyphs', [
 	const NodeLocation = M.TYPED_RESOURCE({//////////////////////////////////
 		
 		name: 'NodeLocation',
+		
+		abstract: true,
 		
 		extends:    Typed,
 		extendedBy: [Lyph, Border],

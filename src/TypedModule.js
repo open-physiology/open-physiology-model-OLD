@@ -5,6 +5,7 @@ import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
 import map       from 'lodash-bound/map';
+import isObject  from 'lodash-bound/isObject';
 import {defineProperty} from 'bound-native-methods';
 import {wrapInArray} from "./util/misc";
 
@@ -21,22 +22,13 @@ export default class TypedModule extends Module {
 			
 			this.basicNormalization(conf);
 			
-			let superClasses = conf.extends || [this.classes.vertexValue('Typed')];
-			superClasses = wrapInArray(superClasses);
-			// if (!superClasses::isArray()) { superClasses = [superClasses] }
-			
-			let subClasses = conf.extendedBy || [];
-			subClasses = wrapInArray(subClasses);
-			// if (!subClasses::isArray()) { subClasses = [subClasses] }
+			const superClasses = wrapInArray(conf.extends || [this.classes.vertexValue('Typed')]);
+			const subClasses   = wrapInArray(conf.extendedBy || []);
 			
 			/* handling properties */
 			conf::defaults({
 				properties: {},
-				patternProperties: {},
-				createUniversalType() {
-					// if class is abstract, this will not be used
-					return this.new();
-				}
+				patternProperties: {}
 			});
 			const [
 				typeProperties,
@@ -55,6 +47,7 @@ export default class TypedModule extends Module {
 				return { ...desc };
 			}));
 			
+			/* Type resource */
 			const NewType = this.RESOURCE({
 				
 				name: `${conf.name}Type`,
@@ -74,17 +67,7 @@ export default class TypedModule extends Module {
 				
 			});
 			
-			// /* create a universal type, which will serve as default type for all templates */
-			// if (!NewType.abstract) {
-			// 	// TODO: fetch already existing universal type from external source
-			// 	const universalType = NewType::conf.createUniversalType();
-			// 	universalType.isUniversalType = true;
-			// 	universalType.commit();
-			// 	NewType::defineProperty('getUniversalType', {
-			// 		value() { return universalType }
-			// 	});
-			// }
-			
+			/* Template resource */
 			const NewTemplate = this.RESOURCE({
 				
 				name: `${conf.name}Template`,
@@ -102,6 +85,23 @@ export default class TypedModule extends Module {
 				
 			});
 			
+			
+			/* create a universal type, which will serve as default type for all templates */
+			if (!NewType.abstract) {
+				// TODO: fetch already existing universal type from external source
+				// TODO: make universal type immutable / readonly
+				const universalType = NewType.new(conf.createUniversalType);
+				universalType.isUniversalType = true;
+				universalType.commit();
+				NewType::defineProperty('getUniversalType', {
+					value() { return universalType }
+				});
+			}
+			const hasTypeDomainDefault = NewType.abstract
+				? {} : { default: NewType.getUniversalType() };
+			
+				
+			/* HasType relationship */
 			const NewHasType = this.RELATIONSHIP({
 				
 				name: `HasType`,
@@ -121,8 +121,8 @@ export default class TypedModule extends Module {
 				
 				singular: 'has type',
 				
-				1: [NewTemplate, '1..1', { anchors: true, key: 'type' }], //, ...(NewType.abstract ? {} : {default: NewType.getUniversalType()})
-				2: [NewType,     '0..*',                               ]
+				1: [NewTemplate, '1..1', { anchors: true, key: 'type', ...hasTypeDomainDefault }],
+				2: [NewType,     '0..*',                                                        ]
 				
 			});
 			
@@ -143,8 +143,8 @@ export default class TypedModule extends Module {
 				
 			});
 			
-			
-			let result = {
+			/* rebuild the typedResource object */
+			const NewTypedResource = {
 				...conf,
 				module:          this,
 				isTypedResource: true,
@@ -153,9 +153,17 @@ export default class TypedModule extends Module {
 				HasType:         NewHasType,
 				IsSubtypeOf:     NewIsSubtypeOf
 			};
-			this.register(result);
+			if (!NewType.abstract) {
+				NewTypedResource::defineProperty('getUniversalType', {
+					value() { return NewType.getUniversalType() }
+				});
+			}
 			
-			return result;
+			/* get rid of 'createUniversalType', which was to be used once at most */
+			delete conf.createUniversalType;
+			
+			/* register and return */
+			return this.register(NewTypedResource);
 		});
 
 	}

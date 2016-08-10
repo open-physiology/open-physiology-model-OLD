@@ -194,8 +194,8 @@ export default class Entity extends ValueTracker {
 			return null;
 		}
 		assert(this.hasInstance(entity), humanMsg`
-			The entity at '${JSON.stringify(href)}' is not
-			of class '${this.name}'
+			The entity at '${JSON.stringify(href)}'
+			is not of class '${this.name}'
 			but of class '${entity.constructor.name}'.
 		`);
 		return entity;
