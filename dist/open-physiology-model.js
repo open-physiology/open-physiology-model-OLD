@@ -4036,20 +4036,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					});
 	
-					/* create a universal type, which will serve as default type for all templates */
-					if (!NewType.abstract) {
-						(function () {
-							// TODO: fetch already existing universal type from external source
-							var universalType = conf.createUniversalType.call(NewType);
-							universalType.isUniversalType = true;
-							universalType.commit();
-							_boundNativeMethods.defineProperty.call(NewType, 'getUniversalType', {
-								value: function value() {
-									return universalType;
-								}
-							});
-						})();
-					}
+					// /* create a universal type, which will serve as default type for all templates */
+					// if (!NewType.abstract) {
+					// 	// TODO: fetch already existing universal type from external source
+					// 	const universalType = NewType::conf.createUniversalType();
+					// 	universalType.isUniversalType = true;
+					// 	universalType.commit();
+					// 	NewType::defineProperty('getUniversalType', {
+					// 		value() { return universalType }
+					// 	});
+					// }
 	
 					var NewTemplate = _this2.RESOURCE({
 	
@@ -4091,7 +4087,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						singular: 'has type',
 	
-						1: [NewTemplate, '1..1', _extends({ anchors: true, key: 'type' }, NewType.abstract ? {} : { default: NewType.getUniversalType() })],
+						1: [NewTemplate, '1..1', { anchors: true, key: 'type' }], //, ...(NewType.abstract ? {} : {default: NewType.getUniversalType()})
 						2: [NewType, '0..*']
 	
 					});
