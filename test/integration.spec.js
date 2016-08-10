@@ -1,6 +1,8 @@
 import {xdescribe, describe, it, expect} from './test.helper';
 import moduleFactory from '../src/index';
 
+import filter from 'lodash-bound/filter';
+
 describe("integrated workflow", () => {
 	
 	let module;
@@ -8,7 +10,7 @@ describe("integrated workflow", () => {
 	
 	it("can track available entities with a stream per class", async () => {
 
-		const {Resource, Material, Type} = module.classes;
+		const {Resource, Type, Material} = module.classes;
 		
 		let gathered_MaterialType  = new Set;
 		let gathered_Type          = new Set;
@@ -16,13 +18,13 @@ describe("integrated workflow", () => {
 		let committed_MaterialType = new Set;
 		let committed_Type         = new Set;
 		let committed_Resource     = new Set;
-
-		Material.Type.p('all').subscribe((all) => { gathered_MaterialType = all });
-		Type         .p('all').subscribe((all) => { gathered_Type         = all });
-		Resource     .p('all').subscribe((all) => { gathered_Resource     = all });
-		Material.Type.p('allCommitted').subscribe((all) => { committed_MaterialType = all });
-		Type         .p('allCommitted').subscribe((all) => { committed_Type         = all });
-		Resource     .p('allCommitted').subscribe((all) => { committed_Resource     = all });
+		
+		Material.Type.p('all').subscribe((all) => { gathered_MaterialType = new Set([...all]::filter(t=>!t.isUniversalType)) });
+		Type         .p('all').subscribe((all) => { gathered_Type         = new Set([...all]::filter(t=>!t.isUniversalType)) });
+		Resource     .p('all').subscribe((all) => { gathered_Resource     = new Set([...all]::filter(t=>!t.isUniversalType)) });
+		Material.Type.p('allCommitted').subscribe((all) => { committed_MaterialType = new Set([...all]::filter(t=>!t.isUniversalType)) });
+		Type         .p('allCommitted').subscribe((all) => { committed_Type         = new Set([...all]::filter(t=>!t.isUniversalType)) });
+		Resource     .p('allCommitted').subscribe((all) => { committed_Resource     = new Set([...all]::filter(t=>!t.isUniversalType)) });
 
 		expect([...gathered_MaterialType]).to.eql([]);
 		expect([...gathered_Type        ]).to.eql([]);
@@ -57,9 +59,9 @@ describe("integrated workflow", () => {
 		expect([...gathered_Type        ]).to.eql([blood, water]);
 		expect([...gathered_Resource    ]).to.eql([blood, water]);
 
-		expect([...Material.Type.getAll()]).to.eql([blood, water]);
-		expect([...Type         .getAll()]).to.eql([blood, water]);
-		expect([...Resource     .getAll()]).to.eql([blood, water]);
+		expect([...Material.Type.getAll()]::filter(t=>!t.isUniversalType)).to.eql([blood, water]);
+		expect([...Type         .getAll()]::filter(t=>!t.isUniversalType)).to.eql([blood, water]);
+		expect([...Resource     .getAll()]::filter(t=>!t.isUniversalType)).to.eql([blood, water]);
 
 		await water.commit();
 
@@ -67,9 +69,9 @@ describe("integrated workflow", () => {
 		expect([...committed_Type        ]).to.eql([blood, water]);
 		expect([...committed_Resource    ]).to.eql([blood, water]);
 
-		expect([...Material.Type.getAllCommitted()]).to.eql([blood, water]);
-		expect([...Type         .getAllCommitted()]).to.eql([blood, water]);
-		expect([...Resource     .getAllCommitted()]).to.eql([blood, water]);
+		expect([...Material.Type.getAllCommitted()]::filter(t=>!t.isUniversalType)).to.eql([blood, water]);
+		expect([...Type         .getAllCommitted()]::filter(t=>!t.isUniversalType)).to.eql([blood, water]);
+		expect([...Resource     .getAllCommitted()]::filter(t=>!t.isUniversalType)).to.eql([blood, water]);
 
 	});
 

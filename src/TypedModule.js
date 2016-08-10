@@ -5,6 +5,7 @@ import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
 import map       from 'lodash-bound/map';
+import {defineProperty} from 'bound-native-methods';
 import {wrapInArray} from "./util/misc";
 
 /**
@@ -29,9 +30,13 @@ export default class TypedModule extends Module {
 			// if (!subClasses::isArray()) { subClasses = [subClasses] }
 			
 			/* handling properties */
-			config::defaults({
+			conf::defaults({
 				properties: {},
-				patternProperties: {}
+				patternProperties: {},
+				createUniversalType() {
+					// if class is abstract, this will not be used
+					return this.new();
+				}
 			});
 			const [
 				typeProperties,
@@ -43,7 +48,7 @@ export default class TypedModule extends Module {
 			    ['properties',        'Template', 'Type'    ],
 			    ['patternProperties', 'Type',     'Template'],
 			    ['patternProperties', 'Template', 'Type'    ]
-			].map(([key, wanted, unwanted]) => config[key]
+			].map(([key, wanted, unwanted]) => conf[key]
 				::omitBy(desc => !desc[wanted] && desc[unwanted])
 				::mapValues((desc) => {
 				if (desc[wanted]) { return { ...desc[wanted], typeCheck: desc.typeCheck } }
@@ -68,6 +73,17 @@ export default class TypedModule extends Module {
 				patternProperties: typePatternProperties
 				
 			});
+			
+			/* create a universal type, which will serve as default type for all templates */
+			if (!NewType.abstract) {
+				// TODO: fetch already existing universal type from external source
+				const universalType = NewType::conf.createUniversalType();
+				universalType.isUniversalType = true;
+				universalType.commit();
+				NewType::defineProperty('getUniversalType', {
+					value() { return universalType }
+				});
+			}
 			
 			const NewTemplate = this.RESOURCE({
 				
@@ -105,7 +121,7 @@ export default class TypedModule extends Module {
 				
 				singular: 'has type',
 				
-				1: [NewTemplate, '1..1', { anchors: true, key: 'type' }],
+				1: [NewTemplate, '1..1', { anchors: true, key: 'type', ...(NewType.abstract ? {} : {default: NewType.getUniversalType()}) }],
 				2: [NewType,     '0..*',                               ]
 				
 			});

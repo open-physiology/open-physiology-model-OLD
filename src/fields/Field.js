@@ -70,17 +70,7 @@ export class Field extends ValueTracker {
 		/* initialize all fields */
 		const keyDescs = {};
 		for (let FieldClass of this[$$fieldClasses]) {
-			
-			if (FieldClass.name === 'PropertyField') { // TODO: remove
-				console.log(Object.keys(owner.constructor.properties));
-				console.log(FieldClass[$$entriesIn](owner.constructor));
-			}
-			
 			for (let { key, desc, relatedKeys } of FieldClass[$$entriesIn](owner.constructor)) {
-				
-				
-				
-				
 				keyDescs[key] = {
 					waitUntilConstructed,
 					owner,
