@@ -31,8 +31,6 @@ export default TypedModule.create('lyphs', [
 		singular: "material"
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const MaterialType     = Material.Type;
-	const MaterialTemplate = Material.Template;
 	
 	
 	const ContainsMaterial = M.RELATIONSHIP({
@@ -90,8 +88,6 @@ export default TypedModule.create('lyphs', [
 		}
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const LyphType     = Lyph.Type;
-	const LyphTemplate = Lyph.Template;
 	
 	
 	const HasPart = M.RELATIONSHIP({
@@ -215,8 +211,6 @@ export default TypedModule.create('lyphs', [
 		}
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const CylindricalLyphType     = CylindricalLyph.Type;
-	const CylindricalLyphTemplate = CylindricalLyph.Template;
 	
 	
 	M.RELATIONSHIP({
@@ -286,8 +280,6 @@ export default TypedModule.create('lyphs', [
 		singleton: true // there is only one border-type
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const BorderType     = Border.Type;
-	const BorderTemplate = Border.Template;
 	
 	
 	const [
@@ -397,8 +389,6 @@ export default TypedModule.create('lyphs', [
 		singular: "node location",
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const NodeLocationType     = NodeLocation.Type;
-	const NodeLocationTemplate = NodeLocation.Template;
 	
 	
 	const HasNode = M.RELATIONSHIP({

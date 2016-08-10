@@ -22,8 +22,6 @@ export default TypedModule.create('omegaTrees', [
 		singular: "omega tree",
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const OmegaTreeType     = OmegaTree.Type;
-	const OmegaTreeTemplate = OmegaTree.Template;
 	
 	
 	const HasAsRoot = M.RELATIONSHIP({
@@ -54,8 +52,6 @@ export default TypedModule.create('omegaTrees', [
 		singular: "omega tree part",
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const OmegaTreePartType     = OmegaTreePart.Type;
-	const OmegaTreePartTemplate = OmegaTreePart.Template;
 	
 	
 	const HasTreeParent = M.RELATIONSHIP({

@@ -32,8 +32,6 @@ export default TypedModule.create('measurables', [
 		}
 		
 	});//////////////////////////////////////////////////////////////////////////
-	const MeasurableType     = Measurable.Type;
-	const MeasurableTemplate = Measurable.Template;
 	
 	
 	const MeasuresMaterial = M.RELATIONSHIP({
@@ -65,8 +63,6 @@ export default TypedModule.create('measurables', [
 		extendedBy: [Lyph, Border, Node, Process]
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const MeasurableLocationType     = MeasurableLocation.Type;
-	const MeasurableLocationTemplate = MeasurableLocation.Template;
 	
 	
 	const HasMeasurable = M.RELATIONSHIP({
@@ -98,7 +94,7 @@ export default TypedModule.create('measurables', [
 	});
 	
 	
-	const Causality = M.TYPED_RESOURCE({/////////////////////////////////////////////////////////////////
+	const Causality = M.TYPED_RESOURCE({////////////////////////////////////////
 		
 		name: 'Causality',
 		
@@ -107,9 +103,7 @@ export default TypedModule.create('measurables', [
 		singular: "causality",
 		plural:   "causalities",
 		
-	});//////////////////////////////////////////////////////////////////////////
-	const CausalityType     = Causality.Type;
-	const CausalityTemplate = Causality.Template;
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const [Causes] = M.RELATIONSHIP([{

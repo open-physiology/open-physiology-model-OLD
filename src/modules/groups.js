@@ -20,8 +20,6 @@ export default TypedModule.create('groups', [
 		singular: "group"
 		
 	});/////////////////////////////////////////////////////////////////////////////
-	const GroupType     = Group.Type;
-	const GroupTemplate = Group.Template;
 	
 	
 	const HasElement = M.RELATIONSHIP({

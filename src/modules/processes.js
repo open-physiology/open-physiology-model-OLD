@@ -15,7 +15,7 @@ export default TypedModule.create('processes', [
 	
 	
 	
-	const Process = M.TYPED_RESOURCE({/////////////////////////////////////////////
+	const Process = M.TYPED_RESOURCE({//////////////////////////////////////////
 		
 		name: 'Process',
 		
@@ -35,9 +35,7 @@ export default TypedModule.create('processes', [
 			}
 		}
 		
-	});/////////////////////////////////////////////////////////////////////////////
-	const ProcessType     = Process.Type;
-	const ProcessTemplate = Process.Template;
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const [FlowsTo] = M.RELATIONSHIP([{
