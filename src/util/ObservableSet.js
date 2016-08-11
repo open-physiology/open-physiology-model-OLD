@@ -96,7 +96,7 @@ export function setEquals(setA, setB) {
 	setA = new Set(setA);
 	setB = new Set(setB);
 	if (setA.size !== setB.size) return false;
-	for (var a of setA) if (!setB.has(a)) return false;
+	for (let a of setA) if (!setB.has(a)) return false;
 	return true;
 }
 

@@ -6,7 +6,7 @@ import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
 import map       from 'lodash-bound/map';
 import isObject  from 'lodash-bound/isObject';
-import {defineProperty} from 'bound-native-methods';
+import {defineProperty, defineProperties} from 'bound-native-methods';
 import {wrapInArray} from "./util/misc";
 
 /**
@@ -90,12 +90,20 @@ export default class TypedModule extends Module {
 			if (!NewType.abstract) {
 				// TODO: fetch already existing universal type from external source
 				// TODO: make universal type immutable / readonly
-				const universalType = NewType.new(conf.createUniversalType);
+				const universalType = NewType.new({
+					name: `universal ${NewType.singular}`,
+					...(conf.createUniversalType || {})
+				});
 				universalType.isUniversalType = true;
 				universalType.commit();
 				NewType::defineProperty('getUniversalType', {
 					value() { return universalType }
 				});
+				if (NewType.singleton) {
+					NewType::defineProperty('getSingleton', {
+						value() { return universalType }
+					});
+				}
 			}
 			const hasTypeDomainDefault = NewType.abstract
 				? {} : { default: NewType.getUniversalType() };

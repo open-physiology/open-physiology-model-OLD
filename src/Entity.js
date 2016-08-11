@@ -220,7 +220,7 @@ export default class Entity extends ValueTracker {
 		`);
 		if (!this[$$singletonObject]) {
 			this[$$singletonObject] = this.new({
-				name: 'Border Type'
+				name: this.singular
 			});
 			this[$$singletonObject].commit();
 			// TODO: make sure that the singleton object is always loaded,

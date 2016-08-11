@@ -26,7 +26,7 @@ import {
 	mapOptionalArray,
 	parseCardinality,
 	wrapInArray,
-	stringifyCardinality
+	definePropertiesByValue
 } from './util/misc';
 
 import Entity  from './Entity';
@@ -160,11 +160,6 @@ export default class Module {
 		/* sanity checks */
 		for (let key of ['extends', 'extendedBy']) {
 			for (let other of config[key]) {
-				
-				if (!other) {
-					console.log(config);
-				}
-				
 				assert(this.classes.hasVertex(other.name), humanMsg`
 					The '${config.name}' class is being processed
 					by module '${this.name}', but it extends a '${other.name}'
@@ -214,12 +209,7 @@ export default class Module {
 				   [ [  [1        , pair[1]],  [2          , pair[2] ]  ] ,
 			         [  [2        , pair[2]],  [1          , pair[1] ]  ] ]) {
 				let [resourceClass, cardinality, options = {}] = givenDomainPair[domainKey];
-				
-				if (!resourceClass) {
-					console.log(givenDomainPair);
-				}
-				
-				domain::assign({
+				domain::definePropertiesByValue({
 					codomain         : codomain,
 					
 					relationshipClass: cls,
@@ -265,10 +255,6 @@ export default class Module {
 			keyInResource,
 			shortcutKey
 		} = referenceDomain;
-		
-		if (!resourceClass) {
-			console.log(referenceDomain::entries());
-		}
 		
 		// const relSinks = relationshipClass::(function findSinks() {
 		// 	if (this.extendedBy::size() === 0) { return [this] }

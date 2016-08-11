@@ -11,6 +11,9 @@ import isObject    from 'lodash-bound/isObject';
 import isFunction  from 'lodash-bound/isFunction';
 import isSet       from 'lodash-bound/isSet';
 import isWeakSet   from 'lodash-bound/isWeakSet';
+import entries     from 'lodash-bound/entries';
+
+import {defineProperty} from 'bound-native-methods';
 
 import _zip from 'lodash/zip';
 
@@ -86,3 +89,13 @@ export const sw = (val, {autoInvoke = true} = {}) => (map) => {
 	if (autoInvoke && result::isFunction()) { result = result() }
 	return result;
 };
+
+export function definePropertyByValue(key, value, options = {}) {
+	this::defineProperty(key, { ...options, value });
+}
+
+export function definePropertiesByValue(obj, options = {}) {
+	for (let [key, value] of obj::entries()) {
+		this::definePropertyByValue(key, value, options);
+	}
+}
