@@ -5,9 +5,10 @@ import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
 import map       from 'lodash-bound/map';
-import isObject  from 'lodash-bound/isObject';
+import memoize   from 'lodash-bound/memoize';
 import {defineProperty, defineProperties} from 'bound-native-methods';
 import {wrapInArray} from "./util/misc";
+import {definePropertyByValue} from "./util/misc";
 
 /**
  * Typed Modules allow to more easily create related
@@ -90,25 +91,21 @@ export default class TypedModule extends Module {
 			if (!NewType.abstract) {
 				// TODO: fetch already existing universal type from external source
 				// TODO: make universal type immutable / readonly
-				const universalType = NewType.new({
-					name: `universal ${NewType.singular}`,
-					...(conf.createUniversalType || {})
-				});
-				universalType.isUniversalType = true;
-				universalType.commit();
-				NewType::defineProperty('getUniversalType', {
-					value() { return universalType }
-				});
-				if (NewType.singleton) {
-					NewType::defineProperty('getSingleton', {
-						value() { return universalType }
+				NewType::definePropertyByValue('getUniversalType', (()=>{
+					let result = NewType.new({
+						name: `universal ${NewType.singular}`,
+						...(conf.universalType || {})
 					});
+					result.isUniversalType = true;
+					result.commit();
+					return result;
+				})::memoize());
+				if (NewType.singleton) {
+					NewType::definePropertyByValue('getSingleton', NewType.getUniversalType);
 				}
 			}
-			const hasTypeDomainDefault = NewType.abstract
-				? {} : { default: NewType.getUniversalType() };
 			
-				
+			
 			/* HasType relationship */
 			const NewHasType = this.RELATIONSHIP({
 				
@@ -129,8 +126,8 @@ export default class TypedModule extends Module {
 				
 				singular: 'has type',
 				
-				1: [NewTemplate, '1..1', { anchors: true, key: 'type', ...hasTypeDomainDefault }],
-				2: [NewType,     '0..*',                                                        ]
+				1: [NewTemplate, '1..1', { anchors: true, key: 'type', default: NewType.getUniversalType }],
+				2: [NewType,     '0..*',                                                                  ]
 				
 			});
 			

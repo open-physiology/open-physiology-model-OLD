@@ -28,6 +28,7 @@ import {
 	$$initSet,
 	$$entriesIn,
 } from './symbols';
+import {callOrReturn} from "../util/misc";
 
 
 Field[$$registerFieldClass](class Rel1Field extends RelField {
@@ -90,7 +91,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			})],
 			[desc.options.default, () => desc.relationshipClass.new({
 				[desc.keyInRelationship]         : this[$$owner],
-				[desc.codomain.keyInRelationship]: desc.options.default
+				[desc.codomain.keyInRelationship]: desc.options.default::callOrReturn()
 			})],
 			[desc.cardinality.min === 0, null]
 		);

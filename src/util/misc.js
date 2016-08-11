@@ -99,3 +99,7 @@ export function definePropertiesByValue(obj, options = {}) {
 		this::definePropertyByValue(key, value, options);
 	}
 }
+
+export function callOrReturn() {
+	return this::isFunction() ? this() : this;
+}
