@@ -7,7 +7,7 @@ import typed     from './typed';
 export default TypedModule.create('groups', [
 	resources, typed
 ], (M, {
-	IsRelatedTo, Typed, Template
+	IsRelatedTo, Template, PullsIntoTypeDefinition
 }) => {
 	
 	
@@ -15,23 +15,23 @@ export default TypedModule.create('groups', [
 		
 		name: 'Group',
 		
-		extends: Typed,
+		extends: Template,
 		
 		singular: "group"
 		
 	});/////////////////////////////////////////////////////////////////////////////
 	
 	
-	const HasElement = M.RELATIONSHIP({
+	const IncludesElement = M.RELATIONSHIP({
 		
-		name: 'HasElement',
+		name: 'IncludesElement',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
-		singular: "has element",
+		singular: "includes element",
 		
-		1: [Group.Type, '0..*', { anchors: true, key: 'elements' }],
-		2: [Template,   '0..*',                                   ],
+		1: [Group,    '0..*', { anchors: true, key: 'elements' }],
+		2: [Template, '0..*',                                   ],
 		
 	});
 

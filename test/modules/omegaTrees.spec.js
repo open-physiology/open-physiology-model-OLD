@@ -9,14 +9,26 @@ describe("'omegaTrees' Module", () => {
 	beforeEach(() => { module = moduleFactory() });
 	
 	it("exports the expected classes", () => {
-
-		expect(module.classes).to.contain.typedResources(
+		
+		expect(module.classes).to.contain.resources(
 			'OmegaTree'
 		);
 		expect(module.classes).to.contain.relationships(
 			'HasAsRoot'
 		);
-
+		
+	});
+	
+	it("exports provisional classes to meet deadline", () => {
+		
+		expect(module.classes).to.contain.resources(
+			'OmegaTreePart'
+		);
+		expect(module.classes).to.contain.relationships(
+			'HasTreeChildren',
+			'HasTreePart'
+		);
+		
 	});
 
 });

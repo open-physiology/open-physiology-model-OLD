@@ -14,57 +14,45 @@ import {
 import resources from './resources';
 import typed     from './typed';
 import {rangeDefault} from "../util/schemas";
+import {wrapInArray} from "../util/misc";
+import {setEquals} from "../util/ObservableSet";
 
 
 export default TypedModule.create('lyphs', [
 	resources, typed
 ], (M, {
-	Resource, IsRelatedTo, Typed
+	Resource, IsRelatedTo, Template, PullsIntoTypeDefinition, Has
 }) => {
 	
-	const Material = M.TYPED_RESOURCE({//////////////////////////////////////
+	const Material = M.TYPED_RESOURCE({/////////////////////////////////////////
 		
 		name: 'Material',
 		
-		extends: Typed,
+		extends: Template,
 		
 		singular: "material"
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
-	const ContainsMaterial = M.RELATIONSHIP({
+	const HasMaterial = M.RELATIONSHIP({
 		
-		name: 'ContainsMaterial',
+		name: 'HasMaterial',
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
-		singular: "contains material",
+		singular: "has material",
 		
-		1: [Material.Type, '0..*', { anchors: true, key: 'materials' }],
-		2: [Material.Type, '0..*'                                     ],
+		1: [Material, '0..*', { anchors: true, key: 'materials' }],
+		2: [Material, '0..1'                                     ],
 		
-		noCycles: true,
-		
-	});
-	
-	const InheritsAllMaterialsFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllMaterialsFrom',
-		
-		singular: "inherits all materials from",
-		
-		extends: IsRelatedTo,
-		
-		1: [Material.Type, '0..*', { anchors: true, key: 'materialProviders' }],
-		2: [Material.Type, '0..*'                                             ],
-		
-		noCycles: true,
+		noCycles: true
 		
 	});
 	
 	
-	const Lyph = M.TYPED_RESOURCE({//////////////////////////////////////////
+	
+	const Lyph = M.TYPED_RESOURCE({/////////////////////////////////////////////
 		
 		name: 'Lyph',
 		
@@ -74,32 +62,39 @@ export default TypedModule.create('lyphs', [
 		
 		properties: {
 			'species': {
-				Type: { type: 'string' }
+				type: 'string',
+				isRefinement(a, b) {
+					return !a || a === b;
+				}
 			},
 			'thickness': {
-				Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }), default: rangeDefault },
-				Template: { ...oneOf({ type: 'number' }, { ...distributionSchema })                        },
-				typeCheck(t, v) {
-					t = normalizeToRange(t);
-					v = normalizeToRange(v);
-					return t.min <= v.min && v.max <= t.max;
+				...oneOf(
+					{ type: 'number'        },
+					{ ...rangeSchema        },
+					{ ...distributionSchema }
+				),
+				default: rangeDefault,
+				isRefinement(a, b) {
+					a = normalizeToRange(a);
+					b = normalizeToRange(b);
+					return a.min <= b.min && b.max <= a.max;
 				}
 			}
 		}
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const HasPart = M.RELATIONSHIP({
 		
 		name: 'HasPart',
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
 		singular: "has part",
 		
-		1: [Lyph.Type,     '0..*', { anchors: true, covariant: true, key: 'parts' }],
-		2: [Lyph.Template, '0..*',                                                 ],
+		1: [Lyph, '0..*', { anchors: true, key: 'parts' }],
+		2: [Lyph, '0..1',                                ],
 		
 		noCycles: true,
 		
@@ -109,12 +104,12 @@ export default TypedModule.create('lyphs', [
 		
 		name: 'HasLayer',
 		
-		extends: HasPart,
+		extends: Has,
 		
 		singular: "has layer",
 		
-		1: [Lyph.Type,     '0..*', { anchors: true, covariant: true, key: 'layers' }],
-		2: [Lyph.Template, '0..*'                                                   ],
+		1: [Lyph, '0..*', { anchors: true, key: 'layers' }],
+		2: [Lyph, '0..1'                                  ],
 		
 		noCycles: true,
 		
@@ -128,8 +123,8 @@ export default TypedModule.create('lyphs', [
 		
 		singular: "has part",
 		
-		1: [Lyph.Type,     '0..*', { anchors: true, covariant: true, key: 'patches' }],
-		2: [Lyph.Template, '0..*'                                                    ],
+		1: [Lyph, '0..*', { anchors: true, key: 'patches' }],
+		2: [Lyph, '0..1'                                   ],
 		
 		properties: {
 			'patchMap': { type: 'string' }
@@ -140,57 +135,7 @@ export default TypedModule.create('lyphs', [
 	});
 	
 	
-	const InheritsAllPartsFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllPartsFrom',
-		
-		extends: IsRelatedTo,
-		
-		singular: "inherits all parts from",
-		
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'partProviders' }],
-		2: [Lyph.Type, '0..*'                                                          ],
-		
-		noCycles: true,
-		
-	});
-	
-	
-	const InheritsAllPatchesFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllPatchesFrom',
-		
-		extends:    IsRelatedTo,
-		extendedBy: InheritsAllPartsFrom,
-		
-		singular: "inherits all patches from",
-		
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'patchProviders' }],
-		2: [Lyph.Type, '0..*'                                                           ],
-		
-		noCycles: true,
-		
-	});
-	
-	
-	const InheritsAllLayersFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllLayersFrom',
-		
-		extends:    IsRelatedTo,
-		extendedBy: InheritsAllPartsFrom,
-		
-		singular: "inherits all layers from",
-		
-		1: [Lyph.Type, '0..*', { anchors: true, covariant: true, key: 'layerProviders' }],
-		2: [Lyph.Type, '0..*'                                                           ],
-		
-		noCycles: true,
-		
-	});
-	
-	
-	const CylindricalLyph = M.TYPED_RESOURCE({///////////////////////////////
+	const CylindricalLyph = M.TYPED_RESOURCE({//////////////////////////////////
 		
 		name: 'CylindricalLyph',
 		
@@ -200,20 +145,26 @@ export default TypedModule.create('lyphs', [
 		
 		properties: {
 			'length': {
-				Type:     { ...oneOf({ type: 'number' }, { ...rangeSchema        }), default: rangeDefault },
-				Template: { ...oneOf({ type: 'number' }, { ...distributionSchema })                        },
-				typeCheck(t, v) {
-					t = normalizeToRange(t);
-					v = normalizeToRange(v);
-					return t.min <= v.min && v.max <= t.max;
+				...oneOf(
+					{ type: 'number'        },
+					{ ...rangeSchema        },
+					{ ...distributionSchema }
+				),
+				default: rangeDefault,
+				isRefinement(a, b) {
+					a = normalizeToRange(a);
+					b = normalizeToRange(b);
+					return a.min <= b.min && b.max <= a.max;
 				}
 			}
 		}
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	M.RELATIONSHIP({
+		
+		// specific version between cylindrical lyphs
 		
 		name: 'HasLayer',
 		
@@ -221,8 +172,8 @@ export default TypedModule.create('lyphs', [
 		
 		singular: "has layer",
 		
-		1: [CylindricalLyph.Type,     '0..*', { anchors: true, covariant: true, key: 'layers' }],
-		2: [CylindricalLyph.Template, '0..*'                                                   ],
+		1: [CylindricalLyph, '0..*', { anchors: true, key: 'layers' }],
+		2: [CylindricalLyph, '0..1'                                  ],
 		
 		noCycles: true,
 		
@@ -236,72 +187,63 @@ export default TypedModule.create('lyphs', [
 		
 		singular: "has segment",
 		
-		1: [CylindricalLyph.Type,     '0..*', { anchors: true, covariant: true, key: 'segments' }],
-		2: [CylindricalLyph.Template, '0..*'                                                     ],
+		1: [CylindricalLyph, '0..*', { anchors: true, key: 'segments' }],
+		2: [CylindricalLyph, '0..1'                                    ],
 		
 		noCycles: true
 		
 	});
 	
 	
-	const InheritsAllSegmentsFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllSegmentsFrom',
-		
-		extends:    IsRelatedTo,
-		extendedBy: InheritsAllPartsFrom,
-		
-		singular: "inherits all segments from",
-		
-		1: [CylindricalLyph.Type, '0..*', { anchors: true, covariant: true, key: 'segmentProviders' }],
-		2: [CylindricalLyph.Type, '0..*',                                                            ],
-		
-		noCycles: true,
-		
-	});
-	
-	
-	const Border = M.TYPED_RESOURCE({////////////////////////////////////////
+	const Border = M.TYPED_RESOURCE({///////////////////////////////////////////
 		
 		name: 'Border',
 		
-		extends: Typed,
+		extends: Template,
 		
 		singular: "border",
 		
 		properties: {
 			nature: {
-				Type:     { ...enumArraySchema('open', 'closed'), value: ['open', 'closed']       },
-				Template: { ...enumSchema     ('open', 'closed'), default: 'open', required: true },
-				typeCheck: arrayContainsValue
+				...oneOf(
+					{ ...enumArraySchema('open', 'closed') },
+					{ ...enumSchema     ('open', 'closed') }
+				),
+				default: ['open', 'closed'],
+				required: true,
+				isRefinement(a, b) {
+					a = new Set(a ? wrapInArray(a) : []);
+					b = new Set(b ? wrapInArray(b) : []);
+					return !(b.has('open'  ) && !a.has('open'  )) &&
+					       !(b.has('closed') && !a.has('closed'));
+					
+				}
 			}
-		},
+		}
 		
-		singleton: true // there is only one border-type
-		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const [
-		             HasInnerBorder,
-		             HasOuterBorder,
-		             HasMinusBorder,
-		             HasPlusBorder
-	             ] = M.RELATIONSHIP([
+		HasInnerBorder,
+		HasOuterBorder,
+		HasMinusBorder,
+		HasPlusBorder
+	] = M.RELATIONSHIP([
 		['HasInnerBorder', Lyph           , 'innerBorder', "has inner border"],
 		['HasOuterBorder', Lyph           , 'outerBorder', "has outer border"],
 		['HasMinusBorder', CylindricalLyph, 'minusBorder', "has minus border"],
 		['HasPlusBorder' , CylindricalLyph, 'plusBorder' , "has plus border" ],
 	].map(([name, LyphClass, key, singular]) => ({
 		
-		name,
+		name: name,
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
-		singular,
+		singular: singular,
 		
-		1: [LyphClass.Type,  '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, covariant: true, key }],
-		2: [Border.Template, '0..1'                                                                                                   ],
+		1: [LyphClass, '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, key }],
+		2: [Border,    '0..1'                                                                                                   ],
 		
 		// The 'readonly' flag above implies that when a lyph is created,
 		// its borders are also automatically created.
@@ -321,7 +263,7 @@ export default TypedModule.create('lyphs', [
 	})));
 	
 	
-	const Coalescence = M.RESOURCE({/////////////////////////////////////////
+	const Coalescence = M.RESOURCE({////////////////////////////////////////////
 		
 		name: 'Coalescence',
 		
@@ -333,48 +275,49 @@ export default TypedModule.create('lyphs', [
 		// that at least one lyph from each participating lyph template
 		// shares its outer layer with the other participating lyphs
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
-	const CoalescesWith = M.RELATIONSHIP({
+	const Coalesces = M.RELATIONSHIP({
 		
-		name: 'CoalescesWith',
+		name: 'Coalesces',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
-		singular: "coalesces with",
+		singular: "coalesces",
 		
-		1: [Lyph.Template, '0..*', {                key: 'coalescences' }],
-		2: [Coalescence,   '2..*', { anchors: true, key: 'lyphs'        }],
+		1: [Coalescence, '2..*', { anchors: true, key: 'lyphs'        }],
+		2: [Lyph,        '0..*', {                key: 'coalescences' }],
 		
 	});
 	
 	
-	const CoalescesThroughLayer = M.RELATIONSHIP({
+	const CoalescesThrough = M.RELATIONSHIP({
 		
-		name: 'CoalescesThroughLayer',
+		name: 'CoalescesThrough',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
-		singular: "coalesces through layer",
+		singular: "coalesces through",
 		
 		1: [Coalescence, '0..*', { anchors: true, key: 'interfaceLayers' }],
-		2: [Lyph.Type,   '0..*',                                          ],
+		2: [Lyph,        '0..*',                                          ],
+		
+		// TODO: CONSTRAINT: each interface layer has to be
+		//     : a refinement of all outer layers of the coalescing lyphs
 		
 	});
 	
 	
-	const Node = M.TYPED_RESOURCE({//////////////////////////////////////////
+	const Node = M.TYPED_RESOURCE({/////////////////////////////////////////////
 		
 		name: 'Node',
 		
-		extends: Typed,
+		extends: Template,
 		
 		singular: "node",
 		
 	});/////////////////////////////////////////////////////////////////////////
-	const NodeType     = Node.Type;
-	const NodeTemplate = Node.Template;
 	
 	
 	const NodeLocation = M.TYPED_RESOURCE({/////////////////////////////////////
@@ -383,7 +326,7 @@ export default TypedModule.create('lyphs', [
 		
 		abstract: true,
 		
-		extends:    Typed,
+		extends:    Template,
 		extendedBy: [Lyph, Border],
 		
 		singular: "node location",
@@ -391,21 +334,18 @@ export default TypedModule.create('lyphs', [
 	});/////////////////////////////////////////////////////////////////////////
 	
 	
-	const HasNode = M.RELATIONSHIP({
+	const ContainsNode = M.RELATIONSHIP({
 		
-		name: 'HasNode',
+		name: 'ContainsNode',
 		
-		singular: "has node",
+		singular: "contains node",
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
-		1: [NodeLocation.Type, '0..*', { anchors: true, covariant: true, key: 'nodes' }],
-		2: [Node.Template,     '0..*',                                                 ],
+		1: [NodeLocation, '0..*'                                     ],
+		2: [Node,         '0..*', { anchors: true, key: 'locations' }],
 		
 	});
 
-	
-	
-	
 });
 

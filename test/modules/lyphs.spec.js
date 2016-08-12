@@ -10,44 +10,27 @@ describe("'lyphs' Module", () => {
 	
 	it("exports the expected classes", () => {
 		
-		const {
-			MaterialType,
-			LyphType,
-			CylindricalLyphType,
-			MaterialTemplate,
-			LyphTemplate,
-			CylindricalLyphTemplate,
-			BorderTemplate
-		} = module.classes;
-		
-		expect(module.classes).to.contain.typedResources(
+		expect(module.classes).to.contain.resources(
 			'Material',
 			'Lyph',
 			'CylindricalLyph',
 			'Border',
-			'Node'
-		);
-		expect(module.classes).to.contain.resources(
+			'Node',
 			'Coalescence'
 		);
 		expect(module.classes).to.contain.relationships(
-			'ContainsMaterial',
-			'InheritsAllMaterialsFrom',
+			'HasMaterial',
 			'HasPart',
 			'HasLayer',
 			'HasPatch',
-			'InheritsAllPatchesFrom',
-			'InheritsAllLayersFrom',
-			'InheritsAllPartsFrom',
 			'HasSegment',
-			'InheritsAllSegmentsFrom',
 			'HasInnerBorder',
 			'HasOuterBorder',
 			'HasMinusBorder',
 			'HasPlusBorder',
-			'HasNode',
-			'CoalescesWith',
-			'CoalescesThroughLayer'
+			'ContainsNode',
+			'Coalesces',
+			'CoalescesThrough'
 		);
 
 	});
@@ -55,56 +38,39 @@ describe("'lyphs' Module", () => {
 	it("exports classes that can be instantiated", async () => {
 		
 		const {
-			MaterialType,
-			LyphType,
-			CylindricalLyphType,
-			MaterialTemplate,
-			LyphTemplate,
-			CylindricalLyphTemplate,
-			BorderTemplate
+			Material,
+			Lyph,
+			CylindricalLyph,
+			Border
 		} = module.classes;
 		
-		let materialType            = MaterialType.new();
-		let materialTemplate        = MaterialTemplate.new({ type: materialType });
-		let lyphType                = LyphType.new();
-		let lyphTemplate            = LyphTemplate.new({ type: lyphType });
-		let cylindricalLyphType     = CylindricalLyphType.new();
-		let cylindricalLyphTemplate = CylindricalLyphTemplate.new({ type: cylindricalLyphType });
+		let material        = Material.new();
+		let lyph            = Lyph.new();
+		let cylindricalLyph = CylindricalLyph.new();
 		
-		expect(materialType           ).to.be.an.instanceof(                                       MaterialType    );
-		expect(materialTemplate       ).to.be.an.instanceof(                                       MaterialTemplate);
-		expect(lyphType               ).to.be.an.instanceof(                         LyphType    , MaterialType    );
-		expect(lyphTemplate           ).to.be.an.instanceof(                         LyphTemplate, MaterialTemplate);
-		expect(cylindricalLyphType    ).to.be.an.instanceof(CylindricalLyphType    , LyphType    , MaterialType    );
-		expect(cylindricalLyphTemplate).to.be.an.instanceof(CylindricalLyphTemplate, LyphTemplate, MaterialTemplate);
+		expect(material       ).to.be.an.instanceof(                       Material);
+		expect(lyph           ).to.be.an.instanceof(                 Lyph, Material);
+		expect(cylindricalLyph).to.be.an.instanceof(CylindricalLyph, Lyph, Material);
 		
-		expect(lyphType.innerBorder).to.be.an.instanceof(BorderTemplate);
-		expect(lyphType.outerBorder).to.be.an.instanceof(BorderTemplate);
-		expect(lyphType.minusBorder).to.be.undefined;
-		expect(lyphType.plusBorder ).to.be.undefined;
+		expect(lyph.innerBorder).to.be.an.instanceof(Border);
+		expect(lyph.outerBorder).to.be.an.instanceof(Border);
+		expect(lyph.minusBorder).to.be.undefined;
+		expect(lyph.plusBorder ).to.be.undefined;
 		
-		expect(cylindricalLyphType.innerBorder).to.be.an.instanceof(BorderTemplate);
-		expect(cylindricalLyphType.outerBorder).to.be.an.instanceof(BorderTemplate);
-		expect(cylindricalLyphType.minusBorder).to.be.an.instanceof(BorderTemplate);
-		expect(cylindricalLyphType.plusBorder ).to.be.an.instanceof(BorderTemplate);
+		expect(cylindricalLyph.innerBorder).to.be.an.instanceof(Border);
+		expect(cylindricalLyph.outerBorder).to.be.an.instanceof(Border);
+		expect(cylindricalLyph.minusBorder).to.be.an.instanceof(Border);
+		expect(cylindricalLyph.plusBorder ).to.be.an.instanceof(Border);
 
 	});
 	
 	it("exports classes that have the properties, relationships and relationshipShortcuts of their superclasses", () => {
 		
-		const {
-			MaterialType,
-			LyphType,
-			CylindricalLyphType,
-			MaterialTemplate,
-			LyphTemplate,
-			CylindricalLyphTemplate,
-			BorderTemplate
-		} = module.classes;
+		const {Lyph} = module.classes;
 		
-		expect(LyphType.properties           ).to.have.property('href');
-		expect(LyphType.relationships        ).to.have.property('-->ContainsMaterial');
-		expect(LyphType.relationshipShortcuts).to.have.property('materials');
+		expect(Lyph.properties           ).to.have.property('href');
+		expect(Lyph.relationships        ).to.have.property('-->HasMaterial');
+		expect(Lyph.relationshipShortcuts).to.have.property('materials');
 		
 	})
 	

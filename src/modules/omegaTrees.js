@@ -9,11 +9,11 @@ import lyphs     from './lyphs';
 export default TypedModule.create('omegaTrees', [
 	resources, typed, groups, lyphs
 ], (M, {
-	IsRelatedTo, Typed, Group, CylindricalLyph, Node
+	IsRelatedTo, Template, Group, CylindricalLyph, Node, Has, PullsIntoTypeDefinition
 }) => {
 	
 	
-	const OmegaTree = M.TYPED_RESOURCE({/////////////////////////////////////
+	const OmegaTree = M.TYPED_RESOURCE({////////////////////////////////////////
 		
 		name: 'OmegaTree',
 		
@@ -21,49 +21,49 @@ export default TypedModule.create('omegaTrees', [
 		
 		singular: "omega tree",
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const HasAsRoot = M.RELATIONSHIP({
 		
 		name: 'HasAsRoot',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "has as root",
 		
-		1: [OmegaTree.Type, '0..*', { anchors: true, covariant: true, key: 'root' }],
-		2: [Node.Template,  '0..*',                                                ],
+		1: [OmegaTree, '0..*', { anchors: true, key: 'root' }],
+		2: [Node,      '0..*',                               ],
 		
 		// TODO: CONSTRAINT: all root nodes must be on a plus-border or minus-border
 		
 	});
 	
 	
-	const OmegaTreePart = M.TYPED_RESOURCE({/////////////////////
+	const OmegaTreePart = M.TYPED_RESOURCE({////////////////////////////////////
 		
 		name: 'OmegaTreePart',
 		
 		abstract: true,
 		
-		extends: Typed,
+		extends:    Template,
 		extendedBy: [CylindricalLyph, OmegaTree],
 		
 		singular: "omega tree part",
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
-	const HasTreeParent = M.RELATIONSHIP({
+	const HasTreeChildren = M.RELATIONSHIP({
 		
-		name: 'HasTreeParent',
+		name: 'HasTreeChildren',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
-		singular: "has tree-parent",
+		singular: "has tree-children",
 		
-		1: [OmegaTreePart.Template, '0..1', { key: 'treeParent'   }],
-		2: [OmegaTreePart.Template, '0..*', { key: 'treeChildren' }],
+		1: [OmegaTreePart, '0..*', { key: 'treeChildren' }],
+		2: [OmegaTreePart, '0..1', { key: 'treeParent'   }],
 		
 		noCycles: true
 		
@@ -74,16 +74,15 @@ export default TypedModule.create('omegaTrees', [
 		
 		name: 'HasTreePart',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "has tree-part",
 		
-		1: [OmegaTree.Type,         '0..*', { anchors: true, key: 'parts' }],
-		2: [OmegaTreePart.Template, '0..*',                                ],
+		1: [OmegaTree,     '0..*', { anchors: true, key: 'parts' }],
+		2: [OmegaTreePart, '0..*',                                ],
 		
 	});
 
-
-
+	
 });
 

@@ -11,9 +11,7 @@ export default Module.create('research', [
 }) => {
 	
 	
-	
-	
-	const Correlation = M.RESOURCE({/////////////////////////////////////////////////////////////////
+	const Correlation = M.RESOURCE({////////////////////////////////////////////
 		
 		name: 'Correlation',
 		
@@ -25,7 +23,7 @@ export default Module.create('research', [
 			'comment': { type: 'string' }
 		}
 		
-	});//////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const InvolvesMeasurable = M.RELATIONSHIP({
@@ -36,13 +34,13 @@ export default Module.create('research', [
 		
 		singular: "involves measurable",
 		
-		1: [Correlation,         '0..*', { anchors: true, key: 'measurables' }],
-		2: [Measurable.Template, '0..*',                                      ],
+		1: [Correlation, '0..*', { anchors: true, key: 'measurables' }],
+		2: [Measurable,  '0..*',                                      ],
 		
 	});
 	
 	
-	const ClinicalIndex= M.RESOURCE({/////////////////////////////////////////////////////////////////
+	const ClinicalIndex= M.RESOURCE({///////////////////////////////////////////
 		
 		name: 'ClinicalIndex',
 		
@@ -51,7 +49,7 @@ export default Module.create('research', [
 		singular: "clinical index",
 		plural:   "clinical indices"
 		
-	});//////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const EncompassesClinicalIndex = M.RELATIONSHIP({
@@ -84,7 +82,7 @@ export default Module.create('research', [
 	});
 	
 	
-	const Publication = M.RESOURCE({/////////////////////////////////////////////////////////////////
+	const Publication = M.RESOURCE({////////////////////////////////////////////
 		
 		name: 'Publication',
 		
@@ -92,7 +90,7 @@ export default Module.create('research', [
 		
 		singular: "publication"
 		
-	});//////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const InvolvesPublication = M.RELATIONSHIP({
@@ -107,8 +105,6 @@ export default Module.create('research', [
 		2: [Publication, '0..*',                                      ],
 		
 	});
-	
-	
 	
 	
 });

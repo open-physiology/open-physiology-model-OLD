@@ -11,39 +11,42 @@ import {dimensionalitySchema} from "../util/schemas";
 export default TypedModule.create('measurables', [
 	resources, typed, lyphs, processes
 ], (M, {
-	Resource, IsRelatedTo, Typed,
+	Resource, IsRelatedTo, Template,
 	Lyph, Material, Border, Node,
-	Process
+	Process, Has, PullsIntoTypeDefinition
 }) => {
 	
 	
-	const Measurable = M.TYPED_RESOURCE({/////////////////////////////////////////////////////////////////
+	const Measurable = M.TYPED_RESOURCE({///////////////////////////////////////
 		
 		name: 'Measurable',
 		
-		extends: Typed,
+		extends: Template,
 		
 		singular: "measurable",
 		
 		properties: {
 			'quality': {
-				Type: { ...qualitySchema }
+				type: 'string',
+				isRefinement(a, b) {
+					return !a || a === b;
+				}
 			}
 		}
 		
-	});//////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const MeasuresMaterial = M.RELATIONSHIP({
 		
 		name: 'MeasuresMaterial',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "measures material",
 		
-		1: [Measurable.Type, '0..*', { anchors: true, covariant: true, key: 'materials' }],
-		2: [Material.Type,   '0..*',                                                     ],
+		1: [Measurable, '0..*', { anchors: true, key: 'materials' }],
+		2: [Material,   '0..*',                                    ],
 		
 		properties: {
 			'dimensionality': { ...dimensionalitySchema }
@@ -52,44 +55,32 @@ export default TypedModule.create('measurables', [
 	});
 	
 	
-	const MeasurableLocation = M.TYPED_RESOURCE({////////////////////////////
+	const MeasurableLocation = M.TYPED_RESOURCE({///////////////////////////////
 		
 		name: 'MeasurableLocation',
 		
 		abstract: true,
 		
-		extends: Typed,
+		extends: Template,
 		
 		extendedBy: [Lyph, Border, Node, Process]
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const HasMeasurable = M.RELATIONSHIP({
 		
 		name: 'HasMeasurable',
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
 		singular: "has measurable",
 		
-		1: [MeasurableLocation.Type, '0..*', { anchors: true, sustains: true, covariant: true, key: 'measurables' }],
-		2: [Measurable.Template,     '1..1', {                                                 key: 'location'    }],
+		1: [MeasurableLocation, '0..*', { anchors: true, sustains: true, key: 'measurables' }],
+		2: [Measurable,         '0..1', {                                key: 'location'    }],
 		
-	});
-	
-	const InheritsAllMeasurablesFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllMeasurablesFrom',
-		
-		extends: IsRelatedTo,
-		
-		singular: "inherits all measurables from",
-		
-		1: [MeasurableLocation.Type, '0..*', { anchors: true, covariant: true, key: 'measurableProviders' }],
-		2: [MeasurableLocation.Type, '0..*',                                                               ],
-		
-		noCycles: true
+		// TODO: auto-create classes for the inverse of relationships,
+		//     : so that HasMeasurable_inverse can extend PullsIntoTypeDefinition
 		
 	});
 	
@@ -98,7 +89,7 @@ export default TypedModule.create('measurables', [
 		
 		name: 'Causality',
 		
-		extends: Typed,
+		extends: Template,
 		
 		singular: "causality",
 		plural:   "causalities",
@@ -110,21 +101,21 @@ export default TypedModule.create('measurables', [
 		
 		name: 'Causes',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "causes",
 		
-		1: [Measurable.Template, '0..*', {                key: 'effects' }],
-		2: [Causality.Template,  '1..1', { anchors: true, key: 'cause'   }],
+		1: [Measurable, '0..*', {                key: 'effects' }],
+		2: [Causality,  '1..1', { anchors: true, key: 'cause'   }],
 		
 	}, {
 		
 		name: 'Causes',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
-		1: [Causality.Template,  '1..1', { anchors: true, key: 'effect' }],
-		2: [Measurable.Template, '0..*', {                key: 'causes' }],
+		1: [Causality,  '1..1', { anchors: true, key: 'effect' }],
+		2: [Measurable, '0..*', {                key: 'causes' }],
 		
 	}]);
 

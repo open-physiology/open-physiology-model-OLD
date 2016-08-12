@@ -96,7 +96,7 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 			.subscribe(([scValue, relValue]) => {
 				if (relValue) {
 					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
-				} else {
+				} else if (scValue) {
 					owner.fields[desc.keyInResource].set(desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: scValue

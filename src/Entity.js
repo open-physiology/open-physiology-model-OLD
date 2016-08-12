@@ -299,11 +299,10 @@ export default class Entity extends ValueTracker {
 		combineLatest(
 			...this.fields::values().map(f=>f.p('isPristine')),
 			(...fieldPristines) => fieldPristines.every(v=>!!v)
-		).subscribe(this.pSubject('isPristine'));
+		).subscribe( this.pSubject('isPristine') );
 		
 		/* register this entity */
 		Entity[$$entities].add(this);
-		
 		
 		// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 		

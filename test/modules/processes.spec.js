@@ -10,18 +10,15 @@ describe("'processes' Module", () => {
 	
 	it("exports the expected classes", () => {
 
-		expect(module.classes).to.contain.typedResources(
+		expect(module.classes).to.contain.resources(
 			'Process'
 		);
 		expect(module.classes).to.contain.relationships(
 			'FlowsTo',
 			'ConveysProcess',
 			'TransportsMaterial',
-			'InheritsAllMaterialsFrom',
 			'HasSegment',
-			'InheritsAllSegmentsFrom',
-			'HasChannel',
-			'InheritsAllChannelsFrom'
+			'HasChannel'
 		);
 
 	});

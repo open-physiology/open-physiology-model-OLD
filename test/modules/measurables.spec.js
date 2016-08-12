@@ -9,14 +9,13 @@ describe("'measurables' Module", () => {
 	
 	it("exports the expected classes", () => {
 
-		expect(module.classes).to.contain.typedResources(
+		expect(module.classes).to.contain.resources(
 			'Measurable',
 			'Causality'
 		);
 		expect(module.classes).to.contain.relationships(
 			'MeasuresMaterial',
-			'HasMeasurable', // TODO: put back
-			'InheritsAllMeasurablesFrom',
+			'HasMeasurable',
 			'Causes'
 		);
 

@@ -14,13 +14,11 @@ describe("'typed' Module", () => {
 			'Type',
 			'Template'
 		);
-		expect(module.classes).to.contain.typedResources(
-			'Typed'
-		);
 		expect(module.classes).to.contain.relationships(
 			'IsSubtypeOf',
 			'HasCardinalityMultipliedByThatOf',
-			'HasType'
+			'HasType',
+			'DefinesType'
 		);
 
 	});

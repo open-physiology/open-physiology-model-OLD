@@ -5,7 +5,7 @@ import defaults  from 'lodash-bound/defaults';
 import mapValues from 'lodash-bound/mapValues';
 import omitBy    from 'lodash-bound/omitBy';
 import map       from 'lodash-bound/map';
-import memoize   from 'lodash-bound/memoize';
+import memoize   from 'lodash/memoize';
 import {defineProperty, defineProperties} from 'bound-native-methods';
 import {wrapInArray} from "./util/misc";
 import {definePropertyByValue} from "./util/misc";
@@ -23,152 +23,56 @@ export default class TypedModule extends Module {
 			
 			this.basicNormalization(conf);
 			
-			const superClasses = wrapInArray(conf.extends || [this.classes.vertexValue('Typed')]);
+			const superClasses = wrapInArray(conf.extends    || [this.classes.vertexValue('Template')]);
 			const subClasses   = wrapInArray(conf.extendedBy || []);
 			
 			/* handling properties */
 			conf::defaults({
-				properties: {},
+				properties:        {},
 				patternProperties: {}
 			});
-			const [
-				typeProperties,
-				templateProperties,
-				typePatternProperties,
-				templatePatternProperties
-		    ] = [
-		    	['properties',        'Type',     'Template'],
-			    ['properties',        'Template', 'Type'    ],
-			    ['patternProperties', 'Type',     'Template'],
-			    ['patternProperties', 'Template', 'Type'    ]
-			].map(([key, wanted, unwanted]) => conf[key]
-				::omitBy(desc => !desc[wanted] && desc[unwanted])
-				::mapValues((desc) => {
-				if (desc[wanted]) { return { ...desc[wanted], typeCheck: desc.typeCheck } }
-				return { ...desc };
-			}));
 			
-			/* Type resource */
-			const NewType = this.RESOURCE({
+			/* Template class */
+			const NewTemplateClass = this.RESOURCE({
+				
+				name: conf.name,
+				
+				extends:  superClasses,
+				extendedBy: subClasses,
+				
+				singular: conf.singular,
+				
+				properties:        conf.properties,
+				patternProperties: conf.patternProperties
+				
+			});
+			
+			/* Type class */
+			const NewTypeClass = this.RESOURCE({
 				
 				name: `${conf.name}Type`,
 				
-				extends:    superClasses::map(sc => sc.Type),
-				extendedBy: subClasses  ::map(sc => sc.Type),
+				extends:  superClasses::map(c=>c.Type),
+				extendedBy: subClasses::map(c=>c.Type),
 				
-				instanceSingular: conf.singular,
-				instancePlural:   conf.plural || `${conf.singular}s`,
-				
-				singular: `${conf.singular} type`,
-				
-				singleton: conf.singleton,
-				
-				properties:        typeProperties,
-				patternProperties: typePatternProperties
+				singular: `${conf.singular} type`
 				
 			});
 			
-			/* Template resource */
-			const NewTemplate = this.RESOURCE({
+			NewTemplateClass::definePropertyByValue('Type',     NewTypeClass    );
+			NewTypeClass    ::definePropertyByValue('Template', NewTemplateClass);
+			
+			this.RELATIONSHIP({
 				
-				name: `${conf.name}Template`,
+				name: 'HasType',
 				
-				extends:    superClasses::map(sc => sc.Template),
-				extendedBy: subClasses  ::map(sc => sc.Template),
-				
-				instanceSingular: conf.singular,
-				instancePlural:   conf.plural || `${conf.singular}s`,
-				
-				singular: `${conf.singular} template`,
-				
-				properties:        templateProperties,
-				patternProperties: templatePatternProperties
+				1: [NewTemplateClass, '0..*', { anchors: true, key: 'types' }],
+				2: [NewTypeClass,     '0..*'                                 ]
 				
 			});
-			
-			
-			/* create a universal type, which will serve as default type for all templates */
-			if (!NewType.abstract) {
-				// TODO: fetch already existing universal type from external source
-				// TODO: make universal type immutable / readonly
-				NewType::definePropertyByValue('getUniversalType', (()=>{
-					let result = NewType.new({
-						name: `universal ${NewType.singular}`,
-						...(conf.universalType || {})
-					});
-					result.isUniversalType = true;
-					result.commit();
-					return result;
-				})::memoize());
-				if (NewType.singleton) {
-					NewType::definePropertyByValue('getSingleton', NewType.getUniversalType);
-				}
-			}
-			
-			
-			/* HasType relationship */
-			const NewHasType = this.RELATIONSHIP({
-				
-				name: `HasType`,
-				
-				extends: this.classes.vertexValue('IsRelatedTo'),
-				// extends:    superClasses.map(sc => sc.HasType), // can this work?
-				// extendedBy: subClasses  .map(sc => sc.HasType),
-				
-				// TODO: in order to give call this `${conf.name}_HasType`,
-				//     : and maintain a proper class hierarchy, we'll need
-				//     : to allow someone to set `-->HasType` on an entity,
-				//     : and recognize this as also setting `-->${conf.name}_HasType`,
-				//     : because of the 1..1 cardinality on the whole domain hierarchy.
-				//     : Alternatively, we may want to allow a class to be identified
-				//     : by more than just the name. We wouldn't want
-				//     : `-->${conf.name}_HasType` to be visible as a settable field.
-				
-				singular: 'has type',
-				
-				1: [NewTemplate, '1..1', { anchors: true, key: 'type', default: NewType.getUniversalType }],
-				2: [NewType,     '0..*',                                                                  ]
-				
-			});
-			
-			const NewIsSubtypeOf = this.RELATIONSHIP({
-				
-				name: `IsSubtypeOf`,
-				
-				extends: this.classes.vertexValue('IsRelatedTo'),
-				// extends:    superClasses.map(sc => sc.IsSubtypeOf), // can this work?
-				// extendedBy: subClasses  .map(sc => sc.IsSubtypeOf), // see TODO above
-				
-				singular: "is subtype of",
-				
-				1: [NewType, '0..*', {                key: 'subtypes'   }],
-				2: [NewType, '0..*', { anchors: true, key: 'supertypes' }],
-				
-				noCycles: true
-				
-			});
-			
-			/* rebuild the typedResource object */
-			const NewTypedResource = {
-				...conf,
-				module:          this,
-				isTypedResource: true,
-				Type:            NewType,
-				Template:        NewTemplate,
-				HasType:         NewHasType,
-				IsSubtypeOf:     NewIsSubtypeOf
-			};
-			if (!NewType.abstract) {
-				NewTypedResource::defineProperty('getUniversalType', {
-					value() { return NewType.getUniversalType() }
-				});
-			}
-			
-			/* get rid of 'createUniversalType', which was to be used once at most */
-			delete conf.createUniversalType;
 			
 			/* register and return */
-			return this.register(NewTypedResource);
+			return NewTemplateClass;
 		});
 
 	}

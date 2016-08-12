@@ -5,33 +5,48 @@ import {enumArraySchema, enumSchema} from '../util/schemas';
 import resources from './resources';
 import typed     from './typed';
 import lyphs     from './lyphs';
+import {wrapInArray} from "../util/misc";
+import {oneOf} from "../util/schemas";
 
 
 export default TypedModule.create('processes', [
 	resources, typed, lyphs
 ], (M, {
-	IsRelatedTo, Typed, Material, Lyph, Node
+	IsRelatedTo, Template, Material, Lyph, Node,
+	Has, PullsIntoTypeDefinition
 }) => {
-	
 	
 	
 	const Process = M.TYPED_RESOURCE({//////////////////////////////////////////
 		
 		name: 'Process',
 		
-		extends: Typed,
+		extends: Template,
 		
 		singular: "process",
 		plural:   "processes",
 		
 		properties: {
 			'transportPhenomenon': {
-				Type:     { ...enumArraySchema('advection', 'diffusion'), default: ['advection', 'diffusion'] },
-				Template: { ...enumSchema     ('advection', 'diffusion'), required: true                      },
-				typeCheck: arrayContainsValue
+				...oneOf(
+					{ ...enumArraySchema('advection', 'diffusion') },
+					{ ...enumSchema     ('advection', 'diffusion') }
+				),
+				default: ['advection', 'diffusion'],
+				required: true,
+				isRefinement(a, b) {
+					a = new Set(a ? wrapInArray(a) : []);
+					b = new Set(b ? wrapInArray(b) : []);
+					return !(b.has('advection') && !a.has('advection')) &&
+					       !(b.has('diffusion') && !a.has('diffusion'));
+					
+				}
 			},
 			'species': {
-				Type: { type: 'string' }
+				type: 'string',
+				isRefinement(a, b) {
+					return !a || a === b;
+				}
 			}
 		}
 		
@@ -42,23 +57,23 @@ export default TypedModule.create('processes', [
 		
 		name: 'FlowsTo',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "flows to",
 		
-		1: [Node.Template,    '0..*', {                key: 'outgoingProcesses' }],
-		2: [Process.Template, '0..1', { anchors: true, key: 'source'            }],
+		1: [Node,    '0..*', {                key: 'outgoingProcesses' }],
+		2: [Process, '0..1', { anchors: true, key: 'source'            }],
 		
 	}, {
 		
 		name: 'FlowsTo',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "flows to",
 		
-		1: [Process.Template, '0..1', { anchors: true, key: 'target'            }],
-		2: [Node.Template,    '0..*', {                key: 'incomingProcesses' }],
+		1: [Process, '0..1', { anchors: true, key: 'target'            }],
+		2: [Node,    '0..*', {                key: 'incomingProcesses' }],
 		
 	}]);
 	
@@ -67,23 +82,23 @@ export default TypedModule.create('processes', [
 		
 		name: 'provisional_FlowsTo',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "flows to",
 		
-		1: [Lyph.Template,    '0..*', {                key: 'outgoingProcesses' }],
-		2: [Process.Template, '0..1', { anchors: true, key: 'sourceLyph'        }],
+		1: [Lyph,    '0..*', {                key: 'outgoingProcesses' }],
+		2: [Process, '0..1', { anchors: true, key: 'sourceLyph'        }],
 		
 	}, {
 		
 		name: 'provisional_FlowsTo',
 		
-		extends: IsRelatedTo,
+		extends: PullsIntoTypeDefinition,
 		
 		singular: "flows to",
 		
-		1: [Process.Template, '0..1', { anchors: true, key: 'targetLyph'        }],
-		2: [Lyph.Template,    '0..*', {                key: 'incomingProcesses' }],
+		1: [Process, '0..1', { anchors: true, key: 'targetLyph'        }],
+		2: [Lyph,    '0..*', {                key: 'incomingProcesses' }],
 		
 	}]);
 	
@@ -92,12 +107,12 @@ export default TypedModule.create('processes', [
 		
 		name: 'ConveysProcess',
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
 		singular: "conveys process",
 		
-		1: [Lyph.Type,        '0..*', { anchors: true, covariant: true, key: 'processes'     }],
-		2: [Process.Template, '0..1', {                                 key: 'conveyingLyph' }],
+		1: [Lyph,    '0..*', { anchors: true, key: 'processes'     }],
+		2: [Process, '0..1', {                key: 'conveyingLyph' }],
 		
 	});
 	
@@ -106,39 +121,25 @@ export default TypedModule.create('processes', [
 		
 		name: 'TransportsMaterial',
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
 		singular: "transports material",
 		
-		1: [Process.Type,  '0..*', { anchors: true, covariant: true, key: 'materials' }],
-		2: [Material.Type, '0..*',                                                     ],
+		1: [Process,  '0..*', { anchors: true, key: 'materials' }],
+		2: [Material, '0..1',                                                     ],
 		
 	});
-	
-	const InheritsAllMaterialsFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllMaterialsFrom',
-		
-		extends: IsRelatedTo,
-		
-		singular: "inherits all materials from",
-		
-		1: [Process.Type, '0..*', { anchors: true, covariant: true, key: 'materialProviders' }],
-		2: [Process.Type, '0..*',                                                             ],
-		
-	});
-	
 	
 	const HasSegment = M.RELATIONSHIP({
 		
 		name: 'HasSegment',
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
 		singular: "has segment",
 		
-		1: [Process.Type,     '0..*', { anchors: true, covariant: true, key: 'segments' }],
-		2: [Process.Template, '0..*',                                                    ],
+		1: [Process, '0..*', { anchors: true, key: 'segments' }],
+		2: [Process, '0..1',                                   ],
 		
 		// TODO: CONSTRAINT: segments are connected in a straight line
 		//     : through nodes, starting and ending with the same nodes
@@ -147,47 +148,24 @@ export default TypedModule.create('processes', [
 		
 	});
 	
-	const InheritsAllSegmentsFrom = M.RELATIONSHIP({
-		
-		name: 'InheritsAllSegmentsFrom',
-		
-		extends: IsRelatedTo,
-		
-		singular: "inherits all segments from",
-		
-		1: [Process.Type, '0..*', { anchors: true, covariant: true, key: 'segmentProviders' }],
-		2: [Process.Type, '0..*',                                                            ],
-		
-	});
-	
 	
 	const [HasChannel] = M.RELATIONSHIP([Process, Node].map(Class => ({
 		
 		name: 'HasChannel',
 		
-		extends: IsRelatedTo,
+		extends: Has,
 		
 		singular: "has channel",
 		
-		1: [Class.Type,     '0..*', { anchors: true, covariant: true, key: 'channels' }],
-		2: [Class.Template, '0..*',                                                    ],
+		1: [Class, '0..*', { anchors: true, key: 'channels' }],
+		2: [Class, '0..1',                                   ],
+		
+		// TODO: make a class for the transitional closure
+		//     : of a relationship, which can be used to
+		//     : manually specify part-hood without excluding
+		//     : the possibility of parts being 'inbetween'.
 		
 	})));
-	
-	
-	const [InheritsAllChannelsFrom] = M.RELATIONSHIP([Process, Node].map(Class => ({
-		
-		name: 'InheritsAllChannelsFrom',
-		
-		extends: IsRelatedTo,
-		
-		singular: "inherits all channels from",
-		
-		1: [Class.Type, '0..*', { anchors: true, covariant: true, key: 'channelProviders' }],
-		2: [Class.Type, '0..*',                                                            ],
-		
-	})));
-	
 	
 	
 });

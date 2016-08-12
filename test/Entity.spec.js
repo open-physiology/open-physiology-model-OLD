@@ -11,7 +11,7 @@ describe("Entity classes", () => {
 
 		const {Lyph} = module.classes;
 
-		let MyLyphType = Lyph.Type.supersede((SuperClass) => class MyLyphType extends SuperClass {
+		let MyLyph = Lyph.supersede((SuperClass) => class MyLyph extends SuperClass {
 
 			constructor(...args) {
 				super(...args);
@@ -26,16 +26,16 @@ describe("Entity classes", () => {
 
 		});
 
-		expect(MyLyphType).to.have.property('name', 'MyLyphType');
-		expect(Lyph.Type.hasSubclass(MyLyphType)).to.be.true;
+		expect(MyLyph).to.have.property('name', 'MyLyph');
+		expect(Lyph.hasSubclass(MyLyph)).to.be.true;
 
 		/* We create a new 'LyphType' */
-		let lyph = Lyph.Type.new({ name: 'heart' });
+		let lyph = Lyph.new({ name: 'heart' });
 		await lyph.commit();
 
 		/* and this should actually result in a 'MyLyphType' instance */
-		expect(lyph).to.be.instanceof(Lyph.Type, MyLyphType);
-		expect(lyph.answer).to.equal(42);
+		expect(lyph).to.be.instanceof(Lyph, MyLyph);
+		expect(lyph.answer)     .to.equal(42);
 		expect(lyph.getAnswer()).to.equal(42);
 
 		expect(lyph.name).to.equal('(heart)');

@@ -41,7 +41,7 @@ export default Module.create('resources', [], (M) => {
 	});
 	
 	
-	const ExternalResource = M.RESOURCE({////////////////////////////////////////////////
+	const ExternalResource = M.RESOURCE({///////////////////////////////////////
 		
 		name: 'ExternalResource',
 		

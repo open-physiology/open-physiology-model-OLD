@@ -2,6 +2,7 @@ import {distributionSchema} from "../util/schemas";
 import Module               from '../Module';
 
 import resources from './resources';
+import {definePropertyByValue} from "../util/misc";
 
 
 export default Module.create('typed', [
@@ -11,25 +12,20 @@ export default Module.create('typed', [
 }) => {
 	
 	
-	
-	const Type = M.RESOURCE({////////////////////////////////////////////////
+	const Type = M.RESOURCE({///////////////////////////////////////////////////
 		
 		name: 'Type',
-		
-		abstract: true,
 		
 		extends: Resource,
 		
 		singular: "type"
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
 	
 	
 	const IsSubtypeOf = M.RELATIONSHIP({
 		
 		name: 'IsSubtypeOf',
-		
-		abstract: true,
 		
 		extends: IsRelatedTo,
 		
@@ -43,7 +39,7 @@ export default Module.create('typed', [
 	});
 	
 	
-	const Template = M.RESOURCE({////////////////////////////////////////////
+	const Template = M.RESOURCE({///////////////////////////////////////////////
 		
 		name: 'Template',
 		
@@ -56,14 +52,17 @@ export default Module.create('typed', [
 		properties: {
 			'cardinalityBase': {
 				oneOf: [
-					distributionSchema,
+					{ ...distributionSchema },
 					{ type: 'integer', minimum: 1 }
 				],
 				default: 1
 			}
 		}
 		
-	});/////////////////////////////////////////////////////////////////////////////
+	});/////////////////////////////////////////////////////////////////////////
+	
+	Template::definePropertyByValue('Type',     Type    );
+	Type    ::definePropertyByValue('Template', Template);
 	
 	
 	const HasCardinalityMultipliedByThatOf = M.RELATIONSHIP({
@@ -86,38 +85,64 @@ export default Module.create('typed', [
 		
 		name: 'HasType',
 		
-		// abstract: true, // not while the concrete versions of HasType are also called HasType
-		
 		extends: IsRelatedTo,
 		
 		singular: "has type",
 		
-		1: [Template, '1..1', { anchors: true, key: 'type' }],
-		2: [Type,     '0..*',                               ]
+		1: [Template, '0..*', { anchors: true, key: 'types' }],
+		2: [Type,     '0..*',                                ]
 		
 	});
 	
 	
-	const Typed = M.OBJECT({/////////////////////////////////////////////////
+	const DefinesType = M.RELATIONSHIP({
 		
-		name: 'Typed',
+		name: 'DefinesType',
 		
-		isTypedResource: true,
+		extends: HasType,
+		
+		singular: "defines type",
+		
+		1: [Template, '0..1', { anchors: true                    }],
+		2: [Type,     '1..1', { anchors: true, key: 'definition' }]
+		
+	});
+
+	
+	const PullsIntoTypeDefinition = M.RELATIONSHIP({
+		
+		name: 'PullsIntoTypeDefinition',
 		
 		abstract: true,
 		
-		singular: "typed resource",
+		extends: IsRelatedTo,
 		
-		Type,
-		Template,
-		HasType,
-		IsSubtypeOf
+		singular: "pulls into type definition",
+		plural:   "pull into type definition",
 		
-	});/////////////////////////////////////////////////////////////////////////////
+		1: [Template, '0..*'],
+		2: [Template, '0..*']
+		
+	});
 	
 	
-	
+	const Has = M.RELATIONSHIP({
+		
+		name: 'Has',
+		
+		abstract: true,
+		
+		extends: PullsIntoTypeDefinition,
+		
+		singular: "has",
+		plural:   "have",
+		
+		1: [Template, '0..*', { anchors: true, key: 'children' }],
+		2: [Template, '0..1', {                key: 'parent'   }],
+		
+		noCycles: true
+		
+	});
 	
 	
 });
-	
