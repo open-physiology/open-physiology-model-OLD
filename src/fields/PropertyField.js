@@ -1,6 +1,6 @@
 import isUndefined from 'lodash-bound/isUndefined';
 import entries     from 'lodash-bound/entries';
-import keys        from 'lodash-bound/keys';
+import cloneDeep   from 'lodash-bound/cloneDeep';
 
 import {defineProperty} from 'bound-native-methods';
 
@@ -79,9 +79,9 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[!initialValue::isUndefined(), initialValue                ],
-			['default' in desc,            desc.default::callOrReturn()],
-			['value'   in desc,            desc.value                  ],
+			[!initialValue::isUndefined(), initialValue],
+			['default' in desc,            desc.default::cloneDeep()],
+			['value'   in desc,            desc.value  ::cloneDeep()],
 			[!desc.required]
 		);
 	}

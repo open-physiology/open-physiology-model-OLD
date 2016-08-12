@@ -83,27 +83,26 @@ describe("'lyphs' Module", () => {
 	
 	it("(regression test: auto-synchronized border-natures?)", async () => {
 		
-		const {
-			CylindricalLyph,
-			Border
-		} = module.classes;
+		const {CylindricalLyph, Border} = module.classes;
 		
 		let cylindricalLyph = CylindricalLyph.new();
 		
 		expect(new Set([
-			cylindricalLyph.innerBorder,
-			cylindricalLyph.outerBorder,
-			cylindricalLyph.minusBorder,
-			cylindricalLyph.plusBorder
+			cylindricalLyph.innerBorder.nature,
+			cylindricalLyph.outerBorder.nature,
+			cylindricalLyph.minusBorder.nature,
+			cylindricalLyph. plusBorder.nature
 		]).size).to.equal(4);
 		
-		expect(cylindricalLyph.innerBorder.nature).to.eql(['open', 'closed']);
-		
-		cylindricalLyph.innerBorder.nature = ['open'];
-		
-		expect(cylindricalLyph.innerBorder.nature).to.eql(['open']);
-		
-		expect(cylindricalLyph.innerBorder.nature).to.eql(['open']);
+		// To compare, this was the nature of the original bug.
+		// The default value of properties was shared among entities:
+		let singleArray = [];
+		expect(new Set([
+			singleArray,
+			singleArray,
+			singleArray,
+			singleArray
+		]).size).to.equal(1);
 		
 	});
 	

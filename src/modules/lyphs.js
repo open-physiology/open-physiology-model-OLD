@@ -72,7 +72,7 @@ export default TypedModule.create('lyphs', [
 					{ ...rangeSchema        },
 					{ ...distributionSchema }
 				),
-				default: () => rangeDefault,
+				default: rangeDefault,
 				isRefinement(a, b) {
 					a = normalizeToRange(a);
 					b = normalizeToRange(b);
@@ -149,7 +149,7 @@ export default TypedModule.create('lyphs', [
 					{ ...rangeSchema        },
 					{ ...distributionSchema }
 				),
-				default: () => rangeDefault,
+				default: rangeDefault,
 				isRefinement(a, b) {
 					a = normalizeToRange(a);
 					b = normalizeToRange(b);
@@ -208,7 +208,7 @@ export default TypedModule.create('lyphs', [
 					{ ...enumArraySchema('open', 'closed') },
 					{ ...enumSchema     ('open', 'closed') }
 				),
-				default: () => ['open', 'closed'],
+				default: ['open', 'closed'],
 				required: true,
 				isRefinement(a, b) {
 					a = new Set(a ? wrapInArray(a) : []);

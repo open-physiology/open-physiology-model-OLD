@@ -32,7 +32,7 @@ export default TypedModule.create('processes', [
 					{ ...enumArraySchema('advection', 'diffusion') },
 					{ ...enumSchema     ('advection', 'diffusion') }
 				),
-				default: () => ['advection', 'diffusion'],
+				default: ['advection', 'diffusion'],
 				required: true,
 				isRefinement(a, b) {
 					a = new Set(a ? wrapInArray(a) : []);
