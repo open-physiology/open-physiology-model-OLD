@@ -6,7 +6,7 @@ import {defineProperty} from 'bound-native-methods';
 
 import assert from 'power-assert';
 
-import {humanMsg, assign} from "../util/misc";
+import {humanMsg, assign, callOrReturn} from "../util/misc";
 
 import {Field} from './Field';
 
@@ -18,7 +18,6 @@ import {
 	$$initSet,
 	$$entriesIn,
 } from './symbols';
-import {callOrReturn} from "../util/misc";
 
 
 Field[$$registerFieldClass](class PropertyField extends Field {
@@ -79,9 +78,9 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[!initialValue::isUndefined(), initialValue],
-			['default' in desc,            desc.default::cloneDeep()],
-			['value'   in desc,            desc.value  ::cloneDeep()],
+			[!initialValue::isUndefined(), initialValue::callOrReturn()::cloneDeep()],
+			['default' in desc,            desc.default::callOrReturn()::cloneDeep()],
+			['value'   in desc,            desc.value  ::callOrReturn()::cloneDeep()],
 			[!desc.required]
 		);
 	}
