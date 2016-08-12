@@ -4212,6 +4212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var boundedNormalDistributionSchema = exports.boundedNormalDistributionSchema = {
 		type: 'object',
 		properties: {
+			// 'probabilityDistribution': {},
 			'mean': { type: 'number', required: true },
 			'std': { type: 'number', required: true },
 			'min': { type: 'number', required: true },
@@ -7930,7 +7931,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			extends: Template,
 	
-			extendedBy: [Lyph, Border, Node, Process]
+			extendedBy: [Lyph, Border, Node, Process],
+	
+			singular: "measurable location"
 	
 		}); /////////////////////////////////////////////////////////////////////////
 	

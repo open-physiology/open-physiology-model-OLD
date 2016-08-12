@@ -70,6 +70,7 @@ export const rangeDefault = {
 export const boundedNormalDistributionSchema = {
 	type: 'object',
 	properties: {
+		// 'probabilityDistribution': {},
 		'mean': { type: 'number', required: true },
 		'std':  { type: 'number', required: true },
 		'min':  { type: 'number', required: true },

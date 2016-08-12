@@ -63,7 +63,9 @@ export default TypedModule.create('measurables', [
 		
 		extends: Template,
 		
-		extendedBy: [Lyph, Border, Node, Process]
+		extendedBy: [Lyph, Border, Node, Process],
+		
+		singular: "measurable location"
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
