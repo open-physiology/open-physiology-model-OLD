@@ -35,21 +35,20 @@ export default TypedModule.create('lyphs', [
 	});/////////////////////////////////////////////////////////////////////////
 	
 	
-	const HasMaterial = M.RELATIONSHIP({
+	const ContainsMaterial = M.RELATIONSHIP({
 		
-		name: 'HasMaterial',
+		name: 'ContainsMaterial',
 		
-		extends: Has,
+		extends: IsRelatedTo,
 		
 		singular: "has material",
 		
-		1: [Material, '0..*', { anchors: true, key: 'materials' }],
-		2: [Material, '0..1'                                     ],
+		1: [Material,      '0..*', { anchors: true, key: 'materials' }],
+		2: [Material.Type, '0..*'                                     ],
 		
 		noCycles: true
 		
 	});
-	
 	
 	
 	const Lyph = M.TYPED_RESOURCE({/////////////////////////////////////////////

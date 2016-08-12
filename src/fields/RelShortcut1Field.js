@@ -71,6 +71,10 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		super(options);
 		const { owner, key, desc, initialValue, waitUntilConstructed, related } = options;
 		
+		
+		if (key === 'definition') console.log('(constructor) '+owner, key, ''+initialValue);
+		
+		
 		/* set the initial value */
 		// shortcuts are only initialized with explicit initial values;
 		// all the fallback options are left to the actual relationship field,
@@ -89,7 +93,9 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		correspondingRelValue
 			::filter(v=>v)
 			::switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
-			.subscribe( this.p('value') );
+			.subscribe( (v) => {
+				this.p('value').next(v);
+			} );
 	
 		/* keep the relationship up to date */
 		this.p('value')::waitUntilConstructed()::withLatestFrom( correspondingRelValue::startWith(null) )

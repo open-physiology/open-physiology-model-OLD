@@ -81,7 +81,7 @@ describe("integrated workflow", () => {
 	});
 
 	it("can create new Materials and link them", async () => {
-		const {Material, HasMaterial} = module.classes;
+		const {Material, ContainsMaterial, Type} = module.classes;
 
 		let blood = Material.new({
 			name: "blood"
@@ -101,9 +101,15 @@ describe("integrated workflow", () => {
 		let water = Material.new({
 			name: "waiter"
 		});
+		let waterType = Type.new({
+			definition: water
+		});
+		
+		expect(waterType).to.be.instanceof(Material.Type);
 
 		expect(water).to.be.an.instanceof(Material);
 		expect(water).to.have.a.property('name', "waiter");
+		expect(waterType).to.have.a.property('definition', water);
 
 		water.name = "water";
 
@@ -115,10 +121,13 @@ describe("integrated workflow", () => {
 		expect(water).to.have.a.property('href').which.is.null;
 		expect(water).to.have.a.property('class', 'Material');
 		expect(water).to.have.a.property('name', "waiter");
+		expect(waterType).to.have.a.property('definition').which.is.null;
 
 		water.name = "water";
+		waterType.definition = water;
 
 		await water.commit();
+		await waterType.commit();
 
 		expect(water).to.have.a.property('id'  ).which.is.a('number');
 		expect(water).to.have.a.property('href').which.is.a('string');
@@ -136,23 +145,23 @@ describe("integrated workflow", () => {
 		expect(water).to.have.a.property('href', waterHref);
 		expect(water).to.have.a.property('name', waterName);
 
-		let bloodHasWater = HasMaterial.new({
+		let bloodHasWater = ContainsMaterial.new({
 			1: blood,
-			2: water
+			2: waterType
 		});
 
 		expect(bloodHasWater).to.have.property(1, blood);
-		expect(bloodHasWater).to.have.property(2, water);
-		expect([...blood['-->HasMaterial']]).to.include(bloodHasWater);
-		expect([...blood.materials        ]).to.include(water        );
-		expect(water['<--HasMaterial']).to.equal(bloodHasWater);
+		expect(bloodHasWater).to.have.property(2, waterType);
+		expect([...blood    ['-->ContainsMaterial']]).to.include(bloodHasWater);
+		expect([...blood    .materials            ] ).to.include(waterType    );
+		expect([...waterType['<--ContainsMaterial']]).to.include(bloodHasWater);
 
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.null;
 		expect(bloodHasWater).to.have.a.property('href').which.is.null;
-		expect(bloodHasWater).to.have.a.property('class', 'HasMaterial');
+		expect(bloodHasWater).to.have.a.property('class', 'ContainsMaterial');
 
 		await bloodHasWater.commit();
-
+	
 		expect(bloodHasWater).to.have.a.property('id'  ).which.is.a('number');
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 

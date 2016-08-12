@@ -3,7 +3,9 @@ import Module               from '../Module';
 
 import resources from './resources';
 import {definePropertyByValue} from "../util/misc";
+import {humanMsg} from "../util/misc";
 
+import assert from 'power-assert';
 
 export default Module.create('typed', [
 	resources
@@ -18,7 +20,25 @@ export default Module.create('typed', [
 		
 		extends: Resource,
 		
-		singular: "type"
+		singular: "type",
+		
+		behavior: {
+			new(vals, options) {
+				let {
+					definition:         sc,
+					['<--DefinesType']: rel
+				} = vals;
+				assert((
+					sc  instanceof Template ||
+					rel instanceof DefinesType
+				), humanMsg`
+					A type must be created with its definition
+					immediately.
+				`);
+				if (rel) { sc = rel[1] }
+				return sc.constructor.Type.new(vals, options);
+			}
+		}
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
@@ -107,7 +127,7 @@ export default Module.create('typed', [
 		2: [Type,     '1..1', { anchors: true, key: 'definition' }]
 		
 	});
-
+	
 	
 	const PullsIntoTypeDefinition = M.RELATIONSHIP({
 		

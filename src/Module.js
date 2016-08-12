@@ -133,6 +133,10 @@ export default class Module {
 			}
 		}
 		
+		config::defaults({
+			behavior: {}
+		});
+		
 		if (config.isResource) {
 			config::defaults({
 				relationships:         {},
@@ -347,7 +351,9 @@ export default class Module {
 	register(cls) : void {
 		/* register the class in this module */
 		this.classes.ensureVertex(cls.name, cls);
-		this.classes[cls.name] = cls;
+		if (!cls.notExported) {
+			this.classes[cls.name] = cls;
+		}
 		
 		/* add subclassing edges and cross-register sub/superclasses */
 		for (let extendee of (cls.extends) || []) {

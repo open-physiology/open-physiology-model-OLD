@@ -19,7 +19,7 @@ describe("'lyphs' Module", () => {
 			'Coalescence'
 		);
 		expect(module.classes).to.contain.relationships(
-			'HasMaterial',
+			'ContainsMaterial',
 			'HasPart',
 			'HasLayer',
 			'HasPatch',
@@ -69,7 +69,7 @@ describe("'lyphs' Module", () => {
 		const {Lyph} = module.classes;
 		
 		expect(Lyph.properties           ).to.have.property('href');
-		expect(Lyph.relationships        ).to.have.property('-->HasMaterial');
+		expect(Lyph.relationships        ).to.have.property('-->ContainsMaterial');
 		expect(Lyph.relationshipShortcuts).to.have.property('materials');
 		
 	})

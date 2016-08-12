@@ -55,7 +55,9 @@ export default class TypedModule extends Module {
 				extends:  superClasses::map(c=>c.Type),
 				extendedBy: subClasses::map(c=>c.Type),
 				
-				singular: `${conf.singular} type`
+				singular: `${conf.singular} type`,
+				
+				notExported: true
 				
 			});
 			
@@ -68,6 +70,15 @@ export default class TypedModule extends Module {
 				
 				1: [NewTemplateClass, '0..*', { anchors: true, key: 'types' }],
 				2: [NewTypeClass,     '0..*'                                 ]
+				
+			});
+			
+			this.RELATIONSHIP({
+				
+				name: 'DefinesType',
+				
+				1: [NewTemplateClass, '0..1', { anchors: true                    }],
+				2: [NewTypeClass,     '1..1', { anchors: true, key: 'definition' }]
 				
 			});
 			

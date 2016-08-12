@@ -3,6 +3,7 @@ import defaults from 'lodash-bound/defaults';
 import size     from 'lodash-bound/size';
 import keys     from 'lodash-bound/keys';
 import values   from 'lodash-bound/values';
+import isFunction   from 'lodash-bound/isFunction';
 
 import _uniqueId from 'lodash/uniqueId';
 
@@ -155,6 +156,12 @@ export default class Entity extends ValueTracker {
 		}
 
 		run() {
+			if (this.context.behavior.new::isFunction()) {
+				return this.context.behavior.new(
+					this.initialValues,
+					this.options
+				);
+			}
 			assert(!this.context.abstract, humanMsg`
 				Cannot instantiate the abstract
 				class ${this.context.name}.
