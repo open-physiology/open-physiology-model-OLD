@@ -18,6 +18,7 @@ import {
 	$$initSet,
 	$$entriesIn,
 } from './symbols';
+import {callOrReturn} from "../util/misc";
 
 
 Field[$$registerFieldClass](class PropertyField extends Field {
@@ -78,9 +79,9 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[!initialValue::isUndefined(), initialValue],
-			['default' in desc,            desc.default],
-			['value'   in desc,            desc.value  ],
+			[!initialValue::isUndefined(), initialValue                ],
+			['default' in desc,            desc.default::callOrReturn()],
+			['value'   in desc,            desc.value                  ],
 			[!desc.required]
 		);
 	}

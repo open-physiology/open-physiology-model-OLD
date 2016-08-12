@@ -103,8 +103,6 @@ describe("'lyphs' Module", () => {
 		
 		expect(cylindricalLyph.innerBorder.nature).to.eql(['open']);
 		
-		cylindricalLyph.outerBorder.nature = ['closed']; // setting outerBorder nature
-		
 		expect(cylindricalLyph.innerBorder.nature).to.eql(['open']);
 		
 	});

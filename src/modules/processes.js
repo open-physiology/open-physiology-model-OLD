@@ -32,14 +32,13 @@ export default TypedModule.create('processes', [
 					{ ...enumArraySchema('advection', 'diffusion') },
 					{ ...enumSchema     ('advection', 'diffusion') }
 				),
-				default: ['advection', 'diffusion'],
+				default: () => ['advection', 'diffusion'],
 				required: true,
 				isRefinement(a, b) {
 					a = new Set(a ? wrapInArray(a) : []);
 					b = new Set(b ? wrapInArray(b) : []);
 					return !(b.has('advection') && !a.has('advection')) &&
 					       !(b.has('diffusion') && !a.has('diffusion'));
-					
 				}
 			},
 			'species': {
