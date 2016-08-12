@@ -67,10 +67,19 @@ export const rangeDefault = {
 	'max':  Infinity
 };
 
+export const normalDistributionSchema = {
+	type: 'object',
+	properties: {
+		'distribution': { value: 'normal' },
+		'mean': { type: 'number', required: true },
+		'std':  { type: 'number', required: true }
+	}
+};
+
 export const boundedNormalDistributionSchema = {
 	type: 'object',
 	properties: {
-		// 'probabilityDistribution': {},
+		'distribution': { value: 'bounded-normal' },
 		'mean': { type: 'number', required: true },
 		'std':  { type: 'number', required: true },
 		'min':  { type: 'number', required: true },
@@ -81,6 +90,7 @@ export const boundedNormalDistributionSchema = {
 export const uniformDistributionSchema = {
 	type: 'object',
 	properties: {
+		'distribution': { value: 'uniform' },
 		'min':  { type: 'number', required: true },
 		'max':  { type: 'number', required: true }
 	}
@@ -88,8 +98,9 @@ export const uniformDistributionSchema = {
 
 export const distributionSchema = {
 	oneOf: [
-		boundedNormalDistributionSchema,
-		uniformDistributionSchema
+		{ ...normalDistributionSchema        },
+		{ ...boundedNormalDistributionSchema },
+		{ ...uniformDistributionSchema       }
 	]
 };
 

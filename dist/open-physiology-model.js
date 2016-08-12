@@ -4209,10 +4209,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		'max': Infinity
 	};
 	
+	var normalDistributionSchema = exports.normalDistributionSchema = {
+		type: 'object',
+		properties: {
+			'distribution': { value: 'normal' },
+			'mean': { type: 'number', required: true },
+			'std': { type: 'number', required: true }
+		}
+	};
+	
 	var boundedNormalDistributionSchema = exports.boundedNormalDistributionSchema = {
 		type: 'object',
 		properties: {
-			// 'probabilityDistribution': {},
+			'distribution': { value: 'bounded-normal' },
 			'mean': { type: 'number', required: true },
 			'std': { type: 'number', required: true },
 			'min': { type: 'number', required: true },
@@ -4223,13 +4232,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var uniformDistributionSchema = exports.uniformDistributionSchema = {
 		type: 'object',
 		properties: {
+			'distribution': { value: 'uniform' },
 			'min': { type: 'number', required: true },
 			'max': { type: 'number', required: true }
 		}
 	};
 	
 	var distributionSchema = exports.distributionSchema = {
-		oneOf: [boundedNormalDistributionSchema, uniformDistributionSchema]
+		oneOf: [_extends({}, normalDistributionSchema), _extends({}, boundedNormalDistributionSchema), _extends({}, uniformDistributionSchema)]
 	};
 	
 	var distributionSchemaOr = exports.distributionSchemaOr = function distributionSchemaOr(otherSchema) {
