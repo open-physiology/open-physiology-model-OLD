@@ -29,8 +29,8 @@ export default Module.create('typed', [
 					['<--DefinesType']: rel
 				} = vals;
 				assert((
-					sc  instanceof Template ||
-					rel instanceof DefinesType
+					Template.hasInstance(sc)  ||
+					DefinesType.hasInstance(rel)
 				), humanMsg`
 					A type must be created with its definition
 					immediately.
