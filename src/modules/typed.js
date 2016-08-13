@@ -76,6 +76,12 @@ export default Module.create('typed', [
 					{ type: 'integer', minimum: 1 }
 				],
 				default: 1
+			},
+			'species': {
+				type: 'string',
+				isRefinement(a, b) {
+					return !a || a === b;
+				}
 			}
 		}
 		

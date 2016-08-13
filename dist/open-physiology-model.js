@@ -3042,6 +3042,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				'cardinalityBase': {
 					oneOf: [_extends({}, _schemas.distributionSchema), { type: 'integer', minimum: 1 }],
 					default: 1
+				},
+				'species': {
+					type: 'string',
+					isRefinement: function isRefinement(a, b) {
+						return !a || a === b;
+					}
 				}
 			}
 	
@@ -5834,12 +5840,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "lyph",
 	
 			properties: {
-				'species': {
-					type: 'string',
-					isRefinement: function isRefinement(a, b) {
-						return !a || a === b;
-					}
-				},
 				'thickness': _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.rangeSchema), _extends({}, _schemas.distributionSchema)), {
 					default: _schemas.rangeDefault,
 					isRefinement: function isRefinement(a, b) {
@@ -8187,13 +8187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						b = new Set(b ? (0, _misc.wrapInArray)(b) : []);
 						return !(b.has('advection') && !a.has('advection')) && !(b.has('diffusion') && !a.has('diffusion'));
 					}
-				}),
-				'species': {
-					type: 'string',
-					isRefinement: function isRefinement(a, b) {
-						return !a || a === b;
-					}
-				}
+				})
 			}
 	
 		}); /////////////////////////////////////////////////////////////////////////

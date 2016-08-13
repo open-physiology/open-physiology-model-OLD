@@ -40,12 +40,6 @@ export default TypedModule.create('processes', [
 					return !(b.has('advection') && !a.has('advection')) &&
 					       !(b.has('diffusion') && !a.has('diffusion'));
 				}
-			},
-			'species': {
-				type: 'string',
-				isRefinement(a, b) {
-					return !a || a === b;
-				}
 			}
 		}
 		

@@ -60,12 +60,6 @@ export default TypedModule.create('lyphs', [
 		singular: "lyph",
 		
 		properties: {
-			'species': {
-				type: 'string',
-				isRefinement(a, b) {
-					return !a || a === b;
-				}
-			},
 			'thickness': {
 				...oneOf(
 					{ type: 'number'        },
