@@ -2,7 +2,8 @@ var webpack = require('webpack');
 module.exports = {
 	devtool: 'source-map',
 	entry: {
-		'open-physiology-model': [ 'babel-polyfill', './src/index.js' ]
+		'open-physiology-model': [ 'babel-polyfill', './src/index.js' ],
+		'open-physiology-model-minimal': [ './src/index.js' ]
 	},
 	output: {
 		path: './dist',
