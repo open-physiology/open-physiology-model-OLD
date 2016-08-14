@@ -14381,7 +14381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					var min = _$$desc$cardinality.min;
 					var max = _$$desc$cardinality.max;
 	
-					(0, _misc.constraint)((_context6 = val.size, _inRange2.default).call(_context6, min, max + 1));
+					(0, _misc.constraint)((_context6 = val.size, _inRange2.default).call(_context6, min, max + 1), '\n\t\t\t\tThe number of values in field ' + this[_symbols.$$owner].constructor.name + '#' + this[_symbols.$$key] + '\n\t\t\t\tis not within the expected range [' + min + ', ' + max + '].\n\t\t\t');
 				}
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -14662,9 +14662,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t'], ['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t']),
-	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tThe number of provided ', ' values is\n\t\t\t\tnot within the expected range.\n\t\t\t'], ['\n\t\t\t\tThe number of provided ', ' values is\n\t\t\t\tnot within the expected range.\n\t\t\t']),
-	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t']);
+	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tYou\'re trying to set a readonly field ', '#', '.\n\t\t'], ['\n\t\t\tYou\'re trying to set a readonly field ', '#', '.\n\t\t']),
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t'], ['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t']),
+	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tThe number of values in field ', '#', '\n\t\t\t\tis not within the expected range [', ', ', '].\n\t\t\t'], ['\n\t\t\t\tThe number of values in field ', '#', '\n\t\t\t\tis not within the expected range [', ', ', '].\n\t\t\t']),
+	    _templateObject4 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t']);
 	
 	var _filter = __webpack_require__(29);
 	
@@ -14894,7 +14895,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _ref8$updatePristine = _ref8.updatePristine;
 				var updatePristine = _ref8$updatePristine === undefined ? false : _ref8$updatePristine;
 	
-				(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly);
+				(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly, (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (!ignoreValidation) {
 					this.validate(newValue, ['set']);
 				}
@@ -14908,7 +14909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function validate(val) {
 				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 	
-				(0, _misc.constraint)(val[Symbol.iterator], (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+				(0, _misc.constraint)(val[Symbol.iterator], (0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (stages.includes('commit')) {
 					var _context5;
 	
@@ -14916,7 +14917,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					var min = _$$desc$cardinality.min;
 					var max = _$$desc$cardinality.max;
 	
-					(0, _misc.constraint)((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, min, max + 1), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$key]));
+					(0, _misc.constraint)((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, min, max + 1), (0, _misc.humanMsg)(_templateObject3, this[_symbols.$$owner].constructor.name, this[_symbols.$$key], min, max));
 				}
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -14925,7 +14926,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function validateElement(element) {
 				/* the value must be of the proper domain */
 				if (!this[_symbols.$$desc].codomain.resourceClass.hasInstance(element)) {
-					throw new Error((0, _misc.humanMsg)(_templateObject3, element, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+					throw new Error((0, _misc.humanMsg)(_templateObject4, element, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				}
 			}
 		}, {

@@ -132,7 +132,9 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 	}
 	
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
-		constraint(ignoreReadonly || !this[$$desc].readonly);
+		constraint(ignoreReadonly || !this[$$desc].readonly, humanMsg`
+			You're trying to set a readonly field ${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
 		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
 		if (updatePristine)    { copySetContent(this[$$pristine], newValue) }
 		copySetContent(this[$$value], newValue);
@@ -146,8 +148,8 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		if (stages.includes('commit')) {
 			const {min, max} = this[$$desc].cardinality;
 			constraint(val::size()::inRange(min, max+1), humanMsg`
-				The number of provided ${this[$$key]} values is
-				not within the expected range.
+				The number of values in field ${this[$$owner].constructor.name}#${this[$$key]}
+				is not within the expected range [${min}, ${max}].
 			`);
 		}
 		val.forEach(::this.validateElement);

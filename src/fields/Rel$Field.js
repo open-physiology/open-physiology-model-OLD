@@ -147,7 +147,10 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		`);
 		if (stages.includes('commit')) {
 			const { min, max } = this[$$desc].cardinality;
-			constraint(val.size::inRange(min, max + 1));
+			constraint(val.size::inRange(min, max + 1), `
+				The number of values in field ${this[$$owner].constructor.name}#${this[$$key]}
+				is not within the expected range [${min}, ${max}].
+			`);
 		}
 		val.forEach(::this.validateElement);
 	}
