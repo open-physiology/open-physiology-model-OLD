@@ -106,6 +106,6 @@ export function callOrReturn() {
 
 export function constraint(constraint, message) {
 	if (!constraint) {
-		throw new AssertionError(message);
+		throw new Error('Constraint Failure: ' + (message || '(no message)'));
 	}
 }
