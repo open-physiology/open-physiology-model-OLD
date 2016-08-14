@@ -3806,6 +3806,19 @@ return /******/ (function(modules) { // webpackBootstrap
 			1: [Lyph, '0..*', { anchors: true, key: 'segments' }],
 			2: [Lyph, '0..1'],
 	
+			properties: {
+				'relativePosition': {
+					type: 'number',
+					required: true,
+					default: function _default() {
+						var _context4;
+	
+						return (_context4 = (_context4 = [].concat(_toConsumableArray(this[1]['-->HasSegment'])), _map2.default).call(_context4, 'relativePosition').concat([0]), _max2.default).call(_context4) + 1;
+					}
+				}
+				// TODO: CONSTRAINT - two segments of the same lyph cannot have the same relativePosition
+			},
+	
 			noCycles: true
 	
 			// Note that two segments can only be formally adjacent if they share

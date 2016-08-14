@@ -118,6 +118,27 @@ describe("'lyphs' Module", () => {
 		
 	});
 	
+	it("exports lyph classes that can have segments", () => {
+		
+		const {Lyph} = module.classes;
+		
+		let lyph = Lyph.new();
+		
+		let layer1 = Lyph.new();
+		let layer2 = Lyph.new();
+		let layer3 = Lyph.new();
+		
+		lyph.segments.add(layer1);
+		lyph.segments.add(layer2);
+		lyph.segments.add(layer3);
+		
+		expect(new Set([...lyph['-->HasSegment']]::map('relativePosition')).size).to.equal(3);
+		expect([...lyph['-->HasSegment']]::map('relativePosition')[0]).to.be.a('number');
+		expect([...lyph['-->HasSegment']]::map('relativePosition')[1]).to.be.a('number');
+		expect([...lyph['-->HasSegment']]::map('relativePosition')[2]).to.be.a('number');
+		
+	});
+	
 	it("(regression test: auto-synchronized border-natures?)", async () => {
 		
 		const {Lyph, Border} = module.classes;

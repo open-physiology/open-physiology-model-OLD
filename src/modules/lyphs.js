@@ -205,6 +205,15 @@ export default TypedModule.create('lyphs', [
 
 		1: [Lyph, '0..*', { anchors: true, key: 'segments' }],
 		2: [Lyph, '0..1'                                    ],
+		
+		properties: {
+			'relativePosition': {
+				type: 'number',
+				required: true,
+				default() { return [...this[1]['-->HasSegment']]::map('relativePosition').concat([0])::max() + 1 }
+			}
+			// TODO: CONSTRAINT - two segments of the same lyph cannot have the same relativePosition
+		},
 
 		noCycles: true
 		
