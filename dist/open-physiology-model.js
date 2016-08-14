@@ -3963,8 +3963,6 @@ return /******/ (function(modules) { // webpackBootstrap
 						return;
 					}
 	
-					console.log(options.createRadialBorders);
-	
 					vals = _extends({}, vals);
 					(_context = vals, _defaults2.default).call(_context, {
 						longitudinalBorders: [],

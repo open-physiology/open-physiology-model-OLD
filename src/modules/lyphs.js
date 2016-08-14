@@ -98,8 +98,6 @@ export default TypedModule.create('lyphs', [
 			new(vals = {}, options = {}) {
 				if (options.customLyphBehaviorDone) { return }
 				
-				console.log(options.createRadialBorders);
-				
 				vals = { ...vals };
 				vals::defaults({
 					longitudinalBorders: [],
