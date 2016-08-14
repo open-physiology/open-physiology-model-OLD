@@ -207,6 +207,10 @@ export default class Module {
 		      OPTIONS     = 2;
 		
 		/* normalizing all domainPairs */
+		cls.keyInResource = {
+			1: `-->${cls.name}`,
+			2: `<--${cls.name}`
+		};
 		cls.domainPairs = cls.domainPairs.map((givenDomainPair) => {
 			let pair = { [1]: {}, [2]: {} };
 			for (let [  [domainKey, domain ],  [codomainKey, codomain]  ] of
@@ -220,12 +224,14 @@ export default class Module {
 					keyInRelationship: domainKey,
 					
 					resourceClass    : resourceClass,
-					keyInResource    : `${domainKey == 1 ? '-->' : '<--'}${cls.name}`,
+					keyInResource    : cls.keyInResource[domainKey],
 					
 					cardinality      : parseCardinality(cardinality),
 					options          : options,
 					
-					shortcutKey      : options.key
+					shortcutKey      : options.key,
+					
+					extends          : new Set()
 				});
 				domain::defineProperty(Symbol.toStringTag, {
 					get() {
@@ -347,7 +353,7 @@ export default class Module {
 			Field.augmentClass(resourceClass, shortcutKey);
 		}
 	}
-	 
+	
 	register(cls) {
 		/* register the class in this module */
 		this.classes.ensureVertex(cls.name, cls);
@@ -442,10 +448,6 @@ export default class Module {
 		});
 		
 		mergeFieldKind(cls, cls, 'relationships', (superDesc, subDesc) => {
-			// if (!superDesc.resourceClass.hasSubclass(subDesc.resourceClass)) { // TODO: remove
-			// 	console.log(superDesc.resourceClass::keys());
-			// 	console.log(superDesc.resourceClass.module === subDesc.resourceClass.module);
-			// }
 			assert(superDesc.resourceClass.hasSubclass(subDesc.resourceClass));
 			return subDesc;
 		});

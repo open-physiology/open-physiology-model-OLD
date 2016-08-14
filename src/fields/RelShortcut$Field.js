@@ -108,11 +108,11 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 			::waitUntilConstructed()
 			.subscribe((newRes) => {
 				let rel = [...correspondingRelField]
-					.find(rel => rel.fields[desc.keyInRelationship]      [$$value] === owner &&
+					.find(rel => rel.fields[desc.keyInRelationship]         [$$value] === owner &&
 					             rel.fields[desc.codomain.keyInRelationship][$$value] === newRes);
 				if (!rel) {
 					correspondingRelField.add(desc.relationshipClass.new({
-						[desc.keyInRelationship]          :       owner,
+						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: newRes
 					}));
 				}

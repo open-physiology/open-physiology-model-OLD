@@ -85,6 +85,10 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 			::waitUntilConstructed()
 			.subscribe((addedRel) => {
 				addedRel.fields[desc.keyInRelationship].set(this[$$owner]);
+				for (let superCls of desc.relationshipClass.extends) {
+					let superField = owner.fields[superCls.keyInResource[desc.keyInRelationship]];
+					superField[$$value].add(addedRel);
+				}
 			});
 		this[$$value].e('delete')
 			::waitUntilConstructed()

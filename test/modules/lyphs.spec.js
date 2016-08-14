@@ -67,18 +67,24 @@ describe("'lyphs' Module", () => {
 		expect([...lyph.longitudinalBorders][0]).to.be.an.instanceOf(Border);
 		expect([...lyph.longitudinalBorders][1]).to.be.an.instanceOf(Border);
 		
+		expect([...lyph['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
+		expect([...lyph['-->HasBorder']])            .to.have.a.lengthOf(3);
+		
 		expect([...lyph.radialBorders]).to.have.a.lengthOf(1);
 		expect([...lyph.radialBorders][0]).to.be.an.instanceOf(Border);
 		
 		
 		let lyph2 = Lyph.new({}, {
 			createRadialBorders: 2,
-			createAxis: 1
+			createAxis: true
 		});
 		
 		expect([...lyph2.longitudinalBorders]).to.have.a.lengthOf(2);
 		expect([...lyph2.longitudinalBorders][0]).to.be.an.instanceOf(Border);
 		expect([...lyph2.longitudinalBorders][1]).to.be.an.instanceOf(Border);
+		
+		expect([...lyph2['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
+		expect([...lyph2['-->HasBorder']])            .to.have.a.lengthOf(4);
 		
 		expect([...lyph2.radialBorders]).to.have.a.lengthOf(2);
 		expect([...lyph2.radialBorders][0]).to.be.an.instanceOf(Border);

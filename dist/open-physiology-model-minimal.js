@@ -2948,6 +2948,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				    OPTIONS = 2;
 	
 				/* normalizing all domainPairs */
+				cls.keyInResource = {
+					1: '-->' + cls.name,
+					2: '<--' + cls.name
+				};
 				cls.domainPairs = cls.domainPairs.map(function (givenDomainPair) {
 					var _pair;
 	
@@ -2980,12 +2984,14 @@ return /******/ (function(modules) { // webpackBootstrap
 							keyInRelationship: domainKey,
 	
 							resourceClass: resourceClass,
-							keyInResource: '' + (domainKey == 1 ? '-->' : '<--') + cls.name,
+							keyInResource: cls.keyInResource[domainKey],
 	
 							cardinality: (0, _misc.parseCardinality)(cardinality),
 							options: options,
 	
-							shortcutKey: options.key
+							shortcutKey: options.key,
+	
+							extends: new Set()
 						});
 						_boundNativeMethods.defineProperty.call(domain, Symbol.toStringTag, {
 							get: function get() {
@@ -3375,10 +3381,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				mergeFieldKind(cls, cls, 'relationships', function (superDesc, subDesc) {
 					return subDesc;
-					// if (!superDesc.resourceClass.hasSubclass(subDesc.resourceClass)) { // TODO: remove
-					// 	console.log(superDesc.resourceClass::keys());
-					// 	console.log(superDesc.resourceClass.module === subDesc.resourceClass.module);
-					// }
 				});
 	
 				mergeFieldKind(cls, cls, 'relationshipShortcuts', function (superDesc, subDesc) {
@@ -14252,6 +14254,31 @@ return /******/ (function(modules) { // webpackBootstrap
 			/* update relationships that are added or deleted here */
 			(_context3 = _this[_symbols.$$value].e('add'), waitUntilConstructed).call(_context3).subscribe(function (addedRel) {
 				addedRel.fields[desc.keyInRelationship].set(_this[_symbols.$$owner]);
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+	
+				try {
+					for (var _iterator = desc.relationshipClass.extends[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var superCls = _step.value;
+	
+						var superField = owner.fields[superCls.keyInResource[desc.keyInRelationship]];
+						superField[_symbols.$$value].add(addedRel);
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
 			});
 			(_context3 = _this[_symbols.$$value].e('delete'), waitUntilConstructed).call(_context3).subscribe(function (deletedRel) {
 				deletedRel.delete();
@@ -14270,13 +14297,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* handle initial values */
 			if (initialValue && initialValue[Symbol.iterator]) {
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
 	
 				try {
-					for (var _iterator = initialValue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var rel = _step.value;
+					for (var _iterator2 = initialValue[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var rel = _step2.value;
 	
 						if (!rel.fields[desc.keyInRelationship].get()) {
 							rel.fields[desc.keyInRelationship].set(_this);
@@ -14287,16 +14314,16 @@ return /******/ (function(modules) { // webpackBootstrap
 						_this[_symbols.$$value].add(rel);
 					}
 				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
 						}
 					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
+						if (_didIteratorError2) {
+							throw _iteratorError2;
 						}
 					}
 				}
