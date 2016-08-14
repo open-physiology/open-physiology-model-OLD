@@ -3708,14 +3708,14 @@ return /******/ (function(modules) { // webpackBootstrap
 						radialBorders: [],
 						axis: null
 					});
-					if (vals.axis) {
-						vals.longitudinalBorders = (0, _union2.default)(vals.longitudinalBorders, [vals.axis]);
-					}
 					if (options.createAxis) {
 						var _context2;
 	
 						var axis = Border.new();
 						(_context2 = vals, _assign2.default).call(_context2, { axis: axis });
+					}
+					if (vals.axis) {
+						vals.longitudinalBorders = (0, _union2.default)([].concat(_toConsumableArray(vals.longitudinalBorders)), [vals.axis]);
 					}
 					if (options.createRadialBorders) {
 						if (options.createRadialBorders === true) {
@@ -14308,7 +14308,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* fill up missing required values with 'auto'matic ones */
 			if (desc.options.auto) {
-				for (var i = (_context5 = _this[_symbols.$$value], _size2.default).call(_context5); i < desc.cardinality.min; ++i) {
+				var shortcutInitial = _get2.default.call(related, [desc.shortcutKey, 'initialValue']);
+				for (var i = (_context5 = _this[_symbols.$$value], _size2.default).call(_context5) + _size2.default.call(shortcutInitial); i < desc.cardinality.min; ++i) {
 					var _context5, _desc$relationshipCla;
 	
 					var _rel = desc.relationshipClass.new((_desc$relationshipCla = {}, _defineProperty(_desc$relationshipCla, desc.keyInRelationship, _this[_symbols.$$owner]), _defineProperty(_desc$relationshipCla, desc.codomain.keyInRelationship, desc.codomain.resourceClass.newOrSingleton()), _desc$relationshipCla));

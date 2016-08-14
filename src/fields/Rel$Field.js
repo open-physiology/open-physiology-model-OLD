@@ -117,7 +117,8 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		
 		/* fill up missing required values with 'auto'matic ones */
 		if (desc.options.auto) {
-			for (let i = this[$$value]::size(); i < desc.cardinality.min; ++i) {
+			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
+			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
 				const rel = desc.relationshipClass.new({
 					[desc.keyInRelationship]         : this[$$owner],
 					[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.newOrSingleton()

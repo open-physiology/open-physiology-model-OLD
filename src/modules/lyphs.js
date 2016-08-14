@@ -105,18 +105,18 @@ export default TypedModule.create('lyphs', [
 				vals = { ...vals };
 				vals::defaults({
 					longitudinalBorders: [],
-					radialBorders:  [],
-					axis:        null
+					radialBorders:       [],
+					axis:              null
 				});
-				if (vals.axis) {
-					vals.longitudinalBorders = union(
-						vals.longitudinalBorders,
-						[vals.axis]
-					);
-				}
 				if (options.createAxis) {
 					const axis = Border.new();
 					vals::assign({ axis });
+				}
+				if (vals.axis) {
+					vals.longitudinalBorders = union(
+						[...vals.longitudinalBorders],
+						[vals.axis]
+					);
 				}
 				if (options.createRadialBorders) {
 					if (options.createRadialBorders === true) {
