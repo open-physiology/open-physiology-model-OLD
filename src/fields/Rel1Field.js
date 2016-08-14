@@ -29,6 +29,7 @@ import {
 	$$entriesIn,
 } from './symbols';
 import {callOrReturn} from "../util/misc";
+import {constraint} from "../util/misc";
 
 
 Field[$$registerFieldClass](class Rel1Field extends RelField {
@@ -76,7 +77,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		
 		/* you cannot give a value as an actual relation and as a shortcut at the same time */
 		let givenShortcutInitialValue = related::get([desc.shortcutKey, 'initialValue']);
-		assert(!initialValue || !givenShortcutInitialValue, humanMsg`
+		constraint(!initialValue || !givenShortcutInitialValue, humanMsg`
 			You cannot set the fields '${key}' and '${desc.shortcutKey}'
 			at the same time for a ${this.constructor.singular}.
 		`);
@@ -122,18 +123,16 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
-			assert(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`
+			constraint(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`
 				No value given for required field
 				${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
 		
 		/* the value must be of the proper domain */
-		if (!(notGiven || this[$$desc].relationshipClass.hasInstance(val))) {
-			throw new Error(humanMsg`
-				Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
-			`);
-		}
+		constraint(notGiven || this[$$desc].relationshipClass.hasInstance(val), humanMsg`
+			Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
 		
 		// TODO: these should not be assertions, but proper constraint-checks,
 		//     : recording errors, possibly allowing them temporarily, etc.

@@ -23,6 +23,7 @@ import {
 	$$initSet,
 	$$entriesIn,
 } from './symbols';
+import {constraint} from "../util/misc";
 
 
 Field[$$registerFieldClass](class SideField extends Field {
@@ -104,18 +105,16 @@ Field[$$registerFieldClass](class SideField extends Field {
 		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
-			assert(!notGiven, humanMsg`
+			constraint(!notGiven, humanMsg`
 			    No resource specified for side ${this[$$key]} of
 				this '${this[$$owner].constructor.name}'.
 			`);
 		}
 		
 		/* the value must be of the proper domain */
-		if (!(notGiven || this[$$desc].resourceClass.hasInstance(val))) {
-			throw new Error(humanMsg`
-				Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
-			`);
-		}
+		constraint(notGiven || this[$$desc].resourceClass.hasInstance(val), humanMsg`
+			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
 		
 		// TODO: these should not be assertions, but proper constraint-checks,
 		//     : recording errors, possibly allowing them temporarily, etc.

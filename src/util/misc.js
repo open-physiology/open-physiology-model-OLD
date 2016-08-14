@@ -103,3 +103,9 @@ export function definePropertiesByValue(obj, options = {}) {
 export function callOrReturn() {
 	return this::isFunction() ? this() : this;
 }
+
+export function constraint(constraint, message) {
+	if (!constraint) {
+		throw new AssertionError(message);
+	}
+}

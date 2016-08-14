@@ -25,6 +25,7 @@ import {
 	$$entriesIn,
 	$$value,
 } from './symbols';
+import {constraint} from "../util/misc";
 
 Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 	
@@ -115,17 +116,15 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		
 		if (stages.includes('commit')) {
 			/* if there's a minimum cardinality, a value must have been given */
-			assert(val::isObject() || this[$$desc].cardinality.min === 0, humanMsg`
+			constraint(val::isObject() || this[$$desc].cardinality.min === 0, humanMsg`
 				No value given for required field ${this[$$owner].constructor.name}#${this[$$key]}.
 			`);
 		}
 		
 		/* a given value must always be of the proper domain */
-		if (val::isObject() && !this[$$desc].codomain.resourceClass.hasInstance(val)) {
-			throw new Error(humanMsg`
-				Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
-			`);
-		}
+		constraint(!val::isObject() || this[$$desc].codomain.resourceClass.hasInstance(val), humanMsg`
+			Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
+		`);
 		
 		// TODO: these should not be assertions, but proper constraint-checks,
 		//     : recording errors, possibly allowing them temporarily, etc.

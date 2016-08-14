@@ -19,6 +19,7 @@ import {skip}                 from 'rxjs/operator/skip';
 import {map}                  from 'rxjs/operator/map';
 import {withLatestFrom}       from 'rxjs/operator/withLatestFrom';
 import 'rxjs/add/operator/do';
+import {constraint} from "./misc";
 
 const $$events             = Symbol('$$events');
 const $$properties         = Symbol('$$properties');
@@ -76,9 +77,9 @@ export default class ValueTracker {
 		this[$$initialize]();
 
 		/* is the event name already taken? */
-		assert(!this[$$events][name],
+		constraint(!this[$$events][name],
 			`There is already an event '${name}' on this object.`);
-		assert(!this[$$properties][name],
+		constraint(!this[$$properties][name],
 			`There is already a property '${name}' on this object.`);
 		
 		this[$$events][name] = new Subject()
@@ -110,9 +111,9 @@ export default class ValueTracker {
 		this[$$initialize]();
 
 		/* is the property name already taken? */
-		assert(!this[$$events][name],
+		constraint(!this[$$events][name],
 			`There is already an event '${name}' on this object.`);
-		assert(!this[$$properties][name],
+		constraint(!this[$$properties][name],
 			`There is already a property '${name}' on this object.`);
 
 		/* if isValid is an array, check for inclusion */
@@ -170,7 +171,7 @@ export default class ValueTracker {
 				::withLatestFrom(...optionalPassiveDeps.map(::this.p),
 					(active, ...passive) => optionalTransformer(...active, ...passive));
 		} else if (nameOrDeps::isString()) {
-			assert(this[$$properties][nameOrDeps], `No property '${nameOrDeps}' exists.`);
+			constraint(this[$$properties][nameOrDeps], `No property '${nameOrDeps}' exists.`);
 			return this[$$properties][nameOrDeps];
 		}
 	}
@@ -204,7 +205,8 @@ export const property = (options = {}) => (target, key) => {
 
 export const event = (options = {}) => (target, key) => {
 	let match = key.match(/^(\w+)Event$/);
-	assert(match);
+	constraint(match,
+		`@event() decorators require a name that ends in 'Event'.`);
 	let name = match[1];
 	target::set(['constructor', $$events, name], options);
 	return { get() { return this.e(name) } };

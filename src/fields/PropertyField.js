@@ -18,6 +18,7 @@ import {
 	$$initSet,
 	$$entriesIn,
 } from './symbols';
+import {constraint} from "../util/misc";
 
 
 Field[$$registerFieldClass](class PropertyField extends Field {
@@ -70,7 +71,7 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		const { owner, key, desc, initialValue } = options;
 		
 		/* sanity checks */
-		assert(desc.value::isUndefined() || initialValue::isUndefined(), humanMsg`
+		constraint(desc.value::isUndefined() || initialValue::isUndefined(), humanMsg`
 			You tried to manually assign a value ${JSON.stringify(initialValue)}
 			to ${owner.constructor.name}#${key},
 			but it already has a fixed value of ${JSON.stringify(desc.value)}.
@@ -88,7 +89,7 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 	validate(val, stages = []) {
 		
 		if (stages.includes('commit')) {
-			assert(!this[$$desc].required || !val::isUndefined(), humanMsg`
+			constraint(!this[$$desc].required || !val::isUndefined(), humanMsg`
 			    No value given for required field
 			    '${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);

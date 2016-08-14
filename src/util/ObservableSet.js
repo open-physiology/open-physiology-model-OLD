@@ -4,6 +4,7 @@ import {merge}           from "rxjs/operator/merge";
 import {map}             from "rxjs/operator/map";
 import assert    from 'power-assert';
 import {humanMsg} from "./misc";
+import {constraint} from "./misc";
 
 const $$set               = Symbol('$$set');
 const $$addSubject        = Symbol('$$addSubject');
@@ -56,7 +57,7 @@ export default class ObservableSet extends Set {
 		switch (op) {
 			case 'add':    { return this[$$addSubject]    }
 			case 'delete': { return this[$$deleteSubject] }
-			default: assert(false, humanMsg`
+			default: constraint(false, humanMsg`
 				The ${op} event does not exist.
 			`);
 		}
@@ -65,7 +66,7 @@ export default class ObservableSet extends Set {
 	p(name) {
 		switch (name) {
 			case 'value': { return this[$$valueObservable] }
-			default: assert(false, humanMsg`
+			default: constraint(false, humanMsg`
 				The ${name} property does not exist.
 			`);
 		}

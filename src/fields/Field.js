@@ -27,6 +27,7 @@ import {
 	$$entriesIn,
 	$$initialized
 } from './symbols';
+import {constraint} from "../util/misc";
 
 export class Field extends ValueTracker {
 	
@@ -146,7 +147,7 @@ export class Field extends ValueTracker {
 	
 	set(val, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
 		if (!this.constructor.isEqual(this[$$value], val)) {
-			assert(ignoreReadonly || !this[$$desc].readonly, humanMsg`
+			constraint(ignoreReadonly || !this[$$desc].readonly, humanMsg`
 				Tried to set the readonly field
 				'${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);

@@ -28,6 +28,7 @@ import {
 	$$pristine,
 	$$entriesIn,
 } from './symbols';
+import {constraint} from "../util/misc";
 
 
 Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
@@ -131,20 +132,23 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 	}
 	
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
-		assert(ignoreReadonly || !this[$$desc].readonly);
+		constraint(ignoreReadonly || !this[$$desc].readonly);
 		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
 		if (updatePristine)    { copySetContent(this[$$pristine], newValue) }
 		copySetContent(this[$$value], newValue);
 	}
 	
 	validate(val, stages = []) {
-		assert(val[Symbol.iterator], humanMsg`
+		constraint(val[Symbol.iterator], humanMsg`
 			The value ${val} given for ${this[$$owner].constructor.name}#${this[$$key]}
 			is not an iterable collection (like array or set).
 		`);
 		if (stages.includes('commit')) {
 			const {min, max} = this[$$desc].cardinality;
-			assert(val::size()::inRange(min, max+1));
+			constraint(val::size()::inRange(min, max+1), humanMsg`
+				The number of provided ${this[$$key]} values is
+				not within the expected range.
+			`);
 		}
 		val.forEach(::this.validateElement);
 	}

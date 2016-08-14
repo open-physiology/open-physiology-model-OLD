@@ -24,6 +24,7 @@ import                            'rxjs/add/operator/do';
 import {defineProperties, defineProperty, assign} from 'bound-native-methods';
 
 import babelHelpers from './util/babel-helpers';
+import {constraint} from "./util/misc";
 
 const $$committedEntitiesByHref  = Symbol('$$committedEntitiesByHref');
 const $$committedEntities        = Symbol('$$committedEntities'      );
@@ -114,7 +115,7 @@ export default class Entity extends ValueTracker {
 					switch (name) {
 						case 'all':          return this[$$entitiesSubject];
 						case 'allCommitted': return this[$$committedEntitiesSubject];
-						default: assert(false, humanMsg`
+						default: constraint(false, humanMsg`
 							The ${name} property does not exist on ${this.name}.
 						`);
 					}
@@ -163,7 +164,7 @@ export default class Entity extends ValueTracker {
 				);
 				if (customResult) { return customResult }
 			}
-			assert(!this.context.abstract, humanMsg`
+			constraint(!this.context.abstract, humanMsg`
 				Cannot instantiate the abstract
 				class ${this.context.name}.
 			`);
@@ -183,15 +184,15 @@ export default class Entity extends ValueTracker {
 	};
 	
 	static new(
-		vals:    Object,
-	    options: Object
+		vals:    Object = {},
+	    options: Object = {}
 	): this {
 		return (new this.Change_new(this, vals, options)).run();
 	}
 	
 	static get(
 		href:    { href: string } | string | number,
-		options: Object // TODO: filtering, expanding, paging, ...
+		options: Object = {} // TODO: filtering, expanding, paging, ...
 	): this {
 		if (href::isObject()) { href = {href} }
 		let entity;
@@ -202,7 +203,7 @@ export default class Entity extends ValueTracker {
 			// so we can't query the server here.
 			return null;
 		}
-		assert(this.hasInstance(entity), humanMsg`
+		constraint(this.hasInstance(entity), humanMsg`
 			The entity at '${JSON.stringify(href)}'
 			is not of class '${this.name}'
 			but of class '${entity.constructor.name}'.
@@ -223,7 +224,7 @@ export default class Entity extends ValueTracker {
 	}
 	
 	static getSingleton() {
-		assert(this.singleton, humanMsg`
+		constraint(this.singleton, humanMsg`
 			The '${this.name}' class is not a singleton class.
 		`);
 		if (!this[$$singletonObject]) {
@@ -239,7 +240,7 @@ export default class Entity extends ValueTracker {
 	
 	static async load(
 		href:    {href: string} | string | number,
-		options: Object // TODO: filtering, expanding, paging, ...
+		options: Object = {} // TODO: filtering, expanding, paging, ...
 	) {
 		
 		// TODO
@@ -282,7 +283,7 @@ export default class Entity extends ValueTracker {
 		});
 		
 		/* make sure this constructor was invoked under proper conditions */
-		assert(allowInvokingConstructor, humanMsg`
+		constraint(allowInvokingConstructor, humanMsg`
 			Do not use 'new ${this.constructor.name}(...args)'.
 			Instead, use '${this.constructor.name}.new(...args)'.
 		`);

@@ -62,7 +62,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(3)
+	var global    = __webpack_require__(4)
 	  , core      = __webpack_require__(72)
 	  , hide      = __webpack_require__(37)
 	  , redefine  = __webpack_require__(42)
@@ -118,15 +118,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
-
-	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-	var global = module.exports = typeof window != 'undefined' && window.Math == Math
-	  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -135,6 +126,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	exports.sw = exports.humanMsg = exports.simpleSpaced = exports.arrayContainsValue = undefined;
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
@@ -154,6 +147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.definePropertyByValue = definePropertyByValue;
 	exports.definePropertiesByValue = definePropertiesByValue;
 	exports.callOrReturn = callOrReturn;
+	exports.constraint = constraint;
 	
 	var _isUndefined = __webpack_require__(45);
 	
@@ -191,15 +185,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isWeakSet2 = _interopRequireDefault(_isWeakSet);
 	
-	var _entries = __webpack_require__(21);
+	var _entries2 = __webpack_require__(21);
 	
-	var _entries2 = _interopRequireDefault(_entries);
+	var _entries3 = _interopRequireDefault(_entries2);
 	
 	var _boundNativeMethods = __webpack_require__(13);
 	
-	var _zip2 = __webpack_require__(515);
+	var _zip3 = __webpack_require__(515);
 	
-	var _zip3 = _interopRequireDefault(_zip2);
+	var _zip4 = _interopRequireDefault(_zip3);
 	
 	var _powerAssert = __webpack_require__(7);
 	
@@ -227,12 +221,20 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		var result = strings[0];
+		_zip2 = (0, _zip4.default)(vals, strings.slice(1));
+	
+		if (!(_zip2 && (typeof _zip2[Symbol.iterator] === 'function' || Array.isArray(_zip2)))) {
+			throw new TypeError('Expected _zip2 to be iterable, got ' + _inspect(_zip2));
+		}
+	
 		var _iteratorNormalCompletion = true;
 		var _didIteratorError = false;
 		var _iteratorError = undefined;
 	
 		try {
-			for (var _iterator = (0, _zip3.default)(vals, strings.slice(1))[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			for (var _iterator = _zip2[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var _zip2;
+	
 				var _step$value = _slicedToArray(_step.value, 2);
 	
 				var val = _step$value[0];
@@ -316,9 +318,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function stringifyCardinality(cardinality) {
-		var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+		var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
-		var abbreviate = _ref.abbreviate;
+		var abbreviate = _ref2.abbreviate;
 	
 		return cardinality.min === cardinality.max && abbreviate ? '   ' + cardinality.min : cardinality.min + '..' + (cardinality.max === Infinity ? '*' : cardinality.max);
 	}
@@ -349,10 +351,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	var sw = exports.sw = function sw(val) {
-		var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+		var _ref3 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
-		var _ref2$autoInvoke = _ref2.autoInvoke;
-		var autoInvoke = _ref2$autoInvoke === undefined ? true : _ref2$autoInvoke;
+		var _ref3$autoInvoke = _ref3.autoInvoke;
+		var autoInvoke = _ref3$autoInvoke === undefined ? true : _ref3$autoInvoke;
 		return function (map) {
 			var _context5;
 	
@@ -372,12 +374,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function definePropertiesByValue(obj) {
 		var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+		_ref = _entries3.default.call(obj);
+	
+		if (!(_ref && (typeof _ref[Symbol.iterator] === 'function' || Array.isArray(_ref)))) {
+			throw new TypeError('Expected _ref to be iterable, got ' + _inspect(_ref));
+		}
+	
 		var _iteratorNormalCompletion2 = true;
 		var _didIteratorError2 = false;
 		var _iteratorError2 = undefined;
 	
 		try {
-			for (var _iterator2 = _entries2.default.call(obj)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+			for (var _iterator2 = _ref[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+				var _ref;
+	
 				var _step2$value = _slicedToArray(_step2.value, 2);
 	
 				var key = _step2$value[0];
@@ -404,6 +414,95 @@ return /******/ (function(modules) { // webpackBootstrap
 	function callOrReturn() {
 		return _isFunction2.default.call(this) ? this() : this;
 	}
+	
+	function constraint(constraint, message) {
+		if (!constraint) {
+			throw new AssertionError(message);
+		}
+	}
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+
+			var _entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				_entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + _entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + _entries + '\n' + indent + '}';
+			}
+		}
+	}
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+	var global = module.exports = typeof window != 'undefined' && window.Math == Math
+	  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
 
 /***/ },
 /* 5 */
@@ -496,7 +595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var store      = __webpack_require__(248)('wks')
 	  , uid        = __webpack_require__(124)
-	  , Symbol     = __webpack_require__(3).Symbol
+	  , Symbol     = __webpack_require__(4).Symbol
 	  , USE_SYMBOL = typeof Symbol == 'function';
 	
 	var $exports = module.exports = function(name){
@@ -1457,28 +1556,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.RelField = exports.Field = undefined;
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _powerAssertVisitorKeys = '{"ArrayExpression":["elements"],"AssignmentExpression":["left","right"],"BinaryExpression":["left","right"],"Directive":["value"],"DirectiveLiteral":[],"BlockStatement":["directives","body"],"BreakStatement":["label"],"CallExpression":["callee","arguments"],"CatchClause":["param","body"],"ConditionalExpression":["test","consequent","alternate"],"ContinueStatement":["label"],"DebuggerStatement":[],"DoWhileStatement":["test","body"],"EmptyStatement":[],"ExpressionStatement":["expression"],"File":["program"],"ForInStatement":["left","right","body"],"ForStatement":["init","test","update","body"],"FunctionDeclaration":["id","params","body","returnType","typeParameters"],"FunctionExpression":["id","params","body","returnType","typeParameters"],"Identifier":["typeAnnotation"],"IfStatement":["test","consequent","alternate"],"LabeledStatement":["label","body"],"StringLiteral":[],"NumericLiteral":[],"NullLiteral":[],"BooleanLiteral":[],"RegExpLiteral":[],"LogicalExpression":["left","right"],"MemberExpression":["object","property"],"NewExpression":["callee","arguments"],"Program":["directives","body"],"ObjectExpression":["properties"],"ObjectMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectProperty":["key","value","decorators"],"RestElement":["argument","typeAnnotation"],"ReturnStatement":["argument"],"SequenceExpression":["expressions"],"SwitchCase":["test","consequent"],"SwitchStatement":["discriminant","cases"],"ThisExpression":[],"ThrowStatement":["argument"],"TryStatement":["block","handler","finalizer"],"UnaryExpression":["argument"],"UpdateExpression":["argument"],"VariableDeclaration":["declarations"],"VariableDeclarator":["id","init"],"WhileStatement":["test","body"],"WithStatement":["object","body"],"AssignmentPattern":["left","right"],"ArrayPattern":["elements","typeAnnotation"],"ArrowFunctionExpression":["params","body","returnType"],"ClassBody":["body"],"ClassDeclaration":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ClassExpression":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ExportAllDeclaration":["source"],"ExportDefaultDeclaration":["declaration"],"ExportNamedDeclaration":["declaration","specifiers","source"],"ExportSpecifier":["local","exported"],"ForOfStatement":["left","right","body"],"ImportDeclaration":["specifiers","source"],"ImportDefaultSpecifier":["local"],"ImportNamespaceSpecifier":["local"],"ImportSpecifier":["local","imported"],"MetaProperty":["meta","property"],"ClassMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectPattern":["properties","typeAnnotation"],"SpreadElement":["argument"],"Super":[],"TaggedTemplateExpression":["tag","quasi"],"TemplateElement":[],"TemplateLiteral":["quasis","expressions"],"YieldExpression":["argument"],"AnyTypeAnnotation":[],"ArrayTypeAnnotation":["elementType"],"BooleanTypeAnnotation":[],"BooleanLiteralTypeAnnotation":[],"NullLiteralTypeAnnotation":[],"ClassImplements":["id","typeParameters"],"ClassProperty":["key","value","typeAnnotation","decorators"],"DeclareClass":["id","typeParameters","extends","body"],"DeclareFunction":["id"],"DeclareInterface":["id","typeParameters","extends","body"],"DeclareModule":["id","body"],"DeclareTypeAlias":["id","typeParameters","right"],"DeclareVariable":["id"],"ExistentialTypeParam":[],"FunctionTypeAnnotation":["typeParameters","params","rest","returnType"],"FunctionTypeParam":["name","typeAnnotation"],"GenericTypeAnnotation":["id","typeParameters"],"InterfaceExtends":["id","typeParameters"],"InterfaceDeclaration":["id","typeParameters","extends","body"],"IntersectionTypeAnnotation":["types"],"MixedTypeAnnotation":[],"NullableTypeAnnotation":["typeAnnotation"],"NumericLiteralTypeAnnotation":[],"NumberTypeAnnotation":[],"StringLiteralTypeAnnotation":[],"StringTypeAnnotation":[],"ThisTypeAnnotation":[],"TupleTypeAnnotation":["types"],"TypeofTypeAnnotation":["argument"],"TypeAlias":["id","typeParameters","right"],"TypeAnnotation":["typeAnnotation"],"TypeCastExpression":["expression","typeAnnotation"],"TypeParameter":["bound"],"TypeParameterDeclaration":["params"],"TypeParameterInstantiation":["params"],"ObjectTypeAnnotation":["properties","indexers","callProperties"],"ObjectTypeCallProperty":["value"],"ObjectTypeIndexer":["id","key","value"],"ObjectTypeProperty":["key","value"],"QualifiedTypeIdentifier":["id","qualification"],"UnionTypeAnnotation":["types"],"VoidTypeAnnotation":[],"JSXAttribute":["name","value"],"JSXClosingElement":["name"],"JSXElement":["openingElement","children","closingElement"],"JSXEmptyExpression":[],"JSXExpressionContainer":["expression"],"JSXIdentifier":[],"JSXMemberExpression":["object","property"],"JSXNamespacedName":["namespace","name"],"JSXOpeningElement":["name","attributes"],"JSXSpreadAttribute":["argument"],"JSXText":[],"Noop":[],"ParenthesizedExpression":["expression"],"AwaitExpression":["argument"],"BindExpression":["object","callee"],"Decorator":["expression"],"DoExpression":["body"],"ExportDefaultSpecifier":["exported"],"ExportNamespaceSpecifier":["exported"],"RestProperty":["argument"],"SpreadProperty":["argument"]}',
-	    _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }(),
-	    _dec,
-	    _dec2,
-	    _dec3,
-	    _dec4,
-	    _desc,
-	    _value,
-	    _class,
-	    _descriptor,
-	    _descriptor2,
-	    _descriptor3,
-	    _descriptor4,
-	    _dec5,
-	    _desc2,
-	    _value2,
-	    _class3,
-	    _descriptor5;
+	var _dec, _dec2, _dec3, _dec4, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _dec5, _desc2, _value2, _class3, _descriptor5;
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t\tTried to set the readonly field\n\t\t\t\t\'', '#', '\'.\n\t\t\t'], ['\n\t\t\t\tTried to set the readonly field\n\t\t\t\t\'', '#', '\'.\n\t\t\t']);
 	
@@ -1516,7 +1600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ValueTracker3 = _interopRequireDefault(_ValueTracker2);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _symbols = __webpack_require__(30);
 	
@@ -1614,19 +1698,35 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 	
 				/* allow each kind of field to perform its initializations */
+				_$$fieldClasses = this[_symbols.$$fieldClasses];
+	
+				if (!(_$$fieldClasses && (typeof _$$fieldClasses[Symbol.iterator] === 'function' || Array.isArray(_$$fieldClasses)))) {
+					throw new TypeError('Expected _$$fieldClasses to be iterable, got ' + _inspect(_$$fieldClasses));
+				}
+	
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
 	
 				try {
-					for (var _iterator = this[_symbols.$$fieldClasses][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					for (var _iterator = _$$fieldClasses[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var _$$fieldClasses;
+	
 						var FieldClass = _step.value;
+						_FieldClass$$$entries = FieldClass[_symbols.$$entriesIn](cls);
+	
+						if (!(_FieldClass$$$entries && (typeof _FieldClass$$$entries[Symbol.iterator] === 'function' || Array.isArray(_FieldClass$$$entries)))) {
+							throw new TypeError('Expected _FieldClass$$$entries to be iterable, got ' + _inspect(_FieldClass$$$entries));
+						}
+	
 						var _iteratorNormalCompletion2 = true;
 						var _didIteratorError2 = false;
 						var _iteratorError2 = undefined;
 	
 						try {
-							for (var _iterator2 = FieldClass[_symbols.$$entriesIn](cls)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+							for (var _iterator2 = _FieldClass$$$entries[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+								var _FieldClass$$$entries;
+	
 								var _step2$value = _step2.value;
 								var key = _step2$value.key;
 								var desc = _step2$value.desc;
@@ -1688,19 +1788,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				/* initialize all fields */
 				var keyDescs = {};
+				_$$fieldClasses2 = this[_symbols.$$fieldClasses];
+	
+				if (!(_$$fieldClasses2 && (typeof _$$fieldClasses2[Symbol.iterator] === 'function' || Array.isArray(_$$fieldClasses2)))) {
+					throw new TypeError('Expected _$$fieldClasses2 to be iterable, got ' + _inspect(_$$fieldClasses2));
+				}
+	
 				var _iteratorNormalCompletion3 = true;
 				var _didIteratorError3 = false;
 				var _iteratorError3 = undefined;
 	
 				try {
-					for (var _iterator3 = this[_symbols.$$fieldClasses][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+					for (var _iterator3 = _$$fieldClasses2[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+						var _$$fieldClasses2;
+	
 						var FieldClass = _step3.value;
+						_FieldClass$$$entries2 = FieldClass[_symbols.$$entriesIn](owner.constructor);
+	
+						if (!(_FieldClass$$$entries2 && (typeof _FieldClass$$$entries2[Symbol.iterator] === 'function' || Array.isArray(_FieldClass$$$entries2)))) {
+							throw new TypeError('Expected _FieldClass$$$entries2 to be iterable, got ' + _inspect(_FieldClass$$$entries2));
+						}
+	
 						var _iteratorNormalCompletion6 = true;
 						var _didIteratorError6 = false;
 						var _iteratorError6 = undefined;
 	
 						try {
-							for (var _iterator6 = FieldClass[_symbols.$$entriesIn](owner.constructor)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+							for (var _iterator6 = _FieldClass$$$entries2[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+								var _FieldClass$$$entries2;
+	
 								var _step6$value = _step6.value;
 								var key = _step6$value.key;
 								var desc = _step6$value.desc;
@@ -1748,12 +1864,20 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				}
 	
+				_ref = _values2.default.call(keyDescs);
+	
+				if (!(_ref && (typeof _ref[Symbol.iterator] === 'function' || Array.isArray(_ref)))) {
+					throw new TypeError('Expected _ref to be iterable, got ' + _inspect(_ref));
+				}
+	
 				var _iteratorNormalCompletion4 = true;
 				var _didIteratorError4 = false;
 				var _iteratorError4 = undefined;
 	
 				try {
-					for (var _iterator4 = _values2.default.call(keyDescs)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+					for (var _iterator4 = _ref[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+						var _ref;
+	
 						var entry = _step4.value;
 	
 						entry.related = _pick2.default.call(keyDescs, entry.relatedKeys);
@@ -1775,12 +1899,20 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				}
 	
+				_ref2 = _values2.default.call(keyDescs);
+	
+				if (!(_ref2 && (typeof _ref2[Symbol.iterator] === 'function' || Array.isArray(_ref2)))) {
+					throw new TypeError('Expected _ref2 to be iterable, got ' + _inspect(_ref2));
+				}
+	
 				var _iteratorNormalCompletion5 = true;
 				var _didIteratorError5 = false;
 				var _iteratorError5 = undefined;
 	
 				try {
-					for (var _iterator5 = _values2.default.call(keyDescs)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+					for (var _iterator5 = _ref2[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+						var _ref2;
+	
 						var _entry = _step5.value;
 						var _FieldClass = _entry.FieldClass;
 	
@@ -1819,14 +1951,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		}]);
 	
-		function Field(_ref) {
+		function Field(_ref3) {
 			var _context;
 	
-			var owner = _ref.owner;
-			var key = _ref.key;
-			var desc = _ref.desc;
-			var _ref$setValueThroughS = _ref.setValueThroughSignal;
-			var setValueThroughSignal = _ref$setValueThroughS === undefined ? true : _ref$setValueThroughS;
+			var owner = _ref3.owner;
+			var key = _ref3.key;
+			var desc = _ref3.desc;
+			var _ref3$setValueThrough = _ref3.setValueThroughSignal;
+			var setValueThroughSignal = _ref3$setValueThrough === undefined ? true : _ref3$setValueThrough;
 	
 			_classCallCheck(this, Field);
 	
@@ -1865,26 +1997,17 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'set',
 			value: function set(val) {
-				var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var _ref4 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
-				var _ref2$ignoreReadonly = _ref2.ignoreReadonly;
-				var ignoreReadonly = _ref2$ignoreReadonly === undefined ? false : _ref2$ignoreReadonly;
-				var _ref2$ignoreValidatio = _ref2.ignoreValidation;
-				var ignoreValidation = _ref2$ignoreValidatio === undefined ? false : _ref2$ignoreValidatio;
-				var _ref2$updatePristine = _ref2.updatePristine;
-				var updatePristine = _ref2$updatePristine === undefined ? false : _ref2$updatePristine;
+				var _ref4$ignoreReadonly = _ref4.ignoreReadonly;
+				var ignoreReadonly = _ref4$ignoreReadonly === undefined ? false : _ref4$ignoreReadonly;
+				var _ref4$ignoreValidatio = _ref4.ignoreValidation;
+				var ignoreValidation = _ref4$ignoreValidatio === undefined ? false : _ref4$ignoreValidatio;
+				var _ref4$updatePristine = _ref4.updatePristine;
+				var updatePristine = _ref4$updatePristine === undefined ? false : _ref4$updatePristine;
 	
 				if (!this.constructor.isEqual(this[_symbols.$$value], val)) {
-					var _rec = new _powerAssertRecorder();
-	
-					(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(ignoreReadonly, 'arguments/0/left') || _rec._capt(!_rec._capt(_rec._capt(this[_rec._capt(_symbols.$$desc, 'arguments/0/right/argument/object/property')], 'arguments/0/right/argument/object').readonly, 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
-						content: 'assert(ignoreReadonly || !this[$$desc].readonly, humanMsg`\n\t\t\t\tTried to set the readonly field\n\t\t\t\t\'${ this[$$owner].constructor.name }#${ this[$$key] }\'.\n\t\t\t`)',
-						filepath: 'src/fields/Field.js',
-						line: 149,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"Identifier","name":"ignoreReadonly","range":[7,21]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[26,30]},"property":{"type":"Identifier","name":"$$desc","range":[31,37]},"computed":true,"range":[26,38]},"property":{"type":"Identifier","name":"readonly","range":[39,47]},"computed":false,"range":[26,47]},"prefix":true,"range":[25,47]},"range":[7,47]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[49,57]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tTried to set the readonly field\\n\\t\\t\\t\\t\'","cooked":"\\n\\t\\t\\t\\tTried to set the readonly field\\n\\t\\t\\t\\t\'"},"tail":false,"range":[58,5]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[40,41]},{"type":"TemplateElement","value":{"raw":"\'.\\n\\t\\t\\t","cooked":"\'.\\n\\t\\t\\t"},"tail":true,"range":[57,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$owner","range":[13,20]},"computed":true,"range":[8,21]},"property":{"type":"Identifier","name":"constructor","range":[22,33]},"computed":false,"range":[8,33]},"property":{"type":"Identifier","name":"name","range":[34,38]},"computed":false,"range":[8,38]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[44,48]},"property":{"type":"Identifier","name":"$$key","range":[49,54]},"computed":true,"range":[44,55]}],"range":[57,4]},"range":[49,4]}],"range":[0,5]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"ignoreReadonly","range":[7,21]},{"type":{"label":"||"},"value":"||","range":[22,24]},{"type":{"label":"prefix"},"value":"!","range":[25,26]},{"type":{"label":"this"},"value":"this","range":[26,30]},{"type":{"label":"["},"range":[30,31]},{"type":{"label":"name"},"value":"$$desc","range":[31,37]},{"type":{"label":"]"},"range":[37,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"readonly","range":[39,47]},{"type":{"label":","},"range":[47,48]},{"type":{"label":"name"},"value":"humanMsg","range":[49,57]},{"type":{"label":"`"},"range":[57,58]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tTried to set the readonly field\\n\\t\\t\\t\\t\'","range":[58,5]},{"type":{"label":"${"},"range":[5,7]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$owner","range":[13,20]},{"type":{"label":"]"},"range":[20,21]},{"type":{"label":"."},"range":[21,22]},{"type":{"label":"name"},"value":"constructor","range":[22,33]},{"type":{"label":"."},"range":[33,34]},{"type":{"label":"name"},"value":"name","range":[34,38]},{"type":{"label":"}"},"range":[39,40]},{"type":{"label":"template"},"value":"#","range":[40,41]},{"type":{"label":"${"},"range":[41,43]},{"type":{"label":"this"},"value":"this","range":[44,48]},{"type":{"label":"["},"range":[48,49]},{"type":{"label":"name"},"value":"$$key","range":[49,54]},{"type":{"label":"]"},"range":[54,55]},{"type":{"label":"}"},"range":[56,57]},{"type":{"label":"template"},"value":"\'.\\n\\t\\t\\t","range":[57,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}), (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+					(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly, (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 					if (!ignoreValidation) {
 						this.validate(val, ['set']);
 					}
@@ -1900,6 +2023,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function value() {
 				for (var _len = arguments.length, alternatives = Array(_len), _key = 0; _key < _len; _key++) {
 					alternatives[_key] = arguments[_key];
+				}
+	
+				if (!(alternatives && (typeof alternatives[Symbol.iterator] === 'function' || Array.isArray(alternatives)))) {
+					throw new TypeError('Expected alternatives to be iterable, got ' + _inspect(alternatives));
 				}
 	
 				var _iteratorNormalCompletion7 = true;
@@ -1965,7 +2092,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'commit',
 			value: function () {
-				var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+				var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
 					return regeneratorRuntime.wrap(function _callee$(_context2) {
 						while (1) {
 							switch (_context2.prev = _context2.next) {
@@ -1983,7 +2110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}));
 	
 				function commit() {
-					return _ref3.apply(this, arguments);
+					return _ref5.apply(this, arguments);
 				}
 	
 				return commit;
@@ -2037,6 +2164,79 @@ return /******/ (function(modules) { // webpackBootstrap
 		initializer: null
 	})), _class3));
 
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+			var entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + entries + '\n' + indent + '}';
+			}
+		}
+	}
+
 /***/ },
 /* 30 */
 /***/ function(module, exports) {
@@ -2069,9 +2269,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _powerAssertVisitorKeys = '{"ArrayExpression":["elements"],"AssignmentExpression":["left","right"],"BinaryExpression":["left","right"],"Directive":["value"],"DirectiveLiteral":[],"BlockStatement":["directives","body"],"BreakStatement":["label"],"CallExpression":["callee","arguments"],"CatchClause":["param","body"],"ConditionalExpression":["test","consequent","alternate"],"ContinueStatement":["label"],"DebuggerStatement":[],"DoWhileStatement":["test","body"],"EmptyStatement":[],"ExpressionStatement":["expression"],"File":["program"],"ForInStatement":["left","right","body"],"ForStatement":["init","test","update","body"],"FunctionDeclaration":["id","params","body","returnType","typeParameters"],"FunctionExpression":["id","params","body","returnType","typeParameters"],"Identifier":["typeAnnotation"],"IfStatement":["test","consequent","alternate"],"LabeledStatement":["label","body"],"StringLiteral":[],"NumericLiteral":[],"NullLiteral":[],"BooleanLiteral":[],"RegExpLiteral":[],"LogicalExpression":["left","right"],"MemberExpression":["object","property"],"NewExpression":["callee","arguments"],"Program":["directives","body"],"ObjectExpression":["properties"],"ObjectMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectProperty":["key","value","decorators"],"RestElement":["argument","typeAnnotation"],"ReturnStatement":["argument"],"SequenceExpression":["expressions"],"SwitchCase":["test","consequent"],"SwitchStatement":["discriminant","cases"],"ThisExpression":[],"ThrowStatement":["argument"],"TryStatement":["block","handler","finalizer"],"UnaryExpression":["argument"],"UpdateExpression":["argument"],"VariableDeclaration":["declarations"],"VariableDeclarator":["id","init"],"WhileStatement":["test","body"],"WithStatement":["object","body"],"AssignmentPattern":["left","right"],"ArrayPattern":["elements","typeAnnotation"],"ArrowFunctionExpression":["params","body","returnType"],"ClassBody":["body"],"ClassDeclaration":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ClassExpression":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ExportAllDeclaration":["source"],"ExportDefaultDeclaration":["declaration"],"ExportNamedDeclaration":["declaration","specifiers","source"],"ExportSpecifier":["local","exported"],"ForOfStatement":["left","right","body"],"ImportDeclaration":["specifiers","source"],"ImportDefaultSpecifier":["local"],"ImportNamespaceSpecifier":["local"],"ImportSpecifier":["local","imported"],"MetaProperty":["meta","property"],"ClassMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectPattern":["properties","typeAnnotation"],"SpreadElement":["argument"],"Super":[],"TaggedTemplateExpression":["tag","quasi"],"TemplateElement":[],"TemplateLiteral":["quasis","expressions"],"YieldExpression":["argument"],"AnyTypeAnnotation":[],"ArrayTypeAnnotation":["elementType"],"BooleanTypeAnnotation":[],"BooleanLiteralTypeAnnotation":[],"NullLiteralTypeAnnotation":[],"ClassImplements":["id","typeParameters"],"ClassProperty":["key","value","typeAnnotation","decorators"],"DeclareClass":["id","typeParameters","extends","body"],"DeclareFunction":["id"],"DeclareInterface":["id","typeParameters","extends","body"],"DeclareModule":["id","body"],"DeclareTypeAlias":["id","typeParameters","right"],"DeclareVariable":["id"],"ExistentialTypeParam":[],"FunctionTypeAnnotation":["typeParameters","params","rest","returnType"],"FunctionTypeParam":["name","typeAnnotation"],"GenericTypeAnnotation":["id","typeParameters"],"InterfaceExtends":["id","typeParameters"],"InterfaceDeclaration":["id","typeParameters","extends","body"],"IntersectionTypeAnnotation":["types"],"MixedTypeAnnotation":[],"NullableTypeAnnotation":["typeAnnotation"],"NumericLiteralTypeAnnotation":[],"NumberTypeAnnotation":[],"StringLiteralTypeAnnotation":[],"StringTypeAnnotation":[],"ThisTypeAnnotation":[],"TupleTypeAnnotation":["types"],"TypeofTypeAnnotation":["argument"],"TypeAlias":["id","typeParameters","right"],"TypeAnnotation":["typeAnnotation"],"TypeCastExpression":["expression","typeAnnotation"],"TypeParameter":["bound"],"TypeParameterDeclaration":["params"],"TypeParameterInstantiation":["params"],"ObjectTypeAnnotation":["properties","indexers","callProperties"],"ObjectTypeCallProperty":["value"],"ObjectTypeIndexer":["id","key","value"],"ObjectTypeProperty":["key","value"],"QualifiedTypeIdentifier":["id","qualification"],"UnionTypeAnnotation":["types"],"VoidTypeAnnotation":[],"JSXAttribute":["name","value"],"JSXClosingElement":["name"],"JSXElement":["openingElement","children","closingElement"],"JSXEmptyExpression":[],"JSXExpressionContainer":["expression"],"JSXIdentifier":[],"JSXMemberExpression":["object","property"],"JSXNamespacedName":["namespace","name"],"JSXOpeningElement":["name","attributes"],"JSXSpreadAttribute":["argument"],"JSXText":[],"Noop":[],"ParenthesizedExpression":["expression"],"AwaitExpression":["argument"],"BindExpression":["object","callee"],"Decorator":["expression"],"DoExpression":["body"],"ExportDefaultSpecifier":["exported"],"ExportNamespaceSpecifier":["exported"],"RestProperty":["argument"],"SpreadProperty":["argument"]}',
-	    _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }();
-	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t\t\tA type must be created with its definition\n\t\t\t\t\timmediately.\n\t\t\t\t'], ['\n\t\t\t\t\tA type must be created with its definition\n\t\t\t\t\timmediately.\n\t\t\t\t']);
 	
 	var _schemas = __webpack_require__(39);
@@ -2084,7 +2281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _powerAssert = __webpack_require__(7);
 	
@@ -2109,19 +2306,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			behavior: {
 				new: function _new(vals, options) {
-					var _rec = new _powerAssertRecorder();
-	
 					var sc = vals.definition;
 					var rel = vals['<--DefinesType'];
 	
-					(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(_rec._capt(Template, 'arguments/0/left/callee/object').hasInstance(_rec._capt(sc, 'arguments/0/left/arguments/0')), 'arguments/0/left') || _rec._capt(_rec._capt(DefinesType, 'arguments/0/right/callee/object').hasInstance(_rec._capt(rel, 'arguments/0/right/arguments/0')), 'arguments/0/right'), 'arguments/0'), {
-						content: 'assert(Template.hasInstance(sc) || DefinesType.hasInstance(rel), humanMsg`\n\t\t\t\t\tA type must be created with its definition\n\t\t\t\t\timmediately.\n\t\t\t\t`)',
-						filepath: 'src/modules/typed.js',
-						line: 31,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"Template","range":[7,15]},"property":{"type":"Identifier","name":"hasInstance","range":[16,27]},"computed":false,"range":[7,27]},"arguments":[{"type":"Identifier","name":"sc","range":[28,30]}],"range":[7,31]},"right":{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"DefinesType","range":[35,46]},"property":{"type":"Identifier","name":"hasInstance","range":[47,58]},"computed":false,"range":[35,58]},"arguments":[{"type":"Identifier","name":"rel","range":[59,62]}],"range":[35,63]},"range":[7,63]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[65,73]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tA type must be created with its definition\\n\\t\\t\\t\\t\\timmediately.\\n\\t\\t\\t\\t","cooked":"\\n\\t\\t\\t\\t\\tA type must be created with its definition\\n\\t\\t\\t\\t\\timmediately.\\n\\t\\t\\t\\t"},"tail":true,"range":[74,4]}],"expressions":[],"range":[73,5]},"range":[65,5]}],"range":[0,6]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"Template","range":[7,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"hasInstance","range":[16,27]},{"type":{"label":"("},"range":[27,28]},{"type":{"label":"name"},"value":"sc","range":[28,30]},{"type":{"label":")"},"range":[30,31]},{"type":{"label":"||"},"value":"||","range":[32,34]},{"type":{"label":"name"},"value":"DefinesType","range":[35,46]},{"type":{"label":"."},"range":[46,47]},{"type":{"label":"name"},"value":"hasInstance","range":[47,58]},{"type":{"label":"("},"range":[58,59]},{"type":{"label":"name"},"value":"rel","range":[59,62]},{"type":{"label":")"},"range":[62,63]},{"type":{"label":","},"range":[63,64]},{"type":{"label":"name"},"value":"humanMsg","range":[65,73]},{"type":{"label":"`"},"range":[73,74]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tA type must be created with its definition\\n\\t\\t\\t\\t\\timmediately.\\n\\t\\t\\t\\t","range":[74,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}), (0, _misc.humanMsg)(_templateObject));
+					(0, _misc.constraint)(Template.hasInstance(sc) || DefinesType.hasInstance(rel), (0, _misc.humanMsg)(_templateObject));
 					if (rel) {
 						sc = rel[1];
 					}
@@ -3000,7 +3188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module3 = _interopRequireDefault(_Module2);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _defaults = __webpack_require__(83);
 	
@@ -3297,7 +3485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(3)
+	var global    = __webpack_require__(4)
 	  , hide      = __webpack_require__(37)
 	  , has       = __webpack_require__(34)
 	  , SRC       = __webpack_require__(124)('src')
@@ -3757,17 +3945,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _assignWith2 = _interopRequireDefault(_assignWith);
 	
-	var _keys = __webpack_require__(193);
+	var _keys2 = __webpack_require__(193);
 	
-	var _keys2 = _interopRequireDefault(_keys);
+	var _keys3 = _interopRequireDefault(_keys2);
 	
 	var _values = __webpack_require__(128);
 	
 	var _values2 = _interopRequireDefault(_values);
 	
-	var _entries = __webpack_require__(21);
+	var _entries2 = __webpack_require__(21);
 	
-	var _entries2 = _interopRequireDefault(_entries);
+	var _entries3 = _interopRequireDefault(_entries2);
 	
 	var _fromPairs = __webpack_require__(363);
 	
@@ -3803,7 +3991,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _boundNativeMethods = __webpack_require__(13);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _Entity = __webpack_require__(254);
 	
@@ -3813,11 +4001,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
-	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
@@ -3879,6 +4067,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			this.classes = graph;
 	
 			/* store the module name */
+	
+			if (!_instanceof(this.classes, _graph2.default)) {
+				throw new TypeError('Value of "this.classes" violates contract.\n\nExpected:\nGraph\n\nGot:\n' + _inspect(this.classes));
+			}
+	
 			this.name = name;
 		}
 	
@@ -3961,96 +4154,193 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 	
 				/* normalizing extends/extendedBy */
-				var _arr = ['extends', 'extendedBy'];
-				for (var _i = 0; _i < _arr.length; _i++) {
-					var key = _arr[_i];
-					_defaults2.default.call(config, _defineProperty({}, key, []));
-					config[key] = new Set((0, _misc.wrapInArray)(config[key]));
+				_ref2 = ['extends', 'extendedBy'];
+	
+				if (!(_ref2 && (typeof _ref2[Symbol.iterator] === 'function' || Array.isArray(_ref2)))) {
+					throw new TypeError('Expected _ref2 to be iterable, got ' + _inspect(_ref2));
 				}
 	
-				/* normalize properties */
-				var _arr2 = [['properties', 'key'], ['patternProperties', 'pattern']];
-				for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-					var _arr2$_i = _slicedToArray(_arr2[_i2], 2);
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
 	
-					var pKey = _arr2$_i[0];
-					var kKey = _arr2$_i[1];
+				try {
+					for (var _iterator = _ref2[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var _ref2;
 	
-					_defaults2.default.call(config, _defineProperty({}, pKey, {}));
-					var _iteratorNormalCompletion = true;
-					var _didIteratorError = false;
-					var _iteratorError = undefined;
+						var key = _step.value;
 	
+						_defaults2.default.call(config, _defineProperty({}, key, []));
+						config[key] = new Set((0, _misc.wrapInArray)(config[key]));
+					}
+	
+					/* normalize properties */
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
 					try {
-						for (var _iterator = (_context2 = config[pKey], _entries2.default).call(_context2)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-							var _context2;
-	
-							var _step$value = _slicedToArray(_step.value, 2);
-	
-							var k = _step$value[0];
-							var desc = _step$value[1];
-	
-							desc[kKey] = k;
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
 						}
-					} catch (err) {
-						_didIteratorError = true;
-						_iteratorError = err;
 					} finally {
-						try {
-							if (!_iteratorNormalCompletion && _iterator.return) {
-								_iterator.return();
-							}
-						} finally {
-							if (_didIteratorError) {
-								throw _iteratorError;
-							}
+						if (_didIteratorError) {
+							throw _iteratorError;
 						}
 					}
 				}
 	
-				/* sanity checks */
-				var _arr3 = ['extends', 'extendedBy'];
-				for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
-					var _key = _arr3[_i3];var _iteratorNormalCompletion2 = true;
-					var _didIteratorError2 = false;
-					var _iteratorError2 = undefined;
+				_ref3 = [['properties', 'key'], ['patternProperties', 'pattern']];
 	
-					try {
-						for (var _iterator2 = config[_key][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-							var _rec = new _powerAssertRecorder(),
-							    _rec2 = new _powerAssertRecorder();
+				if (!(_ref3 && (typeof _ref3[Symbol.iterator] === 'function' || Array.isArray(_ref3)))) {
+					throw new TypeError('Expected _ref3 to be iterable, got ' + _inspect(_ref3));
+				}
 	
-							var other = _step2.value;
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
 	
-							(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(this.classes, 'arguments/0/callee/object').hasVertex(_rec._capt(_rec._capt(other, 'arguments/0/arguments/0/object').name, 'arguments/0/arguments/0')), 'arguments/0'), {
-								content: 'assert(this.classes.hasVertex(other.name), humanMsg`\n\t\t\t\t\tThe \'${ config.name }\' class is being processed\n\t\t\t\t\tby module \'${ this.name }\', but it extends a \'${ other.name }\'\n\t\t\t\t\tclass that has not yet been processed. How can that be?\n\t\t\t\t`)',
-								filepath: 'src/Module.js',
-								line: 167,
-								ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"classes","range":[12,19]},"computed":false,"range":[7,19]},"property":{"type":"Identifier","name":"hasVertex","range":[20,29]},"computed":false,"range":[7,29]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[30,35]},"property":{"type":"Identifier","name":"name","range":[36,40]},"computed":false,"range":[30,40]}],"range":[7,41]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[43,51]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\t\\t\\tThe \'"},"tail":false,"range":[52,10]},{"type":"TemplateElement","value":{"raw":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","cooked":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'"},"tail":false,"range":[26,16]},{"type":"TemplateElement","value":{"raw":"\', but it extends a \'","cooked":"\', but it extends a \'"},"tail":false,"range":[30,51]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t","cooked":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t"},"tail":true,"range":[66,4]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"config","range":[13,19]},"property":{"type":"Identifier","name":"name","range":[20,24]},"computed":false,"range":[13,24]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[19,23]},"property":{"type":"Identifier","name":"name","range":[24,28]},"computed":false,"range":[19,28]},{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[54,59]},"property":{"type":"Identifier","name":"name","range":[60,64]},"computed":false,"range":[54,64]}],"range":[51,5]},"range":[43,5]}],"range":[0,6]}',
-								tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"classes","range":[12,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"hasVertex","range":[20,29]},{"type":{"label":"("},"range":[29,30]},{"type":{"label":"name"},"value":"other","range":[30,35]},{"type":{"label":"."},"range":[35,36]},{"type":{"label":"name"},"value":"name","range":[36,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":","},"range":[41,42]},{"type":{"label":"name"},"value":"humanMsg","range":[43,51]},{"type":{"label":"`"},"range":[51,52]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tThe \'","range":[52,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"name"},"value":"config","range":[13,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"name","range":[20,24]},{"type":{"label":"}"},"range":[25,26]},{"type":{"label":"template"},"value":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","range":[26,16]},{"type":{"label":"${"},"range":[16,18]},{"type":{"label":"this"},"value":"this","range":[19,23]},{"type":{"label":"."},"range":[23,24]},{"type":{"label":"name"},"value":"name","range":[24,28]},{"type":{"label":"}"},"range":[29,30]},{"type":{"label":"template"},"value":"\', but it extends a \'","range":[30,51]},{"type":{"label":"${"},"range":[51,53]},{"type":{"label":"name"},"value":"other","range":[54,59]},{"type":{"label":"."},"range":[59,60]},{"type":{"label":"name"},"value":"name","range":[60,64]},{"type":{"label":"}"},"range":[65,66]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t","range":[66,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
-								visitorKeys: _powerAssertVisitorKeys
-							}), (0, _misc.humanMsg)(_templateObject, config.name, this.name, other.name));
-							(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(_rec2._capt(this.classes, 'arguments/0/left/callee/object').vertexValue(_rec2._capt(_rec2._capt(other, 'arguments/0/left/arguments/0/object').name, 'arguments/0/left/arguments/0')), 'arguments/0/left') === _rec2._capt(other, 'arguments/0/right'), 'arguments/0'), {
-								content: 'assert(this.classes.vertexValue(other.name) === other, humanMsg`\n\t\t\t\t\tThe \'${ config.name }\' class is being processed\n\t\t\t\t\tby module \'${ this.name }\', but it extends an \'${ other.name }\'\n\t\t\t\t\tclass that is in conflict with another class known\n\t\t\t\t\tby that name.\n\t\t\t\t`)',
-								filepath: 'src/Module.js',
-								line: 172,
-								ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"classes","range":[12,19]},"computed":false,"range":[7,19]},"property":{"type":"Identifier","name":"vertexValue","range":[20,31]},"computed":false,"range":[7,31]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[32,37]},"property":{"type":"Identifier","name":"name","range":[38,42]},"computed":false,"range":[32,42]}],"range":[7,43]},"right":{"type":"Identifier","name":"other","range":[48,53]},"range":[7,53]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[55,63]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\t\\t\\tThe \'"},"tail":false,"range":[64,10]},{"type":"TemplateElement","value":{"raw":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","cooked":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'"},"tail":false,"range":[26,16]},{"type":"TemplateElement","value":{"raw":"\', but it extends an \'","cooked":"\', but it extends an \'"},"tail":false,"range":[30,52]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t","cooked":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t"},"tail":true,"range":[67,4]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"config","range":[13,19]},"property":{"type":"Identifier","name":"name","range":[20,24]},"computed":false,"range":[13,24]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[19,23]},"property":{"type":"Identifier","name":"name","range":[24,28]},"computed":false,"range":[19,28]},{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[55,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[55,65]}],"range":[63,5]},"range":[55,5]}],"range":[0,6]}',
-								tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"classes","range":[12,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"vertexValue","range":[20,31]},{"type":{"label":"("},"range":[31,32]},{"type":{"label":"name"},"value":"other","range":[32,37]},{"type":{"label":"."},"range":[37,38]},{"type":{"label":"name"},"value":"name","range":[38,42]},{"type":{"label":")"},"range":[42,43]},{"type":{"label":"==/!="},"value":"===","range":[44,47]},{"type":{"label":"name"},"value":"other","range":[48,53]},{"type":{"label":","},"range":[53,54]},{"type":{"label":"name"},"value":"humanMsg","range":[55,63]},{"type":{"label":"`"},"range":[63,64]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tThe \'","range":[64,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"name"},"value":"config","range":[13,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"name","range":[20,24]},{"type":{"label":"}"},"range":[25,26]},{"type":{"label":"template"},"value":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","range":[26,16]},{"type":{"label":"${"},"range":[16,18]},{"type":{"label":"this"},"value":"this","range":[19,23]},{"type":{"label":"."},"range":[23,24]},{"type":{"label":"name"},"value":"name","range":[24,28]},{"type":{"label":"}"},"range":[29,30]},{"type":{"label":"template"},"value":"\', but it extends an \'","range":[30,52]},{"type":{"label":"${"},"range":[52,54]},{"type":{"label":"name"},"value":"other","range":[55,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t","range":[67,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
-								visitorKeys: _powerAssertVisitorKeys
-							}), (0, _misc.humanMsg)(_templateObject2, config.name, this.name, other.name));
+				try {
+					for (var _iterator2 = _ref3[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var _context2;
+	
+						var _ref3;
+	
+						var _step2$value = _slicedToArray(_step2.value, 2);
+	
+						var pKey = _step2$value[0];
+						var kKey = _step2$value[1];
+	
+						_defaults2.default.call(config, _defineProperty({}, pKey, {}));
+						_ref4 = (_context2 = config[pKey], _entries3.default).call(_context2);
+	
+						if (!(_ref4 && (typeof _ref4[Symbol.iterator] === 'function' || Array.isArray(_ref4)))) {
+							throw new TypeError('Expected _ref4 to be iterable, got ' + _inspect(_ref4));
 						}
-					} catch (err) {
-						_didIteratorError2 = true;
-						_iteratorError2 = err;
-					} finally {
+	
+						var _iteratorNormalCompletion4 = true;
+						var _didIteratorError4 = false;
+						var _iteratorError4 = undefined;
+	
 						try {
-							if (!_iteratorNormalCompletion2 && _iterator2.return) {
-								_iterator2.return();
+							for (var _iterator4 = _ref4[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+								var _ref4;
+	
+								var _step4$value = _slicedToArray(_step4.value, 2);
+	
+								var k = _step4$value[0];
+								var desc = _step4$value[1];
+	
+								desc[kKey] = k;
 							}
+						} catch (err) {
+							_didIteratorError4 = true;
+							_iteratorError4 = err;
 						} finally {
-							if (_didIteratorError2) {
-								throw _iteratorError2;
+							try {
+								if (!_iteratorNormalCompletion4 && _iterator4.return) {
+									_iterator4.return();
+								}
+							} finally {
+								if (_didIteratorError4) {
+									throw _iteratorError4;
+								}
 							}
+						}
+					}
+	
+					/* sanity checks */
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
+						}
+					}
+				}
+	
+				_ref5 = ['extends', 'extendedBy'];
+	
+				if (!(_ref5 && (typeof _ref5[Symbol.iterator] === 'function' || Array.isArray(_ref5)))) {
+					throw new TypeError('Expected _ref5 to be iterable, got ' + _inspect(_ref5));
+				}
+	
+				var _iteratorNormalCompletion3 = true;
+				var _didIteratorError3 = false;
+				var _iteratorError3 = undefined;
+	
+				try {
+					for (var _iterator3 = _ref5[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+						var _ref5;
+	
+						var _key = _step3.value;
+						_config$key = config[_key];
+	
+						if (!(_config$key && (typeof _config$key[Symbol.iterator] === 'function' || Array.isArray(_config$key)))) {
+							throw new TypeError('Expected _config$key to be iterable, got ' + _inspect(_config$key));
+						}
+	
+						var _iteratorNormalCompletion5 = true;
+						var _didIteratorError5 = false;
+						var _iteratorError5 = undefined;
+	
+						try {
+							for (var _iterator5 = _config$key[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+								var _config$key,
+								    _rec = new _powerAssertRecorder(),
+								    _rec2 = new _powerAssertRecorder();
+	
+								var other = _step5.value;
+	
+								(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(this.classes, 'arguments/0/callee/object').hasVertex(_rec._capt(_rec._capt(other, 'arguments/0/arguments/0/object').name, 'arguments/0/arguments/0')), 'arguments/0'), {
+									content: 'assert(this.classes.hasVertex(other.name), humanMsg`\n\t\t\t\t\tThe \'${ config.name }\' class is being processed\n\t\t\t\t\tby module \'${ this.name }\', but it extends a \'${ other.name }\'\n\t\t\t\t\tclass that has not yet been processed. How can that be?\n\t\t\t\t`)',
+									filepath: 'src/Module.js',
+									line: 167,
+									ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"classes","range":[12,19]},"computed":false,"range":[7,19]},"property":{"type":"Identifier","name":"hasVertex","range":[20,29]},"computed":false,"range":[7,29]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[30,35]},"property":{"type":"Identifier","name":"name","range":[36,40]},"computed":false,"range":[30,40]}],"range":[7,41]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[43,51]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\t\\t\\tThe \'"},"tail":false,"range":[52,10]},{"type":"TemplateElement","value":{"raw":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","cooked":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'"},"tail":false,"range":[26,16]},{"type":"TemplateElement","value":{"raw":"\', but it extends a \'","cooked":"\', but it extends a \'"},"tail":false,"range":[30,51]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t","cooked":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t"},"tail":true,"range":[66,4]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"config","range":[13,19]},"property":{"type":"Identifier","name":"name","range":[20,24]},"computed":false,"range":[13,24]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[19,23]},"property":{"type":"Identifier","name":"name","range":[24,28]},"computed":false,"range":[19,28]},{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[54,59]},"property":{"type":"Identifier","name":"name","range":[60,64]},"computed":false,"range":[54,64]}],"range":[51,5]},"range":[43,5]}],"range":[0,6]}',
+									tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"classes","range":[12,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"hasVertex","range":[20,29]},{"type":{"label":"("},"range":[29,30]},{"type":{"label":"name"},"value":"other","range":[30,35]},{"type":{"label":"."},"range":[35,36]},{"type":{"label":"name"},"value":"name","range":[36,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":","},"range":[41,42]},{"type":{"label":"name"},"value":"humanMsg","range":[43,51]},{"type":{"label":"`"},"range":[51,52]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tThe \'","range":[52,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"name"},"value":"config","range":[13,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"name","range":[20,24]},{"type":{"label":"}"},"range":[25,26]},{"type":{"label":"template"},"value":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","range":[26,16]},{"type":{"label":"${"},"range":[16,18]},{"type":{"label":"this"},"value":"this","range":[19,23]},{"type":{"label":"."},"range":[23,24]},{"type":{"label":"name"},"value":"name","range":[24,28]},{"type":{"label":"}"},"range":[29,30]},{"type":{"label":"template"},"value":"\', but it extends a \'","range":[30,51]},{"type":{"label":"${"},"range":[51,53]},{"type":{"label":"name"},"value":"other","range":[54,59]},{"type":{"label":"."},"range":[59,60]},{"type":{"label":"name"},"value":"name","range":[60,64]},{"type":{"label":"}"},"range":[65,66]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\t\\t\\tclass that has not yet been processed. How can that be?\\n\\t\\t\\t\\t","range":[66,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
+									visitorKeys: _powerAssertVisitorKeys
+								}), (0, _misc.humanMsg)(_templateObject, config.name, this.name, other.name));
+								(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(_rec2._capt(this.classes, 'arguments/0/left/callee/object').vertexValue(_rec2._capt(_rec2._capt(other, 'arguments/0/left/arguments/0/object').name, 'arguments/0/left/arguments/0')), 'arguments/0/left') === _rec2._capt(other, 'arguments/0/right'), 'arguments/0'), {
+									content: 'assert(this.classes.vertexValue(other.name) === other, humanMsg`\n\t\t\t\t\tThe \'${ config.name }\' class is being processed\n\t\t\t\t\tby module \'${ this.name }\', but it extends an \'${ other.name }\'\n\t\t\t\t\tclass that is in conflict with another class known\n\t\t\t\t\tby that name.\n\t\t\t\t`)',
+									filepath: 'src/Module.js',
+									line: 172,
+									ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"classes","range":[12,19]},"computed":false,"range":[7,19]},"property":{"type":"Identifier","name":"vertexValue","range":[20,31]},"computed":false,"range":[7,31]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[32,37]},"property":{"type":"Identifier","name":"name","range":[38,42]},"computed":false,"range":[32,42]}],"range":[7,43]},"right":{"type":"Identifier","name":"other","range":[48,53]},"range":[7,53]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[55,63]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\t\\t\\tThe \'"},"tail":false,"range":[64,10]},{"type":"TemplateElement","value":{"raw":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","cooked":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'"},"tail":false,"range":[26,16]},{"type":"TemplateElement","value":{"raw":"\', but it extends an \'","cooked":"\', but it extends an \'"},"tail":false,"range":[30,52]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t","cooked":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t"},"tail":true,"range":[67,4]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"config","range":[13,19]},"property":{"type":"Identifier","name":"name","range":[20,24]},"computed":false,"range":[13,24]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[19,23]},"property":{"type":"Identifier","name":"name","range":[24,28]},"computed":false,"range":[19,28]},{"type":"MemberExpression","object":{"type":"Identifier","name":"other","range":[55,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[55,65]}],"range":[63,5]},"range":[55,5]}],"range":[0,6]}',
+									tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"classes","range":[12,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"vertexValue","range":[20,31]},{"type":{"label":"("},"range":[31,32]},{"type":{"label":"name"},"value":"other","range":[32,37]},{"type":{"label":"."},"range":[37,38]},{"type":{"label":"name"},"value":"name","range":[38,42]},{"type":{"label":")"},"range":[42,43]},{"type":{"label":"==/!="},"value":"===","range":[44,47]},{"type":{"label":"name"},"value":"other","range":[48,53]},{"type":{"label":","},"range":[53,54]},{"type":{"label":"name"},"value":"humanMsg","range":[55,63]},{"type":{"label":"`"},"range":[63,64]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\tThe \'","range":[64,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"name"},"value":"config","range":[13,19]},{"type":{"label":"."},"range":[19,20]},{"type":{"label":"name"},"value":"name","range":[20,24]},{"type":{"label":"}"},"range":[25,26]},{"type":{"label":"template"},"value":"\' class is being processed\\n\\t\\t\\t\\t\\tby module \'","range":[26,16]},{"type":{"label":"${"},"range":[16,18]},{"type":{"label":"this"},"value":"this","range":[19,23]},{"type":{"label":"."},"range":[23,24]},{"type":{"label":"name"},"value":"name","range":[24,28]},{"type":{"label":"}"},"range":[29,30]},{"type":{"label":"template"},"value":"\', but it extends an \'","range":[30,52]},{"type":{"label":"${"},"range":[52,54]},{"type":{"label":"name"},"value":"other","range":[55,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\t\\t\\tclass that is in conflict with another class known\\n\\t\\t\\t\\t\\tby that name.\\n\\t\\t\\t\\t","range":[67,4]},{"type":{"label":"`"},"range":[4,5]},{"type":{"label":")"},"range":[5,6]}]',
+									visitorKeys: _powerAssertVisitorKeys
+								}), (0, _misc.humanMsg)(_templateObject2, config.name, this.name, other.name));
+							}
+						} catch (err) {
+							_didIteratorError5 = true;
+							_iteratorError5 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion5 && _iterator5.return) {
+									_iterator5.return();
+								}
+							} finally {
+								if (_didIteratorError5) {
+									throw _iteratorError5;
+								}
+							}
+						}
+					}
+				} catch (err) {
+					_didIteratorError3 = true;
+					_iteratorError3 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion3 && _iterator3.return) {
+							_iterator3.return();
+						}
+					} finally {
+						if (_didIteratorError3) {
+							throw _iteratorError3;
 						}
 					}
 				}
@@ -4095,47 +4385,74 @@ return /******/ (function(modules) { // webpackBootstrap
 					var _pair;
 	
 					var pair = (_pair = {}, _defineProperty(_pair, 1, {}), _defineProperty(_pair, 2, {}), _pair);
-					var _arr4 = [[[1, pair[1]], [2, pair[2]]], [[2, pair[2]], [1, pair[1]]]];
-					for (var _i4 = 0; _i4 < _arr4.length; _i4++) {
-						var _arr4$_i = _slicedToArray(_arr4[_i4], 2);
+					_ref7 = [[[1, pair[1]], [2, pair[2]]], [[2, pair[2]], [1, pair[1]]]];
 	
-						var _arr4$_i$ = _slicedToArray(_arr4$_i[0], 2);
-	
-						var domainKey = _arr4$_i$[0];
-						var domain = _arr4$_i$[1];
-	
-						var _arr4$_i$2 = _slicedToArray(_arr4$_i[1], 2);
-	
-						var codomainKey = _arr4$_i$2[0];
-						var codomain = _arr4$_i$2[1];
-	
-						var _givenDomainPair$doma = _slicedToArray(givenDomainPair[domainKey], 3);
-	
-						var resourceClass = _givenDomainPair$doma[0];
-						var cardinality = _givenDomainPair$doma[1];
-						var _givenDomainPair$doma2 = _givenDomainPair$doma[2];
-						var options = _givenDomainPair$doma2 === undefined ? {} : _givenDomainPair$doma2;
-	
-						_misc.definePropertiesByValue.call(domain, {
-							codomain: codomain,
-	
-							relationshipClass: cls,
-							keyInRelationship: domainKey,
-	
-							resourceClass: resourceClass,
-							keyInResource: '' + (domainKey == 1 ? '-->' : '<--') + cls.name,
-	
-							cardinality: (0, _misc.parseCardinality)(cardinality),
-							options: options,
-	
-							shortcutKey: options.key
-						});
-						_boundNativeMethods.defineProperty.call(domain, Symbol.toStringTag, {
-							get: function get() {
-								return (0, _misc.humanMsg)(_templateObject4, this.resourceClass.name, this.keyInResource, this.codomain.resourceClass.name);
-							}
-						});
+					if (!(_ref7 && (typeof _ref7[Symbol.iterator] === 'function' || Array.isArray(_ref7)))) {
+						throw new TypeError('Expected _ref7 to be iterable, got ' + _inspect(_ref7));
 					}
+	
+					var _iteratorNormalCompletion6 = true;
+					var _didIteratorError6 = false;
+					var _iteratorError6 = undefined;
+	
+					try {
+						for (var _iterator6 = _ref7[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+							var _ref7;
+	
+							var _step6$value = _slicedToArray(_step6.value, 2);
+	
+							var _step6$value$ = _slicedToArray(_step6$value[0], 2);
+	
+							var domainKey = _step6$value$[0];
+							var domain = _step6$value$[1];
+	
+							var _step6$value$2 = _slicedToArray(_step6$value[1], 2);
+	
+							var codomainKey = _step6$value$2[0];
+							var codomain = _step6$value$2[1];
+	
+							var _givenDomainPair$doma = _slicedToArray(givenDomainPair[domainKey], 3);
+	
+							var resourceClass = _givenDomainPair$doma[0];
+							var cardinality = _givenDomainPair$doma[1];
+							var _givenDomainPair$doma2 = _givenDomainPair$doma[2];
+							var options = _givenDomainPair$doma2 === undefined ? {} : _givenDomainPair$doma2;
+	
+							_misc.definePropertiesByValue.call(domain, {
+								codomain: codomain,
+	
+								relationshipClass: cls,
+								keyInRelationship: domainKey,
+	
+								resourceClass: resourceClass,
+								keyInResource: '' + (domainKey == 1 ? '-->' : '<--') + cls.name,
+	
+								cardinality: (0, _misc.parseCardinality)(cardinality),
+								options: options,
+	
+								shortcutKey: options.key
+							});
+							_boundNativeMethods.defineProperty.call(domain, Symbol.toStringTag, {
+								get: function get() {
+									return (0, _misc.humanMsg)(_templateObject4, this.resourceClass.name, this.keyInResource, this.codomain.resourceClass.name);
+								}
+							});
+						}
+					} catch (err) {
+						_didIteratorError6 = true;
+						_iteratorError6 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion6 && _iterator6.return) {
+								_iterator6.return();
+							}
+						} finally {
+							if (_didIteratorError6) {
+								throw _iteratorError6;
+							}
+						}
+					}
+	
 					return pair;
 				});
 				delete cls[1];
@@ -4144,49 +4461,65 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'resolveRelationshipDomains',
 			value: function resolveRelationshipDomains(cls) {
-				var _iteratorNormalCompletion3 = true;
-				var _didIteratorError3 = false;
-				var _iteratorError3 = undefined;
+				_cls$domainPairs = cls.domainPairs;
+	
+				if (!(_cls$domainPairs && (typeof _cls$domainPairs[Symbol.iterator] === 'function' || Array.isArray(_cls$domainPairs)))) {
+					throw new TypeError('Expected _cls$domainPairs to be iterable, got ' + _inspect(_cls$domainPairs));
+				}
+	
+				var _iteratorNormalCompletion7 = true;
+				var _didIteratorError7 = false;
+				var _iteratorError7 = undefined;
 	
 				try {
-					for (var _iterator3 = cls.domainPairs[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-						var domainPair = _step3.value;
-						var _iteratorNormalCompletion4 = true;
-						var _didIteratorError4 = false;
-						var _iteratorError4 = undefined;
+					for (var _iterator7 = _cls$domainPairs[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+						var _cls$domainPairs;
+	
+						var domainPair = _step7.value;
+						_ref8 = _values2.default.call(domainPair);
+	
+						if (!(_ref8 && (typeof _ref8[Symbol.iterator] === 'function' || Array.isArray(_ref8)))) {
+							throw new TypeError('Expected _ref8 to be iterable, got ' + _inspect(_ref8));
+						}
+	
+						var _iteratorNormalCompletion8 = true;
+						var _didIteratorError8 = false;
+						var _iteratorError8 = undefined;
 	
 						try {
-							for (var _iterator4 = _values2.default.call(domainPair)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-								var domain = _step4.value;
+							for (var _iterator8 = _ref8[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+								var _ref8;
+	
+								var domain = _step8.value;
 	
 								this[$$processRelationshipDomain](domain);
 							}
 						} catch (err) {
-							_didIteratorError4 = true;
-							_iteratorError4 = err;
+							_didIteratorError8 = true;
+							_iteratorError8 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion4 && _iterator4.return) {
-									_iterator4.return();
+								if (!_iteratorNormalCompletion8 && _iterator8.return) {
+									_iterator8.return();
 								}
 							} finally {
-								if (_didIteratorError4) {
-									throw _iteratorError4;
+								if (_didIteratorError8) {
+									throw _iteratorError8;
 								}
 							}
 						}
 					}
 				} catch (err) {
-					_didIteratorError3 = true;
-					_iteratorError3 = err;
+					_didIteratorError7 = true;
+					_iteratorError7 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion3 && _iterator3.return) {
-							_iterator3.return();
+						if (!_iteratorNormalCompletion7 && _iterator7.return) {
+							_iterator7.return();
 						}
 					} finally {
-						if (_didIteratorError3) {
-							throw _iteratorError3;
+						if (_didIteratorError7) {
+							throw _iteratorError7;
 						}
 					}
 				}
@@ -4291,6 +4624,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'register',
 			value: function register(cls) {
+				function _ref9(_id3) {
+					if (!(_id3 == null)) {
+						throw new TypeError('Function return value violates contract.\n\nExpected:\nvoid\n\nGot:\n' + _inspect(_id3));
+					}
+	
+					return _id3;
+				}
+	
 				/* register the class in this module */
 				this.classes.ensureVertex(cls.name, cls);
 				if (!cls.notExported) {
@@ -4298,39 +4639,55 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 	
 				/* add subclassing edges and cross-register sub/superclasses */
-				var _iteratorNormalCompletion5 = true;
-				var _didIteratorError5 = false;
-				var _iteratorError5 = undefined;
+				_ref10 = cls.extends || [];
+	
+				if (!(_ref10 && (typeof _ref10[Symbol.iterator] === 'function' || Array.isArray(_ref10)))) {
+					throw new TypeError('Expected _ref10 to be iterable, got ' + _inspect(_ref10));
+				}
+	
+				var _iteratorNormalCompletion9 = true;
+				var _didIteratorError9 = false;
+				var _iteratorError9 = undefined;
 	
 				try {
-					for (var _iterator5 = (cls.extends || [])[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-						var extendee = _step5.value;
+					for (var _iterator9 = _ref10[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+						var _ref10;
+	
+						var extendee = _step9.value;
 	
 						this.classes.addEdge(extendee.name, cls.name);
 						extendee.extendedBy.add(cls);
 					}
 				} catch (err) {
-					_didIteratorError5 = true;
-					_iteratorError5 = err;
+					_didIteratorError9 = true;
+					_iteratorError9 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion5 && _iterator5.return) {
-							_iterator5.return();
+						if (!_iteratorNormalCompletion9 && _iterator9.return) {
+							_iterator9.return();
 						}
 					} finally {
-						if (_didIteratorError5) {
-							throw _iteratorError5;
+						if (_didIteratorError9) {
+							throw _iteratorError9;
 						}
 					}
 				}
 	
-				var _iteratorNormalCompletion6 = true;
-				var _didIteratorError6 = false;
-				var _iteratorError6 = undefined;
+				_ref11 = cls.extendedBy || [];
+	
+				if (!(_ref11 && (typeof _ref11[Symbol.iterator] === 'function' || Array.isArray(_ref11)))) {
+					throw new TypeError('Expected _ref11 to be iterable, got ' + _inspect(_ref11));
+				}
+	
+				var _iteratorNormalCompletion10 = true;
+				var _didIteratorError10 = false;
+				var _iteratorError10 = undefined;
 	
 				try {
-					for (var _iterator6 = (cls.extendedBy || [])[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-						var extender = _step6.value;
+					for (var _iterator10 = _ref11[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+						var _ref11;
+	
+						var extender = _step10.value;
 	
 						this.classes.addEdge(cls.name, extender.name);
 						extender.extends.add(cls);
@@ -4338,16 +4695,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					/* check for cycles */
 				} catch (err) {
-					_didIteratorError6 = true;
-					_iteratorError6 = err;
+					_didIteratorError10 = true;
+					_iteratorError10 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion6 && _iterator6.return) {
-							_iterator6.return();
+						if (!_iteratorNormalCompletion10 && _iterator10.return) {
+							_iterator10.return();
 						}
 					} finally {
-						if (_didIteratorError6) {
-							throw _iteratorError6;
+						if (_didIteratorError10) {
+							throw _iteratorError10;
 						}
 					}
 				}
@@ -4357,7 +4714,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					throw new Error((0, _misc.humanMsg)(_templateObject5, cls.name, [].concat(_toConsumableArray(cycle), [cycle[0]]).join(' --> ')));
 				}
 	
-				return cls;
+				return _ref9(cls);
 			}
 		}, {
 			key: 'mergeSuperclassFields',
@@ -4381,15 +4738,23 @@ return /******/ (function(modules) { // webpackBootstrap
 					cls[$$processedFor][kind].add(newCls);
 	
 					function mergeBetween(superCls, subCls) {
-						var _iteratorNormalCompletion7 = true;
-						var _didIteratorError7 = false;
-						var _iteratorError7 = undefined;
+						var _context4;
+	
+						_ref13 = (_context4 = superCls[kind], _keys3.default).call(_context4);
+	
+						if (!(_ref13 && (typeof _ref13[Symbol.iterator] === 'function' || Array.isArray(_ref13)))) {
+							throw new TypeError('Expected _ref13 to be iterable, got ' + _inspect(_ref13));
+						}
+	
+						var _iteratorNormalCompletion11 = true;
+						var _didIteratorError11 = false;
+						var _iteratorError11 = undefined;
 	
 						try {
-							for (var _iterator7 = (_context4 = superCls[kind], _keys2.default).call(_context4)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-								var _context4;
+							for (var _iterator11 = _ref13[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+								var _ref13;
 	
-								var key = _step7.value;
+								var key = _step11.value;
 	
 								var superDesc = superCls[kind][key];
 								var subDesc = subCls[kind][key];
@@ -4403,69 +4768,85 @@ return /******/ (function(modules) { // webpackBootstrap
 								}
 							}
 						} catch (err) {
-							_didIteratorError7 = true;
-							_iteratorError7 = err;
+							_didIteratorError11 = true;
+							_iteratorError11 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion7 && _iterator7.return) {
-									_iterator7.return();
+								if (!_iteratorNormalCompletion11 && _iterator11.return) {
+									_iterator11.return();
 								}
 							} finally {
-								if (_didIteratorError7) {
-									throw _iteratorError7;
+								if (_didIteratorError11) {
+									throw _iteratorError11;
 								}
 							}
 						}
 					}
 	
-					var _iteratorNormalCompletion8 = true;
-					var _didIteratorError8 = false;
-					var _iteratorError8 = undefined;
+					_cls$extends = cls.extends;
+	
+					if (!(_cls$extends && (typeof _cls$extends[Symbol.iterator] === 'function' || Array.isArray(_cls$extends)))) {
+						throw new TypeError('Expected _cls$extends to be iterable, got ' + _inspect(_cls$extends));
+					}
+	
+					var _iteratorNormalCompletion12 = true;
+					var _didIteratorError12 = false;
+					var _iteratorError12 = undefined;
 	
 					try {
-						for (var _iterator8 = cls.extends[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-							var superCls = _step8.value;
+						for (var _iterator12 = _cls$extends[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+							var _cls$extends;
+	
+							var superCls = _step12.value;
 	
 							mergeFieldKind(superCls, newCls, kind, customMerge);
 							mergeBetween(superCls, cls);
 						}
 					} catch (err) {
-						_didIteratorError8 = true;
-						_iteratorError8 = err;
+						_didIteratorError12 = true;
+						_iteratorError12 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion8 && _iterator8.return) {
-								_iterator8.return();
+							if (!_iteratorNormalCompletion12 && _iterator12.return) {
+								_iterator12.return();
 							}
 						} finally {
-							if (_didIteratorError8) {
-								throw _iteratorError8;
+							if (_didIteratorError12) {
+								throw _iteratorError12;
 							}
 						}
 					}
 	
-					var _iteratorNormalCompletion9 = true;
-					var _didIteratorError9 = false;
-					var _iteratorError9 = undefined;
+					_cls$extendedBy = cls.extendedBy;
+	
+					if (!(_cls$extendedBy && (typeof _cls$extendedBy[Symbol.iterator] === 'function' || Array.isArray(_cls$extendedBy)))) {
+						throw new TypeError('Expected _cls$extendedBy to be iterable, got ' + _inspect(_cls$extendedBy));
+					}
+	
+					var _iteratorNormalCompletion13 = true;
+					var _didIteratorError13 = false;
+					var _iteratorError13 = undefined;
 	
 					try {
-						for (var _iterator9 = cls.extendedBy[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-							var subCls = _step9.value;
+						for (var _iterator13 = _cls$extendedBy[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+							var _cls$extendedBy;
+	
+							var subCls = _step13.value;
 	
 							mergeBetween(cls, subCls);
 							mergeFieldKind(subCls, newCls, kind, customMerge);
 						}
 					} catch (err) {
-						_didIteratorError9 = true;
-						_iteratorError9 = err;
+						_didIteratorError13 = true;
+						_iteratorError13 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion9 && _iterator9.return) {
-								_iterator9.return();
+							if (!_iteratorNormalCompletion13 && _iterator13.return) {
+								_iterator13.return();
 							}
 						} finally {
-							if (_didIteratorError9) {
-								throw _iteratorError9;
+							if (_didIteratorError13) {
+								throw _iteratorError13;
 							}
 						}
 					}
@@ -4500,15 +4881,23 @@ return /******/ (function(modules) { // webpackBootstrap
 							tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"superDesc","range":[7,16]},{"type":{"label":"."},"range":[16,17]},{"type":{"label":"name"},"value":"oneOf","range":[17,22]},{"type":{"label":"."},"range":[22,23]},{"type":{"label":"name"},"value":"length","range":[23,29]},{"type":{"label":"</>"},"value":">","range":[30,31]},{"type":{"label":"num"},"value":0,"range":[32,33]},{"type":{"label":")"},"range":[33,34]}]',
 							visitorKeys: _powerAssertVisitorKeys
 						}));
-						var _iteratorNormalCompletion10 = true;
-						var _didIteratorError10 = false;
-						var _iteratorError10 = undefined;
+						_superDesc$oneOf = superDesc.oneOf;
+	
+						if (!(_superDesc$oneOf && (typeof _superDesc$oneOf[Symbol.iterator] === 'function' || Array.isArray(_superDesc$oneOf)))) {
+							throw new TypeError('Expected _superDesc$oneOf to be iterable, got ' + _inspect(_superDesc$oneOf));
+						}
+	
+						var _iteratorNormalCompletion14 = true;
+						var _didIteratorError14 = false;
+						var _iteratorError14 = undefined;
 	
 						try {
-							for (var _iterator10 = superDesc.oneOf[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+							for (var _iterator14 = _superDesc$oneOf[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
 								var _context6;
 	
-								var disjunct = _step10.value;
+								var _superDesc$oneOf;
+	
+								var disjunct = _step14.value;
 	
 								if (_typeof(subDesc.value) === disjunct.type || (_context6 = subDesc.value, _isInteger2.default).call(_context6) && disjunct.type === 'integer' || (0, _isEqual3.default)(subDesc.value, disjunct.value)) {
 									singleSuperDesc = _extends({}, superDesc, disjunct);
@@ -4517,16 +4906,16 @@ return /******/ (function(modules) { // webpackBootstrap
 								}
 							}
 						} catch (err) {
-							_didIteratorError10 = true;
-							_iteratorError10 = err;
+							_didIteratorError14 = true;
+							_iteratorError14 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion10 && _iterator10.return) {
-									_iterator10.return();
+								if (!_iteratorNormalCompletion14 && _iterator14.return) {
+									_iterator14.return();
 								}
 							} finally {
-								if (_didIteratorError10) {
-									throw _iteratorError10;
+								if (_didIteratorError14) {
+									throw _iteratorError14;
 								}
 							}
 						}
@@ -4573,11 +4962,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'mergeSameNameResources',
 			value: function mergeSameNameResources(NewClass) {
+				function _ref14(_id5) {
+					if (!(typeof _id5 === 'function' && _id5.prototype && _id5.prototype.constructor === _id5)) {
+						throw new TypeError('Function return value violates contract.\n\nExpected:\nClass<Entity>\n\nGot:\n' + _inspect(_id5));
+					}
+	
+					return _id5;
+				}
+	
 				var OldClass = this.classes.vertexValue(NewClass.name);
 				if (!OldClass) {
-					return NewClass;
+					return _ref14(NewClass);
 				}
-				return _assignWith2.default.call(OldClass, NewClass, function (vOld, vNew, key) {
+				return _ref14(_assignWith2.default.call(OldClass, NewClass, function (vOld, vNew, key) {
 					var _context7;
 	
 					switch (key) {
@@ -4604,23 +5001,29 @@ return /******/ (function(modules) { // webpackBootstrap
 						default:
 							{
 								if (!_isUndefined2.default.call(vOld) && !_isUndefined2.default.call(vNew) && !(0, _isEqual3.default)(vOld, vNew)) {
-									// console.log(OldClass.name, NewClass.name);
 									throw new Error((0, _misc.humanMsg)(_templateObject7, OldClass.name, key, JSON.stringify(vOld), JSON.stringify(vNew)));
 								}
-								// assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), );
 								return _isUndefined2.default.call(vOld) ? vNew : vOld;
 							}
 					}
-				});
+				}));
 			}
 		}, {
 			key: 'mergeSameNameRelationships',
 			value: function mergeSameNameRelationships(NewClass) {
+				function _ref15(_id6) {
+					if (!(typeof _id6 === 'function' && _id6.prototype && _id6.prototype.constructor === _id6)) {
+						throw new TypeError('Function return value violates contract.\n\nExpected:\nClass<Entity>\n\nGot:\n' + _inspect(_id6));
+					}
+	
+					return _id6;
+				}
+	
 				var OldClass = this.classes.vertexValue(NewClass.name);
 				if (!OldClass) {
-					return NewClass;
+					return _ref15(NewClass);
 				}
-				return _assignWith2.default.call(OldClass, NewClass, function (vOld, vNew, key) {
+				return _ref15(_assignWith2.default.call(OldClass, NewClass, function (vOld, vNew, key) {
 					var _context8;
 	
 					switch (key) {
@@ -4639,7 +5042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 								(0, _powerAssert2.default)(_rec9._expr(_rec9._capt(_rec9._capt(_isUndefined2.default.call(pOld), 'arguments/0/left') || _rec9._capt((0, _isEqual3.default)(_rec9._capt(pOld, 'arguments/0/right/arguments/0'), _rec9._capt(pNew, 'arguments/0/right/arguments/1')), 'arguments/0/right'), 'arguments/0'), {
 									content: 'assert(pOld::isUndefined() || _isEqual(pOld, pNew), humanMsg`\n\t\t\t\t\t\tCannot merge property descriptions for ${ OldClass.name }#${ key }.\n\t\t\t\t\t\t\n\t\t\t\t\t\t1) ${ JSON.stringify(pOld) }\n\t\t\t\t\t\t\n\t\t\t\t\t\t2) ${ JSON.stringify(pNew) }\n\t\t\t\t\t`)',
 									filepath: 'src/Module.js',
-									line: 507,
+									line: 505,
 									ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"pOld","range":[7,11]},"callee":{"type":"Identifier","name":"isUndefined","range":[13,24]},"range":[7,24]},"arguments":[],"range":[7,26]},"right":{"type":"CallExpression","callee":{"type":"Identifier","name":"_isEqual","range":[30,38]},"arguments":[{"type":"Identifier","name":"pOld","range":[39,43]},{"type":"Identifier","name":"pNew","range":[45,49]}],"range":[30,50]},"range":[7,50]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[52,60]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\t\\tCannot merge property descriptions for ","cooked":"\\n\\t\\t\\t\\t\\t\\tCannot merge property descriptions for "},"tail":false,"range":[61,45]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[63,64]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t1) ","cooked":".\\n\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t1) "},"tail":false,"range":[72,9]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t2) ","cooked":"\\n\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t2) "},"tail":false,"range":[34,9]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\t","cooked":"\\n\\t\\t\\t\\t\\t"},"tail":true,"range":[34,5]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"OldClass","range":[48,56]},"property":{"type":"Identifier","name":"name","range":[57,61]},"computed":false,"range":[48,61]},{"type":"Identifier","name":"key","range":[67,70]},{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[12,16]},"property":{"type":"Identifier","name":"stringify","range":[17,26]},"computed":false,"range":[12,26]},"arguments":[{"type":"Identifier","name":"pOld","range":[27,31]}],"range":[12,32]},{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[12,16]},"property":{"type":"Identifier","name":"stringify","range":[17,26]},"computed":false,"range":[12,26]},"arguments":[{"type":"Identifier","name":"pNew","range":[27,31]}],"range":[12,32]}],"range":[60,6]},"range":[52,6]}],"range":[0,7]}',
 									tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"pOld","range":[7,11]},{"type":{"label":"::"},"value":"::","range":[11,13]},{"type":{"label":"name"},"value":"isUndefined","range":[13,24]},{"type":{"label":"("},"range":[24,25]},{"type":{"label":")"},"range":[25,26]},{"type":{"label":"||"},"value":"||","range":[27,29]},{"type":{"label":"name"},"value":"_isEqual","range":[30,38]},{"type":{"label":"("},"range":[38,39]},{"type":{"label":"name"},"value":"pOld","range":[39,43]},{"type":{"label":","},"range":[43,44]},{"type":{"label":"name"},"value":"pNew","range":[45,49]},{"type":{"label":")"},"range":[49,50]},{"type":{"label":","},"range":[50,51]},{"type":{"label":"name"},"value":"humanMsg","range":[52,60]},{"type":{"label":"`"},"range":[60,61]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\t\\tCannot merge property descriptions for ","range":[61,45]},{"type":{"label":"${"},"range":[45,47]},{"type":{"label":"name"},"value":"OldClass","range":[48,56]},{"type":{"label":"."},"range":[56,57]},{"type":{"label":"name"},"value":"name","range":[57,61]},{"type":{"label":"}"},"range":[62,63]},{"type":{"label":"template"},"value":"#","range":[63,64]},{"type":{"label":"${"},"range":[64,66]},{"type":{"label":"name"},"value":"key","range":[67,70]},{"type":{"label":"}"},"range":[71,72]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t1) ","range":[72,9]},{"type":{"label":"${"},"range":[9,11]},{"type":{"label":"name"},"value":"JSON","range":[12,16]},{"type":{"label":"."},"range":[16,17]},{"type":{"label":"name"},"value":"stringify","range":[17,26]},{"type":{"label":"("},"range":[26,27]},{"type":{"label":"name"},"value":"pOld","range":[27,31]},{"type":{"label":")"},"range":[31,32]},{"type":{"label":"}"},"range":[33,34]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t2) ","range":[34,9]},{"type":{"label":"${"},"range":[9,11]},{"type":{"label":"name"},"value":"JSON","range":[12,16]},{"type":{"label":"."},"range":[16,17]},{"type":{"label":"name"},"value":"stringify","range":[17,26]},{"type":{"label":"("},"range":[26,27]},{"type":{"label":"name"},"value":"pNew","range":[27,31]},{"type":{"label":")"},"range":[31,32]},{"type":{"label":"}"},"range":[33,34]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\t","range":[34,5]},{"type":{"label":"`"},"range":[5,6]},{"type":{"label":")"},"range":[6,7]}]',
 									visitorKeys: _powerAssertVisitorKeys
@@ -4653,7 +5056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 								(0, _powerAssert2.default)(_rec10._expr(_rec10._capt(_rec10._capt(_rec10._capt(_isUndefined2.default.call(vOld), 'arguments/0/left/left') || _rec10._capt(_isUndefined2.default.call(vNew), 'arguments/0/left/right'), 'arguments/0/left') || _rec10._capt((0, _isEqual3.default)(_rec10._capt(vOld, 'arguments/0/right/arguments/0'), _rec10._capt(vNew, 'arguments/0/right/arguments/1')), 'arguments/0/right'), 'arguments/0'), {
 									content: 'assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), humanMsg`\n\t\t\t\t\t\tCannot merge ${ OldClass.name }.${ key } = ${ JSON.stringify(vOld) }\n\t\t\t\t\t\t        with ${ JSON.stringify(vNew) }.\n\t\t\t\t\t`)',
 									filepath: 'src/Module.js',
-									line: 517,
+									line: 515,
 									ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"LogicalExpression","operator":"||","left":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"vOld","range":[7,11]},"callee":{"type":"Identifier","name":"isUndefined","range":[13,24]},"range":[7,24]},"arguments":[],"range":[7,26]},"right":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"vNew","range":[30,34]},"callee":{"type":"Identifier","name":"isUndefined","range":[36,47]},"range":[30,47]},"arguments":[],"range":[30,49]},"range":[7,49]},"right":{"type":"CallExpression","callee":{"type":"Identifier","name":"_isEqual","range":[53,61]},"arguments":[{"type":"Identifier","name":"vOld","range":[62,66]},{"type":"Identifier","name":"vNew","range":[68,72]}],"range":[53,73]},"range":[7,73]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[75,83]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\t\\tCannot merge ","cooked":"\\n\\t\\t\\t\\t\\t\\tCannot merge "},"tail":false,"range":[84,19]},{"type":"TemplateElement","value":{"raw":".","cooked":"."},"tail":false,"range":[37,38]},{"type":"TemplateElement","value":{"raw":" = ","cooked":" = "},"tail":false,"range":[46,49]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\t\\t\\t        with ","cooked":"\\n\\t\\t\\t\\t\\t\\t        with "},"tail":false,"range":[74,19]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t\\t\\t","cooked":".\\n\\t\\t\\t\\t\\t"},"tail":true,"range":[44,5]}],"expressions":[{"type":"MemberExpression","object":{"type":"Identifier","name":"OldClass","range":[22,30]},"property":{"type":"Identifier","name":"name","range":[31,35]},"computed":false,"range":[22,35]},{"type":"Identifier","name":"key","range":[41,44]},{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[52,56]},"property":{"type":"Identifier","name":"stringify","range":[57,66]},"computed":false,"range":[52,66]},"arguments":[{"type":"Identifier","name":"vOld","range":[67,71]}],"range":[52,72]},{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[22,26]},"property":{"type":"Identifier","name":"stringify","range":[27,36]},"computed":false,"range":[22,36]},"arguments":[{"type":"Identifier","name":"vNew","range":[37,41]}],"range":[22,42]}],"range":[83,6]},"range":[75,6]}],"range":[0,7]}',
 									tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"vOld","range":[7,11]},{"type":{"label":"::"},"value":"::","range":[11,13]},{"type":{"label":"name"},"value":"isUndefined","range":[13,24]},{"type":{"label":"("},"range":[24,25]},{"type":{"label":")"},"range":[25,26]},{"type":{"label":"||"},"value":"||","range":[27,29]},{"type":{"label":"name"},"value":"vNew","range":[30,34]},{"type":{"label":"::"},"value":"::","range":[34,36]},{"type":{"label":"name"},"value":"isUndefined","range":[36,47]},{"type":{"label":"("},"range":[47,48]},{"type":{"label":")"},"range":[48,49]},{"type":{"label":"||"},"value":"||","range":[50,52]},{"type":{"label":"name"},"value":"_isEqual","range":[53,61]},{"type":{"label":"("},"range":[61,62]},{"type":{"label":"name"},"value":"vOld","range":[62,66]},{"type":{"label":","},"range":[66,67]},{"type":{"label":"name"},"value":"vNew","range":[68,72]},{"type":{"label":")"},"range":[72,73]},{"type":{"label":","},"range":[73,74]},{"type":{"label":"name"},"value":"humanMsg","range":[75,83]},{"type":{"label":"`"},"range":[83,84]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\t\\tCannot merge ","range":[84,19]},{"type":{"label":"${"},"range":[19,21]},{"type":{"label":"name"},"value":"OldClass","range":[22,30]},{"type":{"label":"."},"range":[30,31]},{"type":{"label":"name"},"value":"name","range":[31,35]},{"type":{"label":"}"},"range":[36,37]},{"type":{"label":"template"},"value":".","range":[37,38]},{"type":{"label":"${"},"range":[38,40]},{"type":{"label":"name"},"value":"key","range":[41,44]},{"type":{"label":"}"},"range":[45,46]},{"type":{"label":"template"},"value":" = ","range":[46,49]},{"type":{"label":"${"},"range":[49,51]},{"type":{"label":"name"},"value":"JSON","range":[52,56]},{"type":{"label":"."},"range":[56,57]},{"type":{"label":"name"},"value":"stringify","range":[57,66]},{"type":{"label":"("},"range":[66,67]},{"type":{"label":"name"},"value":"vOld","range":[67,71]},{"type":{"label":")"},"range":[71,72]},{"type":{"label":"}"},"range":[73,74]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\t\\t\\t        with ","range":[74,19]},{"type":{"label":"${"},"range":[19,21]},{"type":{"label":"name"},"value":"JSON","range":[22,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"stringify","range":[27,36]},{"type":{"label":"("},"range":[36,37]},{"type":{"label":"name"},"value":"vNew","range":[37,41]},{"type":{"label":")"},"range":[41,42]},{"type":{"label":"}"},"range":[43,44]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t\\t\\t","range":[44,5]},{"type":{"label":"`"},"range":[5,6]},{"type":{"label":")"},"range":[6,7]}]',
 									visitorKeys: _powerAssertVisitorKeys
@@ -4661,7 +5064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 								return _isUndefined2.default.call(vOld) ? vNew : vOld;
 							}
 					}
-				});
+				}));
 			}
 		}]);
 	
@@ -4778,6 +5181,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	exports.default = Module;
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var _keys = Object.keys(input);
+
+			if (!_keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+
+			var _entries = _keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (_keys.length >= maxKeys) {
+				_entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + _entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + _entries + '\n' + indent + '}';
+			}
+		}
+	}
 
 /***/ },
 /* 55 */
@@ -4795,7 +5272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _schemas = __webpack_require__(39);
 	
@@ -5750,6 +6227,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = undefined;
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -5775,7 +6254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -5833,7 +6312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(initialSet, "arguments/0/object")[_rec._capt(_rec._capt(Symbol, "arguments/0/property/object").iterator, "arguments/0/property")], "arguments/0"), {
 				content: "assert(initialSet[Symbol.iterator])",
 				filepath: "src/util/ObservableSet.js",
-				line: 17,
+				line: 18,
 				ast: "{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"assert\",\"range\":[0,6]},\"arguments\":[{\"type\":\"MemberExpression\",\"object\":{\"type\":\"Identifier\",\"name\":\"initialSet\",\"range\":[7,17]},\"property\":{\"type\":\"MemberExpression\",\"object\":{\"type\":\"Identifier\",\"name\":\"Symbol\",\"range\":[18,24]},\"property\":{\"type\":\"Identifier\",\"name\":\"iterator\",\"range\":[25,33]},\"computed\":false,\"range\":[18,33]},\"computed\":true,\"range\":[7,34]}],\"range\":[0,35]}",
 				tokens: "[{\"type\":{\"label\":\"name\"},\"value\":\"assert\",\"range\":[0,6]},{\"type\":{\"label\":\"(\"},\"range\":[6,7]},{\"type\":{\"label\":\"name\"},\"value\":\"initialSet\",\"range\":[7,17]},{\"type\":{\"label\":\"[\"},\"range\":[17,18]},{\"type\":{\"label\":\"name\"},\"value\":\"Symbol\",\"range\":[18,24]},{\"type\":{\"label\":\".\"},\"range\":[24,25]},{\"type\":{\"label\":\"name\"},\"value\":\"iterator\",\"range\":[25,33]},{\"type\":{\"label\":\"]\"},\"range\":[33,34]},{\"type\":{\"label\":\")\"},\"range\":[34,35]}]",
 				visitorKeys: _powerAssertVisitorKeys
@@ -5907,7 +6386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							return this[$$deleteSubject];
 						}
 					default:
-						(0, _powerAssert2.default)(false, (0, _misc.humanMsg)(_templateObject, op));
+						(0, _misc.constraint)(false, (0, _misc.humanMsg)(_templateObject, op));
 				}
 			}
 		}, {
@@ -5919,7 +6398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							return this[$$valueObservable];
 						}
 					default:
-						(0, _powerAssert2.default)(false, (0, _misc.humanMsg)(_templateObject2, name));
+						(0, _misc.constraint)(false, (0, _misc.humanMsg)(_templateObject2, name));
 				}
 			}
 		}, {
@@ -5944,12 +6423,20 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: "clear",
 			value: function clear() {
+				_ref = this;
+	
+				if (!(_ref && (typeof _ref[Symbol.iterator] === 'function' || Array.isArray(_ref)))) {
+					throw new TypeError("Expected _ref to be iterable, got " + _inspect(_ref));
+				}
+	
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
 	
 				try {
-					for (var _iterator = this[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					for (var _iterator = _ref[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var _ref;
+	
 						var value = _step.value;
 						this.delete(value);
 					}
@@ -5980,6 +6467,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		setA = new Set(setA);
 		setB = new Set(setB);
 		if (setA.size !== setB.size) return false;
+	
+		if (!(setA && (typeof setA[Symbol.iterator] === 'function' || Array.isArray(setA)))) {
+			throw new TypeError("Expected setA to be iterable, got " + _inspect(setA));
+		}
+	
 		var _iteratorNormalCompletion2 = true;
 		var _didIteratorError2 = false;
 		var _iteratorError2 = undefined;
@@ -6009,6 +6501,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function copySetContent(reference, newContent) {
 		newContent = new Set(newContent);
+	
+		if (!(reference && (typeof reference[Symbol.iterator] === 'function' || Array.isArray(reference)))) {
+			throw new TypeError("Expected reference to be iterable, got " + _inspect(reference));
+		}
+	
 		var _iteratorNormalCompletion3 = true;
 		var _didIteratorError3 = false;
 		var _iteratorError3 = undefined;
@@ -6036,6 +6533,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		}
 	
+		if (!(newContent && (typeof newContent[Symbol.iterator] === 'function' || Array.isArray(newContent)))) {
+			throw new TypeError("Expected newContent to be iterable, got " + _inspect(newContent));
+		}
+	
 		var _iteratorNormalCompletion4 = true;
 		var _didIteratorError4 = false;
 		var _iteratorError4 = undefined;
@@ -6060,6 +6561,79 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (_didIteratorError4) {
 					throw _iteratorError4;
 				}
+			}
+		}
+	}
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === "undefined" ? "undefined" : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+			var entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + entries + '\n' + indent + '}';
 			}
 		}
 	}
@@ -6229,7 +6803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	if(__webpack_require__(17)){
 	  var LIBRARY             = __webpack_require__(117)
-	    , global              = __webpack_require__(3)
+	    , global              = __webpack_require__(4)
 	    , fails               = __webpack_require__(6)
 	    , $export             = __webpack_require__(1)
 	    , $typed              = __webpack_require__(249)
@@ -7733,7 +8307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _schemas = __webpack_require__(39);
 	
@@ -8065,7 +8639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var global      = __webpack_require__(3)
+	var global      = __webpack_require__(4)
 	  , dP          = __webpack_require__(18)
 	  , DESCRIPTORS = __webpack_require__(17)
 	  , SPECIES     = __webpack_require__(9)('species');
@@ -10423,14 +10997,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.event = exports.property = exports.default = undefined;
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _powerAssertVisitorKeys = '{"ArrayExpression":["elements"],"AssignmentExpression":["left","right"],"BinaryExpression":["left","right"],"Directive":["value"],"DirectiveLiteral":[],"BlockStatement":["directives","body"],"BreakStatement":["label"],"CallExpression":["callee","arguments"],"CatchClause":["param","body"],"ConditionalExpression":["test","consequent","alternate"],"ContinueStatement":["label"],"DebuggerStatement":[],"DoWhileStatement":["test","body"],"EmptyStatement":[],"ExpressionStatement":["expression"],"File":["program"],"ForInStatement":["left","right","body"],"ForStatement":["init","test","update","body"],"FunctionDeclaration":["id","params","body","returnType","typeParameters"],"FunctionExpression":["id","params","body","returnType","typeParameters"],"Identifier":["typeAnnotation"],"IfStatement":["test","consequent","alternate"],"LabeledStatement":["label","body"],"StringLiteral":[],"NumericLiteral":[],"NullLiteral":[],"BooleanLiteral":[],"RegExpLiteral":[],"LogicalExpression":["left","right"],"MemberExpression":["object","property"],"NewExpression":["callee","arguments"],"Program":["directives","body"],"ObjectExpression":["properties"],"ObjectMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectProperty":["key","value","decorators"],"RestElement":["argument","typeAnnotation"],"ReturnStatement":["argument"],"SequenceExpression":["expressions"],"SwitchCase":["test","consequent"],"SwitchStatement":["discriminant","cases"],"ThisExpression":[],"ThrowStatement":["argument"],"TryStatement":["block","handler","finalizer"],"UnaryExpression":["argument"],"UpdateExpression":["argument"],"VariableDeclaration":["declarations"],"VariableDeclarator":["id","init"],"WhileStatement":["test","body"],"WithStatement":["object","body"],"AssignmentPattern":["left","right"],"ArrayPattern":["elements","typeAnnotation"],"ArrowFunctionExpression":["params","body","returnType"],"ClassBody":["body"],"ClassDeclaration":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ClassExpression":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ExportAllDeclaration":["source"],"ExportDefaultDeclaration":["declaration"],"ExportNamedDeclaration":["declaration","specifiers","source"],"ExportSpecifier":["local","exported"],"ForOfStatement":["left","right","body"],"ImportDeclaration":["specifiers","source"],"ImportDefaultSpecifier":["local"],"ImportNamespaceSpecifier":["local"],"ImportSpecifier":["local","imported"],"MetaProperty":["meta","property"],"ClassMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectPattern":["properties","typeAnnotation"],"SpreadElement":["argument"],"Super":[],"TaggedTemplateExpression":["tag","quasi"],"TemplateElement":[],"TemplateLiteral":["quasis","expressions"],"YieldExpression":["argument"],"AnyTypeAnnotation":[],"ArrayTypeAnnotation":["elementType"],"BooleanTypeAnnotation":[],"BooleanLiteralTypeAnnotation":[],"NullLiteralTypeAnnotation":[],"ClassImplements":["id","typeParameters"],"ClassProperty":["key","value","typeAnnotation","decorators"],"DeclareClass":["id","typeParameters","extends","body"],"DeclareFunction":["id"],"DeclareInterface":["id","typeParameters","extends","body"],"DeclareModule":["id","body"],"DeclareTypeAlias":["id","typeParameters","right"],"DeclareVariable":["id"],"ExistentialTypeParam":[],"FunctionTypeAnnotation":["typeParameters","params","rest","returnType"],"FunctionTypeParam":["name","typeAnnotation"],"GenericTypeAnnotation":["id","typeParameters"],"InterfaceExtends":["id","typeParameters"],"InterfaceDeclaration":["id","typeParameters","extends","body"],"IntersectionTypeAnnotation":["types"],"MixedTypeAnnotation":[],"NullableTypeAnnotation":["typeAnnotation"],"NumericLiteralTypeAnnotation":[],"NumberTypeAnnotation":[],"StringLiteralTypeAnnotation":[],"StringTypeAnnotation":[],"ThisTypeAnnotation":[],"TupleTypeAnnotation":["types"],"TypeofTypeAnnotation":["argument"],"TypeAlias":["id","typeParameters","right"],"TypeAnnotation":["typeAnnotation"],"TypeCastExpression":["expression","typeAnnotation"],"TypeParameter":["bound"],"TypeParameterDeclaration":["params"],"TypeParameterInstantiation":["params"],"ObjectTypeAnnotation":["properties","indexers","callProperties"],"ObjectTypeCallProperty":["value"],"ObjectTypeIndexer":["id","key","value"],"ObjectTypeProperty":["key","value"],"QualifiedTypeIdentifier":["id","qualification"],"UnionTypeAnnotation":["types"],"VoidTypeAnnotation":[],"JSXAttribute":["name","value"],"JSXClosingElement":["name"],"JSXElement":["openingElement","children","closingElement"],"JSXEmptyExpression":[],"JSXExpressionContainer":["expression"],"JSXIdentifier":[],"JSXMemberExpression":["object","property"],"JSXNamespacedName":["namespace","name"],"JSXOpeningElement":["name","attributes"],"JSXSpreadAttribute":["argument"],"JSXText":[],"Noop":[],"ParenthesizedExpression":["expression"],"AwaitExpression":["argument"],"BindExpression":["object","callee"],"Decorator":["expression"],"DoExpression":["body"],"ExportDefaultSpecifier":["exported"],"ExportNamespaceSpecifier":["exported"],"RestProperty":["argument"],"SpreadProperty":["argument"]}',
-	    _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }();
 	
 	var _includes = __webpack_require__(364);
 	
@@ -10448,9 +11021,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _set2 = _interopRequireDefault(_set);
 	
-	var _entries = __webpack_require__(21);
+	var _entries2 = __webpack_require__(21);
 	
-	var _entries2 = _interopRequireDefault(_entries);
+	var _entries3 = _interopRequireDefault(_entries2);
 	
 	var _isEqual2 = __webpack_require__(216);
 	
@@ -10482,6 +11055,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	__webpack_require__(27);
 	
+	var _misc = __webpack_require__(3);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
@@ -10512,6 +11087,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(ValueTracker, [{
 			key: $$initialize,
 			value: function value() {
+				var _context;
+	
 				if (this[$$events]) {
 					return;
 				}
@@ -10521,13 +11098,19 @@ return /******/ (function(modules) { // webpackBootstrap
 				this[$$currentValues] = {};
 	
 				/* add the events and properties added with ES7 annotations */
+				_ref = (_context = this.constructor[$$events] || {}, _entries3.default).call(_context);
+	
+				if (!(_ref && (typeof _ref[Symbol.iterator] === 'function' || Array.isArray(_ref)))) {
+					throw new TypeError('Expected _ref to be iterable, got ' + _inspect(_ref));
+				}
+	
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
 	
 				try {
-					for (var _iterator = (_context = this.constructor[$$events] || {}, _entries2.default).call(_context)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var _context;
+					for (var _iterator = _ref[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var _ref;
 	
 						var _step$value = _slicedToArray(_step.value, 2);
 	
@@ -10551,13 +11134,19 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				}
 	
+				_ref2 = (_context = this.constructor[$$properties] || {}, _entries3.default).call(_context);
+	
+				if (!(_ref2 && (typeof _ref2[Symbol.iterator] === 'function' || Array.isArray(_ref2)))) {
+					throw new TypeError('Expected _ref2 to be iterable, got ' + _inspect(_ref2));
+				}
+	
 				var _iteratorNormalCompletion2 = true;
 				var _didIteratorError2 = false;
 				var _iteratorError2 = undefined;
 	
 				try {
-					for (var _iterator2 = (_context2 = this.constructor[$$properties] || {}, _entries2.default).call(_context2)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-						var _context2;
+					for (var _iterator2 = _ref2[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var _ref2;
 	
 						var _step2$value = _slicedToArray(_step2.value, 2);
 	
@@ -10594,13 +11183,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		_createClass(ValueTracker, [{
 			key: 'setValueTrackerOptions',
-			value: function setValueTrackerOptions(_ref) {
-				var _ref$takeUntil = _ref.takeUntil;
-				var takeUntil = _ref$takeUntil === undefined ? (0, _never.never)() : _ref$takeUntil;
-				var _ref$filterBy = _ref.filterBy;
-				var filterBy = _ref$filterBy === undefined ? function () {
+			value: function setValueTrackerOptions(_ref3) {
+				var _ref3$takeUntil = _ref3.takeUntil;
+				var takeUntil = _ref3$takeUntil === undefined ? (0, _never.never)() : _ref3$takeUntil;
+				var _ref3$filterBy = _ref3.filterBy;
+				var filterBy = _ref3$filterBy === undefined ? function () {
 					return true;
-				} : _ref$filterBy;
+				} : _ref3$filterBy;
 	
 				this[$$takeUntil] = takeUntil;
 				this[$$filterBy] = filterBy;
@@ -10619,36 +11208,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'newEvent',
 			value: function newEvent(name) {
-				var _context3;
+				var _context2;
 	
-				var _rec = new _powerAssertRecorder(),
-				    _rec2 = new _powerAssertRecorder();
+				var _ref4 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
-				var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-				_objectDestructuringEmpty(_ref2);
+				_objectDestructuringEmpty(_ref4);
 	
 				this[$$initialize]();
 	
 				/* is the event name already taken? */
-				(0, _powerAssert2.default)(_rec._expr(_rec._capt(!_rec._capt(_rec._capt(this[_rec._capt($$events, 'arguments/0/argument/object/property')], 'arguments/0/argument/object')[_rec._capt(name, 'arguments/0/argument/property')], 'arguments/0/argument'), 'arguments/0'), {
-					content: 'assert(!this[$$events][name], `There is already an event \'${ name }\' on this object.`)',
-					filepath: 'src/util/ValueTracker.js',
-					line: 79,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$events","range":[13,21]},"computed":true,"range":[8,22]},"property":{"type":"Identifier","name":"name","range":[23,27]},"computed":true,"range":[8,28]},"prefix":true,"range":[7,28]},{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"There is already an event \'","cooked":"There is already an event \'"},"tail":false,"range":[31,58]},{"type":"TemplateElement","value":{"raw":"\' on this object.","cooked":"\' on this object."},"tail":true,"range":[67,84]}],"expressions":[{"type":"Identifier","name":"name","range":[61,65]}],"range":[30,85]}],"range":[0,86]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$events","range":[13,21]},{"type":{"label":"]"},"range":[21,22]},{"type":{"label":"["},"range":[22,23]},{"type":{"label":"name"},"value":"name","range":[23,27]},{"type":{"label":"]"},"range":[27,28]},{"type":{"label":","},"range":[28,29]},{"type":{"label":"`"},"range":[30,31]},{"type":{"label":"template"},"value":"There is already an event \'","range":[31,58]},{"type":{"label":"${"},"range":[58,60]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"\' on this object.","range":[67,84]},{"type":{"label":"`"},"range":[84,85]},{"type":{"label":")"},"range":[85,86]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), 'There is already an event \'' + name + '\' on this object.');
-				(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(!_rec2._capt(_rec2._capt(this[_rec2._capt($$properties, 'arguments/0/argument/object/property')], 'arguments/0/argument/object')[_rec2._capt(name, 'arguments/0/argument/property')], 'arguments/0/argument'), 'arguments/0'), {
-					content: 'assert(!this[$$properties][name], `There is already a property \'${ name }\' on this object.`)',
-					filepath: 'src/util/ValueTracker.js',
-					line: 81,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$properties","range":[13,25]},"computed":true,"range":[8,26]},"property":{"type":"Identifier","name":"name","range":[27,31]},"computed":true,"range":[8,32]},"prefix":true,"range":[7,32]},{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"There is already a property \'","cooked":"There is already a property \'"},"tail":false,"range":[35,64]},{"type":"TemplateElement","value":{"raw":"\' on this object.","cooked":"\' on this object."},"tail":true,"range":[73,90]}],"expressions":[{"type":"Identifier","name":"name","range":[67,71]}],"range":[34,91]}],"range":[0,92]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$properties","range":[13,25]},{"type":{"label":"]"},"range":[25,26]},{"type":{"label":"["},"range":[26,27]},{"type":{"label":"name"},"value":"name","range":[27,31]},{"type":{"label":"]"},"range":[31,32]},{"type":{"label":","},"range":[32,33]},{"type":{"label":"`"},"range":[34,35]},{"type":{"label":"template"},"value":"There is already a property \'","range":[35,64]},{"type":{"label":"${"},"range":[64,66]},{"type":{"label":"name"},"value":"name","range":[67,71]},{"type":{"label":"}"},"range":[72,73]},{"type":{"label":"template"},"value":"\' on this object.","range":[73,90]},{"type":{"label":"`"},"range":[90,91]},{"type":{"label":")"},"range":[91,92]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), 'There is already a property \'' + name + '\' on this object.');
+				(0, _misc.constraint)(!this[$$events][name], 'There is already an event \'' + name + '\' on this object.');
+				(0, _misc.constraint)(!this[$$properties][name], 'There is already a property \'' + name + '\' on this object.');
 	
-				this[$$events][name] = (_context3 = (_context3 = new _Subject.Subject(), _takeUntil.takeUntil).call(_context3, this[$$takeUntil]), _filter.filter).call(_context3, this[$$filterBy]);
+				this[$$events][name] = (_context2 = (_context2 = new _Subject.Subject(), _takeUntil.takeUntil).call(_context2, this[$$takeUntil]), _filter.filter).call(_context2, this[$$filterBy]);
 	
 				return this[$$events][name];
 			}
@@ -10670,53 +11242,36 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'newProperty',
 			value: function newProperty(name) {
-				var _context4,
+				var _context3,
 				    _this = this;
 	
-				var _rec3 = new _powerAssertRecorder(),
-				    _rec4 = new _powerAssertRecorder();
+				var _ref5 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
-				var _ref3 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-				var _ref3$readonly = _ref3.readonly;
-				var readonly = _ref3$readonly === undefined ? false : _ref3$readonly;
-				var _ref3$isEqual = _ref3.isEqual;
-				var isEqual = _ref3$isEqual === undefined ? _isEqual3.default : _ref3$isEqual;
-				var _ref3$isValid = _ref3.isValid;
-				var isValid = _ref3$isValid === undefined ? function () {
+				var _ref5$readonly = _ref5.readonly;
+				var readonly = _ref5$readonly === undefined ? false : _ref5$readonly;
+				var _ref5$isEqual = _ref5.isEqual;
+				var isEqual = _ref5$isEqual === undefined ? _isEqual3.default : _ref5$isEqual;
+				var _ref5$isValid = _ref5.isValid;
+				var isValid = _ref5$isValid === undefined ? function () {
 					return true;
-				} : _ref3$isValid;
-				var initial = _ref3.initial;
+				} : _ref5$isValid;
+				var initial = _ref5.initial;
 	
 				this[$$initialize]();
 	
 				/* is the property name already taken? */
-				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(!_rec3._capt(_rec3._capt(this[_rec3._capt($$events, 'arguments/0/argument/object/property')], 'arguments/0/argument/object')[_rec3._capt(name, 'arguments/0/argument/property')], 'arguments/0/argument'), 'arguments/0'), {
-					content: 'assert(!this[$$events][name], `There is already an event \'${ name }\' on this object.`)',
-					filepath: 'src/util/ValueTracker.js',
-					line: 113,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$events","range":[13,21]},"computed":true,"range":[8,22]},"property":{"type":"Identifier","name":"name","range":[23,27]},"computed":true,"range":[8,28]},"prefix":true,"range":[7,28]},{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"There is already an event \'","cooked":"There is already an event \'"},"tail":false,"range":[31,58]},{"type":"TemplateElement","value":{"raw":"\' on this object.","cooked":"\' on this object."},"tail":true,"range":[67,84]}],"expressions":[{"type":"Identifier","name":"name","range":[61,65]}],"range":[30,85]}],"range":[0,86]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$events","range":[13,21]},{"type":{"label":"]"},"range":[21,22]},{"type":{"label":"["},"range":[22,23]},{"type":{"label":"name"},"value":"name","range":[23,27]},{"type":{"label":"]"},"range":[27,28]},{"type":{"label":","},"range":[28,29]},{"type":{"label":"`"},"range":[30,31]},{"type":{"label":"template"},"value":"There is already an event \'","range":[31,58]},{"type":{"label":"${"},"range":[58,60]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"\' on this object.","range":[67,84]},{"type":{"label":"`"},"range":[84,85]},{"type":{"label":")"},"range":[85,86]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), 'There is already an event \'' + name + '\' on this object.');
-				(0, _powerAssert2.default)(_rec4._expr(_rec4._capt(!_rec4._capt(_rec4._capt(this[_rec4._capt($$properties, 'arguments/0/argument/object/property')], 'arguments/0/argument/object')[_rec4._capt(name, 'arguments/0/argument/property')], 'arguments/0/argument'), 'arguments/0'), {
-					content: 'assert(!this[$$properties][name], `There is already a property \'${ name }\' on this object.`)',
-					filepath: 'src/util/ValueTracker.js',
-					line: 115,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$properties","range":[13,25]},"computed":true,"range":[8,26]},"property":{"type":"Identifier","name":"name","range":[27,31]},"computed":true,"range":[8,32]},"prefix":true,"range":[7,32]},{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"There is already a property \'","cooked":"There is already a property \'"},"tail":false,"range":[35,64]},{"type":"TemplateElement","value":{"raw":"\' on this object.","cooked":"\' on this object."},"tail":true,"range":[73,90]}],"expressions":[{"type":"Identifier","name":"name","range":[67,71]}],"range":[34,91]}],"range":[0,92]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$properties","range":[13,25]},{"type":{"label":"]"},"range":[25,26]},{"type":{"label":"["},"range":[26,27]},{"type":{"label":"name"},"value":"name","range":[27,31]},{"type":{"label":"]"},"range":[31,32]},{"type":{"label":","},"range":[32,33]},{"type":{"label":"`"},"range":[34,35]},{"type":{"label":"template"},"value":"There is already a property \'","range":[35,64]},{"type":{"label":"${"},"range":[64,66]},{"type":{"label":"name"},"value":"name","range":[67,71]},{"type":{"label":"}"},"range":[72,73]},{"type":{"label":"template"},"value":"\' on this object.","range":[73,90]},{"type":{"label":"`"},"range":[90,91]},{"type":{"label":")"},"range":[91,92]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), 'There is already a property \'' + name + '\' on this object.');
+				(0, _misc.constraint)(!this[$$events][name], 'There is already an event \'' + name + '\' on this object.');
+				(0, _misc.constraint)(!this[$$properties][name], 'There is already a property \'' + name + '\' on this object.');
 	
 				/* if isValid is an array, check for inclusion */
-				if ((_context4 = isValid, _isArray2.default).call(_context4)) {
-					var _context5;
+				if ((_context3 = isValid, _isArray2.default).call(_context3)) {
+					var _context4;
 	
-					isValid = (_context5 = isValid, _includes2.default).bind(_context5);
+					isValid = (_context4 = isValid, _includes2.default).bind(_context4);
 				}
 	
 				/* define the bus which manages the property */
-				var subject = this[$$settableProperties][name] = (_context4 = (_context4 = (_context4 = (_context4 = new _BehaviorSubject.BehaviorSubject(initial), _filter.filter).call(_context4, this[$$filterBy]), _filter.filter).call(_context4, isValid.bind(this)), _takeUntil.takeUntil).call(_context4, this[$$takeUntil]), _distinctUntilChanged.distinctUntilChanged).call(_context4, isEqual.bind(this));
+				var subject = this[$$settableProperties][name] = (_context3 = (_context3 = (_context3 = (_context3 = new _BehaviorSubject.BehaviorSubject(initial), _filter.filter).call(_context3, this[$$filterBy]), _filter.filter).call(_context3, isValid.bind(this)), _takeUntil.takeUntil).call(_context3, this[$$takeUntil]), _distinctUntilChanged.distinctUntilChanged).call(_context3, isEqual.bind(this));
 				this[$$properties][name] = readonly ? subject.asObservable() : subject;
 	
 				/* keep track of current value */
@@ -10725,7 +11280,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				});
 	
 				/* create event version of the property */
-				this[$$events][name] = (_context4 = subject.asObservable(), _skip.skip).call(_context4, 1); // skip 'current value' on subscribe
+				this[$$events][name] = (_context3 = subject.asObservable(), _skip.skip).call(_context3, 1); // skip 'current value' on subscribe
 	
 				/* return property */
 				return this[$$settableProperties][name];
@@ -10773,9 +11328,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				this[$$initialize]();
 				if (_isArray2.default.call(nameOrDeps)) {
-					var _context6, _ref4;
+					var _context5, _ref6;
 	
-					return (_ref4 = (_context6 = _combineLatest.combineLatest.apply(undefined, _toConsumableArray(nameOrDeps.map(this.p.bind(this)))), _withLatestFrom.withLatestFrom)).call.apply(_ref4, [_context6].concat(_toConsumableArray(optionalPassiveDeps.map(this.p.bind(this))), [function (active) {
+					return (_ref6 = (_context5 = _combineLatest.combineLatest.apply(undefined, _toConsumableArray(nameOrDeps.map(this.p.bind(this)))), _withLatestFrom.withLatestFrom)).call.apply(_ref6, [_context5].concat(_toConsumableArray(optionalPassiveDeps.map(this.p.bind(this))), [function (active) {
 						for (var _len2 = arguments.length, passive = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
 							passive[_key2 - 1] = arguments[_key2];
 						}
@@ -10783,16 +11338,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						return optionalTransformer.apply(undefined, _toConsumableArray(active).concat(passive));
 					}]));
 				} else if (_isString2.default.call(nameOrDeps)) {
-					var _rec5 = new _powerAssertRecorder();
-	
-					(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt(this[_rec5._capt($$properties, 'arguments/0/object/property')], 'arguments/0/object')[_rec5._capt(nameOrDeps, 'arguments/0/property')], 'arguments/0'), {
-						content: 'assert(this[$$properties][nameOrDeps], `No property \'${ nameOrDeps }\' exists.`)',
-						filepath: 'src/util/ValueTracker.js',
-						line: 173,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"$$properties","range":[12,24]},"computed":true,"range":[7,25]},"property":{"type":"Identifier","name":"nameOrDeps","range":[26,36]},"computed":true,"range":[7,37]},{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"No property \'","cooked":"No property \'"},"tail":false,"range":[40,53]},{"type":"TemplateElement","value":{"raw":"\' exists.","cooked":"\' exists."},"tail":true,"range":[68,77]}],"expressions":[{"type":"Identifier","name":"nameOrDeps","range":[56,66]}],"range":[39,78]}],"range":[0,79]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"["},"range":[11,12]},{"type":{"label":"name"},"value":"$$properties","range":[12,24]},{"type":{"label":"]"},"range":[24,25]},{"type":{"label":"["},"range":[25,26]},{"type":{"label":"name"},"value":"nameOrDeps","range":[26,36]},{"type":{"label":"]"},"range":[36,37]},{"type":{"label":","},"range":[37,38]},{"type":{"label":"`"},"range":[39,40]},{"type":{"label":"template"},"value":"No property \'","range":[40,53]},{"type":{"label":"${"},"range":[53,55]},{"type":{"label":"name"},"value":"nameOrDeps","range":[56,66]},{"type":{"label":"}"},"range":[67,68]},{"type":{"label":"template"},"value":"\' exists.","range":[68,77]},{"type":{"label":"`"},"range":[77,78]},{"type":{"label":")"},"range":[78,79]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}), 'No property \'' + nameOrDeps + '\' exists.');
+					(0, _misc.constraint)(this[$$properties][nameOrDeps], 'No property \'' + nameOrDeps + '\' exists.');
 					return this[$$properties][nameOrDeps];
 				}
 			}
@@ -10841,17 +11387,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var event = exports.event = function event() {
 		var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 		return function (target, key) {
-			var _rec6 = new _powerAssertRecorder();
-	
 			var match = key.match(/^(\w+)Event$/);
-			(0, _powerAssert2.default)(_rec6._expr(_rec6._capt(match, 'arguments/0'), {
-				content: 'assert(match)',
-				filepath: 'src/util/ValueTracker.js',
-				line: 207,
-				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"Identifier","name":"match","range":[7,12]}],"range":[0,13]}',
-				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"match","range":[7,12]},{"type":{"label":")"},"range":[12,13]}]',
-				visitorKeys: _powerAssertVisitorKeys
-			}));
+			(0, _misc.constraint)(match, '@event() decorators require a name that ends in \'Event\'.');
 			var name = match[1];
 			_set2.default.call(target, ['constructor', $$events, name], options);
 			return {
@@ -10861,6 +11398,80 @@ return /******/ (function(modules) { // webpackBootstrap
 			};
 		};
 	};
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+
+			var _entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				_entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + _entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + _entries + '\n' + indent + '}';
+			}
+		}
+	}
 
 /***/ },
 /* 166 */
@@ -18368,7 +18979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var global            = __webpack_require__(3)
+	var global            = __webpack_require__(4)
 	  , $export           = __webpack_require__(1)
 	  , redefine          = __webpack_require__(42)
 	  , redefineAll       = __webpack_require__(121)
@@ -18573,7 +19184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var K = Math.random();
 	  // In FF throws only define methods
 	  __defineSetter__.call(null, K, function(){ /* empty */});
-	  delete __webpack_require__(3)[K];
+	  delete __webpack_require__(4)[K];
 	});
 
 /***/ },
@@ -18616,7 +19227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global = __webpack_require__(3)
+	var global = __webpack_require__(4)
 	  , SHARED = '__core-js_shared__'
 	  , store  = global[SHARED] || (global[SHARED] = {});
 	module.exports = function(key){
@@ -18627,7 +19238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 249 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global = __webpack_require__(3)
+	var global = __webpack_require__(4)
 	  , hide   = __webpack_require__(37)
 	  , uid    = __webpack_require__(124)
 	  , TYPED  = uid('typed_array')
@@ -19623,6 +20234,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = undefined;
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -19640,7 +20253,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _dec5,
 	    _dec6,
 	    _desc,
-	    _value,
+	    _value2,
 	    _class,
 	    _descriptor,
 	    _descriptor2,
@@ -19671,9 +20284,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _size2 = _interopRequireDefault(_size);
 	
-	var _keys = __webpack_require__(193);
+	var _keys2 = __webpack_require__(193);
 	
-	var _keys2 = _interopRequireDefault(_keys);
+	var _keys3 = _interopRequireDefault(_keys2);
 	
 	var _values = __webpack_require__(128);
 	
@@ -19695,7 +20308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ObservableSet2 = _interopRequireDefault(_ObservableSet);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _fields = __webpack_require__(163);
 	
@@ -19725,8 +20338,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
-	
 	function _initDefineProp(target, property, descriptor, context) {
 		if (!descriptor) return;
 		Object.defineProperty(target, property, {
@@ -19740,6 +20351,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
@@ -19825,6 +20438,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function createClass(config) {
 				var _defineProperties$cal;
 	
+				function _ref(_id) {
+					if (!(typeof _id === 'function' && _id.prototype && _id.prototype.constructor === _id)) {
+						throw new TypeError('Function return value violates contract.\n\nExpected:\nClass<Entity>\n\nGot:\n' + _inspect(_id));
+					}
+	
+					return _id;
+				}
+	
 				/* create the class with the right name, constructor and static content */
 				var name = config.name;
 	
@@ -19883,12 +20504,20 @@ return /******/ (function(modules) { // webpackBootstrap
 							if (otherClass === this) {
 								return true;
 							}
+							_extendedBy = this.extendedBy;
+	
+							if (!(_extendedBy && (typeof _extendedBy[Symbol.iterator] === 'function' || Array.isArray(_extendedBy)))) {
+								throw new TypeError('Expected _extendedBy to be iterable, got ' + _inspect(_extendedBy));
+							}
+	
 							var _iteratorNormalCompletion = true;
 							var _didIteratorError = false;
 							var _iteratorError = undefined;
 	
 							try {
-								for (var _iterator = this.extendedBy[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+								for (var _iterator = _extendedBy[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+									var _extendedBy;
+	
 									var SubClass = _step.value;
 	
 									if (SubClass.hasSubclass(otherClass)) {
@@ -19921,32 +20550,70 @@ return /******/ (function(modules) { // webpackBootstrap
 							case 'allCommitted':
 								return this[$$committedEntitiesSubject];
 							default:
-								(0, _powerAssert2.default)(false, (0, _misc.humanMsg)(_templateObject, name, this.name));
+								(0, _misc.constraint)(false, (0, _misc.humanMsg)(_templateObject, name, this.name));
 						}
 					}
 				}), _defineProperty(_defineProperties$cal, 'supersede', {
 					value: function value(factory) {
-						return EntitySubclass[$$PreferredClass] = factory(EntitySubclass[$$PreferredClass] || EntitySubclass);
+						function _value(_id2) {
+							if (!(typeof _id2 === 'function' && _id2.prototype && _id2.prototype.constructor === _id2)) {
+								throw new TypeError('Function return value violates contract.\n\nExpected:\nClass<this>\n\nGot:\n' + _inspect(_id2));
+							}
+	
+							return _id2;
+						}
+	
+						if (!(typeof factory === 'function')) {
+							throw new TypeError('Value of argument "factory" violates contract.\n\nExpected:\n(Class<this>) => Class<this>\n\nGot:\n' + _inspect(factory));
+						}
+	
+						return _value(EntitySubclass[$$PreferredClass] = factory(EntitySubclass[$$PreferredClass] || EntitySubclass));
 					}
 				}), _defineProperties$cal));
 	
 				/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
-				var _arr = [[$$entities, $$entitiesSubject], [$$committedEntities, $$committedEntitiesSubject]];
-				for (var _i = 0; _i < _arr.length; _i++) {
-					var _context;
+				_ref2 = [[$$entities, $$entitiesSubject], [$$committedEntities, $$committedEntitiesSubject]];
 	
-					var _arr$_i = _slicedToArray(_arr[_i], 2);
-	
-					var _$$set = _arr$_i[0];
-					var $$subject = _arr$_i[1];
-	
-					var localSet = new _ObservableSet2.default();
-					(_context = Entity[_$$set].e('add'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(localSet.e('add'));
-					(_context = Entity[_$$set].e('delete'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(localSet.e('delete'));
-					_boundNativeMethods.defineProperty.call(EntitySubclass, $$subject, { value: localSet.p('value') });
+				if (!(_ref2 && (typeof _ref2[Symbol.iterator] === 'function' || Array.isArray(_ref2)))) {
+					throw new TypeError('Expected _ref2 to be iterable, got ' + _inspect(_ref2));
 				}
 	
-				return EntitySubclass;
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
+	
+				try {
+					for (var _iterator2 = _ref2[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var _context;
+	
+						var _ref2;
+	
+						var _step2$value = _slicedToArray(_step2.value, 2);
+	
+						var _$$set = _step2$value[0];
+						var $$subject = _step2$value[1];
+	
+						var localSet = new _ObservableSet2.default();
+						(_context = Entity[_$$set].e('add'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(localSet.e('add'));
+						(_context = Entity[_$$set].e('delete'), _filter.filter).call(_context, EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(localSet.e('delete'));
+						_boundNativeMethods.defineProperty.call(EntitySubclass, $$subject, { value: localSet.p('value') });
+					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
+						}
+					}
+				}
+	
+				return _ref(EntitySubclass);
 			}
 	
 			/////////////////////////////////////////////////////////////////////
@@ -19957,6 +20624,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'new',
 			value: function _new(vals, options) {
+				if (!_instanceof(vals, Object)) {
+					throw new TypeError('Value of argument "vals" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(vals));
+				}
+	
+				if (!_instanceof(options, Object)) {
+					throw new TypeError('Value of argument "options" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(options));
+				}
+	
 				return new this.Change_new(this, vals, options).run();
 			}
 		}, {
@@ -19965,7 +20640,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			) {
 				var _context2;
 	
-				var _rec2 = new _powerAssertRecorder();
+				if (!(href != null && typeof href.href === 'string' || typeof href === 'string' || typeof href === 'number')) {
+					throw new TypeError('Value of argument "href" violates contract.\n\nExpected:\n{\n  href: string\n} | string | number\n\nGot:\n' + _inspect(href));
+				}
+	
+				if (!_instanceof(options, Object)) {
+					throw new TypeError('Value of argument "options" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(options));
+				}
 	
 				if ((_context2 = href, _isObject2.default).call(_context2)) {
 					href = { href: href };
@@ -19978,14 +20659,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					// so we can't query the server here.
 					return null;
 				}
-				(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(this.hasInstance(_rec2._capt(entity, 'arguments/0/arguments/0')), 'arguments/0'), {
-					content: 'assert(this.hasInstance(entity), humanMsg`\n\t\t\tThe entity at \'${ JSON.stringify(href) }\'\n\t\t\tis not of class \'${ this.name }\'\n\t\t\tbut of class \'${ entity.constructor.name }\'.\n\t\t`)',
-					filepath: 'src/Entity.js',
-					line: 205,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"hasInstance","range":[12,23]},"computed":false,"range":[7,23]},"arguments":[{"type":"Identifier","name":"entity","range":[24,30]}],"range":[7,31]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[33,41]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe entity at \'","cooked":"\\n\\t\\t\\tThe entity at \'"},"tail":false,"range":[42,18]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\tis not of class \'","cooked":"\'\\n\\t\\t\\tis not of class \'"},"tail":false,"range":[43,20]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\tbut of class \'","cooked":"\'\\n\\t\\t\\tbut of class \'"},"tail":false,"range":[34,17]},{"type":"TemplateElement","value":{"raw":"\'.\\n\\t\\t","cooked":"\'.\\n\\t\\t"},"tail":true,"range":[45,2]}],"expressions":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[21,25]},"property":{"type":"Identifier","name":"stringify","range":[26,35]},"computed":false,"range":[21,35]},"arguments":[{"type":"Identifier","name":"href","range":[36,40]}],"range":[21,41]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[23,27]},"property":{"type":"Identifier","name":"name","range":[28,32]},"computed":false,"range":[23,32]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"entity","range":[20,26]},"property":{"type":"Identifier","name":"constructor","range":[27,38]},"computed":false,"range":[20,38]},"property":{"type":"Identifier","name":"name","range":[39,43]},"computed":false,"range":[20,43]}],"range":[41,3]},"range":[33,3]}],"range":[0,4]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"hasInstance","range":[12,23]},{"type":{"label":"("},"range":[23,24]},{"type":{"label":"name"},"value":"entity","range":[24,30]},{"type":{"label":")"},"range":[30,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"humanMsg","range":[33,41]},{"type":{"label":"`"},"range":[41,42]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe entity at \'","range":[42,18]},{"type":{"label":"${"},"range":[18,20]},{"type":{"label":"name"},"value":"JSON","range":[21,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"stringify","range":[26,35]},{"type":{"label":"("},"range":[35,36]},{"type":{"label":"name"},"value":"href","range":[36,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\tis not of class \'","range":[43,20]},{"type":{"label":"${"},"range":[20,22]},{"type":{"label":"this"},"value":"this","range":[23,27]},{"type":{"label":"."},"range":[27,28]},{"type":{"label":"name"},"value":"name","range":[28,32]},{"type":{"label":"}"},"range":[33,34]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\tbut of class \'","range":[34,17]},{"type":{"label":"${"},"range":[17,19]},{"type":{"label":"name"},"value":"entity","range":[20,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"\'.\\n\\t\\t","range":[45,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), (0, _misc.humanMsg)(_templateObject2, JSON.stringify(href), this.name, entity.constructor.name));
+				(0, _misc.constraint)(this.hasInstance(entity), (0, _misc.humanMsg)(_templateObject2, JSON.stringify(href), this.name, entity.constructor.name));
 				return entity;
 			}
 		}, {
@@ -20006,16 +20680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'getSingleton',
 			value: function getSingleton() {
-				var _rec3 = new _powerAssertRecorder();
-	
-				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(this.singleton, 'arguments/0'), {
-					content: 'assert(this.singleton, humanMsg`\n\t\t\tThe \'${ this.name }\' class is not a singleton class.\n\t\t`)',
-					filepath: 'src/Entity.js',
-					line: 226,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"singleton","range":[12,21]},"computed":false,"range":[7,21]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[23,31]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe \'","cooked":"\\n\\t\\t\\tThe \'"},"tail":false,"range":[32,8]},{"type":"TemplateElement","value":{"raw":"\' class is not a singleton class.\\n\\t\\t","cooked":"\' class is not a singleton class.\\n\\t\\t"},"tail":true,"range":[22,2]}],"expressions":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[11,15]},"property":{"type":"Identifier","name":"name","range":[16,20]},"computed":false,"range":[11,20]}],"range":[31,3]},"range":[23,3]}],"range":[0,4]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"singleton","range":[12,21]},{"type":{"label":","},"range":[21,22]},{"type":{"label":"name"},"value":"humanMsg","range":[23,31]},{"type":{"label":"`"},"range":[31,32]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe \'","range":[32,8]},{"type":{"label":"${"},"range":[8,10]},{"type":{"label":"this"},"value":"this","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"name","range":[16,20]},{"type":{"label":"}"},"range":[21,22]},{"type":{"label":"template"},"value":"\' class is not a singleton class.\\n\\t\\t","range":[22,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), (0, _misc.humanMsg)(_templateObject3, this.name));
+				(0, _misc.constraint)(this.singleton, (0, _misc.humanMsg)(_templateObject3, this.name));
 				if (!this[$$singletonObject]) {
 					this[$$singletonObject] = this.new({
 						name: this.singular
@@ -20029,12 +20694,28 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'load',
 			value: function () {
-				var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(href, options // TODO: filtering, expanding, paging, ...
+				var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee(href, options // TODO: filtering, expanding, paging, ...
 				) {
 					return regeneratorRuntime.wrap(function _callee$(_context3) {
 						while (1) {
 							switch (_context3.prev = _context3.next) {
 								case 0:
+									if (href != null && typeof href.href === 'string' || typeof href === 'string' || typeof href === 'number') {
+										_context3.next = 2;
+										break;
+									}
+	
+									throw new TypeError('Value of argument "href" violates contract.\n\nExpected:\n{\n  href: string\n} | string | number\n\nGot:\n' + _inspect(href));
+	
+								case 2:
+									if (_instanceof(options, Object)) {
+										_context3.next = 4;
+										break;
+									}
+	
+									throw new TypeError('Value of argument "options" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(options));
+	
+								case 4:
 								case 'end':
 									return _context3.stop();
 							}
@@ -20043,7 +20724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}));
 	
 				function load(_x, _x2) {
-					return _ref.apply(this, arguments);
+					return _ref5.apply(this, arguments);
 				}
 	
 				return load;
@@ -20055,18 +20736,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-			var _rec4 = new _powerAssertRecorder(),
-			    _rec5 = new _powerAssertRecorder();
+			var _rec = new _powerAssertRecorder();
+	
+			var _ref6 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+			var _ref6$allowInvokingCo = _ref6.allowInvokingConstructor;
+			var allowInvokingConstructor = _ref6$allowInvokingCo === undefined ? false : _ref6$allowInvokingCo;
+	
+			_classCallCheck(this, Entity);
+	
+			if (!_instanceof(initialValues, Object)) {
+				throw new TypeError('Value of argument "initialValues" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(initialValues));
+			}
 	
 			/* initialize value tracking */
 	
-	
-			var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-			var _ref2$allowInvokingCo = _ref2.allowInvokingConstructor;
-			var allowInvokingConstructor = _ref2$allowInvokingCo === undefined ? false : _ref2$allowInvokingCo;
-	
-			_classCallCheck(this, Entity);
 	
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Entity).call(this));
 	
@@ -20084,18 +20768,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			});
 	
 			/* make sure this constructor was invoked under proper conditions */
-			(0, _powerAssert2.default)(_rec4._expr(_rec4._capt(allowInvokingConstructor, 'arguments/0'), {
-				content: 'assert(allowInvokingConstructor, humanMsg`\n\t\t\tDo not use \'new ${ this.constructor.name }(...args)\'.\n\t\t\tInstead, use \'${ this.constructor.name }.new(...args)\'.\n\t\t`)',
-				filepath: 'src/Entity.js',
-				line: 285,
-				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"Identifier","name":"allowInvokingConstructor","range":[7,31]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[33,41]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tDo not use \'new ","cooked":"\\n\\t\\t\\tDo not use \'new "},"tail":false,"range":[42,19]},{"type":"TemplateElement","value":{"raw":"(...args)\'.\\n\\t\\t\\tInstead, use \'","cooked":"(...args)\'.\\n\\t\\t\\tInstead, use \'"},"tail":false,"range":[45,17]},{"type":"TemplateElement","value":{"raw":".new(...args)\'.\\n\\t\\t","cooked":".new(...args)\'.\\n\\t\\t"},"tail":true,"range":[43,2]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[22,26]},"property":{"type":"Identifier","name":"constructor","range":[27,38]},"computed":false,"range":[22,38]},"property":{"type":"Identifier","name":"name","range":[39,43]},"computed":false,"range":[22,43]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[20,24]},"property":{"type":"Identifier","name":"constructor","range":[25,36]},"computed":false,"range":[20,36]},"property":{"type":"Identifier","name":"name","range":[37,41]},"computed":false,"range":[20,41]}],"range":[41,3]},"range":[33,3]}],"range":[0,4]}',
-				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"allowInvokingConstructor","range":[7,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"humanMsg","range":[33,41]},{"type":{"label":"`"},"range":[41,42]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tDo not use \'new ","range":[42,19]},{"type":{"label":"${"},"range":[19,21]},{"type":{"label":"this"},"value":"this","range":[22,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"(...args)\'.\\n\\t\\t\\tInstead, use \'","range":[45,17]},{"type":{"label":"${"},"range":[17,19]},{"type":{"label":"this"},"value":"this","range":[20,24]},{"type":{"label":"."},"range":[24,25]},{"type":{"label":"name"},"value":"constructor","range":[25,36]},{"type":{"label":"."},"range":[36,37]},{"type":{"label":"name"},"value":"name","range":[37,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":".new(...args)\'.\\n\\t\\t","range":[43,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
-				visitorKeys: _powerAssertVisitorKeys
-			}), (0, _misc.humanMsg)(_templateObject4, _this.constructor.name, _this.constructor.name));
-			(0, _powerAssert2.default)(_rec5._expr(_rec5._capt(_rec5._capt(_this.constructor, 'arguments/0/left') === _rec5._capt(_rec5._capt(_rec5._capt(_this.constructor, 'arguments/0/right/left/object')[_rec5._capt($$PreferredClass, 'arguments/0/right/left/property')], 'arguments/0/right/left') || _rec5._capt(_this.constructor, 'arguments/0/right/right'), 'arguments/0/right'), 'arguments/0'), {
+			(0, _misc.constraint)(allowInvokingConstructor, (0, _misc.humanMsg)(_templateObject4, _this.constructor.name, _this.constructor.name));
+			(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(_this.constructor, 'arguments/0/left') === _rec._capt(_rec._capt(_rec._capt(_this.constructor, 'arguments/0/right/left/object')[_rec._capt($$PreferredClass, 'arguments/0/right/left/property')], 'arguments/0/right/left') || _rec._capt(_this.constructor, 'arguments/0/right/right'), 'arguments/0/right'), 'arguments/0'), {
 				content: 'assert(this.constructor === (this.constructor[$$PreferredClass] || this.constructor))',
 				filepath: 'src/Entity.js',
-				line: 289,
+				line: 290,
 				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"constructor","range":[12,23]},"computed":false,"range":[7,23]},"right":{"type":"LogicalExpression","operator":"||","left":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[29,33]},"property":{"type":"Identifier","name":"constructor","range":[34,45]},"computed":false,"range":[29,45]},"property":{"type":"Identifier","name":"$$PreferredClass","range":[46,62]},"computed":true,"range":[29,63]},"right":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[67,71]},"property":{"type":"Identifier","name":"constructor","range":[72,83]},"computed":false,"range":[67,83]},"range":[29,83]},"range":[7,84]}],"range":[0,85]}',
 				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"constructor","range":[12,23]},{"type":{"label":"==/!="},"value":"===","range":[24,27]},{"type":{"label":"("},"range":[28,29]},{"type":{"label":"this"},"value":"this","range":[29,33]},{"type":{"label":"."},"range":[33,34]},{"type":{"label":"name"},"value":"constructor","range":[34,45]},{"type":{"label":"["},"range":[45,46]},{"type":{"label":"name"},"value":"$$PreferredClass","range":[46,62]},{"type":{"label":"]"},"range":[62,63]},{"type":{"label":"||"},"value":"||","range":[64,66]},{"type":{"label":"this"},"value":"this","range":[67,71]},{"type":{"label":"."},"range":[71,72]},{"type":{"label":"name"},"value":"constructor","range":[72,83]},{"type":{"label":")"},"range":[83,84]},{"type":{"label":")"},"range":[84,85]}]',
 				visitorKeys: _powerAssertVisitorKeys
@@ -20182,7 +20859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'commit',
 			value: function () {
-				var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+				var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
 					var _context5,
 					    _this2 = this;
 	
@@ -20202,7 +20879,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 									/* commit each field individually */ // TODO: commit all in a single transaction?
 									if ((_context5 = keysToCommit, _size2.default).call(_context5) === 0) {
-										keysToCommit = (_context6 = this.fields, _keys2.default).call(_context6);
+										keysToCommit = (_context6 = this.fields, _keys3.default).call(_context6);
 									}
 									_context7.next = 4;
 									return Promise.all(keysToCommit.map(function (key) {
@@ -20242,7 +20919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}));
 	
 				function commit(_x5) {
-					return _ref3.apply(this, arguments);
+					return _ref7.apply(this, arguments);
 				}
 	
 				return commit;
@@ -20260,7 +20937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				if ((_context8 = keysToRollback, _size2.default).call(_context8) === 0) {
 					var _context9;
 	
-					keysToRollback = (_context9 = this.fields, _keys2.default).call(_context9);
+					keysToRollback = (_context9 = this.fields, _keys3.default).call(_context9);
 				}
 				keysToRollback.map(function (key) {
 					_this3.fields[key].rollback();
@@ -20298,28 +20975,19 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function run() {
 				var _context10;
 	
-				var _rec = new _powerAssertRecorder();
-	
 				if ((_context10 = this.context.behavior.new, _isFunction2.default).call(_context10)) {
 					var customResult = this.context.behavior.new(_extends({}, this.initialValues), _extends({}, this.options));
 					if (customResult) {
 						return customResult;
 					}
 				}
-				(0, _powerAssert2.default)(_rec._expr(_rec._capt(!_rec._capt(_rec._capt(this.context, 'arguments/0/argument/object').abstract, 'arguments/0/argument'), 'arguments/0'), {
-					content: 'assert(!this.context.abstract, humanMsg`\n\t\t\t\tCannot instantiate the abstract\n\t\t\t\tclass ${ this.context.name }.\n\t\t\t`)',
-					filepath: 'src/Entity.js',
-					line: 166,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"context","range":[13,20]},"computed":false,"range":[8,20]},"property":{"type":"Identifier","name":"abstract","range":[21,29]},"computed":false,"range":[8,29]},"prefix":true,"range":[7,29]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[31,39]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","cooked":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass "},"tail":false,"range":[40,10]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t","cooked":".\\n\\t\\t\\t"},"tail":true,"range":[32,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[13,17]},"property":{"type":"Identifier","name":"context","range":[18,25]},"computed":false,"range":[13,25]},"property":{"type":"Identifier","name":"name","range":[26,30]},"computed":false,"range":[13,30]}],"range":[39,4]},"range":[31,4]}],"range":[0,5]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"."},"range":[12,13]},{"type":{"label":"name"},"value":"context","range":[13,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"abstract","range":[21,29]},{"type":{"label":","},"range":[29,30]},{"type":{"label":"name"},"value":"humanMsg","range":[31,39]},{"type":{"label":"`"},"range":[39,40]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tCannot instantiate the abstract\\n\\t\\t\\t\\tclass ","range":[40,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"this"},"value":"this","range":[13,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"context","range":[18,25]},{"type":{"label":"."},"range":[25,26]},{"type":{"label":"name"},"value":"name","range":[26,30]},{"type":{"label":"}"},"range":[31,32]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[32,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), (0, _misc.humanMsg)(_templateObject5, this.context.name));
+				(0, _misc.constraint)(!this.context.abstract, (0, _misc.humanMsg)(_templateObject5, this.context.name));
 				return new (this.context[$$PreferredClass] || this.context)(_extends({}, this.initialValues), _extends({}, this.options, { allowInvokingConstructor: true, new: true }));
 			}
 		}, {
 			key: 'commit',
 			value: function () {
-				var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+				var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
 					return regeneratorRuntime.wrap(function _callee3$(_context11) {
 						while (1) {
 							switch (_context11.prev = _context11.next) {
@@ -20332,7 +21000,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}));
 	
 				function commit() {
-					return _ref4.apply(this, arguments);
+					return _ref8.apply(this, arguments);
 				}
 	
 				return commit;
@@ -20380,6 +21048,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	_boundNativeMethods.assign.call(Entity, (_assign$call = {}, _defineProperty(_assign$call, $$entities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$entitiesSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _defineProperty(_assign$call, $$committedEntities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$committedEntitiesSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _defineProperty(_assign$call, $$committedEntitiesByHref, {}), _assign$call));
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var _keys = Object.keys(input);
+
+			if (!_keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+
+			var entries = _keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (_keys.length >= maxKeys) {
+				entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + entries + '\n' + indent + '}';
+			}
+		}
+	}
 
 /***/ },
 /* 255 */
@@ -20391,6 +21133,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	exports.tracker = undefined;
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -20435,6 +21179,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				var g = tracker[$$changes];
 				g.addVertex(this, this);
+	
+				if (!(changeDependencies && (typeof changeDependencies[Symbol.iterator] === 'function' || Array.isArray(changeDependencies)))) {
+					throw new TypeError('Expected changeDependencies to be iterable, got ' + _inspect(changeDependencies));
+				}
+	
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
@@ -20457,6 +21206,10 @@ return /******/ (function(modules) { // webpackBootstrap
 							throw _iteratorError;
 						}
 					}
+				}
+	
+				if (!(changeCauses && (typeof changeCauses[Symbol.iterator] === 'function' || Array.isArray(changeCauses)))) {
+					throw new TypeError('Expected changeCauses to be iterable, got ' + _inspect(changeCauses));
 				}
 	
 				var _iteratorNormalCompletion2 = true;
@@ -20560,21 +21313,31 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: $$commitUpToHere,
 				value: function () {
 					var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-						var _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _step3$value, dep;
+						var _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _tracker$$$changes$ve, _step3$value, dep;
 	
 						return regeneratorRuntime.wrap(function _callee3$(_context3) {
 							while (1) {
 								switch (_context3.prev = _context3.next) {
 									case 0:
+										_tracker$$$changes$ve = tracker[$$changes].verticesTo(this);
+	
+										if (_tracker$$$changes$ve && (typeof _tracker$$$changes$ve[Symbol.iterator] === 'function' || Array.isArray(_tracker$$$changes$ve))) {
+											_context3.next = 3;
+											break;
+										}
+	
+										throw new TypeError('Expected _tracker$$$changes$ve to be iterable, got ' + _inspect(_tracker$$$changes$ve));
+	
+									case 3:
 										_iteratorNormalCompletion3 = true;
 										_didIteratorError3 = false;
 										_iteratorError3 = undefined;
-										_context3.prev = 3;
-										_iterator3 = tracker[$$changes].verticesTo(this)[Symbol.iterator]();
+										_context3.prev = 6;
+										_iterator3 = _tracker$$$changes$ve[Symbol.iterator]();
 	
-									case 5:
+									case 8:
 										if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-											_context3.next = 16;
+											_context3.next = 19;
 											break;
 										}
 	
@@ -20582,62 +21345,62 @@ return /******/ (function(modules) { // webpackBootstrap
 										dep = _step3$value[0];
 	
 										if (dep.committed) {
-											_context3.next = 13;
+											_context3.next = 16;
 											break;
 										}
 	
-										_context3.next = 11;
+										_context3.next = 14;
 										return dep[$$commitUpToHere]();
 	
-									case 11:
-										_context3.next = 13;
+									case 14:
+										_context3.next = 16;
 										return dep.commit();
 	
-									case 13:
-										_iteratorNormalCompletion3 = true;
-										_context3.next = 5;
-										break;
-	
 									case 16:
-										_context3.next = 22;
+										_iteratorNormalCompletion3 = true;
+										_context3.next = 8;
 										break;
 	
-									case 18:
-										_context3.prev = 18;
-										_context3.t0 = _context3['catch'](3);
+									case 19:
+										_context3.next = 25;
+										break;
+	
+									case 21:
+										_context3.prev = 21;
+										_context3.t0 = _context3['catch'](6);
 										_didIteratorError3 = true;
 										_iteratorError3 = _context3.t0;
 	
-									case 22:
-										_context3.prev = 22;
-										_context3.prev = 23;
+									case 25:
+										_context3.prev = 25;
+										_context3.prev = 26;
 	
 										if (!_iteratorNormalCompletion3 && _iterator3.return) {
 											_iterator3.return();
 										}
 	
-									case 25:
-										_context3.prev = 25;
+									case 28:
+										_context3.prev = 28;
 	
 										if (!_didIteratorError3) {
-											_context3.next = 28;
+											_context3.next = 31;
 											break;
 										}
 	
 										throw _iteratorError3;
 	
-									case 28:
+									case 31:
+										return _context3.finish(28);
+	
+									case 32:
 										return _context3.finish(25);
 	
-									case 29:
-										return _context3.finish(22);
-	
-									case 30:
+									case 33:
 									case 'end':
 										return _context3.stop();
 								}
 							}
-						}, _callee3, this, [[3, 18, 22, 30], [23,, 25, 29]]);
+						}, _callee3, this, [[6, 21, 25, 33], [26,, 28, 32]]);
 					}));
 	
 					function value() {
@@ -20650,21 +21413,31 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: $$commitForcedFromHere,
 				value: function () {
 					var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
-						var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _step4$value, rdep, forced;
+						var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _tracker$$$changes$ve2, _step4$value, rdep, forced;
 	
 						return regeneratorRuntime.wrap(function _callee4$(_context4) {
 							while (1) {
 								switch (_context4.prev = _context4.next) {
 									case 0:
+										_tracker$$$changes$ve2 = tracker[$$changes].verticesFrom(this);
+	
+										if (_tracker$$$changes$ve2 && (typeof _tracker$$$changes$ve2[Symbol.iterator] === 'function' || Array.isArray(_tracker$$$changes$ve2))) {
+											_context4.next = 3;
+											break;
+										}
+	
+										throw new TypeError('Expected _tracker$$$changes$ve2 to be iterable, got ' + _inspect(_tracker$$$changes$ve2));
+	
+									case 3:
 										_iteratorNormalCompletion4 = true;
 										_didIteratorError4 = false;
 										_iteratorError4 = undefined;
-										_context4.prev = 3;
-										_iterator4 = tracker[$$changes].verticesFrom(this)[Symbol.iterator]();
+										_context4.prev = 6;
+										_iterator4 = _tracker$$$changes$ve2[Symbol.iterator]();
 	
-									case 5:
+									case 8:
 										if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-											_context4.next = 18;
+											_context4.next = 21;
 											break;
 										}
 	
@@ -20673,67 +21446,67 @@ return /******/ (function(modules) { // webpackBootstrap
 										forced = _step4$value[2].forced;
 	
 										if (!forced) {
-											_context4.next = 15;
+											_context4.next = 18;
 											break;
 										}
 	
 										if (rdep.committed) {
-											_context4.next = 13;
+											_context4.next = 16;
 											break;
 										}
 	
-										_context4.next = 13;
+										_context4.next = 16;
 										return rdep.commit();
 	
-									case 13:
-										_context4.next = 15;
+									case 16:
+										_context4.next = 18;
 										return rdep[$$commitForcedFromHere]();
 	
-									case 15:
-										_iteratorNormalCompletion4 = true;
-										_context4.next = 5;
-										break;
-	
 									case 18:
-										_context4.next = 24;
+										_iteratorNormalCompletion4 = true;
+										_context4.next = 8;
 										break;
 	
-									case 20:
-										_context4.prev = 20;
-										_context4.t0 = _context4['catch'](3);
+									case 21:
+										_context4.next = 27;
+										break;
+	
+									case 23:
+										_context4.prev = 23;
+										_context4.t0 = _context4['catch'](6);
 										_didIteratorError4 = true;
 										_iteratorError4 = _context4.t0;
 	
-									case 24:
-										_context4.prev = 24;
-										_context4.prev = 25;
+									case 27:
+										_context4.prev = 27;
+										_context4.prev = 28;
 	
 										if (!_iteratorNormalCompletion4 && _iterator4.return) {
 											_iterator4.return();
 										}
 	
-									case 27:
-										_context4.prev = 27;
+									case 30:
+										_context4.prev = 30;
 	
 										if (!_didIteratorError4) {
-											_context4.next = 30;
+											_context4.next = 33;
 											break;
 										}
 	
 										throw _iteratorError4;
 	
-									case 30:
+									case 33:
+										return _context4.finish(30);
+	
+									case 34:
 										return _context4.finish(27);
 	
-									case 31:
-										return _context4.finish(24);
-	
-									case 32:
+									case 35:
 									case 'end':
 										return _context4.stop();
 								}
 							}
-						}, _callee4, this, [[3, 20, 24, 32], [25,, 27, 31]]);
+						}, _callee4, this, [[6, 23, 27, 35], [28,, 30, 34]]);
 					}));
 	
 					function value() {
@@ -20808,6 +21581,79 @@ return /******/ (function(modules) { // webpackBootstrap
 	// export class SetRel$Field extends Change {}
 	//
 	// export class SetRel$ShortcutField extends Change {}
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+			var entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + entries + '\n' + indent + '}';
+			}
+		}
+	}
 
 /***/ },
 /* 256 */
@@ -20820,9 +21666,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _powerAssertVisitorKeys = '{"ArrayExpression":["elements"],"AssignmentExpression":["left","right"],"BinaryExpression":["left","right"],"Directive":["value"],"DirectiveLiteral":[],"BlockStatement":["directives","body"],"BreakStatement":["label"],"CallExpression":["callee","arguments"],"CatchClause":["param","body"],"ConditionalExpression":["test","consequent","alternate"],"ContinueStatement":["label"],"DebuggerStatement":[],"DoWhileStatement":["test","body"],"EmptyStatement":[],"ExpressionStatement":["expression"],"File":["program"],"ForInStatement":["left","right","body"],"ForStatement":["init","test","update","body"],"FunctionDeclaration":["id","params","body","returnType","typeParameters"],"FunctionExpression":["id","params","body","returnType","typeParameters"],"Identifier":["typeAnnotation"],"IfStatement":["test","consequent","alternate"],"LabeledStatement":["label","body"],"StringLiteral":[],"NumericLiteral":[],"NullLiteral":[],"BooleanLiteral":[],"RegExpLiteral":[],"LogicalExpression":["left","right"],"MemberExpression":["object","property"],"NewExpression":["callee","arguments"],"Program":["directives","body"],"ObjectExpression":["properties"],"ObjectMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectProperty":["key","value","decorators"],"RestElement":["argument","typeAnnotation"],"ReturnStatement":["argument"],"SequenceExpression":["expressions"],"SwitchCase":["test","consequent"],"SwitchStatement":["discriminant","cases"],"ThisExpression":[],"ThrowStatement":["argument"],"TryStatement":["block","handler","finalizer"],"UnaryExpression":["argument"],"UpdateExpression":["argument"],"VariableDeclaration":["declarations"],"VariableDeclarator":["id","init"],"WhileStatement":["test","body"],"WithStatement":["object","body"],"AssignmentPattern":["left","right"],"ArrayPattern":["elements","typeAnnotation"],"ArrowFunctionExpression":["params","body","returnType"],"ClassBody":["body"],"ClassDeclaration":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ClassExpression":["id","body","superClass","mixins","typeParameters","superTypeParameters","implements","decorators"],"ExportAllDeclaration":["source"],"ExportDefaultDeclaration":["declaration"],"ExportNamedDeclaration":["declaration","specifiers","source"],"ExportSpecifier":["local","exported"],"ForOfStatement":["left","right","body"],"ImportDeclaration":["specifiers","source"],"ImportDefaultSpecifier":["local"],"ImportNamespaceSpecifier":["local"],"ImportSpecifier":["local","imported"],"MetaProperty":["meta","property"],"ClassMethod":["key","params","body","decorators","returnType","typeParameters"],"ObjectPattern":["properties","typeAnnotation"],"SpreadElement":["argument"],"Super":[],"TaggedTemplateExpression":["tag","quasi"],"TemplateElement":[],"TemplateLiteral":["quasis","expressions"],"YieldExpression":["argument"],"AnyTypeAnnotation":[],"ArrayTypeAnnotation":["elementType"],"BooleanTypeAnnotation":[],"BooleanLiteralTypeAnnotation":[],"NullLiteralTypeAnnotation":[],"ClassImplements":["id","typeParameters"],"ClassProperty":["key","value","typeAnnotation","decorators"],"DeclareClass":["id","typeParameters","extends","body"],"DeclareFunction":["id"],"DeclareInterface":["id","typeParameters","extends","body"],"DeclareModule":["id","body"],"DeclareTypeAlias":["id","typeParameters","right"],"DeclareVariable":["id"],"ExistentialTypeParam":[],"FunctionTypeAnnotation":["typeParameters","params","rest","returnType"],"FunctionTypeParam":["name","typeAnnotation"],"GenericTypeAnnotation":["id","typeParameters"],"InterfaceExtends":["id","typeParameters"],"InterfaceDeclaration":["id","typeParameters","extends","body"],"IntersectionTypeAnnotation":["types"],"MixedTypeAnnotation":[],"NullableTypeAnnotation":["typeAnnotation"],"NumericLiteralTypeAnnotation":[],"NumberTypeAnnotation":[],"StringLiteralTypeAnnotation":[],"StringTypeAnnotation":[],"ThisTypeAnnotation":[],"TupleTypeAnnotation":["types"],"TypeofTypeAnnotation":["argument"],"TypeAlias":["id","typeParameters","right"],"TypeAnnotation":["typeAnnotation"],"TypeCastExpression":["expression","typeAnnotation"],"TypeParameter":["bound"],"TypeParameterDeclaration":["params"],"TypeParameterInstantiation":["params"],"ObjectTypeAnnotation":["properties","indexers","callProperties"],"ObjectTypeCallProperty":["value"],"ObjectTypeIndexer":["id","key","value"],"ObjectTypeProperty":["key","value"],"QualifiedTypeIdentifier":["id","qualification"],"UnionTypeAnnotation":["types"],"VoidTypeAnnotation":[],"JSXAttribute":["name","value"],"JSXClosingElement":["name"],"JSXElement":["openingElement","children","closingElement"],"JSXEmptyExpression":[],"JSXExpressionContainer":["expression"],"JSXIdentifier":[],"JSXMemberExpression":["object","property"],"JSXNamespacedName":["namespace","name"],"JSXOpeningElement":["name","attributes"],"JSXSpreadAttribute":["argument"],"JSXText":[],"Noop":[],"ParenthesizedExpression":["expression"],"AwaitExpression":["argument"],"BindExpression":["object","callee"],"Decorator":["expression"],"DoExpression":["body"],"ExportDefaultSpecifier":["exported"],"ExportNamespaceSpecifier":["exported"],"RestProperty":["argument"],"SpreadProperty":["argument"]}',
-	    _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }();
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tYou tried to manually assign a value ', '\n\t\t\tto ', '#', ',\n\t\t\tbut it already has a fixed value of ', '.\n\t\t'], ['\n\t\t\tYou tried to manually assign a value ', '\n\t\t\tto ', '#', ',\n\t\t\tbut it already has a fixed value of ', '.\n\t\t']),
 	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t    No value given for required field\n\t\t\t    \'', '#', '\'.\n\t\t\t'], ['\n\t\t\t    No value given for required field\n\t\t\t    \'', '#', '\'.\n\t\t\t']);
@@ -20845,7 +21688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _Field2 = __webpack_require__(29);
 	
@@ -20933,8 +21776,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		function PropertyField(options) {
 			var _context3;
 	
-			var _rec = new _powerAssertRecorder();
-	
 			_classCallCheck(this, PropertyField);
 	
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PropertyField).call(this, options));
@@ -20946,14 +21787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* sanity checks */
 	
-			(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt((_context3 = desc.value, _isUndefined2.default).call(_context3), 'arguments/0/left') || _rec._capt(_isUndefined2.default.call(initialValue), 'arguments/0/right'), 'arguments/0'), {
-				content: 'assert(desc.value::isUndefined() || initialValue::isUndefined(), humanMsg`\n\t\t\tYou tried to manually assign a value ${ JSON.stringify(initialValue) }\n\t\t\tto ${ owner.constructor.name }#${ key },\n\t\t\tbut it already has a fixed value of ${ JSON.stringify(desc.value) }.\n\t\t`)',
-				filepath: 'src/fields/PropertyField.js',
-				line: 73,
-				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"desc","range":[7,11]},"property":{"type":"Identifier","name":"value","range":[12,17]},"computed":false,"range":[7,17]},"callee":{"type":"Identifier","name":"isUndefined","range":[19,30]},"range":[7,30]},"arguments":[],"range":[7,32]},"right":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"initialValue","range":[36,48]},"callee":{"type":"Identifier","name":"isUndefined","range":[50,61]},"range":[36,61]},"arguments":[],"range":[36,63]},"range":[7,63]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[65,73]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tYou tried to manually assign a value ","cooked":"\\n\\t\\t\\tYou tried to manually assign a value "},"tail":false,"range":[74,40]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tto ","cooked":"\\n\\t\\t\\tto "},"tail":false,"range":[73,6]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[33,34]},{"type":"TemplateElement","value":{"raw":",\\n\\t\\t\\tbut it already has a fixed value of ","cooked":",\\n\\t\\t\\tbut it already has a fixed value of "},"tail":false,"range":[42,39]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t","cooked":".\\n\\t\\t"},"tail":true,"range":[70,2]}],"expressions":[{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[43,47]},"property":{"type":"Identifier","name":"stringify","range":[48,57]},"computed":false,"range":[43,57]},"arguments":[{"type":"Identifier","name":"initialValue","range":[58,70]}],"range":[43,71]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"owner","range":[9,14]},"property":{"type":"Identifier","name":"constructor","range":[15,26]},"computed":false,"range":[9,26]},"property":{"type":"Identifier","name":"name","range":[27,31]},"computed":false,"range":[9,31]},{"type":"Identifier","name":"key","range":[37,40]},{"type":"CallExpression","callee":{"type":"MemberExpression","object":{"type":"Identifier","name":"JSON","range":[42,46]},"property":{"type":"Identifier","name":"stringify","range":[47,56]},"computed":false,"range":[42,56]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"desc","range":[57,61]},"property":{"type":"Identifier","name":"value","range":[62,67]},"computed":false,"range":[57,67]}],"range":[42,68]}],"range":[73,3]},"range":[65,3]}],"range":[0,4]}',
-				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"desc","range":[7,11]},{"type":{"label":"."},"range":[11,12]},{"type":{"label":"name"},"value":"value","range":[12,17]},{"type":{"label":"::"},"value":"::","range":[17,19]},{"type":{"label":"name"},"value":"isUndefined","range":[19,30]},{"type":{"label":"("},"range":[30,31]},{"type":{"label":")"},"range":[31,32]},{"type":{"label":"||"},"value":"||","range":[33,35]},{"type":{"label":"name"},"value":"initialValue","range":[36,48]},{"type":{"label":"::"},"value":"::","range":[48,50]},{"type":{"label":"name"},"value":"isUndefined","range":[50,61]},{"type":{"label":"("},"range":[61,62]},{"type":{"label":")"},"range":[62,63]},{"type":{"label":","},"range":[63,64]},{"type":{"label":"name"},"value":"humanMsg","range":[65,73]},{"type":{"label":"`"},"range":[73,74]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tYou tried to manually assign a value ","range":[74,40]},{"type":{"label":"${"},"range":[40,42]},{"type":{"label":"name"},"value":"JSON","range":[43,47]},{"type":{"label":"."},"range":[47,48]},{"type":{"label":"name"},"value":"stringify","range":[48,57]},{"type":{"label":"("},"range":[57,58]},{"type":{"label":"name"},"value":"initialValue","range":[58,70]},{"type":{"label":")"},"range":[70,71]},{"type":{"label":"}"},"range":[72,73]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tto ","range":[73,6]},{"type":{"label":"${"},"range":[6,8]},{"type":{"label":"name"},"value":"owner","range":[9,14]},{"type":{"label":"."},"range":[14,15]},{"type":{"label":"name"},"value":"constructor","range":[15,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"name","range":[27,31]},{"type":{"label":"}"},"range":[32,33]},{"type":{"label":"template"},"value":"#","range":[33,34]},{"type":{"label":"${"},"range":[34,36]},{"type":{"label":"name"},"value":"key","range":[37,40]},{"type":{"label":"}"},"range":[41,42]},{"type":{"label":"template"},"value":",\\n\\t\\t\\tbut it already has a fixed value of ","range":[42,39]},{"type":{"label":"${"},"range":[39,41]},{"type":{"label":"name"},"value":"JSON","range":[42,46]},{"type":{"label":"."},"range":[46,47]},{"type":{"label":"name"},"value":"stringify","range":[47,56]},{"type":{"label":"("},"range":[56,57]},{"type":{"label":"name"},"value":"desc","range":[57,61]},{"type":{"label":"."},"range":[61,62]},{"type":{"label":"name"},"value":"value","range":[62,67]},{"type":{"label":")"},"range":[67,68]},{"type":{"label":"}"},"range":[69,70]},{"type":{"label":"template"},"value":".\\n\\t\\t","range":[70,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
-				visitorKeys: _powerAssertVisitorKeys
-			}), (0, _misc.humanMsg)(_templateObject, JSON.stringify(initialValue), owner.constructor.name, key, JSON.stringify(desc.value)));
+			(0, _misc.constraint)((_context3 = desc.value, _isUndefined2.default).call(_context3) || _isUndefined2.default.call(initialValue), (0, _misc.humanMsg)(_templateObject, JSON.stringify(initialValue), owner.constructor.name, key, JSON.stringify(desc.value)));
 	
 			/* set the initial value */
 			_this[_symbols.$$initSet]([!_isUndefined2.default.call(initialValue), (_context3 = _misc.callOrReturn.call(initialValue), _cloneDeep2.default).call(_context3)], ['default' in desc, (_context3 = (_context3 = desc.default, _misc.callOrReturn).call(_context3), _cloneDeep2.default).call(_context3)], ['value' in desc, (_context3 = (_context3 = desc.value, _misc.callOrReturn).call(_context3), _cloneDeep2.default).call(_context3)], [!desc.required]);
@@ -20967,16 +21801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 				if (stages.includes('commit')) {
-					var _rec2 = new _powerAssertRecorder();
-	
-					(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(!_rec2._capt(_rec2._capt(this[_rec2._capt(_symbols.$$desc, 'arguments/0/left/argument/object/property')], 'arguments/0/left/argument/object').required, 'arguments/0/left/argument'), 'arguments/0/left') || _rec2._capt(!_rec2._capt(_isUndefined2.default.call(val), 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
-						content: 'assert(!this[$$desc].required || !val::isUndefined(), humanMsg`\n\t\t\t    No value given for required field\n\t\t\t    \'${ this[$$owner].constructor.name }#${ this[$$key] }\'.\n\t\t\t`)',
-						filepath: 'src/fields/PropertyField.js',
-						line: 91,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[8,12]},"property":{"type":"Identifier","name":"$$desc","range":[13,19]},"computed":true,"range":[8,20]},"property":{"type":"Identifier","name":"required","range":[21,29]},"computed":false,"range":[8,29]},"prefix":true,"range":[7,29]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"val","range":[34,37]},"callee":{"type":"Identifier","name":"isUndefined","range":[39,50]},"range":[34,50]},"arguments":[],"range":[34,52]},"prefix":true,"range":[33,52]},"range":[7,52]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[54,62]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t    No value given for required field\\n\\t\\t\\t    \'","cooked":"\\n\\t\\t\\t    No value given for required field\\n\\t\\t\\t    \'"},"tail":false,"range":[63,8]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[43,44]},{"type":"TemplateElement","value":{"raw":"\'.\\n\\t\\t\\t","cooked":"\'.\\n\\t\\t\\t"},"tail":true,"range":[60,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[11,15]},"property":{"type":"Identifier","name":"$$owner","range":[16,23]},"computed":true,"range":[11,24]},"property":{"type":"Identifier","name":"constructor","range":[25,36]},"computed":false,"range":[11,36]},"property":{"type":"Identifier","name":"name","range":[37,41]},"computed":false,"range":[11,41]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[47,51]},"property":{"type":"Identifier","name":"$$key","range":[52,57]},"computed":true,"range":[47,58]}],"range":[62,4]},"range":[54,4]}],"range":[0,5]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"this"},"value":"this","range":[8,12]},{"type":{"label":"["},"range":[12,13]},{"type":{"label":"name"},"value":"$$desc","range":[13,19]},{"type":{"label":"]"},"range":[19,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"required","range":[21,29]},{"type":{"label":"||"},"value":"||","range":[30,32]},{"type":{"label":"prefix"},"value":"!","range":[33,34]},{"type":{"label":"name"},"value":"val","range":[34,37]},{"type":{"label":"::"},"value":"::","range":[37,39]},{"type":{"label":"name"},"value":"isUndefined","range":[39,50]},{"type":{"label":"("},"range":[50,51]},{"type":{"label":")"},"range":[51,52]},{"type":{"label":","},"range":[52,53]},{"type":{"label":"name"},"value":"humanMsg","range":[54,62]},{"type":{"label":"`"},"range":[62,63]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t    No value given for required field\\n\\t\\t\\t    \'","range":[63,8]},{"type":{"label":"${"},"range":[8,10]},{"type":{"label":"this"},"value":"this","range":[11,15]},{"type":{"label":"["},"range":[15,16]},{"type":{"label":"name"},"value":"$$owner","range":[16,23]},{"type":{"label":"]"},"range":[23,24]},{"type":{"label":"."},"range":[24,25]},{"type":{"label":"name"},"value":"constructor","range":[25,36]},{"type":{"label":"."},"range":[36,37]},{"type":{"label":"name"},"value":"name","range":[37,41]},{"type":{"label":"}"},"range":[42,43]},{"type":{"label":"template"},"value":"#","range":[43,44]},{"type":{"label":"${"},"range":[44,46]},{"type":{"label":"this"},"value":"this","range":[47,51]},{"type":{"label":"["},"range":[51,52]},{"type":{"label":"name"},"value":"$$key","range":[52,57]},{"type":{"label":"]"},"range":[57,58]},{"type":{"label":"}"},"range":[59,60]},{"type":{"label":"template"},"value":"\'.\\n\\t\\t\\t","range":[60,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+					(0, _misc.constraint)(!this[_symbols.$$desc].required || !_isUndefined2.default.call(val), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				}
 	
 				// TODO: CHECK CONSTRAINT: given property value conforms to JSON schema
@@ -20993,6 +21818,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -21026,9 +21853,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _size2 = _interopRequireDefault(_size);
 	
-	var _entries = __webpack_require__(21);
+	var _entries2 = __webpack_require__(21);
 	
-	var _entries2 = _interopRequireDefault(_entries);
+	var _entries3 = _interopRequireDefault(_entries2);
 	
 	var _boundNativeMethods = __webpack_require__(13);
 	
@@ -21040,7 +21867,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ObservableSet2 = _interopRequireDefault(_ObservableSet);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _Field = __webpack_require__(29);
 	
@@ -21089,7 +21916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/fields/Rel$Field.js',
-					line: 42,
+					line: 43,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[7,10]},"property":{"type":"Identifier","name":"isResource","range":[11,21]},"computed":false,"range":[7,21]}],"range":[0,22]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"cls","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"isResource","range":[11,21]},{"type":{"label":")"},"range":[21,22]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -21118,7 +21945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (!cls.isResource) {
 					return [];
 				}
-				return (_context2 = cls.relationships, _entries2.default).call(_context2).filter(function (_ref2) {
+				return (_context2 = cls.relationships, _entries3.default).call(_context2).filter(function (_ref2) {
 					var _ref3 = _slicedToArray(_ref2, 2);
 	
 					var rel = _ref3[1];
@@ -21182,6 +22009,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* handle initial values */
 			if (initialValue && initialValue[Symbol.iterator]) {
+				if (!(initialValue && (typeof initialValue[Symbol.iterator] === 'function' || Array.isArray(initialValue)))) {
+					throw new TypeError('Expected initialValue to be iterable, got ' + _inspect(initialValue));
+				}
+	
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
@@ -21198,7 +22029,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(_rec2._capt(rel, 'arguments/0/left/object')[_rec2._capt(_rec2._capt(desc, 'arguments/0/left/property/object').keyInRelationship, 'arguments/0/left/property')], 'arguments/0/left') === _this, 'arguments/0'), {
 							content: 'assert(rel[desc.keyInRelationship] === this)',
 							filepath: 'src/fields/Rel$Field.js',
-							line: 106,
+							line: 107,
 							ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"Identifier","name":"rel","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"desc","range":[11,15]},"property":{"type":"Identifier","name":"keyInRelationship","range":[16,33]},"computed":false,"range":[11,33]},"computed":true,"range":[7,34]},"right":{"type":"ThisExpression","range":[39,43]},"range":[7,43]}],"range":[0,44]}',
 							tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"rel","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"desc","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"keyInRelationship","range":[16,33]},{"type":{"label":"]"},"range":[33,34]},{"type":{"label":"==/!="},"value":"===","range":[35,38]},{"type":{"label":"this"},"value":"this","range":[39,43]},{"type":{"label":")"},"range":[43,44]}]',
 							visitorKeys: _powerAssertVisitorKeys
@@ -21243,8 +22074,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(Rel$Field, [{
 			key: 'set',
 			value: function set(newValue) {
-				var _rec3 = new _powerAssertRecorder();
-	
 				var _ref6 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
 				var _ref6$ignoreReadonly = _ref6.ignoreReadonly;
@@ -21254,14 +22083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _ref6$updatePristine = _ref6.updatePristine;
 				var updatePristine = _ref6$updatePristine === undefined ? false : _ref6$updatePristine;
 	
-				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(_rec3._capt(ignoreReadonly, 'arguments/0/left') || _rec3._capt(!_rec3._capt(_rec3._capt(this[_rec3._capt(_symbols.$$desc, 'arguments/0/right/argument/object/property')], 'arguments/0/right/argument/object').readonly, 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
-					content: 'assert(ignoreReadonly || !this[$$desc].readonly)',
-					filepath: 'src/fields/Rel$Field.js',
-					line: 131,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"Identifier","name":"ignoreReadonly","range":[7,21]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[26,30]},"property":{"type":"Identifier","name":"$$desc","range":[31,37]},"computed":true,"range":[26,38]},"property":{"type":"Identifier","name":"readonly","range":[39,47]},"computed":false,"range":[26,47]},"prefix":true,"range":[25,47]},"range":[7,47]}],"range":[0,48]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"ignoreReadonly","range":[7,21]},{"type":{"label":"||"},"value":"||","range":[22,24]},{"type":{"label":"prefix"},"value":"!","range":[25,26]},{"type":{"label":"this"},"value":"this","range":[26,30]},{"type":{"label":"["},"range":[30,31]},{"type":{"label":"name"},"value":"$$desc","range":[31,37]},{"type":{"label":"]"},"range":[37,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"readonly","range":[39,47]},{"type":{"label":")"},"range":[47,48]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}));
+				(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly);
 				if (!ignoreValidation) {
 					this.validate(newValue, ['set']);
 				}
@@ -21273,34 +22095,17 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var _rec4 = new _powerAssertRecorder();
-	
 				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 	
-				(0, _powerAssert2.default)(_rec4._expr(_rec4._capt(_rec4._capt(val, 'arguments/0/object')[_rec4._capt(_rec4._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
-					content: 'assert(val[Symbol.iterator], humanMsg`\n\t\t\tThe value ${ val } given for ${ this[$$owner].constructor.name }#${ this[$$key] }\n\t\t\tis not an iterable collection (like array or set).\n\t\t`)',
-					filepath: 'src/fields/Rel$Field.js',
-					line: 138,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"Symbol","range":[11,17]},"property":{"type":"Identifier","name":"iterator","range":[18,26]},"computed":false,"range":[11,26]},"computed":true,"range":[7,27]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[29,37]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe value ","cooked":"\\n\\t\\t\\tThe value "},"tail":false,"range":[38,13]},{"type":"TemplateElement","value":{"raw":" given for ","cooked":" given for "},"tail":false,"range":[21,32]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[67,68]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","cooked":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t"},"tail":true,"range":[84,2]}],"expressions":[{"type":"Identifier","name":"val","range":[16,19]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[35,39]},"property":{"type":"Identifier","name":"$$owner","range":[40,47]},"computed":true,"range":[35,48]},"property":{"type":"Identifier","name":"constructor","range":[49,60]},"computed":false,"range":[35,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[35,65]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[71,75]},"property":{"type":"Identifier","name":"$$key","range":[76,81]},"computed":true,"range":[71,82]}],"range":[37,3]},"range":[29,3]}],"range":[0,4]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"Symbol","range":[11,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"iterator","range":[18,26]},{"type":{"label":"]"},"range":[26,27]},{"type":{"label":","},"range":[27,28]},{"type":{"label":"name"},"value":"humanMsg","range":[29,37]},{"type":{"label":"`"},"range":[37,38]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe value ","range":[38,13]},{"type":{"label":"${"},"range":[13,15]},{"type":{"label":"name"},"value":"val","range":[16,19]},{"type":{"label":"}"},"range":[20,21]},{"type":{"label":"template"},"value":" given for ","range":[21,32]},{"type":{"label":"${"},"range":[32,34]},{"type":{"label":"this"},"value":"this","range":[35,39]},{"type":{"label":"["},"range":[39,40]},{"type":{"label":"name"},"value":"$$owner","range":[40,47]},{"type":{"label":"]"},"range":[47,48]},{"type":{"label":"."},"range":[48,49]},{"type":{"label":"name"},"value":"constructor","range":[49,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"#","range":[67,68]},{"type":{"label":"${"},"range":[68,70]},{"type":{"label":"this"},"value":"this","range":[71,75]},{"type":{"label":"["},"range":[75,76]},{"type":{"label":"name"},"value":"$$key","range":[76,81]},{"type":{"label":"]"},"range":[81,82]},{"type":{"label":"}"},"range":[83,84]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","range":[84,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+				(0, _misc.constraint)(val[Symbol.iterator], (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (stages.includes('commit')) {
-					var _rec5 = new _powerAssertRecorder(),
-					    _context6;
+					var _context6;
 	
 					var _$$desc$cardinality = this[_symbols.$$desc].cardinality;
 					var min = _$$desc$cardinality.min;
 					var max = _$$desc$cardinality.max;
 	
-					(0, _powerAssert2.default)(_rec5._expr(_rec5._capt((_context6 = val.size, _inRange2.default).call(_context6, _rec5._capt(min, 'arguments/0/arguments/0'), _rec5._capt(_rec5._capt(max, 'arguments/0/arguments/1/left') + 1, 'arguments/0/arguments/1')), 'arguments/0'), {
-						content: 'assert(val.size::inRange(min, max + 1))',
-						filepath: 'src/fields/Rel$Field.js',
-						line: 144,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"property":{"type":"Identifier","name":"size","range":[11,15]},"computed":false,"range":[7,15]},"callee":{"type":"Identifier","name":"inRange","range":[17,24]},"range":[7,24]},"arguments":[{"type":"Identifier","name":"min","range":[25,28]},{"type":"BinaryExpression","operator":"+","left":{"type":"Identifier","name":"max","range":[30,33]},"right":{"type":"NumericLiteral","value":1,"range":[36,37]},"range":[30,37]}],"range":[7,38]}],"range":[0,39]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"size","range":[11,15]},{"type":{"label":"::"},"value":"::","range":[15,17]},{"type":{"label":"name"},"value":"inRange","range":[17,24]},{"type":{"label":"("},"range":[24,25]},{"type":{"label":"name"},"value":"min","range":[25,28]},{"type":{"label":","},"range":[28,29]},{"type":{"label":"name"},"value":"max","range":[30,33]},{"type":{"label":"+/-"},"value":"+","range":[34,35]},{"type":{"label":"num"},"value":1,"range":[36,37]},{"type":{"label":")"},"range":[37,38]},{"type":{"label":")"},"range":[38,39]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}));
+					(0, _misc.constraint)((_context6 = val.size, _inRange2.default).call(_context6, min, max + 1));
 				}
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -21348,6 +22153,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		return Rel$Field;
 	}(_Field.RelField));
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+
+			var _entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				_entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + _entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + _entries + '\n' + indent + '}';
+			}
+		}
+	}
 
 /***/ },
 /* 258 */
@@ -21366,7 +22245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tYou cannot set the fields \'', '\' and \'', '\'\n\t\t\tat the same time for a ', '.\n\t\t'], ['\n\t\t\tYou cannot set the fields \'', '\' and \'', '\'\n\t\t\tat the same time for a ', '.\n\t\t']),
 	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tNo value given for required field\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tNo value given for required field\n\t\t\t\t', '#', '.\n\t\t\t']),
-	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t\t']);
+	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t'], ['\n\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t']);
 	
 	var _map = __webpack_require__(50);
 	
@@ -21406,7 +22285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _Field = __webpack_require__(29);
 	
@@ -21453,7 +22332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/fields/Rel1Field.js',
-					line: 45,
+					line: 46,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[7,10]},"property":{"type":"Identifier","name":"isResource","range":[11,21]},"computed":false,"range":[7,21]}],"range":[0,22]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"cls","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"isResource","range":[11,21]},{"type":{"label":")"},"range":[21,22]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -21509,8 +22388,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		function Rel1Field(options) {
 			var _context4;
 	
-			var _rec2 = new _powerAssertRecorder();
-	
 			_classCallCheck(this, Rel1Field);
 	
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Rel1Field).call(this, options));
@@ -21525,14 +22402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			/* you cannot give a value as an actual relation and as a shortcut at the same time */
 	
 			var givenShortcutInitialValue = _get2.default.call(related, [desc.shortcutKey, 'initialValue']);
-			(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(!_rec2._capt(initialValue, 'arguments/0/left/argument'), 'arguments/0/left') || _rec2._capt(!_rec2._capt(givenShortcutInitialValue, 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
-				content: 'assert(!initialValue || !givenShortcutInitialValue, humanMsg`\n\t\t\tYou cannot set the fields \'${ key }\' and \'${ desc.shortcutKey }\'\n\t\t\tat the same time for a ${ this.constructor.singular }.\n\t\t`)',
-				filepath: 'src/fields/Rel1Field.js',
-				line: 79,
-				ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"UnaryExpression","operator":"!","argument":{"type":"Identifier","name":"initialValue","range":[8,20]},"prefix":true,"range":[7,20]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"Identifier","name":"givenShortcutInitialValue","range":[25,50]},"prefix":true,"range":[24,50]},"range":[7,50]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[52,60]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tYou cannot set the fields \'","cooked":"\\n\\t\\t\\tYou cannot set the fields \'"},"tail":false,"range":[61,30]},{"type":"TemplateElement","value":{"raw":"\' and \'","cooked":"\' and \'"},"tail":false,"range":[38,45]},{"type":"TemplateElement","value":{"raw":"\'\\n\\t\\t\\tat the same time for a ","cooked":"\'\\n\\t\\t\\tat the same time for a "},"tail":false,"range":[66,26]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t","cooked":".\\n\\t\\t"},"tail":true,"range":[56,2]}],"expressions":[{"type":"Identifier","name":"key","range":[33,36]},{"type":"MemberExpression","object":{"type":"Identifier","name":"desc","range":[48,52]},"property":{"type":"Identifier","name":"shortcutKey","range":[53,64]},"computed":false,"range":[48,64]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[29,33]},"property":{"type":"Identifier","name":"constructor","range":[34,45]},"computed":false,"range":[29,45]},"property":{"type":"Identifier","name":"singular","range":[46,54]},"computed":false,"range":[29,54]}],"range":[60,3]},"range":[52,3]}],"range":[0,4]}',
-				tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"name"},"value":"initialValue","range":[8,20]},{"type":{"label":"||"},"value":"||","range":[21,23]},{"type":{"label":"prefix"},"value":"!","range":[24,25]},{"type":{"label":"name"},"value":"givenShortcutInitialValue","range":[25,50]},{"type":{"label":","},"range":[50,51]},{"type":{"label":"name"},"value":"humanMsg","range":[52,60]},{"type":{"label":"`"},"range":[60,61]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tYou cannot set the fields \'","range":[61,30]},{"type":{"label":"${"},"range":[30,32]},{"type":{"label":"name"},"value":"key","range":[33,36]},{"type":{"label":"}"},"range":[37,38]},{"type":{"label":"template"},"value":"\' and \'","range":[38,45]},{"type":{"label":"${"},"range":[45,47]},{"type":{"label":"name"},"value":"desc","range":[48,52]},{"type":{"label":"."},"range":[52,53]},{"type":{"label":"name"},"value":"shortcutKey","range":[53,64]},{"type":{"label":"}"},"range":[65,66]},{"type":{"label":"template"},"value":"\'\\n\\t\\t\\tat the same time for a ","range":[66,26]},{"type":{"label":"${"},"range":[26,28]},{"type":{"label":"this"},"value":"this","range":[29,33]},{"type":{"label":"."},"range":[33,34]},{"type":{"label":"name"},"value":"constructor","range":[34,45]},{"type":{"label":"."},"range":[45,46]},{"type":{"label":"name"},"value":"singular","range":[46,54]},{"type":{"label":"}"},"range":[55,56]},{"type":{"label":"template"},"value":".\\n\\t\\t","range":[56,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
-				visitorKeys: _powerAssertVisitorKeys
-			}), (0, _misc.humanMsg)(_templateObject, key, desc.shortcutKey, _this.constructor.singular));
+			(0, _misc.constraint)(!initialValue || !givenShortcutInitialValue, (0, _misc.humanMsg)(_templateObject, key, desc.shortcutKey, _this.constructor.singular));
 	
 			/* set the initial value */
 			_this[_symbols.$$initSet]([initialValue, initialValue], [givenShortcutInitialValue], [desc.options.auto, function () {
@@ -21580,23 +22450,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				var notGiven = _isNull2.default.call(val) || _isUndefined2.default.call(val);
 	
 				if (stages.includes('commit')) {
-					var _rec3 = new _powerAssertRecorder();
-	
 					/* if there's a minimum cardinality, a value must have been given */
-					(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(_rec3._capt(!_rec3._capt(notGiven, 'arguments/0/left/argument'), 'arguments/0/left') || _rec3._capt(_rec3._capt(_rec3._capt(_rec3._capt(this[_rec3._capt(_symbols.$$desc, 'arguments/0/right/left/object/object/property')], 'arguments/0/right/left/object/object').cardinality, 'arguments/0/right/left/object').min, 'arguments/0/right/left') === 0, 'arguments/0/right'), 'arguments/0'), {
-						content: 'assert(!notGiven || this[$$desc].cardinality.min === 0, humanMsg`\n\t\t\t\tNo value given for required field\n\t\t\t\t${ this[$$owner].constructor.name }#${ this[$$key] }.\n\t\t\t`)',
-						filepath: 'src/fields/Rel1Field.js',
-						line: 125,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"UnaryExpression","operator":"!","argument":{"type":"Identifier","name":"notGiven","range":[8,16]},"prefix":true,"range":[7,16]},"right":{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[20,24]},"property":{"type":"Identifier","name":"$$desc","range":[25,31]},"computed":true,"range":[20,32]},"property":{"type":"Identifier","name":"cardinality","range":[33,44]},"computed":false,"range":[20,44]},"property":{"type":"Identifier","name":"min","range":[45,48]},"computed":false,"range":[20,48]},"right":{"type":"NumericLiteral","value":0,"range":[53,54]},"range":[20,54]},"range":[7,54]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[56,64]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tNo value given for required field\\n\\t\\t\\t\\t","cooked":"\\n\\t\\t\\t\\tNo value given for required field\\n\\t\\t\\t\\t"},"tail":false,"range":[65,4]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[39,40]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t","cooked":".\\n\\t\\t\\t"},"tail":true,"range":[56,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[7,11]},"property":{"type":"Identifier","name":"$$owner","range":[12,19]},"computed":true,"range":[7,20]},"property":{"type":"Identifier","name":"constructor","range":[21,32]},"computed":false,"range":[7,32]},"property":{"type":"Identifier","name":"name","range":[33,37]},"computed":false,"range":[7,37]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[43,47]},"property":{"type":"Identifier","name":"$$key","range":[48,53]},"computed":true,"range":[43,54]}],"range":[64,4]},"range":[56,4]}],"range":[0,5]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"name"},"value":"notGiven","range":[8,16]},{"type":{"label":"||"},"value":"||","range":[17,19]},{"type":{"label":"this"},"value":"this","range":[20,24]},{"type":{"label":"["},"range":[24,25]},{"type":{"label":"name"},"value":"$$desc","range":[25,31]},{"type":{"label":"]"},"range":[31,32]},{"type":{"label":"."},"range":[32,33]},{"type":{"label":"name"},"value":"cardinality","range":[33,44]},{"type":{"label":"."},"range":[44,45]},{"type":{"label":"name"},"value":"min","range":[45,48]},{"type":{"label":"==/!="},"value":"===","range":[49,52]},{"type":{"label":"num"},"value":0,"range":[53,54]},{"type":{"label":","},"range":[54,55]},{"type":{"label":"name"},"value":"humanMsg","range":[56,64]},{"type":{"label":"`"},"range":[64,65]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tNo value given for required field\\n\\t\\t\\t\\t","range":[65,4]},{"type":{"label":"${"},"range":[4,6]},{"type":{"label":"this"},"value":"this","range":[7,11]},{"type":{"label":"["},"range":[11,12]},{"type":{"label":"name"},"value":"$$owner","range":[12,19]},{"type":{"label":"]"},"range":[19,20]},{"type":{"label":"."},"range":[20,21]},{"type":{"label":"name"},"value":"constructor","range":[21,32]},{"type":{"label":"."},"range":[32,33]},{"type":{"label":"name"},"value":"name","range":[33,37]},{"type":{"label":"}"},"range":[38,39]},{"type":{"label":"template"},"value":"#","range":[39,40]},{"type":{"label":"${"},"range":[40,42]},{"type":{"label":"this"},"value":"this","range":[43,47]},{"type":{"label":"["},"range":[47,48]},{"type":{"label":"name"},"value":"$$key","range":[48,53]},{"type":{"label":"]"},"range":[53,54]},{"type":{"label":"}"},"range":[55,56]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[56,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+					(0, _misc.constraint)(!notGiven || this[_symbols.$$desc].cardinality.min === 0, (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				}
 	
 				/* the value must be of the proper domain */
-				if (!(notGiven || this[_symbols.$$desc].relationshipClass.hasInstance(val))) {
-					throw new Error((0, _misc.humanMsg)(_templateObject3, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
-				}
+				(0, _misc.constraint)(notGiven || this[_symbols.$$desc].relationshipClass.hasInstance(val), (0, _misc.humanMsg)(_templateObject3, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 	
 				// TODO: these should not be assertions, but proper constraint-checks,
 				//     : recording errors, possibly allowing them temporarily, etc.
@@ -21612,6 +22471,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -21622,7 +22483,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }();
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t'], ['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t']),
-	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t']);
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tThe number of provided ', ' values is\n\t\t\t\tnot within the expected range.\n\t\t\t'], ['\n\t\t\t\tThe number of provided ', ' values is\n\t\t\t\tnot within the expected range.\n\t\t\t']),
+	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t']);
 	
 	var _filter = __webpack_require__(35);
 	
@@ -21644,9 +22506,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _size2 = _interopRequireDefault(_size);
 	
-	var _entries = __webpack_require__(21);
+	var _entries2 = __webpack_require__(21);
 	
-	var _entries2 = _interopRequireDefault(_entries);
+	var _entries3 = _interopRequireDefault(_entries2);
 	
 	var _boundNativeMethods = __webpack_require__(13);
 	
@@ -21658,7 +22520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ObservableSet2 = _interopRequireDefault(_ObservableSet);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _Field = __webpack_require__(29);
 	
@@ -21709,7 +22571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/fields/RelShortcut$Field.js',
-					line: 44,
+					line: 45,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[7,10]},"property":{"type":"Identifier","name":"isResource","range":[11,21]},"computed":false,"range":[7,21]}],"range":[0,22]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"cls","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"isResource","range":[11,21]},{"type":{"label":")"},"range":[21,22]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -21738,7 +22600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (!cls.isResource) {
 					return [];
 				}
-				return (_context2 = cls.relationshipShortcuts, _entries2.default).call(_context2).filter(function (_ref2) {
+				return (_context2 = cls.relationshipShortcuts, _entries3.default).call(_context2).filter(function (_ref2) {
 					var _ref3 = _slicedToArray(_ref2, 2);
 	
 					var rel = _ref3[1];
@@ -21821,6 +22683,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* handle initial values */
 			if (initialValue !== undefined) {
+				if (!(initialValue && (typeof initialValue[Symbol.iterator] === 'function' || Array.isArray(initialValue)))) {
+					throw new TypeError('Expected initialValue to be iterable, got ' + _inspect(initialValue));
+				}
+	
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
@@ -21857,8 +22723,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(RelShortcut$Field, [{
 			key: 'set',
 			value: function set(newValue) {
-				var _rec2 = new _powerAssertRecorder();
-	
 				var _ref8 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
 				var _ref8$ignoreReadonly = _ref8.ignoreReadonly;
@@ -21868,14 +22732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _ref8$updatePristine = _ref8.updatePristine;
 				var updatePristine = _ref8$updatePristine === undefined ? false : _ref8$updatePristine;
 	
-				(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(ignoreReadonly, 'arguments/0/left') || _rec2._capt(!_rec2._capt(_rec2._capt(this[_rec2._capt(_symbols.$$desc, 'arguments/0/right/argument/object/property')], 'arguments/0/right/argument/object').readonly, 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
-					content: 'assert(ignoreReadonly || !this[$$desc].readonly)',
-					filepath: 'src/fields/RelShortcut$Field.js',
-					line: 134,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"Identifier","name":"ignoreReadonly","range":[7,21]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[26,30]},"property":{"type":"Identifier","name":"$$desc","range":[31,37]},"computed":true,"range":[26,38]},"property":{"type":"Identifier","name":"readonly","range":[39,47]},"computed":false,"range":[26,47]},"prefix":true,"range":[25,47]},"range":[7,47]}],"range":[0,48]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"ignoreReadonly","range":[7,21]},{"type":{"label":"||"},"value":"||","range":[22,24]},{"type":{"label":"prefix"},"value":"!","range":[25,26]},{"type":{"label":"this"},"value":"this","range":[26,30]},{"type":{"label":"["},"range":[30,31]},{"type":{"label":"name"},"value":"$$desc","range":[31,37]},{"type":{"label":"]"},"range":[37,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"readonly","range":[39,47]},{"type":{"label":")"},"range":[47,48]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}));
+				(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly);
 				if (!ignoreValidation) {
 					this.validate(newValue, ['set']);
 				}
@@ -21887,34 +22744,17 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var _rec3 = new _powerAssertRecorder();
-	
 				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 	
-				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(_rec3._capt(val, 'arguments/0/object')[_rec3._capt(_rec3._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
-					content: 'assert(val[Symbol.iterator], humanMsg`\n\t\t\tThe value ${ val } given for ${ this[$$owner].constructor.name }#${ this[$$key] }\n\t\t\tis not an iterable collection (like array or set).\n\t\t`)',
-					filepath: 'src/fields/RelShortcut$Field.js',
-					line: 141,
-					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"Symbol","range":[11,17]},"property":{"type":"Identifier","name":"iterator","range":[18,26]},"computed":false,"range":[11,26]},"computed":true,"range":[7,27]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[29,37]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe value ","cooked":"\\n\\t\\t\\tThe value "},"tail":false,"range":[38,13]},{"type":"TemplateElement","value":{"raw":" given for ","cooked":" given for "},"tail":false,"range":[21,32]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[67,68]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","cooked":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t"},"tail":true,"range":[84,2]}],"expressions":[{"type":"Identifier","name":"val","range":[16,19]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[35,39]},"property":{"type":"Identifier","name":"$$owner","range":[40,47]},"computed":true,"range":[35,48]},"property":{"type":"Identifier","name":"constructor","range":[49,60]},"computed":false,"range":[35,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[35,65]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[71,75]},"property":{"type":"Identifier","name":"$$key","range":[76,81]},"computed":true,"range":[71,82]}],"range":[37,3]},"range":[29,3]}],"range":[0,4]}',
-					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"Symbol","range":[11,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"iterator","range":[18,26]},{"type":{"label":"]"},"range":[26,27]},{"type":{"label":","},"range":[27,28]},{"type":{"label":"name"},"value":"humanMsg","range":[29,37]},{"type":{"label":"`"},"range":[37,38]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe value ","range":[38,13]},{"type":{"label":"${"},"range":[13,15]},{"type":{"label":"name"},"value":"val","range":[16,19]},{"type":{"label":"}"},"range":[20,21]},{"type":{"label":"template"},"value":" given for ","range":[21,32]},{"type":{"label":"${"},"range":[32,34]},{"type":{"label":"this"},"value":"this","range":[35,39]},{"type":{"label":"["},"range":[39,40]},{"type":{"label":"name"},"value":"$$owner","range":[40,47]},{"type":{"label":"]"},"range":[47,48]},{"type":{"label":"."},"range":[48,49]},{"type":{"label":"name"},"value":"constructor","range":[49,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"#","range":[67,68]},{"type":{"label":"${"},"range":[68,70]},{"type":{"label":"this"},"value":"this","range":[71,75]},{"type":{"label":"["},"range":[75,76]},{"type":{"label":"name"},"value":"$$key","range":[76,81]},{"type":{"label":"]"},"range":[81,82]},{"type":{"label":"}"},"range":[83,84]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","range":[84,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
-					visitorKeys: _powerAssertVisitorKeys
-				}), (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+				(0, _misc.constraint)(val[Symbol.iterator], (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (stages.includes('commit')) {
-					var _rec4 = new _powerAssertRecorder(),
-					    _context5;
+					var _context5;
 	
 					var _$$desc$cardinality = this[_symbols.$$desc].cardinality;
 					var min = _$$desc$cardinality.min;
 					var max = _$$desc$cardinality.max;
 	
-					(0, _powerAssert2.default)(_rec4._expr(_rec4._capt((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, _rec4._capt(min, 'arguments/0/arguments/0'), _rec4._capt(_rec4._capt(max, 'arguments/0/arguments/1/left') + 1, 'arguments/0/arguments/1')), 'arguments/0'), {
-						content: 'assert(val::size()::inRange(min, max + 1))',
-						filepath: 'src/fields/RelShortcut$Field.js',
-						line: 147,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"callee":{"type":"Identifier","name":"size","range":[12,16]},"range":[7,16]},"arguments":[],"range":[7,18]},"callee":{"type":"Identifier","name":"inRange","range":[20,27]},"range":[7,27]},"arguments":[{"type":"Identifier","name":"min","range":[28,31]},{"type":"BinaryExpression","operator":"+","left":{"type":"Identifier","name":"max","range":[33,36]},"right":{"type":"NumericLiteral","value":1,"range":[39,40]},"range":[33,40]}],"range":[7,41]}],"range":[0,42]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"::"},"value":"::","range":[10,12]},{"type":{"label":"name"},"value":"size","range":[12,16]},{"type":{"label":"("},"range":[16,17]},{"type":{"label":")"},"range":[17,18]},{"type":{"label":"::"},"value":"::","range":[18,20]},{"type":{"label":"name"},"value":"inRange","range":[20,27]},{"type":{"label":"("},"range":[27,28]},{"type":{"label":"name"},"value":"min","range":[28,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"max","range":[33,36]},{"type":{"label":"+/-"},"value":"+","range":[37,38]},{"type":{"label":"num"},"value":1,"range":[39,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":")"},"range":[41,42]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}));
+					(0, _misc.constraint)((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, min, max + 1), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$key]));
 				}
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -21923,7 +22763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function validateElement(element) {
 				/* the value must be of the proper domain */
 				if (!this[_symbols.$$desc].codomain.resourceClass.hasInstance(element)) {
-					throw new Error((0, _misc.humanMsg)(_templateObject2, element, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+					throw new Error((0, _misc.humanMsg)(_templateObject3, element, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				}
 			}
 		}, {
@@ -21962,6 +22802,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		return RelShortcut$Field;
 	}(_Field.RelField));
+	
+	function _inspect(input, depth) {
+		var maxDepth = 4;
+		var maxKeys = 15;
+
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		depth += 1;
+
+		if (input === null) {
+			return 'null';
+		} else if (input === undefined) {
+			return 'void';
+		} else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+			return typeof input === 'undefined' ? 'undefined' : _typeof(input);
+		} else if (Array.isArray(input)) {
+			if (input.length > 0) {
+				var _ret = function () {
+					if (depth > maxDepth) return {
+							v: '[...]'
+						};
+
+					var first = _inspect(input[0], depth);
+
+					if (input.every(function (item) {
+						return _inspect(item, depth) === first;
+					})) {
+						return {
+							v: first.trim() + '[]'
+						};
+					} else {
+						return {
+							v: '[' + input.slice(0, maxKeys).map(function (item) {
+								return _inspect(item, depth);
+							}).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+						};
+					}
+				}();
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+				return 'Array';
+			}
+		} else {
+			var keys = Object.keys(input);
+
+			if (!keys.length) {
+				if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+					return input.constructor.name;
+				} else {
+					return 'Object';
+				}
+			}
+
+			if (depth > maxDepth) return '{...}';
+			var indent = '  '.repeat(depth - 1);
+
+			var _entries = keys.slice(0, maxKeys).map(function (key) {
+				return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+			}).join('\n  ' + indent);
+
+			if (keys.length >= maxKeys) {
+				_entries += '\n  ' + indent + '...';
+			}
+
+			if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+				return input.constructor.name + ' {\n  ' + indent + _entries + '\n' + indent + '}';
+			} else {
+				return '{\n  ' + indent + _entries + '\n' + indent + '}';
+			}
+		}
+	}
 
 /***/ },
 /* 260 */
@@ -21979,7 +22893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }();
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t\tNo value given for required field ', '#', '.\n\t\t\t'], ['\n\t\t\t\tNo value given for required field ', '#', '.\n\t\t\t']),
-	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t\t']);
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t'], ['\n\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t']);
 	
 	var _filter = __webpack_require__(35);
 	
@@ -22007,7 +22921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _Field = __webpack_require__(29);
 	
@@ -22054,7 +22968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(cls, 'arguments/0/object').isResource, 'arguments/0'), {
 					content: 'assert(cls.isResource)',
 					filepath: 'src/fields/RelShortcut1Field.js',
-					line: 40,
+					line: 41,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[7,10]},"property":{"type":"Identifier","name":"isResource","range":[11,21]},"computed":false,"range":[7,21]}],"range":[0,22]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"cls","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"isResource","range":[11,21]},{"type":{"label":")"},"range":[21,22]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -22169,23 +23083,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 				if (stages.includes('commit')) {
-					var _rec2 = new _powerAssertRecorder();
-	
 					/* if there's a minimum cardinality, a value must have been given */
-					(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(_isObject2.default.call(val), 'arguments/0/left') || _rec2._capt(_rec2._capt(_rec2._capt(_rec2._capt(this[_rec2._capt(_symbols.$$desc, 'arguments/0/right/left/object/object/property')], 'arguments/0/right/left/object/object').cardinality, 'arguments/0/right/left/object').min, 'arguments/0/right/left') === 0, 'arguments/0/right'), 'arguments/0'), {
-						content: 'assert(val::isObject() || this[$$desc].cardinality.min === 0, humanMsg`\n\t\t\t\tNo value given for required field ${ this[$$owner].constructor.name }#${ this[$$key] }.\n\t\t\t`)',
-						filepath: 'src/fields/RelShortcut1Field.js',
-						line: 118,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"callee":{"type":"Identifier","name":"isObject","range":[12,20]},"range":[7,20]},"arguments":[],"range":[7,22]},"right":{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[26,30]},"property":{"type":"Identifier","name":"$$desc","range":[31,37]},"computed":true,"range":[26,38]},"property":{"type":"Identifier","name":"cardinality","range":[39,50]},"computed":false,"range":[26,50]},"property":{"type":"Identifier","name":"min","range":[51,54]},"computed":false,"range":[26,54]},"right":{"type":"NumericLiteral","value":0,"range":[59,60]},"range":[26,60]},"range":[7,60]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[62,70]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t\\tNo value given for required field ","cooked":"\\n\\t\\t\\t\\tNo value given for required field "},"tail":false,"range":[71,38]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[73,74]},{"type":"TemplateElement","value":{"raw":".\\n\\t\\t\\t","cooked":".\\n\\t\\t\\t"},"tail":true,"range":[90,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[41,45]},"property":{"type":"Identifier","name":"$$owner","range":[46,53]},"computed":true,"range":[41,54]},"property":{"type":"Identifier","name":"constructor","range":[55,66]},"computed":false,"range":[41,66]},"property":{"type":"Identifier","name":"name","range":[67,71]},"computed":false,"range":[41,71]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[77,81]},"property":{"type":"Identifier","name":"$$key","range":[82,87]},"computed":true,"range":[77,88]}],"range":[70,4]},"range":[62,4]}],"range":[0,5]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"::"},"value":"::","range":[10,12]},{"type":{"label":"name"},"value":"isObject","range":[12,20]},{"type":{"label":"("},"range":[20,21]},{"type":{"label":")"},"range":[21,22]},{"type":{"label":"||"},"value":"||","range":[23,25]},{"type":{"label":"this"},"value":"this","range":[26,30]},{"type":{"label":"["},"range":[30,31]},{"type":{"label":"name"},"value":"$$desc","range":[31,37]},{"type":{"label":"]"},"range":[37,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"cardinality","range":[39,50]},{"type":{"label":"."},"range":[50,51]},{"type":{"label":"name"},"value":"min","range":[51,54]},{"type":{"label":"==/!="},"value":"===","range":[55,58]},{"type":{"label":"num"},"value":0,"range":[59,60]},{"type":{"label":","},"range":[60,61]},{"type":{"label":"name"},"value":"humanMsg","range":[62,70]},{"type":{"label":"`"},"range":[70,71]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t\\tNo value given for required field ","range":[71,38]},{"type":{"label":"${"},"range":[38,40]},{"type":{"label":"this"},"value":"this","range":[41,45]},{"type":{"label":"["},"range":[45,46]},{"type":{"label":"name"},"value":"$$owner","range":[46,53]},{"type":{"label":"]"},"range":[53,54]},{"type":{"label":"."},"range":[54,55]},{"type":{"label":"name"},"value":"constructor","range":[55,66]},{"type":{"label":"."},"range":[66,67]},{"type":{"label":"name"},"value":"name","range":[67,71]},{"type":{"label":"}"},"range":[72,73]},{"type":{"label":"template"},"value":"#","range":[73,74]},{"type":{"label":"${"},"range":[74,76]},{"type":{"label":"this"},"value":"this","range":[77,81]},{"type":{"label":"["},"range":[81,82]},{"type":{"label":"name"},"value":"$$key","range":[82,87]},{"type":{"label":"]"},"range":[87,88]},{"type":{"label":"}"},"range":[89,90]},{"type":{"label":"template"},"value":".\\n\\t\\t\\t","range":[90,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}), (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+					(0, _misc.constraint)(_isObject2.default.call(val) || this[_symbols.$$desc].cardinality.min === 0, (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				}
 	
 				/* a given value must always be of the proper domain */
-				if (_isObject2.default.call(val) && !this[_symbols.$$desc].codomain.resourceClass.hasInstance(val)) {
-					throw new Error((0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
-				}
+				(0, _misc.constraint)(!_isObject2.default.call(val) || this[_symbols.$$desc].codomain.resourceClass.hasInstance(val), (0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 	
 				// TODO: these should not be assertions, but proper constraint-checks,
 				//     : recording errors, possibly allowing them temporarily, etc.
@@ -22211,7 +23114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { return { powerAssertContext: { value: value, events: this.captured }, source: source }; }; return PowerAssertRecorder; }();
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t    No resource specified for side ', ' of\n\t\t\t\tthis \'', '\'.\n\t\t\t'], ['\n\t\t\t    No resource specified for side ', ' of\n\t\t\t\tthis \'', '\'.\n\t\t\t']),
-	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value \'', '\' given for ', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value \'', '\' given for ', '#', '.\n\t\t\t']);
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tInvalid value \'', '\' given for ', '#', '.\n\t\t'], ['\n\t\t\tInvalid value \'', '\' given for ', '#', '.\n\t\t']);
 	
 	var _filter = __webpack_require__(35);
 	
@@ -22239,7 +23142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _powerAssert2 = _interopRequireDefault(_powerAssert);
 	
-	var _misc = __webpack_require__(4);
+	var _misc = __webpack_require__(3);
 	
 	var _Field2 = __webpack_require__(29);
 	
@@ -22284,7 +23187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec._expr(_rec._capt(_rec._capt(cls, 'arguments/0/object').isRelationship, 'arguments/0'), {
 					content: 'assert(cls.isRelationship)',
 					filepath: 'src/fields/SideField.js',
-					line: 39,
+					line: 40,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"cls","range":[7,10]},"property":{"type":"Identifier","name":"isRelationship","range":[11,25]},"computed":false,"range":[7,25]}],"range":[0,26]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"cls","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"isRelationship","range":[11,25]},{"type":{"label":")"},"range":[25,26]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -22380,23 +23283,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				var notGiven = _isNull2.default.call(val) || _isUndefined2.default.call(val);
 	
 				if (stages.includes('commit')) {
-					var _rec2 = new _powerAssertRecorder();
-	
 					/* if there's a minimum cardinality, a value must have been given */
-					(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(!_rec2._capt(notGiven, 'arguments/0/argument'), 'arguments/0'), {
-						content: 'assert(!notGiven, humanMsg`\n\t\t\t    No resource specified for side ${ this[$$key] } of\n\t\t\t\tthis \'${ this[$$owner].constructor.name }\'.\n\t\t\t`)',
-						filepath: 'src/fields/SideField.js',
-						line: 107,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"UnaryExpression","operator":"!","argument":{"type":"Identifier","name":"notGiven","range":[8,16]},"prefix":true,"range":[7,16]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[18,26]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\t    No resource specified for side ","cooked":"\\n\\t\\t\\t    No resource specified for side "},"tail":false,"range":[27,38]},{"type":"TemplateElement","value":{"raw":" of\\n\\t\\t\\t\\tthis \'","cooked":" of\\n\\t\\t\\t\\tthis \'"},"tail":false,"range":[54,10]},{"type":"TemplateElement","value":{"raw":"\'.\\n\\t\\t\\t","cooked":"\'.\\n\\t\\t\\t"},"tail":true,"range":[45,3]}],"expressions":[{"type":"MemberExpression","object":{"type":"ThisExpression","range":[41,45]},"property":{"type":"Identifier","name":"$$key","range":[46,51]},"computed":true,"range":[41,52]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[13,17]},"property":{"type":"Identifier","name":"$$owner","range":[18,25]},"computed":true,"range":[13,26]},"property":{"type":"Identifier","name":"constructor","range":[27,38]},"computed":false,"range":[13,38]},"property":{"type":"Identifier","name":"name","range":[39,43]},"computed":false,"range":[13,43]}],"range":[26,4]},"range":[18,4]}],"range":[0,5]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"prefix"},"value":"!","range":[7,8]},{"type":{"label":"name"},"value":"notGiven","range":[8,16]},{"type":{"label":","},"range":[16,17]},{"type":{"label":"name"},"value":"humanMsg","range":[18,26]},{"type":{"label":"`"},"range":[26,27]},{"type":{"label":"template"},"value":"\\n\\t\\t\\t    No resource specified for side ","range":[27,38]},{"type":{"label":"${"},"range":[38,40]},{"type":{"label":"this"},"value":"this","range":[41,45]},{"type":{"label":"["},"range":[45,46]},{"type":{"label":"name"},"value":"$$key","range":[46,51]},{"type":{"label":"]"},"range":[51,52]},{"type":{"label":"}"},"range":[53,54]},{"type":{"label":"template"},"value":" of\\n\\t\\t\\t\\tthis \'","range":[54,10]},{"type":{"label":"${"},"range":[10,12]},{"type":{"label":"this"},"value":"this","range":[13,17]},{"type":{"label":"["},"range":[17,18]},{"type":{"label":"name"},"value":"$$owner","range":[18,25]},{"type":{"label":"]"},"range":[25,26]},{"type":{"label":"."},"range":[26,27]},{"type":{"label":"name"},"value":"constructor","range":[27,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"name","range":[39,43]},{"type":{"label":"}"},"range":[44,45]},{"type":{"label":"template"},"value":"\'.\\n\\t\\t\\t","range":[45,3]},{"type":{"label":"`"},"range":[3,4]},{"type":{"label":")"},"range":[4,5]}]',
-						visitorKeys: _powerAssertVisitorKeys
-					}), (0, _misc.humanMsg)(_templateObject, this[_symbols.$$key], this[_symbols.$$owner].constructor.name));
+					(0, _misc.constraint)(!notGiven, (0, _misc.humanMsg)(_templateObject, this[_symbols.$$key], this[_symbols.$$owner].constructor.name));
 				}
 	
 				/* the value must be of the proper domain */
-				if (!(notGiven || this[_symbols.$$desc].resourceClass.hasInstance(val))) {
-					throw new Error((0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
-				}
+				(0, _misc.constraint)(notGiven || this[_symbols.$$desc].resourceClass.hasInstance(val), (0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 	
 				// TODO: these should not be assertions, but proper constraint-checks,
 				//     : recording errors, possibly allowing them temporarily, etc.
@@ -23998,7 +24890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isObject = __webpack_require__(8)
-	  , document = __webpack_require__(3).document
+	  , document = __webpack_require__(4).document
 	  // in old IE typeof document.createElement is 'object'
 	  , is = isObject(document) && isObject(document.createElement);
 	module.exports = function(it){
@@ -24035,7 +24927,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 315 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(3).document && document.documentElement;
+	module.exports = __webpack_require__(4).document && document.documentElement;
 
 /***/ },
 /* 316 */
@@ -24205,7 +25097,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 324 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(3)
+	var global    = __webpack_require__(4)
 	  , macrotask = __webpack_require__(331).set
 	  , Observer  = global.MutationObserver || global.WebKitMutationObserver
 	  , process   = global.process
@@ -24364,7 +25256,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , invoke             = __webpack_require__(242)
 	  , html               = __webpack_require__(315)
 	  , cel                = __webpack_require__(312)
-	  , global             = __webpack_require__(3)
+	  , global             = __webpack_require__(4)
 	  , process            = global.process
 	  , setTask            = global.setImmediate
 	  , clearTask          = global.clearImmediate
@@ -24441,7 +25333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var global         = __webpack_require__(3)
+	var global         = __webpack_require__(4)
 	  , DESCRIPTORS    = __webpack_require__(17)
 	  , LIBRARY        = __webpack_require__(117)
 	  , $typed         = __webpack_require__(249)
@@ -24720,7 +25612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 333 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global         = __webpack_require__(3)
+	var global         = __webpack_require__(4)
 	  , core           = __webpack_require__(72)
 	  , LIBRARY        = __webpack_require__(117)
 	  , wksExt         = __webpack_require__(587)
@@ -40420,7 +41312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var gOPN     = __webpack_require__(119)
 	  , gOPS     = __webpack_require__(246)
 	  , anObject = __webpack_require__(2)
-	  , Reflect  = __webpack_require__(3).Reflect;
+	  , Reflect  = __webpack_require__(4).Reflect;
 	module.exports = Reflect && Reflect.ownKeys || function ownKeys(it){
 	  var keys       = gOPN.f(anObject(it))
 	    , getSymbols = gOPS.f;
@@ -40431,7 +41323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 583 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $parseFloat = __webpack_require__(3).parseFloat
+	var $parseFloat = __webpack_require__(4).parseFloat
 	  , $trim       = __webpack_require__(162).trim;
 	
 	module.exports = 1 / $parseFloat(__webpack_require__(330) + '-0') !== -Infinity ? function parseFloat(str){
@@ -40444,7 +41336,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 584 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $parseInt = __webpack_require__(3).parseInt
+	var $parseInt = __webpack_require__(4).parseInt
 	  , $trim     = __webpack_require__(162).trim
 	  , ws        = __webpack_require__(330)
 	  , hex       = /^[\-+]?0[xX]/;
@@ -40760,7 +41652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 600 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(3);
+	module.exports = __webpack_require__(4);
 
 /***/ },
 /* 601 */
@@ -41602,7 +42494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var global            = __webpack_require__(3)
+	var global            = __webpack_require__(4)
 	  , has               = __webpack_require__(34)
 	  , cof               = __webpack_require__(59)
 	  , inheritIfRequired = __webpack_require__(316)
@@ -41686,7 +42578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// 20.1.2.2 Number.isFinite(number)
 	var $export   = __webpack_require__(1)
-	  , _isFinite = __webpack_require__(3).isFinite;
+	  , _isFinite = __webpack_require__(4).isFinite;
 	
 	$export($export.S, 'Number', {
 	  isFinite: function isFinite(it){
@@ -42129,7 +43021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	var LIBRARY            = __webpack_require__(117)
-	  , global             = __webpack_require__(3)
+	  , global             = __webpack_require__(4)
 	  , ctx                = __webpack_require__(80)
 	  , classof            = __webpack_require__(159)
 	  , $export            = __webpack_require__(1)
@@ -42738,7 +43630,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 695 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global            = __webpack_require__(3)
+	var global            = __webpack_require__(4)
 	  , inheritIfRequired = __webpack_require__(316)
 	  , dP                = __webpack_require__(18).f
 	  , gOPN              = __webpack_require__(119).f
@@ -43271,7 +44163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	// ECMAScript 6 symbols shim
-	var global         = __webpack_require__(3)
+	var global         = __webpack_require__(4)
 	  , has            = __webpack_require__(34)
 	  , DESCRIPTORS    = __webpack_require__(17)
 	  , $export        = __webpack_require__(1)
@@ -43518,7 +44410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , toLength     = __webpack_require__(24)
 	  , isObject     = __webpack_require__(8)
 	  , TYPED_ARRAY  = __webpack_require__(9)('typed_array')
-	  , ArrayBuffer  = __webpack_require__(3).ArrayBuffer
+	  , ArrayBuffer  = __webpack_require__(4).ArrayBuffer
 	  , speciesConstructor = __webpack_require__(326)
 	  , $ArrayBuffer = buffer.ArrayBuffer
 	  , $DataView    = buffer.DataView
@@ -43697,7 +44589,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// https://github.com/rwaldron/tc39-notes/blob/master/es6/2014-09/sept-25.md#510-globalasap-for-enqueuing-a-microtask
 	var $export   = __webpack_require__(1)
 	  , microtask = __webpack_require__(324)()
-	  , process   = __webpack_require__(3).process
+	  , process   = __webpack_require__(4).process
 	  , isNode    = __webpack_require__(59)(process) == 'process';
 	
 	$export($export.G, {
@@ -43943,7 +44835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	// https://github.com/zenparsing/es-observable
 	var $export     = __webpack_require__(1)
-	  , global      = __webpack_require__(3)
+	  , global      = __webpack_require__(4)
 	  , core        = __webpack_require__(72)
 	  , microtask   = __webpack_require__(324)()
 	  , OBSERVABLE  = __webpack_require__(9)('observable')
@@ -44433,7 +45325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// https://github.com/ljharb/proposal-global
 	var $export = __webpack_require__(1);
 	
-	$export($export.S, 'System', {global: __webpack_require__(3)});
+	$export($export.S, 'System', {global: __webpack_require__(4)});
 
 /***/ },
 /* 771 */
@@ -44441,7 +45333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var $iterators    = __webpack_require__(335)
 	  , redefine      = __webpack_require__(42)
-	  , global        = __webpack_require__(3)
+	  , global        = __webpack_require__(4)
 	  , hide          = __webpack_require__(37)
 	  , Iterators     = __webpack_require__(116)
 	  , wks           = __webpack_require__(9)
@@ -44478,7 +45370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	// ie9- setTimeout & setInterval additional parameters fix
-	var global     = __webpack_require__(3)
+	var global     = __webpack_require__(4)
 	  , $export    = __webpack_require__(1)
 	  , invoke     = __webpack_require__(242)
 	  , partial    = __webpack_require__(599)

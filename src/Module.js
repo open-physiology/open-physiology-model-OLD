@@ -347,8 +347,8 @@ export default class Module {
 			Field.augmentClass(resourceClass, shortcutKey);
 		}
 	}
-	
-	register(cls) : void {
+	 
+	register(cls) {
 		/* register the class in this module */
 		this.classes.ensureVertex(cls.name, cls);
 		if (!cls.notExported) {
@@ -480,13 +480,11 @@ export default class Module {
 				});
 				default: {
 					if (!vOld::isUndefined() && !vNew::isUndefined() && !_isEqual(vOld, vNew)) {
-						// console.log(OldClass.name, NewClass.name);
 						throw new Error(humanMsg`
 							Cannot merge ${OldClass.name}.${key} = ${JSON.stringify(vOld)}
 							        with ${JSON.stringify(vNew)}.
 						`);
 					}
-					// assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), );
 					return vOld::isUndefined() ? vNew : vOld;
 				}
 			}

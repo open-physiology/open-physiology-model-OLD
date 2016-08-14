@@ -6,6 +6,7 @@ import {definePropertyByValue} from "../util/misc";
 import {humanMsg} from "../util/misc";
 
 import assert from 'power-assert';
+import {constraint} from "../util/misc";
 
 export default Module.create('typed', [
 	resources
@@ -28,7 +29,7 @@ export default Module.create('typed', [
 					definition:         sc,
 					['<--DefinesType']: rel
 				} = vals;
-				assert((
+				constraint((
 					Template.hasInstance(sc)  ||
 					DefinesType.hasInstance(rel)
 				), humanMsg`
