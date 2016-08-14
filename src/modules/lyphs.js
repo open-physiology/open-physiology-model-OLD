@@ -17,6 +17,12 @@ import {universalDistanceRange} from "../util/schemas";
 import {wrapInArray} from "../util/misc";
 import {setEquals} from "../util/ObservableSet";
 
+import union from 'lodash/union';
+
+import defaults from 'lodash-bound/defaults';
+import assign from 'lodash-bound/assign';
+import entries from 'lodash-bound/entries';
+
 
 export default TypedModule.create('lyphs', [
 	resources, typed
@@ -73,7 +79,7 @@ export default TypedModule.create('lyphs', [
 					return a.min <= b.min && b.max <= a.max;
 				}
 			},
-			'length': { // size in axial dimension
+			'length': { // size in longitudinal dimension
 				...oneOf(
 					{ type: 'number'        },
 					{ ...rangeSchema        },
@@ -85,6 +91,44 @@ export default TypedModule.create('lyphs', [
 					b = normalizeToRange(b);
 					return a.min <= b.min && b.max <= a.max;
 				}
+			}
+		},
+		
+		behavior: {
+			new(vals = {}, options = {}) {
+				if (options.customLyphBehaviorDone) { return }
+				
+				console.log(options.createRadialBorders);
+				
+				vals = { ...vals };
+				vals::defaults({
+					longitudinalBorders: [],
+					radialBorders:  [],
+					axis:        null
+				});
+				if (vals.axis) {
+					vals.longitudinalBorders = union(
+						vals.longitudinalBorders,
+						[vals.axis]
+					);
+				}
+				if (options.createAxis) {
+					const axis = Border.new();
+					vals::assign({ axis });
+				}
+				if (options.createRadialBorders) {
+					if (options.createRadialBorders === true) {
+						options.createRadialBorders = 1;
+					}
+					const nr = Math.min(options.createRadialBorders , 2);
+					for (let i = vals.radialBorders.length; i < nr; ++i) {
+						vals.radialBorders.push(Border.new());
+					}
+				}
+				return Lyph.new(
+					vals,
+					{ ...options, customLyphBehaviorDone: true }
+				);
 			}
 		}
 		
@@ -154,7 +198,7 @@ export default TypedModule.create('lyphs', [
 		noCycles: true
 		
 		// Note that two segments can only be formally adjacent if they share
-		// an axial border (which must therefore exist; used to be enforced with the Cylindrical)
+		// a radial border (which must therefore exist; used to be enforced with the Cylindrical)
 
 	});
 	
@@ -215,20 +259,30 @@ export default TypedModule.create('lyphs', [
 			//     : Plus border and minus border can be either.
 			
 			// TODO: CONSTRAINT - a lyph can only have a non-infinite thickness
-			//     :              if it has two radial borders
+			//     :              if it has two longitudinal borders
 			
 			// TODO: CONSTRAINT - a lyph can only have a non-infinite length
-			//     :              if it has two axial borders
+			//     :              if it has two radial borders
 		
 		});
 	
-	// radial = inner & outer
-	// axial  = minus & plus
-	const HasBorder       = borderRel('HasBorder',       Has,       '0..4', 'borders',       'has border', { abstract: true });
-	const HasRadialBorder = borderRel('HasRadialBorder', HasBorder, '2..2', 'radialBorders', 'has radial border', {}, {auto: true, readonly: true});
-	const HasAxialBorder  = borderRel('HasAxialBorder',  HasBorder, '0..2', 'axialBorders',  'has axial border' );
+	//// //// //// //// ////
+	// We're using a cylindrical coordinate system:
+	// • https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
+	// • longitudinal dimension = 'length' dimension
+	// • radial dimension       = 'thickness' dimension
+	// • longitudinal borders   = inner & outer borders
+	// • radial borders         = minus & plus borders
+	//// //// //// //// ////
 	
-	const HasAxis = borderRel('HasAxis', HasRadialBorder, '0..1', 'axis', 'has axis');
+	/* 4 borders maximum; at least two longitudinal borders; optionally one or two radial borders */
+	const HasBorder             = borderRel('HasBorder',             Has,       '0..4', 'borders',             'has border', { abstract: true });
+	const HasLongitudinalBorder = borderRel('HasLongitudinalBorder', HasBorder, '2..2', 'longitudinalBorders', 'has longitudinal border', {}, {auto: true, readonly: true});
+	const HasRadialBorder       = borderRel('HasRadialBorder',       HasBorder, '0..2', 'radialBorders',       'has radial border');
+	
+	/* one of the longitudinal borders can be an axis */
+	const HasAxis = borderRel('HasAxis', HasLongitudinalBorder, '0..1', 'axis', 'has axis');
+	
 	
 	const CoalescenceScenario = M.TYPED_RESOURCE({//////////////////////////////
 		

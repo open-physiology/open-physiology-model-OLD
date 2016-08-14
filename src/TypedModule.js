@@ -43,7 +43,9 @@ export default class TypedModule extends Module {
 				singular: conf.singular,
 				
 				properties:        conf.properties,
-				patternProperties: conf.patternProperties
+				patternProperties: conf.patternProperties,
+				
+				behavior: conf.behavior
 				
 			});
 			

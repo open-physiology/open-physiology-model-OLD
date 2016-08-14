@@ -25,7 +25,7 @@ describe("'lyphs' Module", () => {
 			'HasSegment',
 			'HasBorder',
 			'HasRadialBorder',
-			'HasAxialBorder',
+			'HasLongitudinalBorder',
 			'ContainsNode',
 			'JoinsLyph',
 			'Coalesces',
@@ -48,9 +48,40 @@ describe("'lyphs' Module", () => {
 		expect(material).to.be.an.instanceOf(Material);
 		expect(lyph    ).to.be.an.instanceOf(Material, Lyph);
 		
-		expect([...lyph.radialBorders]).to.have.a.lengthOf(2);
+	});
+
+	it("exports lyph type that can be given custom borders and axes", async () => {
+		
+		const {
+			Lyph,
+			Border
+		} = module.classes;
+		
+		let lyph = Lyph.new({}, {
+			createRadialBorders: 1
+		});
+		
+		expect([...lyph.longitudinalBorders]).to.have.a.lengthOf(2);
+		expect([...lyph.longitudinalBorders][0]).to.be.an.instanceOf(Border);
+		expect([...lyph.longitudinalBorders][1]).to.be.an.instanceOf(Border);
+		
+		expect([...lyph.radialBorders]).to.have.a.lengthOf(1);
 		expect([...lyph.radialBorders][0]).to.be.an.instanceOf(Border);
-		expect([...lyph.radialBorders][1]).to.be.an.instanceOf(Border);
+		
+		
+		let lyph2 = Lyph.new({}, {
+			createRadialBorders: 2,
+			createAxis: 1
+		});
+		
+		expect([...lyph2.longitudinalBorders]).to.have.a.lengthOf(2);
+		expect([...lyph2.longitudinalBorders][0]).to.be.an.instanceOf(Border);
+		expect([...lyph2.longitudinalBorders][1]).to.be.an.instanceOf(Border);
+		
+		expect([...lyph2.radialBorders]).to.have.a.lengthOf(2);
+		expect([...lyph2.radialBorders][0]).to.be.an.instanceOf(Border);
+		expect([...lyph2.radialBorders][1]).to.be.an.instanceOf(Border);
+		expect(lyph2.axis).to.be.an.instanceOf(Border);
 		
 	});
 	
@@ -71,8 +102,8 @@ describe("'lyphs' Module", () => {
 		let lyph = Lyph.new();
 		
 		expect(new Set([
-			[...lyph.radialBorders][0].nature,
-			[...lyph.radialBorders][1].nature
+			[...lyph.longitudinalBorders][0].nature,
+			[...lyph.longitudinalBorders][1].nature
 		]).size).to.equal(2);
 		
 		// To compare, this was the nature of the original bug.

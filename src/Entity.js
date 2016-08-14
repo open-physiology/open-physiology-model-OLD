@@ -148,19 +148,20 @@ export default class Entity extends ValueTracker {
 	
 	
 	static Change_new = class extends tracker.Change {
-		constructor(context, props = {}, options = {}) {
+		constructor(context, initialValues = {}, options = {}) {
 			super(options);
 			this.context       = context;
-			this.initialValues = props;
+			this.initialValues = initialValues;
 			this.options       = options;
 		}
 
 		run() {
 			if (this.context.behavior.new::isFunction()) {
-				return this.context.behavior.new(
-					this.initialValues,
-					this.options
+				let customResult = this.context.behavior.new(
+					{ ...this.initialValues },
+					{ ...this.options       }
 				);
+				if (customResult) { return customResult }
 			}
 			assert(!this.context.abstract, humanMsg`
 				Cannot instantiate the abstract
@@ -182,15 +183,15 @@ export default class Entity extends ValueTracker {
 	};
 	
 	static new(
-		vals:    Object = {},
-	    options: Object = {}
+		vals:    Object,
+	    options: Object
 	): this {
 		return (new this.Change_new(this, vals, options)).run();
 	}
 	
 	static get(
 		href:    { href: string } | string | number,
-		options: Object = {} // TODO: filtering, expanding, paging, ...
+		options: Object // TODO: filtering, expanding, paging, ...
 	): this {
 		if (href::isObject()) { href = {href} }
 		let entity;
@@ -238,7 +239,7 @@ export default class Entity extends ValueTracker {
 	
 	static async load(
 		href:    {href: string} | string | number,
-		options: Object = {} // TODO: filtering, expanding, paging, ...
+		options: Object // TODO: filtering, expanding, paging, ...
 	) {
 		
 		// TODO
