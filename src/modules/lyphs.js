@@ -18,10 +18,14 @@ import {wrapInArray} from "../util/misc";
 import {setEquals} from "../util/ObservableSet";
 
 import union from 'lodash/union';
+import uniqueId from 'lodash/uniqueId';
 
 import defaults from 'lodash-bound/defaults';
 import assign from 'lodash-bound/assign';
 import entries from 'lodash-bound/entries';
+import parseInt from 'lodash-bound/parseInt';
+import max from 'lodash-bound/max';
+import map from 'lodash-bound/map';
 
 
 export default TypedModule.create('lyphs', [
@@ -116,7 +120,7 @@ export default TypedModule.create('lyphs', [
 				}
 				if (options.createRadialBorders) {
 					if (options.createRadialBorders === true) {
-						options.createRadialBorders = 1;
+						options.createRadialBorders = 2;
 					}
 					const nr = Math.min(options.createRadialBorders , 2);
 					for (let i = vals.radialBorders.length; i < nr; ++i) {
@@ -158,6 +162,15 @@ export default TypedModule.create('lyphs', [
 		
 		1: [Lyph, '0..*', { anchors: true, key: 'layers' }],
 		2: [Lyph, '0..1'                                  ],
+		
+		properties: {
+			'relativePosition': {
+				type: 'number',
+				required: true,
+				default() { return [...this[1]['-->HasLayer']]::map('relativePosition').concat([0])::max() + 1 }
+			}
+			// TODO: CONSTRAINT - two layers of the same lyph cannot have the same relativePosition
+		},
 		
 		noCycles: true,
 		

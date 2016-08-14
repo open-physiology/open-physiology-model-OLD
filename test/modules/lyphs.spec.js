@@ -2,6 +2,8 @@ import {xdescribe, describe, it, expect} from '../test.helper';
 
 import moduleFactory from '../../src/modules/lyphs';
 
+import map from 'lodash-bound/map';
+
 describe("'lyphs' Module", () => {
 	
 	let module;
@@ -92,6 +94,27 @@ describe("'lyphs' Module", () => {
 		expect(Lyph.properties           ).to.have.property('href');
 		expect(Lyph.relationships        ).to.have.property('-->ContainsMaterial');
 		expect(Lyph.relationshipShortcuts).to.have.property('materials');
+		
+	});
+	
+	it("exports lyph classes that can have layers", () => {
+		
+		const {Lyph} = module.classes;
+		
+		let lyph = Lyph.new();
+		
+		let layer1 = Lyph.new();
+		let layer2 = Lyph.new();
+		let layer3 = Lyph.new();
+		
+		lyph.layers.add(layer1);
+		lyph.layers.add(layer2);
+		lyph.layers.add(layer3);
+		
+		expect(new Set([...lyph['-->HasLayer']]::map('relativePosition')).size).to.equal(3);
+		expect([...lyph['-->HasLayer']]::map('relativePosition')[0]).to.be.a('number');
+		expect([...lyph['-->HasLayer']]::map('relativePosition')[1]).to.be.a('number');
+		expect([...lyph['-->HasLayer']]::map('relativePosition')[2]).to.be.a('number');
 		
 	});
 	

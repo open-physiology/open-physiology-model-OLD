@@ -79,9 +79,9 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[!initialValue::isUndefined(), initialValue::callOrReturn()::cloneDeep()],
-			['default' in desc,            desc.default::callOrReturn()::cloneDeep()],
-			['value'   in desc,            desc.value  ::callOrReturn()::cloneDeep()],
+			[!initialValue::isUndefined(), initialValue::callOrReturn(owner)::cloneDeep()],
+			['default' in desc,            desc.default::callOrReturn(owner)::cloneDeep()],
+			['value'   in desc,            desc.value  ::callOrReturn(owner)::cloneDeep()],
 			[!desc.required]
 		);
 	}

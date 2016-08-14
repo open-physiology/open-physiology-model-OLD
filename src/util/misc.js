@@ -100,8 +100,8 @@ export function definePropertiesByValue(obj, options = {}) {
 	}
 }
 
-export function callOrReturn() {
-	return this::isFunction() ? this() : this;
+export function callOrReturn(context) {
+	return this::isFunction() ? context::this() : this;
 }
 
 export function constraint(constraint, message) {
