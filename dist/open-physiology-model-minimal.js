@@ -4763,11 +4763,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		//// //// //// //// ////
 		// We're using a cylindrical coordinate system:
-		// - https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
-		// - longitudinal dimension = 'length' dimension
-		// - radial dimension       = 'thickness' dimension
-		// - longitudinal borders   = inner & outer borders
-		// - radial borders         = minus & plus borders
+		// + https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
+		// + longitudinal dimension = 'length' dimension
+		// + radial dimension       = 'thickness' dimension
+		// + longitudinal borders   = inner & outer borders
+		// + radial borders         = minus & plus borders
 		//// //// //// //// ////
 	
 		/* 4 borders maximum; at least two longitudinal borders; optionally one or two radial borders */
