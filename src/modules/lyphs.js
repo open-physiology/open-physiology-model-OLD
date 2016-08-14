@@ -13,7 +13,7 @@ import {
 
 import resources from './resources';
 import typed     from './typed';
-import {rangeDefault} from "../util/schemas";
+import {universalDistanceRange} from "../util/schemas";
 import {wrapInArray} from "../util/misc";
 import {setEquals} from "../util/ObservableSet";
 
@@ -60,13 +60,26 @@ export default TypedModule.create('lyphs', [
 		singular: "lyph",
 		
 		properties: {
-			'thickness': {
+			'thickness': { // size in radial dimension
 				...oneOf(
 					{ type: 'number'        },
 					{ ...rangeSchema        },
 					{ ...distributionSchema }
 				),
-				default: rangeDefault,
+				default: universalDistanceRange,
+				isRefinement(a, b) {
+					a = normalizeToRange(a);
+					b = normalizeToRange(b);
+					return a.min <= b.min && b.max <= a.max;
+				}
+			},
+			'length': { // size in axial dimension
+				...oneOf(
+					{ type: 'number'        },
+					{ ...rangeSchema        },
+					{ ...distributionSchema }
+				),
+				default: universalDistanceRange,
 				isRefinement(a, b) {
 					a = normalizeToRange(a);
 					b = normalizeToRange(b);
@@ -127,64 +140,22 @@ export default TypedModule.create('lyphs', [
 		
 	});
 	
-	
-	const CylindricalLyph = M.TYPED_RESOURCE({//////////////////////////////////
-		
-		name: 'CylindricalLyph',
-		
-		extends: Lyph,
-		
-		singular: "cylindrical lyph",
-		
-		properties: {
-			'length': {
-				...oneOf(
-					{ type: 'number'        },
-					{ ...rangeSchema        },
-					{ ...distributionSchema }
-				),
-				default: rangeDefault,
-				isRefinement(a, b) {
-					a = normalizeToRange(a);
-					b = normalizeToRange(b);
-					return a.min <= b.min && b.max <= a.max;
-				}
-			}
-		}
-		
-	});/////////////////////////////////////////////////////////////////////////
-	
-	
-	M.RELATIONSHIP({
-		
-		// specific version between cylindrical lyphs
-		
-		name: 'HasLayer',
-		
-		extends: HasPart,
-		
-		singular: "has layer",
-		
-		1: [CylindricalLyph, '0..*', { anchors: true, key: 'layers' }],
-		2: [CylindricalLyph, '0..1'                                  ],
-		
-		noCycles: true,
-		
-	});
-	
 	const HasSegment = M.RELATIONSHIP({
-		
+
 		name: 'HasSegment',
-		
+
 		extends: HasPatch,
-		
+
 		singular: "has segment",
-		
-		1: [CylindricalLyph, '0..*', { anchors: true, key: 'segments' }],
-		2: [CylindricalLyph, '0..1'                                    ],
-		
+
+		1: [Lyph, '0..*', { anchors: true, key: 'segments' }],
+		2: [Lyph, '0..1'                                    ],
+
 		noCycles: true
 		
+		// Note that two segments can only be formally adjacent if they share
+		// an axial border (which must therefore exist; used to be enforced with the Cylindrical)
+
 	});
 	
 	
@@ -209,52 +180,85 @@ export default TypedModule.create('lyphs', [
 					b = new Set(b ? wrapInArray(b) : []);
 					return !(b.has('open'  ) && !a.has('open'  )) &&
 					       !(b.has('closed') && !a.has('closed'));
-					
 				}
 			}
 		}
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
+	const borderRel = (name, Superclass, cardinality, key, singular, flags = {}, options = {}) => M.RELATIONSHIP({
+			 
+			name: name,
+			
+			extends: Superclass,
+			
+			singular: singular,
+		
+			...flags,
+			
+			1: [Lyph,   cardinality, { ...options, sustains: true, anchors: true, expand: true, key }],
+			2: [Border, '1..1'                                                                       ],
+			
+			// The 'readonly' flag above implies that when a lyph is created,
+			// its borders are also automatically created.
+			
+			// Two lyphs never share the same border, formally speaking.
+			// The degree to which two borders overlap can be controlled through
+			// the existence of shared nodes on those borders.
+			// (1) Simply a single shared node between two borders indicates that they overlap anywhere.
+			// (2) If a node is on, e.g., the minus and top borders, it is in the corner, with all meaning it implies.
+			// (3) In the strictest case, two nodes could be used to connect four corners and perfectly align two lyphs.
+			
+			// TODO: CONSTRAINT: Outer border                 always has `nature: 'closed'`.
+			//     :             Inner border of position = 0 always has `nature: 'open'  `.
+			//     :             Inner border of position > 0 always has `nature: 'closed'`.
+			//     : Plus border and minus border can be either.
+			
+			// TODO: CONSTRAINT - a lyph can only have a non-infinite thickness
+			//     :              if it has two radial borders
+			
+			// TODO: CONSTRAINT - a lyph can only have a non-infinite length
+			//     :              if it has two axial borders
+		
+		});
 	
-	const [
-		HasInnerBorder,
-		HasOuterBorder,
-		HasMinusBorder,
-		HasPlusBorder
-	] = M.RELATIONSHIP([
-		['HasInnerBorder', Lyph           , 'innerBorder', "has inner border"],
-		['HasOuterBorder', Lyph           , 'outerBorder', "has outer border"],
-		['HasMinusBorder', CylindricalLyph, 'minusBorder', "has minus border"],
-		['HasPlusBorder' , CylindricalLyph, 'plusBorder' , "has plus border" ],
-	].map(([name, LyphClass, key, singular]) => ({
-		
-		name: name,
-		
-		extends: Has,
-		
-		singular: singular,
-		
-		1: [LyphClass, '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, key }],
-		2: [Border,    '0..1'                                                                                                   ],
-		
-		// The 'readonly' flag above implies that when a lyph is created,
-		// its borders are also automatically created.
-		
-		// Two lyphs never share the same border, formally speaking.
-		// The degree to which two borders overlap can be controlled through
-		// the existence of shared nodes on those borders.
-		// (1) Simply a single shared node between two borders indicates that they overlap anywhere.
-		// (2) If a node is on, e.g., the minus and top borders, it is in the corner, with all meaning it implies.
-		// (3) In the strictest case, two nodes could be used to connect four corners and perfectly align two lyphs.
-		
-		// TODO: CONSTRAINT: Outer border                 always has `nature: 'closed'`.
-		//     :             Inner border of position = 0 always has `nature: 'open'  `.
-		//     :             Inner border of position > 0 always has `nature: 'closed'`.
-		//     : Plus border and minus border can be either.
-		
-	})));
+	// radial = inner & outer
+	// axial  = minus & plus
+	const HasBorder       = borderRel('HasBorder',       Has,       '0..4', 'borders',       'has border', { abstract: true });
+	const HasRadialBorder = borderRel('HasRadialBorder', HasBorder, '2..2', 'radialBorders', 'has radial border', {}, {auto: true, readonly: true});
+	const HasAxialBorder  = borderRel('HasAxialBorder',  HasBorder, '0..2', 'axialBorders',  'has axial border' );
 	
+	const HasAxis = borderRel('HasAxis', HasRadialBorder, '0..1', 'axis', 'has axis');
+	
+	const CoalescenceScenario = M.TYPED_RESOURCE({//////////////////////////////
+		
+		name: 'CoalescenceScenario',
+		
+		extends: Template,
+		
+		singular: "coalescence scenario"
+		
+	});/////////////////////////////////////////////////////////////////////////
+	
+	
+	const JoinsLyph = M.RELATIONSHIP({
+		
+		name: 'JoinsLyph',
+		
+		extends: PullsIntoTypeDefinition,
+		
+		singular: "joins lyph",
+		
+		1: [CoalescenceScenario, '2..2', { anchors: true, key: 'lyphs' }],
+		2: [Lyph,                '0..*'                                 ],
+		
+		// cardinality max=2, because we're only working in two dimensions right now
+		
+		// TODO: CONSTRAINT: both joint lyphs of a given scenario need to
+		//     :             use the same Lyph entity as their outer layer
+		// TODO: CONSTRAINT: cardinality = 1 on both lyphs and their layers
+		
+	});
 	
 	const Coalescence = M.RESOURCE({////////////////////////////////////////////
 		
@@ -275,29 +279,31 @@ export default TypedModule.create('lyphs', [
 		
 		name: 'Coalesces',
 		
-		extends: PullsIntoTypeDefinition,
+		extends: IsRelatedTo,
 		
 		singular: "coalesces",
 		
-		1: [Coalescence, '2..*', { anchors: true, key: 'lyphs'        }],
+		1: [Coalescence, '2..2', { anchors: true, key: 'lyphs'        }],
 		2: [Lyph,        '0..*', {                key: 'coalescences' }],
 		
+		// cardinality max=2, because we're only working in two dimensions right now
+				
 	});
 	
 	
-	const CoalescesThrough = M.RELATIONSHIP({
+	const CoalescesLike = M.RELATIONSHIP({
 		
-		name: 'CoalescesThrough',
+		name: 'CoalescesLike',
 		
-		extends: PullsIntoTypeDefinition,
+		extends: IsRelatedTo,
 		
 		singular: "coalesces through",
 		
-		1: [Coalescence, '0..*', { anchors: true, key: 'interfaceLayers' }],
-		2: [Lyph,        '0..*',                                          ],
+		1: [Coalescence,         '0..*', { anchors: true, key: 'scenarios' }],
+		2: [CoalescenceScenario, '0..*',                                    ],
 		
-		// TODO: CONSTRAINT: each interface layer has to be
-		//     : a refinement of all outer layers of the coalescing lyphs
+		// TODO: CONSTRAINT: the two lyphs for every scenario each have to be
+		//     :             a refinement of their respective lyphs in the coalescence
 		
 	});
 	

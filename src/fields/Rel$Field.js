@@ -100,10 +100,6 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		/* handle initial values */
 		if (initialValue && initialValue[Symbol.iterator]) {
 			for (let rel of initialValue) {
-				// TODO: - rel may be a reference to an existing relationship;
-				//     :   then go get it
-				//     : - It may also be a description of a new relationship;
-				//     :   then create it
 				if (!rel.fields[desc.keyInRelationship].get()) {
 					rel.fields[desc.keyInRelationship].set(this);
 				}
@@ -116,6 +112,18 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 			// OK, a shortcut was given
 		} else if (desc.cardinality.min === 0) {
 			// OK, this field is optional
+		}
+		
+		/* fill up missing required values with 'auto'matic ones */
+		if (desc.options.auto) {
+			for (let i = this[$$value]::size(); i < desc.cardinality.min; ++i) {
+				const rel = desc.relationshipClass.new({
+					[desc.keyInRelationship]         : this[$$owner],
+					[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.newOrSingleton()
+				});
+				this[$$pristine].add(rel);
+				this[$$value]   .add(rel);
+			}
 		}
 	}
 	
@@ -133,7 +141,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		`);
 		if (stages.includes('commit')) {
 			const { min, max } = this[$$desc].cardinality;
-			assert(val::size()::inRange(min, max + 1));
+			assert(val.size::inRange(min, max + 1));
 		}
 		val.forEach(::this.validateElement);
 	}

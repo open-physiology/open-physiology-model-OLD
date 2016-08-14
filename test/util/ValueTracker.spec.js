@@ -10,7 +10,7 @@ describe("ValueTracker class", () => {
 	let obj;
 	let log;
 	const record = (observable) => {
-		expect(observable).to.be.an.instanceof(Observable);
+		expect(observable).to.be.an.instanceOf(Observable);
 		observable.subscribe(::log.push);
 	};
 	

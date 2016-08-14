@@ -3,7 +3,7 @@
 import stringify from 'json-stringify-safe';
 
 export default function propertiesPlugin(chai, utils) {
-	var Assertion = chai.Assertion;
+	const Assertion = chai.Assertion;
 
 	Assertion.addMethod('branch', function () {
 		let assertion = new Assertion(this._obj);
@@ -11,10 +11,10 @@ export default function propertiesPlugin(chai, utils) {
 		return assertion;
 	});
 	
-	Assertion.addMethod('instanceof', function (...classes) {
+	Assertion.addMethod('instanceOf', function (...classes) {
 		for (let cls of classes) {
 			this.assert(
-				this._obj instanceof cls
+				this._obj instanceof cls || cls.hasInstance && cls.hasInstance(this._obj)
 				, 'expected #{this} to be an instance of ' + cls.name
 				, 'expected #{this} to not be an instance of ' + cls.name
 			);

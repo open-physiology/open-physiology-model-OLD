@@ -24,7 +24,6 @@ describe("'visualisation' Module", () => {
 			'MaterialGlyph',
 			'LyphRectangle',
 			'LyphArtefact',
-			'CylindricalLyphRectangle',
 			'BorderLine',
 			'CoalescenceRectangle',
 			'NodeGlyph',

@@ -9,7 +9,7 @@ import lyphs     from './lyphs';
 export default TypedModule.create('omegaTrees', [
 	resources, typed, groups, lyphs
 ], (M, {
-	IsRelatedTo, Template, Group, CylindricalLyph, Node, Has, PullsIntoTypeDefinition
+	IsRelatedTo, Template, Group, Lyph, Node, Has, PullsIntoTypeDefinition
 }) => {
 	
 	
@@ -47,7 +47,7 @@ export default TypedModule.create('omegaTrees', [
 		abstract: true,
 		
 		extends:    Template,
-		extendedBy: [CylindricalLyph, OmegaTree],
+		extendedBy: [Lyph, OmegaTree],
 		
 		singular: "omega tree part",
 		

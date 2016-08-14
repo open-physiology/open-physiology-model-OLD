@@ -12,7 +12,7 @@ export default TypedModule.create('visualisations', [
 	resources, lyphs, typed, processes, measurables
 ], (M, {
 	Resource, IsRelatedTo, Material, Lyph,
-	CylindricalLyph, Border, Coalescence, Node,
+	Border, Coalescence, Node,
 	Template, Process, Measurable, Causality
 }) => {
 	
@@ -296,16 +296,6 @@ export default TypedModule.create('visualisations', [
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
-	const CylindricalLyphRectangle = M.RESOURCE({///////////////////////////////
-		
-		name: 'CylindricalLyphRectangle',
-		
-		extends: LyphRectangle,
-		
-		singular: "cylindrical lyph rectangle"
-		
-	});/////////////////////////////////////////////////////////////////////////
-	
 	const BorderLine = M.RESOURCE({/////////////////////////////////////////////
 		
 		name: 'BorderLine',
@@ -375,7 +365,6 @@ export default TypedModule.create('visualisations', [
 		[Artefact,                 Template       ],
 		[MaterialGlyph,            Material       ],
 		[LyphArtefact,             Lyph           ],
-		[CylindricalLyphRectangle, CylindricalLyph],
 		[BorderLine,               Border         ],
 		[NodeGlyph,                Node           ],
 		[ProcessEdge,              Process        ],

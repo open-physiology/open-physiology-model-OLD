@@ -6,14 +6,14 @@ import chai                   from 'chai';
 import genericPlugin          from './generic.plugin';
 import propertiesPlugin       from './properties.plugin';
 import resourceCheckingPlugin from './resourceChecking.plugin';
-import matchPatternPlugin     from 'chai-match-pattern';
 import chaiAsPromised         from 'chai-as-promised';
+import chaiThings             from 'chai-things';
 
 chai.use(chaiAsPromised); // keep this as the first plugin or it messes up other plugins
 chai.use(genericPlugin);
 chai.use(propertiesPlugin);
 chai.use(resourceCheckingPlugin);
-chai.use(matchPatternPlugin);
+chai.use(chaiThings);
 
 import mocha from 'mocha';
 export const describe   = mocha.describe   || (global || window).describe;
@@ -24,4 +24,3 @@ export const beforeEach = mocha.beforeEach || (global || window).beforeEach;
 export const afterEach  = mocha.afterEach  || (global || window).afterEach;
 
 export const expect = chai.expect;
-export const _      = matchPatternPlugin.getLodashModule();

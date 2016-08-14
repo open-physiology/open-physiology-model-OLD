@@ -62,9 +62,9 @@ export const rangeSchema = {
 	}
 };
 
-export const rangeDefault = {
-	'min': -Infinity,
-	'max':  Infinity
+export const universalDistanceRange = {
+	'min': 0,
+	'max': Infinity
 };
 
 export const normalDistributionSchema = {

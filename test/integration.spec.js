@@ -87,7 +87,7 @@ describe("integrated workflow", () => {
 			name: "blood"
 		});
 
-		expect(blood).to.be.an.instanceof(Material);
+		expect(blood).to.be.an.instanceOf(Material);
 		expect(blood).to.have.a.property('id'  ).which.is.null;
 		expect(blood).to.have.a.property('href').which.is.null;
 		expect(blood).to.have.a.property('class', 'Material');
@@ -105,9 +105,9 @@ describe("integrated workflow", () => {
 			definition: water
 		});
 		
-		expect(waterType).to.be.instanceof(Material.Type);
+		expect(waterType).to.be.instanceOf(Material.Type);
 
-		expect(water).to.be.an.instanceof(Material);
+		expect(water).to.be.an.instanceOf(Material);
 		expect(water).to.have.a.property('name', "waiter");
 		expect(waterType).to.have.a.property('definition', water);
 
@@ -168,10 +168,10 @@ describe("integrated workflow", () => {
 	});
 
 	it("(regression test: HasType[2] set to null?)", async () => {
-		const {OmegaTree, CylindricalLyph, HasMaterial} = module.classes;
+		const {OmegaTree, Lyph, HasMaterial} = module.classes;
 		
-		let lyph1 = CylindricalLyph.new();
-		let lyph2 = CylindricalLyph.new();
+		let lyph1 = Lyph.new();
+		let lyph2 = Lyph.new();
 		let omegaTree = OmegaTree.new();
 
 		omegaTree.elements.add(lyph1);
@@ -186,14 +186,15 @@ describe("integrated workflow", () => {
 	});
 
 	it("(regression test 2: setting type in initializer fails at commit)", async () => {
-		const {CylindricalLyph} = module.classes;
-		let t1 = CylindricalLyph.new({ name: "Renal hilum" });
-		await expect(t1.commit()).to.not.be.rejected;
+		const {Lyph} = module.classes;
+		let t1 = Lyph.new({ name: "Renal hilum" });
+		await t1.commit();
+		// await expect(t1.commit()).to.not.be.rejected;
 	});
 
-	it("(regression test 3: Missing 'treeParent' field in CylindricalLyphTemplate)", async () => {
-		const {CylindricalLyph, OmegaTree} = module.classes;
-		let lyph = CylindricalLyph.new();
+	it("(regression test 3: Missing 'treeParent' field in Lyph)", async () => {
+		const {Lyph, OmegaTree} = module.classes;
+		let lyph = Lyph.new();
 
 		expect(lyph.fields).to.have.a.property('treeParent');
 		expect(lyph)       .to.have.a.property('treeParent');
@@ -226,7 +227,7 @@ describe("integrated workflow", () => {
 		
 		let treeFromP = await treeP;
 			
-		expect(treeFromP).to.be.instanceof(OmegaTree);
+		expect(treeFromP).to.be.instanceOf(OmegaTree);
 		
 		expect(() => treeFromP.p('root')).not.to.throw();
 	});

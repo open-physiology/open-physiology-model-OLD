@@ -4254,8 +4254,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	};
 	
-	var rangeDefault = exports.rangeDefault = {
-		'min': -Infinity,
+	var universalDistanceRange = exports.universalDistanceRange = {
+		'min': 0,
 		'max': Infinity
 	};
 	
@@ -5773,8 +5773,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _TypedModule = __webpack_require__(67);
@@ -5841,7 +5839,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			properties: {
 				'thickness': _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.rangeSchema), _extends({}, _schemas.distributionSchema)), {
-					default: _schemas.rangeDefault,
+					default: _schemas.universalDistanceRange,
+					isRefinement: function isRefinement(a, b) {
+						a = (0, _misc.normalizeToRange)(a);
+						b = (0, _misc.normalizeToRange)(b);
+						return a.min <= b.min && b.max <= a.max;
+					}
+				}),
+				'length': _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.rangeSchema), _extends({}, _schemas.distributionSchema)), {
+					default: _schemas.universalDistanceRange,
 					isRefinement: function isRefinement(a, b) {
 						a = (0, _misc.normalizeToRange)(a);
 						b = (0, _misc.normalizeToRange)(b);
@@ -5902,45 +5908,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		});
 	
-		var CylindricalLyph = M.TYPED_RESOURCE({ //////////////////////////////////
-	
-			name: 'CylindricalLyph',
-	
-			extends: Lyph,
-	
-			singular: "cylindrical lyph",
-	
-			properties: {
-				'length': _extends({}, (0, _schemas.oneOf)({ type: 'number' }, _extends({}, _schemas.rangeSchema), _extends({}, _schemas.distributionSchema)), {
-					default: _schemas.rangeDefault,
-					isRefinement: function isRefinement(a, b) {
-						a = (0, _misc.normalizeToRange)(a);
-						b = (0, _misc.normalizeToRange)(b);
-						return a.min <= b.min && b.max <= a.max;
-					}
-				})
-			}
-	
-		}); /////////////////////////////////////////////////////////////////////////
-	
-	
-		M.RELATIONSHIP({
-	
-			// specific version between cylindrical lyphs
-	
-			name: 'HasLayer',
-	
-			extends: HasPart,
-	
-			singular: "has layer",
-	
-			1: [CylindricalLyph, '0..*', { anchors: true, key: 'layers' }],
-			2: [CylindricalLyph, '0..1'],
-	
-			noCycles: true
-	
-		});
-	
 		var HasSegment = M.RELATIONSHIP({
 	
 			name: 'HasSegment',
@@ -5949,10 +5916,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			singular: "has segment",
 	
-			1: [CylindricalLyph, '0..*', { anchors: true, key: 'segments' }],
-			2: [CylindricalLyph, '0..1'],
+			1: [Lyph, '0..*', { anchors: true, key: 'segments' }],
+			2: [Lyph, '0..1'],
 	
 			noCycles: true
+	
+			// Note that two segments can only be formally adjacent if they share
+			// an axial border (which must therefore exist; used to be enforced with the Cylindrical)
 	
 		});
 	
@@ -5978,35 +5948,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		}); /////////////////////////////////////////////////////////////////////////
 	
-	
-		var _M$RELATIONSHIP = M.RELATIONSHIP([['HasInnerBorder', Lyph, 'innerBorder', "has inner border"], ['HasOuterBorder', Lyph, 'outerBorder', "has outer border"], ['HasMinusBorder', CylindricalLyph, 'minusBorder', "has minus border"], ['HasPlusBorder', CylindricalLyph, 'plusBorder', "has plus border"]].map(function (_ref2) {
-			var _ref3 = _slicedToArray(_ref2, 4);
-	
-			var name = _ref3[0];
-			var LyphClass = _ref3[1];
-			var key = _ref3[2];
-			var singular = _ref3[3];
-			return {
+		var borderRel = function borderRel(name, Superclass, cardinality, key, singular) {
+			var flags = arguments.length <= 5 || arguments[5] === undefined ? {} : arguments[5];
+			var options = arguments.length <= 6 || arguments[6] === undefined ? {} : arguments[6];
+			return M.RELATIONSHIP(_extends({
 	
 				name: name,
 	
-				extends: Has,
+				extends: Superclass,
 	
-				singular: singular,
+				singular: singular
 	
-				1: [LyphClass, '1..1', { auto: true, readonly: true, sustains: true, anchors: true, expand: true, key: key }],
-				2: [Border, '0..1']
+			}, flags, {
 	
-			};
-		}));
+				1: [Lyph, cardinality, _extends({}, options, { sustains: true, anchors: true, expand: true, key: key })],
+				2: [Border, '1..1']
 	
-		var _M$RELATIONSHIP2 = _slicedToArray(_M$RELATIONSHIP, 4);
+			}));
+		};
 	
-		var HasInnerBorder = _M$RELATIONSHIP2[0];
-		var HasOuterBorder = _M$RELATIONSHIP2[1];
-		var HasMinusBorder = _M$RELATIONSHIP2[2];
-		var HasPlusBorder = _M$RELATIONSHIP2[3];
+		// radial = inner & outer
+		// axial  = minus & plus
+		var HasBorder = borderRel('HasBorder', Has, '0..4', 'borders', 'has border', { abstract: true });
+		var HasRadialBorder = borderRel('HasRadialBorder', HasBorder, '2..2', 'radialBorders', 'has radial border', {}, { auto: true, readonly: true });
+		var HasAxialBorder = borderRel('HasAxialBorder', HasBorder, '0..2', 'axialBorders', 'has axial border');
 	
+		var HasAxis = borderRel('HasAxis', HasRadialBorder, '0..1', 'axis', 'has axis');
+	
+		var CoalescenceScenario = M.TYPED_RESOURCE({ //////////////////////////////
+	
+			name: 'CoalescenceScenario',
+	
+			extends: Template,
+	
+			singular: "coalescence scenario"
+	
+		}); /////////////////////////////////////////////////////////////////////////
+	
+	
+		var JoinsLyph = M.RELATIONSHIP({
+	
+			name: 'JoinsLyph',
+	
+			extends: PullsIntoTypeDefinition,
+	
+			singular: "joins lyph",
+	
+			1: [CoalescenceScenario, '2..2', { anchors: true, key: 'lyphs' }],
+			2: [Lyph, '0..*']
+	
+		});
 	
 		var Coalescence = M.RESOURCE({ ////////////////////////////////////////////
 	
@@ -6027,25 +6018,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			name: 'Coalesces',
 	
-			extends: PullsIntoTypeDefinition,
+			extends: IsRelatedTo,
 	
 			singular: "coalesces",
 	
-			1: [Coalescence, '2..*', { anchors: true, key: 'lyphs' }],
+			1: [Coalescence, '2..2', { anchors: true, key: 'lyphs' }],
 			2: [Lyph, '0..*', { key: 'coalescences' }]
 	
 		});
 	
-		var CoalescesThrough = M.RELATIONSHIP({
+		var CoalescesLike = M.RELATIONSHIP({
 	
-			name: 'CoalescesThrough',
+			name: 'CoalescesLike',
 	
-			extends: PullsIntoTypeDefinition,
+			extends: IsRelatedTo,
 	
 			singular: "coalesces through",
 	
-			1: [Coalescence, '0..*', { anchors: true, key: 'interfaceLayers' }],
-			2: [Lyph, '0..*']
+			1: [Coalescence, '0..*', { anchors: true, key: 'scenarios' }],
+			2: [CoalescenceScenario, '0..*']
 	
 		});
 	
@@ -22459,6 +22450,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
 	function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -22595,17 +22588,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						var rel = _step.value;
 	
-						// TODO: - rel may be a reference to an existing relationship;
-						//     :   then go get it
-						//     : - It may also be a description of a new relationship;
-						//     :   then create it
 						if (!rel.fields[desc.keyInRelationship].get()) {
 							rel.fields[desc.keyInRelationship].set(_this);
 						}
 						(0, _powerAssert2.default)(_rec2._expr(_rec2._capt(_rec2._capt(_rec2._capt(rel, 'arguments/0/left/object')[_rec2._capt(_rec2._capt(desc, 'arguments/0/left/property/object').keyInRelationship, 'arguments/0/left/property')], 'arguments/0/left') === _this, 'arguments/0'), {
 							content: 'assert(rel[desc.keyInRelationship] === this)',
 							filepath: 'src/fields/Rel$Field.js',
-							line: 110,
+							line: 106,
 							ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"BinaryExpression","operator":"===","left":{"type":"MemberExpression","object":{"type":"Identifier","name":"rel","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"desc","range":[11,15]},"property":{"type":"Identifier","name":"keyInRelationship","range":[16,33]},"computed":false,"range":[11,33]},"computed":true,"range":[7,34]},"right":{"type":"ThisExpression","range":[39,43]},"range":[7,43]}],"range":[0,44]}',
 							tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"rel","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"desc","range":[11,15]},{"type":{"label":"."},"range":[15,16]},{"type":{"label":"name"},"value":"keyInRelationship","range":[16,33]},{"type":{"label":"]"},"range":[33,34]},{"type":{"label":"==/!="},"value":"===","range":[35,38]},{"type":{"label":"this"},"value":"this","range":[39,43]},{"type":{"label":")"},"range":[43,44]}]',
 							visitorKeys: _powerAssertVisitorKeys
@@ -22630,8 +22619,19 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 			} else if (_get2.default.call(related, [desc.shortcutKey, 'initialValue'])) {
 				// OK, a shortcut was given
-			} else if (desc.cardinality.min === 0) {
-				// OK, this field is optional
+			} else if (desc.cardinality.min === 0) {}
+			// OK, this field is optional
+	
+	
+			/* fill up missing required values with 'auto'matic ones */
+			if (desc.options.auto) {
+				for (var i = (_context5 = _this[_symbols.$$value], _size2.default).call(_context5); i < desc.cardinality.min; ++i) {
+					var _context5, _desc$relationshipCla;
+	
+					var _rel = desc.relationshipClass.new((_desc$relationshipCla = {}, _defineProperty(_desc$relationshipCla, desc.keyInRelationship, _this[_symbols.$$owner]), _defineProperty(_desc$relationshipCla, desc.codomain.keyInRelationship, desc.codomain.resourceClass.newOrSingleton()), _desc$relationshipCla));
+					_this[_symbols.$$pristine].add(_rel);
+					_this[_symbols.$$value].add(_rel);
+				}
 			}
 			return _this;
 		}
@@ -22653,7 +22653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec3._expr(_rec3._capt(_rec3._capt(ignoreReadonly, 'arguments/0/left') || _rec3._capt(!_rec3._capt(_rec3._capt(this[_rec3._capt(_symbols.$$desc, 'arguments/0/right/argument/object/property')], 'arguments/0/right/argument/object').readonly, 'arguments/0/right/argument'), 'arguments/0/right'), 'arguments/0'), {
 					content: 'assert(ignoreReadonly || !this[$$desc].readonly)',
 					filepath: 'src/fields/Rel$Field.js',
-					line: 123,
+					line: 131,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"LogicalExpression","operator":"||","left":{"type":"Identifier","name":"ignoreReadonly","range":[7,21]},"right":{"type":"UnaryExpression","operator":"!","argument":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[26,30]},"property":{"type":"Identifier","name":"$$desc","range":[31,37]},"computed":true,"range":[26,38]},"property":{"type":"Identifier","name":"readonly","range":[39,47]},"computed":false,"range":[26,47]},"prefix":true,"range":[25,47]},"range":[7,47]}],"range":[0,48]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"ignoreReadonly","range":[7,21]},{"type":{"label":"||"},"value":"||","range":[22,24]},{"type":{"label":"prefix"},"value":"!","range":[25,26]},{"type":{"label":"this"},"value":"this","range":[26,30]},{"type":{"label":"["},"range":[30,31]},{"type":{"label":"name"},"value":"$$desc","range":[31,37]},{"type":{"label":"]"},"range":[37,38]},{"type":{"label":"."},"range":[38,39]},{"type":{"label":"name"},"value":"readonly","range":[39,47]},{"type":{"label":")"},"range":[47,48]}]',
 					visitorKeys: _powerAssertVisitorKeys
@@ -22676,25 +22676,25 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _powerAssert2.default)(_rec4._expr(_rec4._capt(_rec4._capt(val, 'arguments/0/object')[_rec4._capt(_rec4._capt(Symbol, 'arguments/0/property/object').iterator, 'arguments/0/property')], 'arguments/0'), {
 					content: 'assert(val[Symbol.iterator], humanMsg`\n\t\t\tThe value ${ val } given for ${ this[$$owner].constructor.name }#${ this[$$key] }\n\t\t\tis not an iterable collection (like array or set).\n\t\t`)',
 					filepath: 'src/fields/Rel$Field.js',
-					line: 130,
+					line: 138,
 					ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"MemberExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"property":{"type":"MemberExpression","object":{"type":"Identifier","name":"Symbol","range":[11,17]},"property":{"type":"Identifier","name":"iterator","range":[18,26]},"computed":false,"range":[11,26]},"computed":true,"range":[7,27]},{"type":"TaggedTemplateExpression","tag":{"type":"Identifier","name":"humanMsg","range":[29,37]},"quasi":{"type":"TemplateLiteral","quasis":[{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tThe value ","cooked":"\\n\\t\\t\\tThe value "},"tail":false,"range":[38,13]},{"type":"TemplateElement","value":{"raw":" given for ","cooked":" given for "},"tail":false,"range":[21,32]},{"type":"TemplateElement","value":{"raw":"#","cooked":"#"},"tail":false,"range":[67,68]},{"type":"TemplateElement","value":{"raw":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","cooked":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t"},"tail":true,"range":[84,2]}],"expressions":[{"type":"Identifier","name":"val","range":[16,19]},{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"MemberExpression","object":{"type":"ThisExpression","range":[35,39]},"property":{"type":"Identifier","name":"$$owner","range":[40,47]},"computed":true,"range":[35,48]},"property":{"type":"Identifier","name":"constructor","range":[49,60]},"computed":false,"range":[35,60]},"property":{"type":"Identifier","name":"name","range":[61,65]},"computed":false,"range":[35,65]},{"type":"MemberExpression","object":{"type":"ThisExpression","range":[71,75]},"property":{"type":"Identifier","name":"$$key","range":[76,81]},"computed":true,"range":[71,82]}],"range":[37,3]},"range":[29,3]}],"range":[0,4]}',
 					tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"["},"range":[10,11]},{"type":{"label":"name"},"value":"Symbol","range":[11,17]},{"type":{"label":"."},"range":[17,18]},{"type":{"label":"name"},"value":"iterator","range":[18,26]},{"type":{"label":"]"},"range":[26,27]},{"type":{"label":","},"range":[27,28]},{"type":{"label":"name"},"value":"humanMsg","range":[29,37]},{"type":{"label":"`"},"range":[37,38]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tThe value ","range":[38,13]},{"type":{"label":"${"},"range":[13,15]},{"type":{"label":"name"},"value":"val","range":[16,19]},{"type":{"label":"}"},"range":[20,21]},{"type":{"label":"template"},"value":" given for ","range":[21,32]},{"type":{"label":"${"},"range":[32,34]},{"type":{"label":"this"},"value":"this","range":[35,39]},{"type":{"label":"["},"range":[39,40]},{"type":{"label":"name"},"value":"$$owner","range":[40,47]},{"type":{"label":"]"},"range":[47,48]},{"type":{"label":"."},"range":[48,49]},{"type":{"label":"name"},"value":"constructor","range":[49,60]},{"type":{"label":"."},"range":[60,61]},{"type":{"label":"name"},"value":"name","range":[61,65]},{"type":{"label":"}"},"range":[66,67]},{"type":{"label":"template"},"value":"#","range":[67,68]},{"type":{"label":"${"},"range":[68,70]},{"type":{"label":"this"},"value":"this","range":[71,75]},{"type":{"label":"["},"range":[75,76]},{"type":{"label":"name"},"value":"$$key","range":[76,81]},{"type":{"label":"]"},"range":[81,82]},{"type":{"label":"}"},"range":[83,84]},{"type":{"label":"template"},"value":"\\n\\t\\t\\tis not an iterable collection (like array or set).\\n\\t\\t","range":[84,2]},{"type":{"label":"`"},"range":[2,3]},{"type":{"label":")"},"range":[3,4]}]',
 					visitorKeys: _powerAssertVisitorKeys
 				}), (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (stages.includes('commit')) {
 					var _rec5 = new _powerAssertRecorder(),
-					    _context5;
+					    _context6;
 	
 					var _$$desc$cardinality = this[_symbols.$$desc].cardinality;
 					var min = _$$desc$cardinality.min;
 					var max = _$$desc$cardinality.max;
 	
-					(0, _powerAssert2.default)(_rec5._expr(_rec5._capt((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, _rec5._capt(min, 'arguments/0/arguments/0'), _rec5._capt(_rec5._capt(max, 'arguments/0/arguments/1/left') + 1, 'arguments/0/arguments/1')), 'arguments/0'), {
-						content: 'assert(val::size()::inRange(min, max + 1))',
+					(0, _powerAssert2.default)(_rec5._expr(_rec5._capt((_context6 = val.size, _inRange2.default).call(_context6, _rec5._capt(min, 'arguments/0/arguments/0'), _rec5._capt(_rec5._capt(max, 'arguments/0/arguments/1/left') + 1, 'arguments/0/arguments/1')), 'arguments/0'), {
+						content: 'assert(val.size::inRange(min, max + 1))',
 						filepath: 'src/fields/Rel$Field.js',
-						line: 136,
-						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"callee":{"type":"Identifier","name":"size","range":[12,16]},"range":[7,16]},"arguments":[],"range":[7,18]},"callee":{"type":"Identifier","name":"inRange","range":[20,27]},"range":[7,27]},"arguments":[{"type":"Identifier","name":"min","range":[28,31]},{"type":"BinaryExpression","operator":"+","left":{"type":"Identifier","name":"max","range":[33,36]},"right":{"type":"NumericLiteral","value":1,"range":[39,40]},"range":[33,40]}],"range":[7,41]}],"range":[0,42]}',
-						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"::"},"value":"::","range":[10,12]},{"type":{"label":"name"},"value":"size","range":[12,16]},{"type":{"label":"("},"range":[16,17]},{"type":{"label":")"},"range":[17,18]},{"type":{"label":"::"},"value":"::","range":[18,20]},{"type":{"label":"name"},"value":"inRange","range":[20,27]},{"type":{"label":"("},"range":[27,28]},{"type":{"label":"name"},"value":"min","range":[28,31]},{"type":{"label":","},"range":[31,32]},{"type":{"label":"name"},"value":"max","range":[33,36]},{"type":{"label":"+/-"},"value":"+","range":[37,38]},{"type":{"label":"num"},"value":1,"range":[39,40]},{"type":{"label":")"},"range":[40,41]},{"type":{"label":")"},"range":[41,42]}]',
+						line: 144,
+						ast: '{"type":"CallExpression","callee":{"type":"Identifier","name":"assert","range":[0,6]},"arguments":[{"type":"CallExpression","callee":{"type":"BindExpression","object":{"type":"MemberExpression","object":{"type":"Identifier","name":"val","range":[7,10]},"property":{"type":"Identifier","name":"size","range":[11,15]},"computed":false,"range":[7,15]},"callee":{"type":"Identifier","name":"inRange","range":[17,24]},"range":[7,24]},"arguments":[{"type":"Identifier","name":"min","range":[25,28]},{"type":"BinaryExpression","operator":"+","left":{"type":"Identifier","name":"max","range":[30,33]},"right":{"type":"NumericLiteral","value":1,"range":[36,37]},"range":[30,37]}],"range":[7,38]}],"range":[0,39]}',
+						tokens: '[{"type":{"label":"name"},"value":"assert","range":[0,6]},{"type":{"label":"("},"range":[6,7]},{"type":{"label":"name"},"value":"val","range":[7,10]},{"type":{"label":"."},"range":[10,11]},{"type":{"label":"name"},"value":"size","range":[11,15]},{"type":{"label":"::"},"value":"::","range":[15,17]},{"type":{"label":"name"},"value":"inRange","range":[17,24]},{"type":{"label":"("},"range":[24,25]},{"type":{"label":"name"},"value":"min","range":[25,28]},{"type":{"label":","},"range":[28,29]},{"type":{"label":"name"},"value":"max","range":[30,33]},{"type":{"label":"+/-"},"value":"+","range":[34,35]},{"type":{"label":"num"},"value":1,"range":[36,37]},{"type":{"label":")"},"range":[37,38]},{"type":{"label":")"},"range":[38,39]}]',
 						visitorKeys: _powerAssertVisitorKeys
 					}));
 				}
@@ -22712,9 +22712,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'commit',
 			value: function () {
 				var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-					return regeneratorRuntime.wrap(function _callee$(_context6) {
+					return regeneratorRuntime.wrap(function _callee$(_context7) {
 						while (1) {
-							switch (_context6.prev = _context6.next) {
+							switch (_context7.prev = _context7.next) {
 								case 0:
 									this.validate(this[_symbols.$$value], ['commit']);
 									(0, _ObservableSet.copySetContent)(this[_symbols.$$pristine], this[_symbols.$$value]);
@@ -22722,7 +22722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 								case 3:
 								case 'end':
-									return _context6.stop();
+									return _context7.stop();
 							}
 						}
 					}, _callee, this);
@@ -23892,7 +23892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var IsRelatedTo = _ref.IsRelatedTo;
 		var Template = _ref.Template;
 		var Group = _ref.Group;
-		var CylindricalLyph = _ref.CylindricalLyph;
+		var Lyph = _ref.Lyph;
 		var Node = _ref.Node;
 		var Has = _ref.Has;
 		var PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
@@ -23929,7 +23929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			abstract: true,
 	
 			extends: Template,
-			extendedBy: [CylindricalLyph, OmegaTree],
+			extendedBy: [Lyph, OmegaTree],
 	
 			singular: "omega tree part"
 	
@@ -24137,7 +24137,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		var IsRelatedTo = _ref.IsRelatedTo;
 		var Material = _ref.Material;
 		var Lyph = _ref.Lyph;
-		var CylindricalLyph = _ref.CylindricalLyph;
 		var Border = _ref.Border;
 		var Coalescence = _ref.Coalescence;
 		var Node = _ref.Node;
@@ -24422,16 +24421,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		}); /////////////////////////////////////////////////////////////////////////
 	
-		var CylindricalLyphRectangle = M.RESOURCE({ ///////////////////////////////
-	
-			name: 'CylindricalLyphRectangle',
-	
-			extends: LyphRectangle,
-	
-			singular: "cylindrical lyph rectangle"
-	
-		}); /////////////////////////////////////////////////////////////////////////
-	
 		var BorderLine = M.RESOURCE({ /////////////////////////////////////////////
 	
 			name: 'BorderLine',
@@ -24497,7 +24486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		//// Model - Artefact Relationships ////
 		////////////////////////////////////////
 	
-		var _M$RELATIONSHIP = M.RELATIONSHIP([[Artefact, Template], [MaterialGlyph, Material], [LyphArtefact, Lyph], [CylindricalLyphRectangle, CylindricalLyph], [BorderLine, Border], [NodeGlyph, Node], [ProcessEdge, Process], [MeasurableGlyph, Measurable], [CausalityArrow, Causality], [CoalescenceRectangle, Coalescence]].map(function (_ref2) {
+		var _M$RELATIONSHIP = M.RELATIONSHIP([[Artefact, Template], [MaterialGlyph, Material], [LyphArtefact, Lyph], [BorderLine, Border], [NodeGlyph, Node], [ProcessEdge, Process], [MeasurableGlyph, Measurable], [CausalityArrow, Causality], [CoalescenceRectangle, Coalescence]].map(function (_ref2) {
 			var _ref3 = _slicedToArray(_ref2, 2);
 	
 			var ArtefactClass = _ref3[0];

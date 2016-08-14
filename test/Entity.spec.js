@@ -34,7 +34,7 @@ describe("Entity classes", () => {
 		await lyph.commit();
 
 		/* and this should actually result in a 'MyLyphType' instance */
-		expect(lyph).to.be.instanceof(Lyph, MyLyph);
+		expect(lyph).to.be.instanceOf(Lyph, MyLyph);
 		expect(lyph.answer)     .to.equal(42);
 		expect(lyph.getAnswer()).to.equal(42);
 

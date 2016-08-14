@@ -2,7 +2,6 @@ import {xdescribe, describe, it, expect} from '../test.helper';
 
 import moduleFactory from '../../src/modules/lyphs';
 
-
 describe("'lyphs' Module", () => {
 	
 	let module;
@@ -13,9 +12,9 @@ describe("'lyphs' Module", () => {
 		expect(module.classes).to.contain.resources(
 			'Material',
 			'Lyph',
-			'CylindricalLyph',
 			'Border',
 			'Node',
+			'CoalescenceScenario',
 			'Coalescence'
 		);
 		expect(module.classes).to.contain.relationships(
@@ -24,13 +23,13 @@ describe("'lyphs' Module", () => {
 			'HasLayer',
 			'HasPatch',
 			'HasSegment',
-			'HasInnerBorder',
-			'HasOuterBorder',
-			'HasMinusBorder',
-			'HasPlusBorder',
+			'HasBorder',
+			'HasRadialBorder',
+			'HasAxialBorder',
 			'ContainsNode',
+			'JoinsLyph',
 			'Coalesces',
-			'CoalescesThrough'
+			'CoalescesLike'
 		);
 
 	});
@@ -40,34 +39,18 @@ describe("'lyphs' Module", () => {
 		const {
 			Material,
 			Lyph,
-			CylindricalLyph,
 			Border
 		} = module.classes;
 		
-		let material        = Material.new();
-		let lyph            = Lyph.new();
-		let cylindricalLyph = CylindricalLyph.new();
+		let material = Material.new();
+		let lyph     = Lyph.new();
 		
-		expect(material       ).to.be.an.instanceof(                       Material);
-		expect(lyph           ).to.be.an.instanceof(                 Lyph, Material);
-		expect(cylindricalLyph).to.be.an.instanceof(CylindricalLyph, Lyph, Material);
+		expect(material).to.be.an.instanceOf(Material);
+		expect(lyph    ).to.be.an.instanceOf(Material, Lyph);
 		
-		expect(lyph.innerBorder).to.be.an.instanceof(Border);
-		expect(lyph.outerBorder).to.be.an.instanceof(Border);
-		expect(lyph.minusBorder).to.be.undefined;
-		expect(lyph.plusBorder ).to.be.undefined;
-		
-		expect(cylindricalLyph.innerBorder).to.be.an.instanceof(Border);
-		expect(cylindricalLyph.outerBorder).to.be.an.instanceof(Border);
-		expect(cylindricalLyph.minusBorder).to.be.an.instanceof(Border);
-		expect(cylindricalLyph.plusBorder ).to.be.an.instanceof(Border);
-		
-		expect(new Set([
-			cylindricalLyph.innerBorder,
-			cylindricalLyph.outerBorder,
-			cylindricalLyph.minusBorder,
-			cylindricalLyph.plusBorder
-		]).size).to.equal(4);
+		expect([...lyph.radialBorders]).to.have.a.lengthOf(2);
+		expect([...lyph.radialBorders][0]).to.be.an.instanceOf(Border);
+		expect([...lyph.radialBorders][1]).to.be.an.instanceOf(Border);
 		
 	});
 	
@@ -83,23 +66,19 @@ describe("'lyphs' Module", () => {
 	
 	it("(regression test: auto-synchronized border-natures?)", async () => {
 		
-		const {CylindricalLyph, Border} = module.classes;
+		const {Lyph, Border} = module.classes;
 		
-		let cylindricalLyph = CylindricalLyph.new();
+		let lyph = Lyph.new();
 		
 		expect(new Set([
-			cylindricalLyph.innerBorder.nature,
-			cylindricalLyph.outerBorder.nature,
-			cylindricalLyph.minusBorder.nature,
-			cylindricalLyph. plusBorder.nature
-		]).size).to.equal(4);
+			[...lyph.radialBorders][0].nature,
+			[...lyph.radialBorders][1].nature
+		]).size).to.equal(2);
 		
 		// To compare, this was the nature of the original bug.
 		// The default value of properties was shared among entities:
 		let singleArray = [];
 		expect(new Set([
-			singleArray,
-			singleArray,
 			singleArray,
 			singleArray
 		]).size).to.equal(1);
