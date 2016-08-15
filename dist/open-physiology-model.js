@@ -16672,24 +16672,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				return v;
 			}), _switchMap.switchMap).call(_context3, function (rel) {
 				return rel.fields[desc.codomain.keyInRelationship].p('value');
-			}).subscribe(function (v) {
-	
-				if (owner.constructor.module.classes.Has.hasSubclass(desc.relationshipClass)) {
-					console.log('((RelShortcut1Field.js:96)) ', 'this:' + _this, 'v:' + v);
-				}
-	
-				_this.p('value').next(v); // TODO: inline
-			});
+			}).subscribe(_this.p('value'));
 	
 			/* keep the relationship up to date */
 			(_context3 = _this.p('value'), waitUntilConstructed).call(_context3).subscribe(function (scValue) {
-	
 				var relValue = owner.fields[desc.keyInResource].get();
-	
-				if (owner.constructor.module.classes.Has.hasSubclass(desc.relationshipClass)) {
-					console.log('((RelShortcut1Field.js:108)) ', 'this:' + _this, 'scValue:' + scValue, 'relValue:' + relValue);
-				}
-	
 				if (relValue) {
 					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
 				} else if (scValue) {
