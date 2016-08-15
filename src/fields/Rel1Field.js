@@ -73,7 +73,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 	
 	constructor(options) {
 		super(options);
-		const { owner, key, desc, initialValue, waitUntilConstructed, related } = options;
+		const { owner, key, desc, initialValue, waitUntilConstructed, constructingOwner, related } = options;
 		
 		/* you cannot give a value as an actual relation and as a shortcut at the same time */
 		let givenShortcutInitialValue = related::get([desc.shortcutKey, 'initialValue']);
@@ -96,6 +96,16 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			})],
 			[desc.cardinality.min === 0, null]
 		);
+		
+		/* pull in values set in sub-fields */
+		constructingOwner.subscribe({complete: ()=>{
+			for (let subCls of desc.relationshipClass.extendedBy) {
+				const subFieldKey = subCls.keyInResource[desc.keyInRelationship];
+				const subField = owner.fields[subFieldKey];
+				if (!subField) { continue }
+				subField.p('value').subscribe( this.p('value') );
+			}
+		}});
 		
 		/* keep the relationship up to date with changes here */
 		this.p('value')

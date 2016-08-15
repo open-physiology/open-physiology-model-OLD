@@ -63,29 +63,27 @@ export class Field extends ValueTracker {
 		owner::defineProperty('fields', { value: {} });
 		
 		/* allow specific field-init code to wait until all fields are initialized */
-		const constructing = new Subject();
+		const constructingOwner = new Subject();
 		const waitUntilConstructed = function() {
-			return concat(constructing, this);
+			return concat(constructingOwner, this);
 		};
 		
 		/* initialize all fields */
 		const keyDescs = {};
 		for (let FieldClass of this[$$fieldClasses]) {
-			for (let { key, desc, relatedKeys } of FieldClass[$$entriesIn](owner.constructor)) {
+			for (let entry of FieldClass[$$entriesIn](owner.constructor)) {
+				const {key} = entry;
 				keyDescs[key] = {
+					...entry,
 					waitUntilConstructed,
+					constructingOwner,
 					owner,
 					key,
-					desc,
 					initialValue: initialValues[key],
-					relatedKeys,
 					FieldClass
 				};
 			}
 		}
-		
-		
-		
 		
 		/* add related descriptions to each description */
 		for (let entry of keyDescs::values()) {
@@ -101,7 +99,7 @@ export class Field extends ValueTracker {
 		}
 		
 		/* notify completion of field initialization */
-		constructing.complete();
+		constructingOwner.complete();
 	}
 	
 	static isEqual(a, b) { return a === b }

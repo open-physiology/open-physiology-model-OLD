@@ -20,6 +20,7 @@ import {map}                  from 'rxjs/operator/map';
 import {withLatestFrom}       from 'rxjs/operator/withLatestFrom';
 import 'rxjs/add/operator/do';
 import {constraint} from "./misc";
+import {humanMsg} from "./misc";
 
 const $$events             = Symbol('$$events');
 const $$properties         = Symbol('$$properties');
@@ -168,10 +169,19 @@ export default class ValueTracker {
 		this[$$initialize]();
 		if (nameOrDeps::isArray()) {
 			return combineLatest(...nameOrDeps         .map(::this.p))
-				::withLatestFrom(...optionalPassiveDeps.map(::this.p),
+				::withLatestFrom(...optionalPassiveDeps.map(::this.p), // TODO: withLatestFrom doesn't work; provides old values
 					(active, ...passive) => optionalTransformer(...active, ...passive));
 		} else if (nameOrDeps::isString()) {
-			constraint(this[$$properties][nameOrDeps], `No property '${nameOrDeps}' exists.`);
+			if (!this[$$properties][nameOrDeps]) {
+				const butEventExists = (this[$$events][nameOrDeps] ? humanMsg`
+					But there is an event with that name, so
+					you could use .e('${nameOrDeps}')
+				` : '');
+				throw new Error(humanMsg`
+					No property '${nameOrDeps}' exists.
+					${butEventExists}
+				`);
+			}
 			return this[$$properties][nameOrDeps];
 		}
 	}

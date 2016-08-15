@@ -229,9 +229,7 @@ export default class Module {
 					cardinality      : parseCardinality(cardinality),
 					options          : options,
 					
-					shortcutKey      : options.key,
-					
-					extends          : new Set()
+					shortcutKey      : options.key
 				});
 				domain::defineProperty(Symbol.toStringTag, {
 					get() {

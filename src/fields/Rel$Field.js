@@ -1,6 +1,10 @@
 import {map}       from 'rxjs/operator/map';
 import {filter}    from 'rxjs/operator/filter';
 import {switchMap} from 'rxjs/operator/switchMap';
+import {startWith} from 'rxjs/operator/startWith';
+import {pairwise}  from 'rxjs/operator/pairwise';
+import {concat}    from 'rxjs/observable/concat';
+import {Subject}   from 'rxjs/Subject';
 import 'rxjs/add/operator/do';
 
 import inRange from 'lodash-bound/inRange';
@@ -72,27 +76,40 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 	
 	constructor(options) {
 		super({ ...options, setValueThroughSignal: false });
-		const { owner, desc, initialValue, waitUntilConstructed, related } = options;
+		const { owner, desc, initialValue, waitUntilConstructed, constructingOwner, related } = options;
 		
 		this::defineProperty($$pristine, { value: new Set           });
 		this::defineProperty($$value,    { value: new ObservableSet });
 		
-		/* emit 'value' signals (but note that setValueThroughSignal = false) */
-		this[$$value].p('value')::waitUntilConstructed().subscribe(this.p('value'));
+		/* mirror stuff that happens in sub-fields */
+		
+		constructingOwner.subscribe({complete: () => {
+			for (let subCls of desc.relationshipClass.extendedBy) {
+				const subFieldKey = subCls.keyInResource[desc.keyInRelationship];
+				const subField    = owner.fields[subFieldKey];
+				if (!subField) { continue }
+				if (subField instanceof Rel$Field) {
+					subField.get().e('add')   .subscribe( this.get().e('add')    );
+					subField.get().e('delete').subscribe( this.get().e('delete') );
+				} else { // Rel1Field
+					subField.p('value')
+						::startWith(null)
+						::pairwise()
+						.subscribe(([prev, curr]) => {
+							if (prev) { this.get().delete(prev) }
+							if (curr) { this.get().add   (curr) }
+						});
+				}
+			}
+		}});
 		
 		/* update relationships that are added or deleted here */
 		this[$$value].e('add')
 			::waitUntilConstructed()
-			.subscribe((addedRel) => {
-				addedRel.fields[desc.keyInRelationship].set(this[$$owner]);
-				for (let superCls of desc.relationshipClass.extends) {
-					let superField = owner.fields[superCls.keyInResource[desc.keyInRelationship]];
-					superField[$$value].add(addedRel);
-				}
-			});
+			.subscribe((rel) => { rel.fields[desc.keyInRelationship].set(this[$$owner]) });
 		this[$$value].e('delete')
 			::waitUntilConstructed()
-			.subscribe((deletedRel) => { deletedRel.delete() });
+			.subscribe((rel) => { rel.delete() });
 		
 		/* decouple a relationship when it decouples from this resource */
 		this[$$value].e('add')
@@ -100,7 +117,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 			::switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value')
 				::filter(res => res !== owner)
 				::map(() => newRel)
-			).subscribe( this[$$value].e('delete') );
+			).subscribe( this.get().e('delete') );
 		
 		/* handle initial values */
 		if (initialValue && initialValue[Symbol.iterator]) {
@@ -131,6 +148,9 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 				this[$$value]   .add(rel);
 			}
 		}
+		
+		/* emit 'value' signals (but note that setValueThroughSignal = false) */
+		this[$$value].p('value')::waitUntilConstructed().subscribe( this.p('value') );
 	}
 	
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {

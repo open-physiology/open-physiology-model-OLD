@@ -1,7 +1,6 @@
 import {filter}                   from 'rxjs/operator/filter';
 import {switchMap}                from 'rxjs/operator/switchMap';
 import {startWith}                from 'rxjs/operator/startWith';
-import {withLatestFrom}           from 'rxjs/operator/withLatestFrom';
 import {defer as deferObservable} from 'rxjs/observable/defer';
 import 'rxjs/add/operator/do';
 
@@ -42,7 +41,7 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		if (cls.prototype.hasOwnProperty(key)) { return }
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
-			...(readonly ? undefined : {
+			...(readonly ? {} : {
 				set(val) {
 					this.fields[key].set(val)
 				}
@@ -72,10 +71,6 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		super(options);
 		const { owner, key, desc, initialValue, waitUntilConstructed, related } = options;
 		
-		
-		if (key === 'definition') console.log('(constructor) '+owner, key, ''+initialValue);
-		
-		
 		/* set the initial value */
 		// shortcuts are only initialized with explicit initial values;
 		// all the fallback options are left to the actual relationship field,
@@ -94,13 +89,12 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		correspondingRelValue
 			::filter(v=>v)
 			::switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
-			.subscribe( (v) => {
-				this.p('value').next(v);
-			} );
+			.subscribe( this.p('value') );
 	
 		/* keep the relationship up to date */
-		this.p('value')::waitUntilConstructed()::withLatestFrom( correspondingRelValue::startWith(null) )
-			.subscribe(([scValue, relValue]) => {
+		this.p('value')::waitUntilConstructed()
+			.subscribe((scValue) => {
+				const relValue = owner.fields[desc.keyInResource].get();
 				if (relValue) {
 					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
 				} else if (scValue) {

@@ -79,11 +79,6 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		this::defineProperty($$pristine, { value: new Set           });
 		this::defineProperty($$value,    { value: new ObservableSet });
 
-		/* emit 'value' signals (but note that setValueThroughSignal = false) */
-		this[$$value].p('value')
-			::waitUntilConstructed()
-			.subscribe(this.p('value'));
-		
 		/* syncing with relationship field */
 		const correspondingRelField = owner.fields[desc.keyInResource][$$value];
 		correspondingRelField.e('add')
@@ -108,8 +103,8 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 			::waitUntilConstructed()
 			.subscribe((newRes) => {
 				let rel = [...correspondingRelField]
-					.find(rel => rel.fields[desc.keyInRelationship]         [$$value] === owner &&
-					             rel.fields[desc.codomain.keyInRelationship][$$value] === newRes);
+					.find(rel => rel.fields[desc.keyInRelationship]         .get() === owner &&
+					             rel.fields[desc.codomain.keyInRelationship].get() === newRes);
 				if (!rel) {
 					correspondingRelField.add(desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
@@ -129,6 +124,12 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 				this[$$value]   .add(res);
 			}
 		}
+		
+		/* emit 'value' signals (but note that setValueThroughSignal = false) */
+		this[$$value].p('value')
+			::waitUntilConstructed()
+			.subscribe(this.p('value'));
+		
 	}
 	
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {

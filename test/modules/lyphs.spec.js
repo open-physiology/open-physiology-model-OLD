@@ -56,23 +56,30 @@ describe("'lyphs' Module", () => {
 		
 		const {
 			Lyph,
-			Border
+			Border,
+			Has,
+			HasBorder,
+			HasLongitudinalBorder
 		} = module.classes;
 		
-		let lyph = Lyph.new({}, {
+		let lyph1 = Lyph.new({}, {
 			createRadialBorders: 1
 		});
 		
-		expect([...lyph.longitudinalBorders]).to.have.a.lengthOf(2);
-		expect([...lyph.longitudinalBorders][0]).to.be.an.instanceOf(Border);
-		expect([...lyph.longitudinalBorders][1]).to.be.an.instanceOf(Border);
+		expect([...lyph1.longitudinalBorders]).to.have.a.lengthOf(2);
+		expect([...lyph1.longitudinalBorders][0]).to.be.an.instanceOf(Border);
+		expect([...lyph1.longitudinalBorders][1]).to.be.an.instanceOf(Border);
 		
-		expect([...lyph['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
-		expect([...lyph['-->HasBorder']])            .to.have.a.lengthOf(3);
+		expect([...lyph1['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
+		expect([...lyph1['-->HasBorder']])            .to.have.a.lengthOf(3);
 		
-		expect([...lyph.radialBorders]).to.have.a.lengthOf(1);
-		expect([...lyph.radialBorders][0]).to.be.an.instanceOf(Border);
-		
+		let oneLongitudinalBorderOfLyph1 = [...lyph1.longitudinalBorders][0];
+		expect(oneLongitudinalBorderOfLyph1['<--HasLongitudinalBorder']).to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
+		expect(oneLongitudinalBorderOfLyph1['<--HasBorder'])            .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
+		expect(oneLongitudinalBorderOfLyph1['<--Has'])                  .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
+		 
+		expect([...lyph1.radialBorders]).to.have.a.lengthOf(1);
+		expect([...lyph1.radialBorders][0]).to.be.an.instanceOf(Border);
 		
 		let lyph2 = Lyph.new({}, {
 			createRadialBorders: 2,

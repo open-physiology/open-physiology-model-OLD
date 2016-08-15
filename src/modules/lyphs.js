@@ -290,9 +290,9 @@ export default TypedModule.create('lyphs', [
 	// We're using a cylindrical coordinate system:
 	// + https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
 	// + longitudinal dimension = 'length' dimension
+	// +              borders   = inner & outer borders
 	// + radial dimension       = 'thickness' dimension
-	// + longitudinal borders   = inner & outer borders
-	// + radial borders         = minus & plus borders
+	// +        borders         = minus & plus borders
 	//// //// //// //// ////
 	
 	/* 4 borders maximum; at least two longitudinal borders; optionally one or two radial borders */
