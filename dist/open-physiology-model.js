@@ -4126,9 +4126,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		}); /////////////////////////////////////////////////////////////////////////
 	
-		var borderRel = function borderRel(name, Superclass, cardinality, key, singular) {
-			var flags = arguments.length <= 5 || arguments[5] === undefined ? {} : arguments[5];
-			var options = arguments.length <= 6 || arguments[6] === undefined ? {} : arguments[6];
+		var borderRel = function borderRel(name, Superclass, c1, c2, key, singular) {
+			var flags = arguments.length <= 6 || arguments[6] === undefined ? {} : arguments[6];
+			var options = arguments.length <= 7 || arguments[7] === undefined ? {} : arguments[7];
 			return M.RELATIONSHIP(_extends({
 	
 				name: name,
@@ -4139,8 +4139,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			}, flags, {
 	
-				1: [Lyph, cardinality, _extends({}, options, { sustains: true, anchors: true, expand: true, key: key })],
-				2: [Border, '1..1']
+				1: [Lyph, c1, _extends({}, options, { sustains: true, anchors: true, expand: true, key: key })],
+				2: [Border, c2]
 	
 			}));
 		};
@@ -4155,12 +4155,12 @@ return /******/ (function(modules) { // webpackBootstrap
 		//// //// //// //// ////
 	
 		/* 4 borders maximum; at least two longitudinal borders; optionally one or two radial borders */
-		var HasBorder = borderRel('HasBorder', Has, '0..4', 'borders', 'has border', { abstract: true });
-		var HasLongitudinalBorder = borderRel('HasLongitudinalBorder', HasBorder, '2..2', 'longitudinalBorders', 'has longitudinal border', {}, { auto: true, readonly: true });
-		var HasRadialBorder = borderRel('HasRadialBorder', HasBorder, '0..2', 'radialBorders', 'has radial border');
+		var HasBorder = borderRel('HasBorder', Has, '0..4', '1..1', 'borders', 'has border', { abstract: true });
+		var HasLongitudinalBorder = borderRel('HasLongitudinalBorder', HasBorder, '2..2', '0..1', 'longitudinalBorders', 'has longitudinal border', {}, { auto: true, readonly: true });
+		var HasRadialBorder = borderRel('HasRadialBorder', HasBorder, '0..2', '0..1', 'radialBorders', 'has radial border');
 	
 		/* one of the longitudinal borders can be an axis */
-		var HasAxis = borderRel('HasAxis', HasLongitudinalBorder, '0..1', 'axis', 'has axis');
+		var HasAxis = borderRel('HasAxis', HasLongitudinalBorder, '0..1', '0..1', 'axis', 'has axis');
 	
 		var CoalescenceScenario = M.TYPED_RESOURCE({ //////////////////////////////
 	

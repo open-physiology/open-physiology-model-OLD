@@ -250,7 +250,7 @@ export default TypedModule.create('lyphs', [
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
-	const borderRel = (name, Superclass, cardinality, key, singular, flags = {}, options = {}) => M.RELATIONSHIP({
+	const borderRel = (name, Superclass, c1, c2, key, singular, flags = {}, options = {}) => M.RELATIONSHIP({
 			 
 			name: name,
 			
@@ -260,8 +260,8 @@ export default TypedModule.create('lyphs', [
 		
 			...flags,
 			
-			1: [Lyph,   cardinality, { ...options, sustains: true, anchors: true, expand: true, key }],
-			2: [Border, '1..1'                                                                       ],
+			1: [Lyph,   c1, { ...options, sustains: true, anchors: true, expand: true, key }],
+			2: [Border, c2                                                                  ],
 			
 			// The 'readonly' flag above implies that when a lyph is created,
 			// its borders are also automatically created.
@@ -296,12 +296,12 @@ export default TypedModule.create('lyphs', [
 	//// //// //// //// ////
 	
 	/* 4 borders maximum; at least two longitudinal borders; optionally one or two radial borders */
-	const HasBorder             = borderRel('HasBorder',             Has,       '0..4', 'borders',             'has border', { abstract: true });
-	const HasLongitudinalBorder = borderRel('HasLongitudinalBorder', HasBorder, '2..2', 'longitudinalBorders', 'has longitudinal border', {}, {auto: true, readonly: true});
-	const HasRadialBorder       = borderRel('HasRadialBorder',       HasBorder, '0..2', 'radialBorders',       'has radial border');
+	const HasBorder             = borderRel('HasBorder',             Has,       '0..4', '1..1', 'borders',             'has border', { abstract: true });
+	const HasLongitudinalBorder = borderRel('HasLongitudinalBorder', HasBorder, '2..2', '0..1', 'longitudinalBorders', 'has longitudinal border', {}, {auto: true, readonly: true});
+	const HasRadialBorder       = borderRel('HasRadialBorder',       HasBorder, '0..2', '0..1', 'radialBorders',       'has radial border');
 	
 	/* one of the longitudinal borders can be an axis */
-	const HasAxis = borderRel('HasAxis', HasLongitudinalBorder, '0..1', 'axis', 'has axis');
+	const HasAxis = borderRel('HasAxis', HasLongitudinalBorder, '0..1', '0..1', 'axis', 'has axis');
 	
 	
 	const CoalescenceScenario = M.TYPED_RESOURCE({//////////////////////////////
