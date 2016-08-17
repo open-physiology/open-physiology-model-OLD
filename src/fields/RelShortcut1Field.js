@@ -97,7 +97,8 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 				const relValue = owner.fields[desc.keyInResource].get();
 				if (relValue) {
 					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
-				} else if (scValue) {
+				} else if (scValue && !desc.relationshipClass.abstract) {
+					// TODO: Is the abstractness test above really the best way?
 					owner.fields[desc.keyInResource].set(desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: scValue

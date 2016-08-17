@@ -15082,9 +15082,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				var relValue = owner.fields[desc.keyInResource].get();
 				if (relValue) {
 					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
-				} else if (scValue) {
+				} else if (scValue && !desc.relationshipClass.abstract) {
 					var _desc$relationshipCla;
 	
+					// TODO: Is the abstractness test above really the best way?
 					owner.fields[desc.keyInResource].set(desc.relationshipClass.new((_desc$relationshipCla = {}, _defineProperty(_desc$relationshipCla, desc.keyInRelationship, owner), _defineProperty(_desc$relationshipCla, desc.codomain.keyInRelationship, scValue), _desc$relationshipCla)));
 				}
 			});

@@ -232,4 +232,37 @@ describe("integrated workflow", () => {
 		expect(() => treeFromP.p('root')).not.to.throw();
 	});
 	
+	it("(regression test 6: Trying to instantiate abstract class Has.)", async () => {
+		const {Lyph, HasPart} = module.classes;
+		
+		let sublyph = Lyph.new(
+			{ name: 'Sublyph' },
+			{ createAxis: true, createRadialBorders: true }
+		);
+		
+		let layer1 = Lyph.new(
+	        { name: 'Vessel Wall' },
+		    { createRadialBorders: true }
+	    );
+		
+		let layer2 = Lyph.new({
+			name: 'Blood Layer',
+			parts: [ sublyph ]
+		}, { createRadialBorders: true });
+		
+		let bloodVessel = Lyph.new({
+			name: 'Blood Vessel',
+			layers: [ layer1, layer2 ]
+		}, { createAxis: true, createRadialBorders: true });
+		
+		expect(() => { layer1.parts.add(sublyph) }).not.to.throw();
+		
+		expect([...layer1.parts])   .to.include(sublyph);
+		expect([...layer1.children]).to.include(sublyph);
+		expect(sublyph.parent).to.equal(layer1);
+		expect(sublyph['<--HasPart']).to.be.instanceOf(HasPart);
+		expect(sublyph['<--Has']).to.be.instanceOf(HasPart);
+		
+	});
+	
 });
