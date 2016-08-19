@@ -415,7 +415,7 @@ export default TypedModule.create('lyphs', [
 		
 		extends: PullsIntoTypeDefinition,
 		
-		1: [NodeLocation, '0..*'                                     ],
+		1: [NodeLocation, '0..*', { anchors: true, key: 'nodes'     }],
 		2: [Node,         '0..*', { anchors: true, key: 'locations' }],
 		
 	});
