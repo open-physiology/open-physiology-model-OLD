@@ -38,5 +38,5 @@ describe("'visualisation' Module", () => {
 		);
 
 	});
-
+ 
 });

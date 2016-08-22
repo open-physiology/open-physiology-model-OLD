@@ -9,7 +9,7 @@ export default Module.create('research', [
 ], (M, {
 	Resource, IsRelatedTo, Measurable
 }) => {
-	
+	 
 	
 	const Correlation = M.RESOURCE({////////////////////////////////////////////
 		

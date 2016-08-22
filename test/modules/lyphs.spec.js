@@ -51,7 +51,7 @@ describe("'lyphs' Module", () => {
 		expect(lyph    ).to.be.an.instanceOf(Material, Lyph);
 		
 	});
-
+ 
 	it("exports lyph type that can be given custom borders and axes", async () => {
 		
 		const {

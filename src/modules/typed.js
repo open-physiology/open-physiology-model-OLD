@@ -121,7 +121,7 @@ export default Module.create('typed', [
 		
 	});
 	
-	
+	 
 	const DefinesType = M.RELATIONSHIP({
 		
 		name: 'DefinesType',

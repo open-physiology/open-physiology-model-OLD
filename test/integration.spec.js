@@ -166,7 +166,7 @@ describe("integrated workflow", () => {
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 
 	});
-
+	
 	it("(regression test: HasType[2] set to null?)", async () => {
 		const {OmegaTree, Lyph, HasMaterial} = module.classes;
 		

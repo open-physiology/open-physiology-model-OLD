@@ -19,7 +19,7 @@ export default Module.create('resources', [], (M) => {
 		}
 		
 	});//////////////////////////////////////////////////////////////////////////
-	
+	 
 	
 	const IsRelatedTo = M.RELATIONSHIP({
 		

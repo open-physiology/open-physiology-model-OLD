@@ -28,7 +28,9 @@ import assert from 'power-assert';
 
 export const arrayContainsValue = (array, value) => array.includes(value);
 
-export const simpleSpaced = (str) => str.replace(/\s+/mg, ' ');
+export const simpleSpaced = (str) => {
+	return str.replace(/\s+/mg, ' ');
+};
 
 export const humanMsg = (strings, ...vals) => {
 	let result = strings[0];

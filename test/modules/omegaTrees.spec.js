@@ -28,7 +28,7 @@ describe("'omegaTrees' Module", () => {
 			'HasTreeChildren',
 			'HasTreePart'
 		);
-		
+		 
 	});
 
 });
