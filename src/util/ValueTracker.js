@@ -3,10 +3,16 @@ import isArray  from 'lodash-bound/isArray';
 import isString from 'lodash-bound/isString';
 import set      from 'lodash-bound/set';
 import entries  from 'lodash-bound/entries';
+import keys  from 'lodash-bound/keys';
+import isPlainObject from 'lodash-bound/isPlainObject';
+import isFunction from 'lodash-bound/isFunction';
 
 import _isEqual from 'lodash/isEqual';
+import _isBoolean from 'lodash/isBoolean';
 
 import assert from 'power-assert';
+
+import {args, humanMsg} from './misc';
 
 import {Subject}              from 'rxjs/Subject';
 import {BehaviorSubject}      from 'rxjs/BehaviorSubject';
@@ -18,9 +24,9 @@ import {takeUntil}            from 'rxjs/operator/takeUntil';
 import {skip}                 from 'rxjs/operator/skip';
 import {map}                  from 'rxjs/operator/map';
 import {withLatestFrom}       from 'rxjs/operator/withLatestFrom';
+import {switchMap}            from 'rxjs/operator/switchMap';
 import 'rxjs/add/operator/do';
 import {constraint} from "./misc";
-import {humanMsg} from "./misc";
 
 const $$events             = Symbol('$$events');
 const $$properties         = Symbol('$$properties');
@@ -105,7 +111,7 @@ export default class ValueTracker {
 	 */
 	newProperty(name, {
 		readonly = false,
-		isEqual  = _isEqual,
+		isEqual  = (a,b) => (a===b),
 		isValid  = ()=>true,
 		initial
 	} = {}) {
@@ -156,34 +162,55 @@ export default class ValueTracker {
 	}
 	
 	/**
-	 * Retrieve a property by name.
+	 * Retrieve a property (or multiple properties combined) by name.
 	 *
 	 * @public
 	 * @method
-	 * @param  {String|Array} nameOrDeps          - the name of the property to retrieve, or a list of active dependencies for a derived property
-	 * @param  {Array?}       optionalPassiveDeps - an optional list of passive dependencies for a derived property
-	 * @param  {Function?}    optionalTransformer - an optional function to map the dependencies to a new value for the derived property
+	 * @param  {String?}   name                - the name of the property to retrieve (choose name or deps)
+	 * @param  {Array?}    deps                - a list of active dependencies for a derived property
+	 * @param  {Array?}    optionalPassiveDeps - an optional list of passive dependencies for a derived property
+	 * @param  {Function?} optionalTransformer - an optional function to map the dependencies to a new value for the derived property
 	 * @return {BehaviorSubject | Observable} - the property associated with the given name or an observable of combined properties
 	 */
-	p(nameOrDeps, optionalPassiveDeps = [], optionalTransformer = (...args)=>args) {
+	@args('s?a?a?f?') p(name, deps, optionalPassiveDeps = [], optionalTransformer = (...a)=>a) {
 		this[$$initialize]();
-		if (nameOrDeps::isArray()) {
-			return combineLatest(...nameOrDeps         .map(::this.p))
-				::withLatestFrom(...optionalPassiveDeps.map(::this.p), // TODO: withLatestFrom doesn't work; provides old values
-					(active, ...passive) => optionalTransformer(...active, ...passive));
-		} else if (nameOrDeps::isString()) {
-			if (!this[$$properties][nameOrDeps]) {
-				const butEventExists = (this[$$events][nameOrDeps] ? humanMsg`
-					But there is an event with that name, so
-					you could use .e('${nameOrDeps}')
-				` : '');
-				throw new Error(humanMsg`
-					No property '${nameOrDeps}' exists.
-					${butEventExists}
-				`);
+		if (deps) {
+			return combineLatest(...deps               .map(::this.p))
+				::withLatestFrom(...optionalPassiveDeps.map(::this.p),
+				(active, ...passive) => optionalTransformer(...active, ...passive));
+		} else if (name) {
+			const [head, ...tail] = name.split('.');
+			if (tail.length > 0) {
+				return this.p(head)::switchMap((obj) => {
+					if (!obj) { return never() }
+					assert(obj instanceof ValueTracker, humanMsg`
+						The '${head}' property did not return
+						a ValueTracker-based object,
+						so it cannot be chained.
+					`);
+					return obj.p(tail.join('.'));
+				});
+			} else {
+				assert(this[$$properties][head], humanMsg`No property '${name}' exists.`);
+				return this[$$properties][head];
 			}
-			return this[$$properties][nameOrDeps];
 		}
+	}
+	
+	/**
+	 * Retrieve multiple properties by name in an object, possibly transformed.
+	 *
+	 * @public
+	 * @method
+	 * @param  {Object}    activeDeps          - a list of active dependencies for a derived property
+	 * @param  {Object?}   optionalPassiveDeps - an optional list of passive dependencies for a derived property
+	 * @param  {Function?} optionalTransformer - an optional function to map the dependencies to a new value for the derived property
+	 * @return {Observable} - an observable of combined properties
+	 */
+	pObj(activeDeps, optionalPassiveDeps = [], optionalTransformer = (obj=>obj)) {
+		this[$$initialize]();
+		const bothList = activeDeps.concat(optionalPassiveDeps);
+		return this.p(activeDeps, optionalPassiveDeps, (...vals) => optionalTransformer(Object.assign({}, ...vals.map((v, i)=>({ [bothList[i]]: v })))));
 	}
 	
 	/**
@@ -221,3 +248,5 @@ export const event = (options = {}) => (target, key) => {
 	target::set(['constructor', $$events, name], options);
 	return { get() { return this.e(name) } };
 };
+
+export const flag = (initial) => property({ isValid: _isBoolean, initial });

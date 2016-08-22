@@ -57,6 +57,7 @@
     "graph.js": "^1.20.10",
     "lodash": "^4.13.1",
     "lodash-bound": "^1.1.1",
+    "rearg": "0.0.2",
     "rxjs": "^5.0.0-beta"
   }
 }

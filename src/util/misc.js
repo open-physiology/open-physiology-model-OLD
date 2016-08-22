@@ -13,7 +13,11 @@ import isSet       from 'lodash-bound/isSet';
 import isWeakSet   from 'lodash-bound/isWeakSet';
 import entries     from 'lodash-bound/entries';
 
+import rearg from 'rearg';
+
 import {defineProperty} from 'bound-native-methods';
+
+import {filter} from 'rxjs/operator/filter';
 
 import _zip from 'lodash/zip';
 
@@ -103,6 +107,42 @@ export function definePropertiesByValue(obj, options = {}) {
 export function callOrReturn(context) {
 	return this::isFunction() ? context::this() : this;
 }
+
+// n - number
+// s - string
+// b - boolean
+// f - function
+// O - any Object
+// a - Array
+// d - Date
+// r - RegExp
+// o - other Object (object which isn't Array, Date or RegExp)
+export const args = (...pattern) => (target, key, descriptor) => {
+	return {
+		...descriptor,
+		value: rearg.expand(...pattern, descriptor.value)
+	};
+};
+
+export const withoutMod = (...modifiers) => (event) =>
+	modifiers.every(m => !event[`${m}Key`]);
+
+export const withMod = (...modifiers) => (event) =>
+	modifiers.every(m => event[`${m}Key`]);
+
+export const stopPropagation = (event) => {
+	event.preventDefault();
+	event.stopPropagation();
+};
+
+export function which(keyCode) {
+	return this::filter(event => event.which === keyCode);
+}
+
+export const xy_add = (a, b) => ({
+	x: a.x + b.x,
+	y: a.y + b.y
+});
 
 export function constraint(constraint, message) {
 	if (!constraint) {
