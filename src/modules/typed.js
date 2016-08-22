@@ -130,8 +130,8 @@ export default Module.create('typed', [
 		
 		singular: "defines type",
 		
-		1: [Template, '0..1', { anchors: true                    }],
-		2: [Type,     '1..1', { anchors: true, key: 'definition' }]
+		1: [Template, '0..1', { anchors: true, key: 'definedType' }],
+		2: [Type,     '1..1', { anchors: true, key: 'definition'  }]
 		
 	});
 	
