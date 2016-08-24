@@ -259,9 +259,10 @@ describe("integrated workflow", () => {
 		
 		expect([...layer1.parts])   .to.include(sublyph);
 		expect([...layer1.children]).to.include(sublyph);
-		expect(sublyph.parent).to.equal(layer1);
-		expect(sublyph['<--HasPart']).to.be.instanceOf(HasPart);
-		expect(sublyph['<--Has']).to.be.instanceOf(HasPart);
+		expect([...sublyph.parents]).to.include(layer1);
+		expect([...sublyph.parents]).to.include(layer2);
+		expect([...sublyph['<--HasPart']][0]).to.be.instanceOf(HasPart);
+		expect([...sublyph['<--Has']][0]).to.be.instanceOf(HasPart);
 		
 	});
 	

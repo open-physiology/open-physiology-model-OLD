@@ -36,7 +36,7 @@ export default TypedModule.create('measurables', [
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
-	 
+	  
 	const MeasuresMaterial = M.RELATIONSHIP({
 		
 		name: 'MeasuresMaterial',
@@ -45,8 +45,8 @@ export default TypedModule.create('measurables', [
 		
 		singular: "measures material",
 		
-		1: [Measurable, '0..*', { anchors: true, key: 'materials' }],
-		2: [Material,   '0..*',                                    ],
+		1: [Measurable,    '0..*', { anchors: true, key: 'materials' }],
+		2: [Material.Type, '0..*',                                    ],
 		
 		properties: {
 			'dimensionality': { ...dimensionalitySchema }
@@ -79,7 +79,7 @@ export default TypedModule.create('measurables', [
 		singular: "has measurable",
 		
 		1: [MeasurableLocation, '0..*', { anchors: true, sustains: true, key: 'measurables' }],
-		2: [Measurable,         '0..1', {                                key: 'location'    }],
+		2: [Measurable,         '0..*', {                                key: 'location'    }],
 		
 		// TODO: auto-create classes for the inverse of relationships,
 		//     : so that HasMeasurable_inverse can extend PullsIntoTypeDefinition

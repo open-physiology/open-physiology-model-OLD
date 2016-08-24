@@ -9,7 +9,7 @@ export default TypedModule.create('groups', [
 ], (M, {
 	IsRelatedTo, Template, PullsIntoTypeDefinition
 }) => {
-	  
+	   
 	
 	const Group = M.TYPED_RESOURCE({/////////////////////////////////////////
 		

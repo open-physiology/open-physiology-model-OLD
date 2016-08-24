@@ -44,7 +44,7 @@ export default TypedModule.create('lyphs', [
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
-	
+	 
 	const ContainsMaterial = M.RELATIONSHIP({
 		
 		name: 'ContainsMaterial',
@@ -146,7 +146,7 @@ export default TypedModule.create('lyphs', [
 		singular: "has part",
 		
 		1: [Lyph, '0..*', { anchors: true, key: 'parts' }],
-		2: [Lyph, '0..1',                                ],
+		2: [Lyph, '0..*',                                ],
 		
 		noCycles: true,
 		
@@ -161,7 +161,7 @@ export default TypedModule.create('lyphs', [
 		singular: "has layer",
 		
 		1: [Lyph, '0..*', { anchors: true, key: 'layers' }],
-		2: [Lyph, '0..1'                                  ],
+		2: [Lyph, '0..*'                                  ],
 		
 		properties: {
 			'relativePosition': {
@@ -185,7 +185,7 @@ export default TypedModule.create('lyphs', [
 		singular: "has part",
 		
 		1: [Lyph, '0..*', { anchors: true, key: 'patches' }],
-		2: [Lyph, '0..1'                                   ],
+		2: [Lyph, '0..*'                                   ],
 		
 		properties: {
 			'patchMap': { type: 'string' }
@@ -204,7 +204,7 @@ export default TypedModule.create('lyphs', [
 		singular: "has segment",
 
 		1: [Lyph, '0..*', { anchors: true, key: 'segments' }],
-		2: [Lyph, '0..1'                                    ],
+		2: [Lyph, '0..*'                                    ],
 		
 		properties: {
 			'relativePosition': {

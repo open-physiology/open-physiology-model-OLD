@@ -2063,7 +2063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			plural: "have",
 	
 			1: [Template, '0..*', { anchors: true, key: 'children' }],
-			2: [Template, '0..1', { key: 'parent' }],
+			2: [Template, '0..*', { key: 'parents' }],
 	
 			noCycles: true
 	
@@ -3811,7 +3811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "has part",
 	
 			1: [Lyph, '0..*', { anchors: true, key: 'parts' }],
-			2: [Lyph, '0..1'],
+			2: [Lyph, '0..*'],
 	
 			noCycles: true
 	
@@ -3826,7 +3826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "has layer",
 	
 			1: [Lyph, '0..*', { anchors: true, key: 'layers' }],
-			2: [Lyph, '0..1'],
+			2: [Lyph, '0..*'],
 	
 			properties: {
 				'relativePosition': {
@@ -3854,7 +3854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "has part",
 	
 			1: [Lyph, '0..*', { anchors: true, key: 'patches' }],
-			2: [Lyph, '0..1'],
+			2: [Lyph, '0..*'],
 	
 			properties: {
 				'patchMap': { type: 'string' }
@@ -3873,7 +3873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "has segment",
 	
 			1: [Lyph, '0..*', { anchors: true, key: 'segments' }],
-			2: [Lyph, '0..1'],
+			2: [Lyph, '0..*'],
 	
 			properties: {
 				'relativePosition': {
@@ -5919,7 +5919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "measures material",
 	
 			1: [Measurable, '0..*', { anchors: true, key: 'materials' }],
-			2: [Material, '0..*'],
+			2: [Material.Type, '0..*'],
 	
 			properties: {
 				'dimensionality': _extends({}, _schemas.dimensionalitySchema)
@@ -5951,7 +5951,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "has measurable",
 	
 			1: [MeasurableLocation, '0..*', { anchors: true, sustains: true, key: 'measurables' }],
-			2: [Measurable, '0..1', { key: 'location' }]
+			2: [Measurable, '0..*', { key: 'location' }]
 	
 		});
 	
@@ -6130,7 +6130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "conveys process",
 	
 			1: [Lyph, '0..*', { anchors: true, key: 'processes' }],
-			2: [Process, '0..1', { key: 'conveyingLyph' }]
+			2: [Process, '0..*', { key: 'conveyingLyph' }]
 	
 		});
 	
@@ -6143,7 +6143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "transports material",
 	
 			1: [Process, '0..*', { anchors: true, key: 'materials' }],
-			2: [Material, '0..1']
+			2: [Material.Type, '0..*']
 	
 		});
 	
@@ -6156,7 +6156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "has segment",
 	
 			1: [Process, '0..*', { anchors: true, key: 'segments' }],
-			2: [Process, '0..1']
+			2: [Process, '0..*']
 	
 		});
 	
@@ -6170,7 +6170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				singular: "has channel",
 	
 				1: [Class, '0..*', { anchors: true, key: 'channels' }],
-				2: [Class, '0..1']
+				2: [Class, '0..*']
 	
 			};
 		}));

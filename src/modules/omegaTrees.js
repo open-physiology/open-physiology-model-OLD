@@ -11,7 +11,7 @@ export default TypedModule.create('omegaTrees', [
 ], (M, {
 	IsRelatedTo, Template, Group, Lyph, Node, Has, PullsIntoTypeDefinition
 }) => {
-	 
+	  
 	
 	const OmegaTree = M.TYPED_RESOURCE({////////////////////////////////////////
 		

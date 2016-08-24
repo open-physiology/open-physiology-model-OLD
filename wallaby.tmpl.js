@@ -25,25 +25,23 @@ module.exports = function (tests) {
 				
 				wallaby.testFramework.timeout(10000);
 				
-				var modulePrototype = require('module').Module.prototype;
-				if (!modulePrototype._originalRequire) {
-					modulePrototype._originalRequire = modulePrototype.require;
-					modulePrototype.require = function (filePath) {
-						var exports = modulePrototype._originalRequire.call(this, filePath);
-						if (filePath === 'mocha') {
-							exports.describe = global.describe;
-							exports.it = global.it;
-							exports.xdescribe = global.xdescribe;
-							exports.xit = global.xit;
-						}
-						return exports;
-					};
-				}
+				// var modulePrototype = require('module').Module.prototype;
+				// if (!modulePrototype._originalRequire) {
+				// 	modulePrototype._originalRequire = modulePrototype.require;
+				// 	modulePrototype.require = function (filePath) {
+				// 		var exports = modulePrototype._originalRequire.call(this, filePath);
+				// 		if (filePath === 'mocha') {
+				// 			exports.describe = global.describe;
+				// 			exports.it = global.it;
+				// 			exports.xdescribe = global.xdescribe;
+				// 			exports.xit = global.xit;
+				// 		}
+				// 		return exports;
+				// 	};
+				// }
 			},
 			
-			workers: {
-		      recycle: true
-		    }
+			debug: true
 			
 		};
 	};

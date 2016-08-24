@@ -362,15 +362,15 @@ export default TypedModule.create('visualisations', [
 	////////////////////////////////////////
 	
 	const [PresentsModel] = M.RELATIONSHIP([
-		[Artefact,                 Template       ],
-		[MaterialGlyph,            Material       ],
-		[LyphArtefact,             Lyph           ],
-		[BorderLine,               Border         ],
-		[NodeGlyph,                Node           ],
-		[ProcessEdge,              Process        ],
-		[MeasurableGlyph,          Measurable     ],
-		[CausalityArrow,           Causality      ],
-		[CoalescenceRectangle,     Coalescence    ]
+		[Artefact,             Template   ],
+		[MaterialGlyph,        Material   ],
+		[LyphArtefact,         Lyph       ],
+		[BorderLine,           Border     ],
+		[NodeGlyph,            Node       ],
+		[ProcessEdge,          Process    ],
+		[MeasurableGlyph,      Measurable ],
+		[CausalityArrow,       Causality  ],
+		[CoalescenceRectangle, Coalescence],
 	].map(([ArtefactClass, ModelClass]) => ({
 		
 		name: 'PresentsModel',

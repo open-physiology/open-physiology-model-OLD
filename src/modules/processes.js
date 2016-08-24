@@ -105,7 +105,7 @@ export default TypedModule.create('processes', [
 		singular: "conveys process",
 		
 		1: [Lyph,    '0..*', { anchors: true, key: 'processes'     }],
-		2: [Process, '0..1', {                key: 'conveyingLyph' }],
+		2: [Process, '0..*', {                key: 'conveyingLyph' }],
 		
 	});
 	
@@ -118,8 +118,8 @@ export default TypedModule.create('processes', [
 		
 		singular: "transports material",
 		
-		1: [Process,  '0..*', { anchors: true, key: 'materials' }],
-		2: [Material, '0..1',                                                     ],
+		1: [Process,       '0..*', { anchors: true, key: 'materials' }],
+		2: [Material.Type, '0..*',                                    ],
 		
 	});
 	
@@ -132,7 +132,7 @@ export default TypedModule.create('processes', [
 		singular: "has segment",
 		
 		1: [Process, '0..*', { anchors: true, key: 'segments' }],
-		2: [Process, '0..1',                                   ],
+		2: [Process, '0..*',                                   ],
 		
 		// TODO: CONSTRAINT: segments are connected in a straight line
 		//     : through nodes, starting and ending with the same nodes
@@ -151,7 +151,7 @@ export default TypedModule.create('processes', [
 		singular: "has channel",
 		
 		1: [Class, '0..*', { anchors: true, key: 'channels' }],
-		2: [Class, '0..1',                                   ],
+		2: [Class, '0..*',                                   ],
 		
 		// TODO: make a class for the transitional closure
 		//     : of a relationship, which can be used to

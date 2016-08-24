@@ -165,7 +165,7 @@ export default Module.create('typed', [
 		plural:   "have",
 		
 		1: [Template, '0..*', { anchors: true, key: 'children' }],
-		2: [Template, '0..1', {                key: 'parent'   }],
+		2: [Template, '0..*', {                key: 'parents'  }],
 		
 		noCycles: true
 		

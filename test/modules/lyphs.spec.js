@@ -76,7 +76,7 @@ describe("'lyphs' Module", () => {
 		let oneLongitudinalBorderOfLyph1 = [...lyph1.longitudinalBorders][0];
 		expect(oneLongitudinalBorderOfLyph1['<--HasLongitudinalBorder']).to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
 		expect(oneLongitudinalBorderOfLyph1['<--HasBorder'])            .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
-		expect(oneLongitudinalBorderOfLyph1['<--Has'])                  .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
+		expect([...oneLongitudinalBorderOfLyph1['<--Has']][0])          .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
 		 
 		expect([...lyph1.radialBorders]).to.have.a.lengthOf(1);
 		expect([...lyph1.radialBorders][0]).to.be.an.instanceOf(Border);
