@@ -79,7 +79,7 @@ export default TypedModule.create('measurables', [
 		singular: "has measurable",
 		
 		1: [MeasurableLocation, '0..*', { anchors: true, sustains: true, key: 'measurables' }],
-		2: [Measurable,         '0..*', {                                key: 'location'    }],
+		2: [Measurable,         '0..*', {                                key: 'locations'   }],
 		
 		// TODO: auto-create classes for the inverse of relationships,
 		//     : so that HasMeasurable_inverse can extend PullsIntoTypeDefinition

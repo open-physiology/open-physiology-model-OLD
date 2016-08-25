@@ -6995,7 +6995,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			singular: "has measurable",
 	
 			1: [MeasurableLocation, '0..*', { anchors: true, sustains: true, key: 'measurables' }],
-			2: [Measurable, '0..*', { key: 'location' }]
+			2: [Measurable, '0..*', { key: 'locations' }]
 	
 		});
 	
