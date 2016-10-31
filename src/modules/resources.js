@@ -11,6 +11,8 @@ export default Module.create('resources', [], (M) => {
 		
 		abstract: true,
 		
+		singular: "resource",
+		
 		properties: {
 			'id':    { ...idSchema,         readonly: true },
 			'href':  { ...uriSchema,        readonly: true },
