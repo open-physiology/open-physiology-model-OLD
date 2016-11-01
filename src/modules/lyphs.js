@@ -7,7 +7,6 @@ import {
 	enumArraySchema,
 	enumSchema,
 	rangeSchema,
-	oneOf,
 	distributionSchema
 } from '../util/schemas';
 
@@ -26,6 +25,7 @@ import entries from 'lodash-bound/entries';
 import parseInt from 'lodash-bound/parseInt';
 import max from 'lodash-bound/max';
 import map from 'lodash-bound/map';
+import {typedDistributionSchema} from "../util/schemas";
 
 
 export default TypedModule.create('lyphs', [
@@ -71,11 +71,7 @@ export default TypedModule.create('lyphs', [
 		
 		properties: {
 			'thickness': { // size in radial dimension
-				...oneOf(
-					{ type: 'number'        },
-					{ ...rangeSchema        },
-					{ ...distributionSchema }
-				),
+				...typedDistributionSchema,
 				default: universalDistanceRange,
 				isRefinement(a, b) {
 					a = normalizeToRange(a);
@@ -84,11 +80,7 @@ export default TypedModule.create('lyphs', [
 				}
 			},
 			'length': { // size in longitudinal dimension
-				...oneOf(
-					{ type: 'number'        },
-					{ ...rangeSchema        },
-					{ ...distributionSchema }
-				),
+				...typedDistributionSchema,
 				default: universalDistanceRange,
 				isRefinement(a, b) {
 					a = normalizeToRange(a);
@@ -233,10 +225,7 @@ export default TypedModule.create('lyphs', [
 		
 		properties: {
 			nature: {
-				...oneOf(
-					{ ...enumArraySchema('open', 'closed') },
-					{ ...enumSchema     ('open', 'closed') }
-				),
+				...enumArraySchema('open', 'closed'),
 				default: ['open', 'closed'],
 				required: true,
 				isRefinement(a, b) {

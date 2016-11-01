@@ -76,12 +76,12 @@ export function stringifyCardinality(cardinality, {abbreviate} = {}) {
 		: `${cardinality.min}..${cardinality.max === Infinity ? '*' : cardinality.max}`;
 }
 
-export function normalizeToRange(val) {
-	if (val::isNumber())       { val = {min: val, max: val} }
-	else if (!val::isObject()) { val = {}                   }
+export function normalizeToRange(val) { // assumes typedDistributionSchema
+	// 'UniformDistribution' | 'BoundedNormalDistribution' | 'Number' | 'NumberRange'
+	if (val.class === 'Number')       { val = {min: val.value, max: val.value} }
 	if (!val.min::isNumber()) { val.min = -Infinity }
 	if (!val.max::isNumber()) { val.max =  Infinity }
-	return val;
+	return { min: val.min, max: val.max };
 }
 
 export function setDefault(obj, key, val) {

@@ -6,8 +6,6 @@ import resources from './resources';
 import typed     from './typed';
 import lyphs     from './lyphs';
 import {wrapInArray} from "../util/misc";
-import {oneOf} from "../util/schemas";
-
 
 export default TypedModule.create('processes', [
 	resources, typed, lyphs
@@ -28,10 +26,7 @@ export default TypedModule.create('processes', [
 		
 		properties: {
 			'transportPhenomenon': {
-				...oneOf(
-					{ ...enumArraySchema('advection', 'diffusion') },
-					{ ...enumSchema     ('advection', 'diffusion') }
-				),
+				...enumArraySchema('advection', 'diffusion'),
 				default: ['advection', 'diffusion'],
 				required: true,
 				isRefinement(a, b) {

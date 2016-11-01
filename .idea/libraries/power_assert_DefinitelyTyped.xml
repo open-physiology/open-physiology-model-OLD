@@ -1,10 +1,5 @@
 <component name="libraryTable">
   <library name="power-assert-DefinitelyTyped" type="javaScript">
-    <properties>
-      <sourceFilesUrls>
-        <item url="file://$APPLICATION_CONFIG_DIR$/javascript/extLibs/http_github.com_DefinitelyTyped_DefinitelyTyped_raw_master_power-assert_power-assert.d.ts" />
-      </sourceFilesUrls>
-    </properties>
     <CLASSES>
       <root url="file://$APPLICATION_CONFIG_DIR$/javascript/extLibs/http_github.com_DefinitelyTyped_DefinitelyTyped_raw_master_power-assert_power-assert.d.ts" />
     </CLASSES>

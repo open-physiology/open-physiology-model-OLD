@@ -54,6 +54,19 @@ export const angleSchema = {
 	maximum: 360, exclusiveMaximum: true
 };
 
+export const typedDistributionSchema = {
+	type: 'object',
+	properties: {
+		'value': { type: 'number' },
+		'min':   { type: 'number' },
+		'max':   { type: 'number' },
+		'mean':  { type: 'number' },
+		'std':   { type: 'number' },
+		'class': { type: 'string', required: true }
+		// 'UniformDistribution' | 'BoundedNormalDistribution' | 'Number' | 'NumberRange'
+	}
+};
+
 export const rangeSchema = {
 	type: 'object',
 	properties: {
@@ -96,13 +109,13 @@ export const uniformDistributionSchema = {
 	}
 };
 
-export const distributionSchema = {
-	oneOf: [
-		{ ...normalDistributionSchema        },
-		{ ...boundedNormalDistributionSchema },
-		{ ...uniformDistributionSchema       }
-	]
-};
+// export const distributionSchema = {
+// 	oneOf: [
+// 		{ ...normalDistributionSchema        },
+// 		{ ...boundedNormalDistributionSchema },
+// 		{ ...uniformDistributionSchema       }
+// 	]
+// };
 
 export const distributionSchemaOr = (otherSchema) => ({
 	oneOf: [

@@ -7,6 +7,7 @@ import {humanMsg} from "../util/misc";
 
 import assert from 'power-assert';
 import {constraint} from "../util/misc";
+import {typedDistributionSchema} from "../util/schemas";
 
 export default Module.create('typed', [
 	resources
@@ -69,13 +70,10 @@ export default Module.create('typed', [
 		extends: Resource,
 		
 		singular: "template",
-		
+
 		properties: {
 			'cardinalityBase': {
-				oneOf: [
-					{ ...distributionSchema },
-					{ type: 'integer', minimum: 1 }
-				],
+				...typedDistributionSchema,
 				default: 1
 			},
 			'species': {
