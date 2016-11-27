@@ -16,6 +16,7 @@ import {args, humanMsg} from './misc';
 
 import {Subject}              from 'rxjs/Subject';
 import {BehaviorSubject}      from 'rxjs/BehaviorSubject';
+import {of}                   from 'rxjs/observable/of';
 import {never}                from 'rxjs/observable/never';
 import {combineLatest}        from 'rxjs/observable/combineLatest';
 import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged';
@@ -26,7 +27,6 @@ import {map}                  from 'rxjs/operator/map';
 import {withLatestFrom}       from 'rxjs/operator/withLatestFrom';
 import {switchMap}            from 'rxjs/operator/switchMap';
 import 'rxjs/add/operator/do';
-import {constraint} from "./misc";
 
 const $$events             = Symbol('$$events');
 const $$properties         = Symbol('$$properties');
@@ -84,9 +84,9 @@ export default class ValueTracker {
 		this[$$initialize]();
 
 		/* is the event name already taken? */
-		constraint(!this[$$events][name],
+		assert(!this[$$events][name],
 			`There is already an event '${name}' on this object.`);
-		constraint(!this[$$properties][name],
+		assert(!this[$$properties][name],
 			`There is already a property '${name}' on this object.`);
 		
 		this[$$events][name] = new Subject()
@@ -105,32 +105,38 @@ export default class ValueTracker {
 	 * @param  {Boolean}                 [readonly=false] - whether the value can be manually set
 	 * @param  {function(*,*):Boolean}   [isEqual]        - a predicate function by which to test for duplicate values
 	 * @param  {function(*):Boolean}     [isValid]        - a predicate function to validate a given value
+	 * @param  {function(*):*}           [transform]      - a function to transform any input value
 	 * @param  {*}                       [initial]        - the initial value of this property
 	 *
 	 * @return {BehaviorSubject} - the property associated with the given name
 	 */
 	newProperty(name, {
-		readonly = false,
-		isEqual  = (a,b) => (a===b),
-		isValid  = ()=>true,
+		readonly  = false,
+		isEqual   = (a,b) => (a===b),
+		isValid   = ()=>true,
+		transform = v=>v,
 		initial
 	} = {}) {
 		this[$$initialize]();
 
 		/* is the property name already taken? */
-		constraint(!this[$$events][name],
+		assert(!this[$$events][name],
 			`There is already an event '${name}' on this object.`);
-		constraint(!this[$$properties][name],
+		assert(!this[$$properties][name],
 			`There is already a property '${name}' on this object.`);
 
 		/* if isValid is an array, check for inclusion */
 		if (isValid::isArray()) { isValid = isValid::includes }
 		
+		/* if initial is a function, call it to get the initial value */
+		if (initial::isFunction()) { initial = this::initial() }
+		
 		/* define the bus which manages the property */
 		let subject = this[$$settableProperties][name] = new BehaviorSubject(initial)
-			::filter              (this[$$filterBy] )
+			// ::filter              (this[$$filterBy] )
 			::filter              (this::isValid    )
-			::takeUntil           (this[$$takeUntil])
+			::map                 (this::transform  )
+			// ::takeUntil           (this[$$takeUntil])
 			::distinctUntilChanged(this::isEqual    );
 		this[$$properties][name] = readonly ? subject.asObservable() : subject;
 		
@@ -179,21 +185,44 @@ export default class ValueTracker {
 				::withLatestFrom(...optionalPassiveDeps.map(::this.p),
 				(active, ...passive) => optionalTransformer(...active, ...passive));
 		} else if (name) {
-			const [head, ...tail] = name.split('.');
-			if (tail.length > 0) {
+			let head = name, sep, tail;
+			const match = name.match(/^(.+?)(\??\.)(.+)$/);
+			// console.log('(p-regex)', name, match); // TODO: remove
+			if (match) {
+				[,head,sep,tail] = match;
+				let loose = (sep === '?.');
 				return this.p(head)::switchMap((obj) => {
-					if (!obj) { return never() }
-					assert(obj instanceof ValueTracker, humanMsg`
+					if (!obj) {
+						if (loose) { return of(null) }
+						else       { return never()  }
+					}
+					assert(obj.p::isFunction(), humanMsg`
 						The '${head}' property did not return
 						a ValueTracker-based object,
 						so it cannot be chained.
-					`);
-					return obj.p(tail.join('.'));
+					`); // TODO: allow simple property chaining (even if not observables)
+					return obj.p(tail);
 				});
 			} else {
-				assert(this[$$properties][head], humanMsg`No property '${name}' exists.`);
-				return this[$$properties][head];
+				assert(this[$$properties][name], humanMsg`No property '${name}' exists.`);
+				return this[$$properties][name];
 			}
+			
+			// const [head, ...tail] = name.split('.');
+			// if (tail.length > 0) {
+			// 	return this.p(head)::switchMap((obj) => {
+			// 		if (!obj) { return never() }
+			// 		assert(obj.p::isFunction(), humanMsg`
+			// 			The '${head}' property did not return
+			// 			a ValueTracker-based object,
+			// 			so it cannot be chained.
+			// 		`);
+			// 		return obj.p(tail.join('.'));
+			// 	});
+			// } else {
+			// 	assert(this[$$properties][head], humanMsg`No property '${name}' exists.`);
+			// 	return this[$$properties][head];
+			// }
 		}
 	}
 	
@@ -242,7 +271,7 @@ export const property = (options = {}) => (target, key) => {
 
 export const event = (options = {}) => (target, key) => {
 	let match = key.match(/^(\w+)Event$/);
-	constraint(match,
+	assert(match,
 		`@event() decorators require a name that ends in 'Event'.`);
 	let name = match[1];
 	target::set(['constructor', $$events, name], options);

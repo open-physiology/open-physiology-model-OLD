@@ -11,7 +11,7 @@ export default TypedModule.create('omegaTrees', [
 ], (M, {
 	IsRelatedTo, Template, Group, Lyph, Node, Has, PullsIntoTypeDefinition
 }) => {
-	  
+	
 	
 	const OmegaTree = M.TYPED_RESOURCE({////////////////////////////////////////
 		
@@ -36,6 +36,7 @@ export default TypedModule.create('omegaTrees', [
 		2: [Node,      '0..*',                               ],
 		
 		// TODO: CONSTRAINT: all root nodes must be on a plus-border or minus-border
+		// TODO: maybe root won't be (a) node(s) at all?
 		
 	});
 	
