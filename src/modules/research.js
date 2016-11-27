@@ -101,8 +101,8 @@ export default Module.create('research', [
 		
 		singular: "involves publication",
 		
-		1: [Correlation, '0..1', { anchors: true, key: 'publication' }],
-		2: [Publication, '0..*',                                      ],
+		1: [Correlation, '0..1', { anchors: true, key: 'publication'  }],
+		2: [Publication, '0..*', { anchors: true, key: 'correlations' }],
 		
 	});
 	
