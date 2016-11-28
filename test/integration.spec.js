@@ -276,5 +276,16 @@ describe("integrated workflow", () => {
 		
 		await expect(blood.commit()).to.be.fulfilled;
 	});
-	
+
+
+	it("(regression test 8: Export manually defined plural)", async () => {
+		const {Process, Causality} = module.classes;
+
+		let process   = Process.new({ name: "Blood advection" });
+		let causality = Causality.new({});
+
+		expect(process.constructor).to.have.a.property('plural', "processes");
+		expect(causality.constructor).to.have.a.property('plural', "causalities");
+	});
+
 });

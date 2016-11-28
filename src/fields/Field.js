@@ -195,6 +195,7 @@ export class Field extends ValueTracker {
 	
 	rollback() {
 		this.set(this[$$pristine]);
+		this.pSubject('isPristine').next(true);
 	}
 	
 }
