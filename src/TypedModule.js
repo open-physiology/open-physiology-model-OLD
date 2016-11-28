@@ -20,18 +20,18 @@ export default class TypedModule extends Module {
 
 	TYPED_RESOURCE(config) {
 		return mapOptionalArray(config, (conf) => {
-			
+
 			this.basicNormalization(conf);
 			
 			const superClasses = wrapInArray(conf.extends    || [this.classes.vertexValue('Template')]);
 			const subClasses   = wrapInArray(conf.extendedBy || []);
-			
+
 			/* handling properties */
 			conf::defaults({
 				properties:        {},
 				patternProperties: {}
 			});
-			
+
 			/* Template class */
 			const NewTemplateClass = this.RESOURCE({
 				
@@ -41,14 +41,15 @@ export default class TypedModule extends Module {
 				extendedBy: subClasses,
 				
 				singular: conf.singular,
-				
+				plural: conf.plural,
+
 				properties:        conf.properties,
 				patternProperties: conf.patternProperties,
 				
 				behavior: conf.behavior
 				
 			});
-			
+
 			/* Type class */
 			const NewTypeClass = this.RESOURCE({
 				
@@ -58,7 +59,7 @@ export default class TypedModule extends Module {
 				extendedBy: subClasses::map(c=>c.Type),
 				
 				singular: `${conf.singular} type`,
-				
+
 				notExported: true
 				
 			});
