@@ -56,7 +56,7 @@ export const rationalNumberSchema = {
 		'n': { type: 'integer', minimum: 0,                required: true }, // numerator
 		'd': { type: 'integer', minimum: 1,    default: 1, required: true }, // denominator
 		's': { type: 'integer', enum: [-1, 1], default: 1, required: true }  // sign
-	},
+	}
 };
 
 export const angleSchema = {
