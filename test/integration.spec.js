@@ -266,14 +266,13 @@ describe("integrated workflow", () => {
 		
 	});
 	
-	// TODO: fix this failing test
-	it.skip("(regression test 7: Relationship mismatch)", async () => {
+	it("(regression test 7: Relationship mismatch)", async () => {
 		const {Lyph, Type} = module.classes;
 		
 		let blood = Lyph.new({ name: "Blood" });
 		let bloodType = Type.new({ name: blood.name, definition: blood });
 		blood.types.add(bloodType);
-		
+
 		await expect(blood.commit()).to.be.fulfilled;
 	});
 

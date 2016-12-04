@@ -22,25 +22,7 @@ export default Module.create('typed', [
 		
 		extends: Resource,
 		
-		singular: "type",
-		
-		behavior: {
-			new(vals, options) {
-				let {
-					definition:         sc,
-					['<--DefinesType']: rel
-				} = vals;
-				constraint((
-					Template.hasInstance(sc)  ||
-					DefinesType.hasInstance(rel)
-				), humanMsg`
-					A type must be created with its definition
-					immediately.
-				`);
-				if (rel) { sc = rel[1] }
-				return sc.constructor.Type.new(vals, options);
-			}
-		}
+		singular: "type"
 		
 	});/////////////////////////////////////////////////////////////////////////
 	

@@ -140,7 +140,9 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		}
 		
 		/* the value must be of the proper domain */
-		constraint(notGiven || this[$$desc].relationshipClass.hasInstance(val), humanMsg`
+		const expectedRelationshipClass = this[$$desc].relationshipClass;
+		const hasCompatibleType = expectedRelationshipClass.hasInstance(val);
+		constraint(notGiven || hasCompatibleType, humanMsg`
 			Invalid value '${val}' given for field ${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
 		

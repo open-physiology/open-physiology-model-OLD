@@ -494,30 +494,31 @@ export default class Module {
 	mergeSameNameRelationships(NewClass) : Class<Entity> {
 		const OldClass = this.classes.vertexValue(NewClass.name);
 		if (!OldClass) { return NewClass }
+		
+		const chooseOne = (o, n, sep, key) => {
+			assert(o::isUndefined() || n::isUndefined() || _isEqual(o, n), humanMsg`
+				Cannot merge values for ${OldClass.name}${sep}${key}.
+				(1) ${JSON.stringify(o)}
+				(2) ${JSON.stringify(n)}
+			`);
+			return o::isUndefined() ? n : o;
+		};
+		
 		return OldClass::assignWith(NewClass, (vOld, vNew, key) => {
 			switch (key) {
-				case 'module': return vOld;
+				case 'module':
+					return vOld;
 				case 'extends':
-				case 'extendedBy':  return new Set([...vOld, ...vNew]);
-				case 'domainPairs': return [...vOld, ...vNew];
+				case 'extendedBy':
+					return new Set([...vOld, ...vNew]);
+				case 'domainPairs':
+					return [...vOld, ...vNew];
 				case 'properties':
-				case 'patternProperties': return {}::assignWith(vOld, vNew, (pOld, pNew, pKey) => {
-					assert(pOld::isUndefined() || _isEqual(pOld, pNew), humanMsg`
-						Cannot merge property descriptions for ${OldClass.name}#${key}.
-						
-						1) ${JSON.stringify(pOld)}
-						
-						2) ${JSON.stringify(pNew)}
-					`);
-					return pOld::isUndefined() ? pNew : pOld;
-				});
-				default: {
-					assert(vOld::isUndefined() || vNew::isUndefined() || _isEqual(vOld, vNew), humanMsg`
-						Cannot merge ${OldClass.name}.${key} = ${JSON.stringify(vOld)}
-						        with ${JSON.stringify(vNew)}.
-					`);
-					return vOld::isUndefined() ? vNew : vOld;
-				}
+				case 'patternProperties':
+				case 'behavior':
+					return {}::assignWith(vOld, vNew, (pOld, pNew, pKey) => chooseOne(pOld, pNew, '#', pKey));
+				default:
+					return chooseOne(vOld, vNew, '.', key);
 			}
 		});
 	}

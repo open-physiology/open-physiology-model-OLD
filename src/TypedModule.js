@@ -20,20 +20,20 @@ export default class TypedModule extends Module {
 
 	TYPED_RESOURCE(config) {
 		return mapOptionalArray(config, (conf) => {
-
+			
 			this.basicNormalization(conf);
 			
 			const superClasses = wrapInArray(conf.extends    || [this.classes.vertexValue('Template')]);
 			const subClasses   = wrapInArray(conf.extendedBy || []);
-
+			
 			/* handling properties */
 			conf::defaults({
 				properties:        {},
 				patternProperties: {}
 			});
-
+			
 			/* Template class */
-			const NewTemplateClass = this.RESOURCE({
+			const newTemplateClass = this.RESOURCE({
 				
 				name: conf.name,
 				
@@ -49,44 +49,15 @@ export default class TypedModule extends Module {
 				behavior: conf.behavior
 				
 			});
-
-			/* Type class */
-			const NewTypeClass = this.RESOURCE({
-				
-				name: `${conf.name}Type`,
-				
-				extends:  superClasses::map(c=>c.Type),
-				extendedBy: subClasses::map(c=>c.Type),
-				
-				singular: `${conf.singular} type`,
-
-				notExported: true
-				
-			});
 			
-			NewTemplateClass::definePropertyByValue('Type',     NewTypeClass    );
-			NewTypeClass    ::definePropertyByValue('Template', NewTemplateClass);
-			
-			this.RELATIONSHIP({
-				
-				name: 'HasType',
-				
-				1: [NewTemplateClass, '0..*', { anchors: true, key: 'types' }],
-				2: [NewTypeClass,     '0..*'                                 ]
-				
-			});
-			
-			this.RELATIONSHIP({
-				
-				name: 'DefinesType',
-				
-				1: [NewTemplateClass, '0..1', { anchors: true                    }],
-				2: [NewTypeClass,     '1..1', { anchors: true, key: 'definition' }]
-				
-			});
+			// TODO: figure out if we still want to set
+			//     : a property `Type` on each template class,
+			//     : since a module now only has one Type class.
+			const Type = this.classes.vertexValue('Type');
+			newTemplateClass::definePropertyByValue('Type', Type);
 			
 			/* register and return */
-			return NewTemplateClass;
+			return newTemplateClass;
 		});
 
 	}
