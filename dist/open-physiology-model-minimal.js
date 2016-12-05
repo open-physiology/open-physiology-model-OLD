@@ -1829,6 +1829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'rollback',
 			value: function rollback() {
 				this.set(this[_symbols.$$pristine]);
+				this.pSubject('isPristine').next(true);
 			}
 		}]);
 	
@@ -1906,8 +1907,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t\t\tA type must be created with its definition\n\t\t\t\t\timmediately.\n\t\t\t\t'], ['\n\t\t\t\t\tA type must be created with its definition\n\t\t\t\t\timmediately.\n\t\t\t\t']);
-	
 	var _schemas = __webpack_require__(32);
 	
 	var _Module = __webpack_require__(47);
@@ -1922,8 +1921,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
-	
 	exports.default = _Module2.default.create('typed', [_resources2.default], function (M, _ref) {
 		var Resource = _ref.Resource;
 		var IsRelatedTo = _ref.IsRelatedTo;
@@ -1935,20 +1932,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			extends: Resource,
 	
-			singular: "type",
-	
-			behavior: {
-				new: function _new(vals, options) {
-					var sc = vals.definition;
-					var rel = vals['<--DefinesType'];
-	
-					(0, _misc.constraint)(Template.hasInstance(sc) || DefinesType.hasInstance(rel), (0, _misc.humanMsg)(_templateObject));
-					if (rel) {
-						sc = rel[1];
-					}
-					return sc.constructor.Type.new(vals, options);
-				}
-			}
+			singular: "type"
 	
 		}); /////////////////////////////////////////////////////////////////////////
 	
@@ -2158,7 +2142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					});
 	
 					/* Template class */
-					var NewTemplateClass = _this2.RESOURCE({
+					var newTemplateClass = _this2.RESOURCE({
 	
 						name: conf.name,
 	
@@ -2166,6 +2150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						extendedBy: subClasses,
 	
 						singular: conf.singular,
+						plural: conf.plural,
 	
 						properties: conf.properties,
 						patternProperties: conf.patternProperties,
@@ -2174,47 +2159,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					});
 	
-					/* Type class */
-					var NewTypeClass = _this2.RESOURCE({
-	
-						name: conf.name + 'Type',
-	
-						extends: _map2.default.call(superClasses, function (c) {
-							return c.Type;
-						}),
-						extendedBy: _map2.default.call(subClasses, function (c) {
-							return c.Type;
-						}),
-	
-						singular: conf.singular + ' type',
-	
-						notExported: true
-	
-					});
-	
-					_misc.definePropertyByValue.call(NewTemplateClass, 'Type', NewTypeClass);
-					_misc.definePropertyByValue.call(NewTypeClass, 'Template', NewTemplateClass);
-	
-					_this2.RELATIONSHIP({
-	
-						name: 'HasType',
-	
-						1: [NewTemplateClass, '0..*', { anchors: true, key: 'types' }],
-						2: [NewTypeClass, '0..*']
-	
-					});
-	
-					_this2.RELATIONSHIP({
-	
-						name: 'DefinesType',
-	
-						1: [NewTemplateClass, '0..1', { anchors: true }],
-						2: [NewTypeClass, '1..1', { anchors: true, key: 'definition' }]
-	
-					});
+					// TODO: figure out if we still want to set
+					//     : a property `Type` on each template class,
+					//     : since a module now only has one Type class.
+					var Type = _this2.classes.vertexValue('Type');
+					_misc.definePropertyByValue.call(newTemplateClass, 'Type', Type);
 	
 					/* register and return */
-					return NewTemplateClass;
+					return newTemplateClass;
 				});
 			}
 		}]);
@@ -2292,15 +2244,26 @@ return /******/ (function(modules) { // webpackBootstrap
 		return { oneOf: schemas };
 	};
 	
-	var rationalNumberSchema = exports.rationalNumberSchema = oneOf({
-		// TODO: specify format (https://github.com/infusion/Fraction.js)
+	// export const rationalNumberSchema = oneOf({
+	// 	// TODO: specify format (https://github.com/infusion/Fraction.js)
+	// 	type: 'object',
+	// 	properties: {
+	// 		'n': { type: 'integer', minimum: 0,                required: true }, // numerator
+	// 		'd': { type: 'integer', minimum: 1,    default: 1, required: true }, // denominator
+	// 		's': { type: 'integer', enum: [-1, 1], default: 1, required: true }  // sign
+	// 	}
+	// }, { type: 'number' }, { type: 'string' });
+	
+	
+	//NK Simplified schema to avoid oneOf
+	var rationalNumberSchema = exports.rationalNumberSchema = {
 		type: 'object',
 		properties: {
 			'n': { type: 'integer', minimum: 0, required: true }, // numerator
 			'd': { type: 'integer', minimum: 1, default: 1, required: true }, // denominator
 			's': { type: 'integer', enum: [-1, 1], default: 1, required: true } // sign
 		}
-	}, { type: 'number' }, { type: 'string' });
+	};
 	
 	var angleSchema = exports.angleSchema = {
 		type: 'number',
@@ -3639,6 +3602,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (!OldClass) {
 					return NewClass;
 				}
+	
+				var chooseOne = function chooseOne(o, n, sep, key) {
+					return _isUndefined2.default.call(o) ? n : o;
+				};
+	
 				return _assignWith2.default.call(OldClass, NewClass, function (vOld, vNew, key) {
 					var _context8;
 	
@@ -3652,13 +3620,12 @@ return /******/ (function(modules) { // webpackBootstrap
 							return [].concat(_toConsumableArray(vOld), _toConsumableArray(vNew));
 						case 'properties':
 						case 'patternProperties':
+						case 'behavior':
 							return (_context8 = {}, _assignWith2.default).call(_context8, vOld, vNew, function (pOld, pNew, pKey) {
-								return _isUndefined2.default.call(pOld) ? pNew : pOld;
+								return chooseOne(pOld, pNew, '#', pKey);
 							});
 						default:
-							{
-								return _isUndefined2.default.call(vOld) ? vNew : vOld;
-							}
+							return chooseOne(vOld, vNew, '.', key);
 					}
 				});
 			}
@@ -14230,7 +14197,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t'], ['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t']),
-	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t']);
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tThe number of values in field ', '#', '\n\t\t\t\tis not within the expected range [', ', ', '].\n\t\t\t'], ['\n\t\t\t\tThe number of values in field ', '#', '\n\t\t\t\tis not within the expected range [', ', ', '].\n\t\t\t']),
+	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t']);
 	
 	var _map = __webpack_require__(43);
 	
@@ -14541,7 +14509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					var min = _$$desc$cardinality.min;
 					var max = _$$desc$cardinality.max;
 	
-					(0, _misc.constraint)((_context7 = val.size, _inRange2.default).call(_context7, min, max + 1), '\n\t\t\t\tThe number of values in field ' + this[_symbols.$$owner].constructor.name + '#' + this[_symbols.$$key] + '\n\t\t\t\tis not within the expected range [' + min + ', ' + max + '].\n\t\t\t');
+					(0, _misc.constraint)((_context7 = _size2.default.call(val), _inRange2.default).call(_context7, min, max + 1), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key], min, max));
 				}
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -14550,7 +14518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function validateElement(element) {
 				/* the value must be of the proper domain */
 				if (!this[_symbols.$$desc].relationshipClass.hasInstance(element)) {
-					throw new Error((0, _misc.humanMsg)(_templateObject2, element, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+					throw new Error((0, _misc.humanMsg)(_templateObject3, element, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				}
 			}
 		}, {
@@ -14834,7 +14802,9 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 	
 				/* the value must be of the proper domain */
-				(0, _misc.constraint)(notGiven || this[_symbols.$$desc].relationshipClass.hasInstance(val), (0, _misc.humanMsg)(_templateObject3, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+				var expectedRelationshipClass = this[_symbols.$$desc].relationshipClass;
+				var hasCompatibleType = expectedRelationshipClass.hasInstance(val);
+				(0, _misc.constraint)(notGiven || hasCompatibleType, (0, _misc.humanMsg)(_templateObject3, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 	
 				// TODO: these should not be assertions, but proper constraint-checks,
 				//     : recording errors, possibly allowing them temporarily, etc.
