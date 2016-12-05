@@ -166,8 +166,8 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 			is not an iterable collection (like array or set).
 		`);
 		if (stages.includes('commit')) {
-			const { min, max } = this[$$desc].cardinality;
-			constraint(val.size::inRange(min, max + 1), `
+			const {min, max} = this[$$desc].cardinality;
+			constraint(val::size()::inRange(min, max + 1), humanMsg`
 				The number of values in field ${this[$$owner].constructor.name}#${this[$$key]}
 				is not within the expected range [${min}, ${max}].
 			`);
