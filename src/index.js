@@ -3,10 +3,13 @@ import typed          from './modules/typed';
 import lyphs          from './modules/lyphs';
 import groups         from './modules/groups';
 import measurables    from './modules/measurables';
-import omegaTrees     from './modules/omegaTrees';
 import processes      from './modules/processes';
+import canonicalTrees from './modules/canonicalTrees';
 import research       from './modules/research';
 import visualisations from './modules/visualisations';
+
+import omegaTrees     from './modules/omegaTrees';
+// TODO: ^ remove when we've switched to canonicalTrees
 
 import Module from './Module';
 
@@ -16,8 +19,10 @@ export default Module.create('all', [
 	lyphs,
 	groups,
 	measurables,
-	omegaTrees,
 	processes,
+	canonicalTrees,
 	research,
-	visualisations
+	visualisations,
+	
+	omegaTrees // TODO: <- remove when we've switched to canonical trees
 ]);
