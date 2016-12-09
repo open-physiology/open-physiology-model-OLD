@@ -16,8 +16,6 @@ import ValueTracker, {event, property} from './util/ValueTracker';
 import {tracker}             from './changes/Change';
 import {BehaviorSubject}     from 'rxjs/BehaviorSubject';
 import {filter}              from 'rxjs/operator/filter';
-import {merge}               from 'rxjs/observable/merge';
-import {map}                 from 'rxjs/operator/map';
 import {combineLatest}       from 'rxjs/observable/combineLatest';
 import                            'rxjs/add/operator/do';
 

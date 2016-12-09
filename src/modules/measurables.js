@@ -1,4 +1,3 @@
-import {qualitySchema} from '../util/schemas';
 import TypedModule     from '../TypedModule';
 
 import resources from './resources';

@@ -1,28 +1,20 @@
 import TypedModule from '../TypedModule';
 import {
-	arrayContainsValue,
 	normalizeToRange
 } from '../util/misc';
 import {
-	enumArraySchema,
-	enumSchema,
-	rangeSchema,
-	distributionSchema
+	enumArraySchema
 } from '../util/schemas';
 
 import resources from './resources';
 import typed     from './typed';
 import {universalDistanceRange} from "../util/schemas";
 import {wrapInArray} from "../util/misc";
-import {setEquals} from "../util/ObservableSet";
 
-import union from 'lodash/union';
-import uniqueId from 'lodash/uniqueId';
+import _union from 'lodash/union';
 
 import defaults from 'lodash-bound/defaults';
 import assign from 'lodash-bound/assign';
-import entries from 'lodash-bound/entries';
-import parseInt from 'lodash-bound/parseInt';
 import max from 'lodash-bound/max';
 import map from 'lodash-bound/map';
 import {typedDistributionSchema} from "../util/schemas";
@@ -105,7 +97,7 @@ export default TypedModule.create('lyphs', [
 					vals::assign({ axis });
 				}
 				if (vals.axis) {
-					vals.longitudinalBorders = union(
+					vals.longitudinalBorders = _union(
 						[...vals.longitudinalBorders],
 						[vals.axis]
 					);

@@ -16,7 +16,7 @@ import {defineProperty} from 'bound-native-methods';
 
 import assert from 'power-assert';
 
-import {humanMsg, assign} from "../util/misc";
+import {humanMsg, callOrReturn, constraint} from "../util/misc";
 
 import {Field, RelField} from './Field';
 
@@ -28,8 +28,6 @@ import {
 	$$initSet,
 	$$entriesIn,
 } from './symbols';
-import {callOrReturn} from "../util/misc";
-import {constraint} from "../util/misc";
 
 
 Field[$$registerFieldClass](class Rel1Field extends RelField {

@@ -1,14 +1,15 @@
 import Module                       from './Module';
-import {mapOptionalArray} from './util/misc';
 
-import defaults  from 'lodash-bound/defaults';
-import mapValues from 'lodash-bound/mapValues';
-import omitBy    from 'lodash-bound/omitBy';
-import map       from 'lodash-bound/map';
-import memoize   from 'lodash/memoize';
-import {defineProperty, defineProperties} from 'bound-native-methods';
-import {wrapInArray} from "./util/misc";
-import {definePropertyByValue} from "./util/misc";
+import defaults from 'lodash-bound/defaults';
+import {
+	defineProperty,
+	defineProperties
+} from 'bound-native-methods';
+import {
+	mapOptionalArray,
+	wrapInArray,
+	definePropertyByValue
+} from './util/misc';
 
 /**
  * Typed Modules allow to more easily create related

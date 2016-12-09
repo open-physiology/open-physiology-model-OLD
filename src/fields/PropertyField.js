@@ -4,8 +4,6 @@ import cloneDeep   from 'lodash-bound/cloneDeep';
 
 import {defineProperty} from 'bound-native-methods';
 
-import assert from 'power-assert';
-
 import {humanMsg, assign, callOrReturn} from "../util/misc";
 
 import {Field} from './Field';

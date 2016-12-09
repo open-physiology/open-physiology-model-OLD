@@ -15,7 +15,7 @@ import {defineProperties, defineProperty} from 'bound-native-methods';
 import assert from 'power-assert';
 
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
-import {humanMsg, assign} from "../util/misc";
+import {humanMsg} from "../util/misc";
 
 import {Field, RelField} from './Field';
 

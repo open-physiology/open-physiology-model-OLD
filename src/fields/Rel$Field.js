@@ -3,8 +3,6 @@ import {filter}    from 'rxjs/operator/filter';
 import {switchMap} from 'rxjs/operator/switchMap';
 import {startWith} from 'rxjs/operator/startWith';
 import {pairwise}  from 'rxjs/operator/pairwise';
-import {concat}    from 'rxjs/observable/concat';
-import {Subject}   from 'rxjs/Subject';
 import 'rxjs/add/operator/do';
 
 import inRange from 'lodash-bound/inRange';
@@ -17,7 +15,7 @@ import {defineProperty} from 'bound-native-methods';
 import assert from 'power-assert';
 
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
-import {humanMsg, assign} from "../util/misc";
+import {humanMsg, constraint} from '../util/misc';
 
 import {Field, RelField} from './Field';
 
@@ -30,7 +28,6 @@ import {
 	$$pristine,
 	$$entriesIn
 } from './symbols';
-import {constraint} from "../util/misc";
 
 
 Field[$$registerFieldClass](class Rel$Field extends RelField {

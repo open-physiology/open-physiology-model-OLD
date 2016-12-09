@@ -1,10 +1,7 @@
 import {Subject}         from 'rxjs/Subject';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {merge}           from "rxjs/operator/merge";
-import {map}             from "rxjs/operator/map";
-import assert    from 'power-assert';
-import {humanMsg} from "./misc";
-import {constraint} from "./misc";
+import assert from "power-assert";
+import {humanMsg, constraint} from "./misc";
 
 const $$set               = Symbol('$$set');
 const $$addSubject        = Symbol('$$addSubject');

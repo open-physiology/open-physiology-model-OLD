@@ -1,6 +1,5 @@
 import {filter}                   from 'rxjs/operator/filter';
 import {switchMap}                from 'rxjs/operator/switchMap';
-import {startWith}                from 'rxjs/operator/startWith';
 import {defer as deferObservable} from 'rxjs/observable/defer';
 import 'rxjs/add/operator/do';
 
@@ -11,7 +10,7 @@ import {defineProperty} from 'bound-native-methods';
 
 import assert from 'power-assert';
 
-import {humanMsg, assign} from "../util/misc";
+import {humanMsg} from "../util/misc";
 
 import {Field, RelField} from './Field';
 
@@ -22,7 +21,6 @@ import {
 	$$desc,
 	$$initSet,
 	$$entriesIn,
-	$$value,
 } from './symbols';
 import {constraint} from "../util/misc";
 

@@ -1,13 +1,9 @@
-import includes from 'lodash-bound/includes';
-import isArray  from 'lodash-bound/isArray';
-import isString from 'lodash-bound/isString';
-import set      from 'lodash-bound/set';
-import entries  from 'lodash-bound/entries';
-import keys  from 'lodash-bound/keys';
-import isPlainObject from 'lodash-bound/isPlainObject';
+import includes   from 'lodash-bound/includes';
+import isArray    from 'lodash-bound/isArray';
+import set        from 'lodash-bound/set';
+import entries    from 'lodash-bound/entries';
 import isFunction from 'lodash-bound/isFunction';
 
-import _isEqual from 'lodash/isEqual';
 import _isBoolean from 'lodash/isBoolean';
 
 import assert from 'power-assert';

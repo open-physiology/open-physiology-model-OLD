@@ -1,13 +1,9 @@
-import {distributionSchema} from "../util/schemas";
 import Module               from '../Module';
 
-import resources from './resources';
-import {definePropertyByValue} from "../util/misc";
-import {humanMsg} from "../util/misc";
+import resources                 from './resources';
+import {definePropertyByValue}   from '../util/misc';
+import {typedDistributionSchema} from '../util/schemas';
 
-import assert from 'power-assert';
-import {constraint} from "../util/misc";
-import {typedDistributionSchema} from "../util/schemas";
 
 export default Module.create('typed', [
 	resources
