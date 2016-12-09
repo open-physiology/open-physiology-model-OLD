@@ -152,25 +152,4 @@ describe("'lyphs' Module", () => {
 		
 	});
 	
-	it("(regression test: auto-synchronized border-natures?)", async () => {
-		
-		const {Lyph, Border} = module.classes;
-		
-		let lyph = Lyph.new();
-		
-		expect(new Set([
-			[...lyph.longitudinalBorders][0].nature,
-			[...lyph.longitudinalBorders][1].nature
-		]).size).to.equal(2);
-		
-		// To compare, this was the nature of the original bug.
-		// The default value of properties was shared among entities:
-		let singleArray = [];
-		expect(new Set([
-			singleArray,
-			singleArray
-		]).size).to.equal(1);
-		
-	});
-	
 });
