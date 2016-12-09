@@ -1,4 +1,4 @@
-import {describe, it, expect} from './test.helper';
+import {regression, describe, expect} from './test.helper';
 import moduleFactory from '../src/index';
 
 import {map} from 'rxjs/operator/map';
@@ -6,12 +6,13 @@ import {take} from 'rxjs/operator/take';
 import {toPromise} from 'rxjs/operator/toPromise';
 import {filter} from '../src/util/bound-hybrid-functions';
 
+
 describe("regression tests", () => {
 
     let module;
     beforeEach(() => { module = moduleFactory() });
     
-    it("(regression 1: HasType[2] set to null?)", async () => {
+	regression("HasType[2] set to null?", async () => {
    		const {OmegaTree, Lyph, HasMaterial} = module.classes;
    		
    		let lyph1 = Lyph.new();
@@ -29,14 +30,14 @@ describe("regression tests", () => {
    		
    	});
    
-   	it("(regression 2: setting type in initializer fails at commit)", async () => {
+   	regression("setting type in initializer fails at commit", async () => {
    		const {Lyph} = module.classes;
    		let t1 = Lyph.new({ name: "Renal hilum" });
    		await t1.commit();
    		// await expect(t1.commit()).to.not.be.rejected;
    	});
    
-   	it("(regression 3: Missing 'treeParent' field in Lyph)", async () => {
+   	regression("missing 'treeParent' field in Lyph", async () => {
    		const {Lyph, OmegaTree} = module.classes;
    		let lyph = Lyph.new();
    
@@ -47,10 +48,11 @@ describe("regression tests", () => {
    		lyph.treeParent = tree;
    
    		expect([...tree.treeChildren]).to.include(lyph);
-   
+	    
+   		// TODO: remove this test after we've switched to canonicalTree module
    	});
    
-   	it("(regression 4: no property called 'root'", async () => {
+   	regression("no property called 'root'", async () => {
    		const {OmegaTree} = module.classes;
    
    		let tree = OmegaTree.new({ name: "Tree" });
@@ -58,7 +60,7 @@ describe("regression tests", () => {
    		expect(()=>tree.p('root')).not.to.throw();
    	});
    
-   	it("(regression 5: No property '...' exists.)", async () => {
+   	regression("no property '...' exists", async () => {
    		const {OmegaTree} = module.classes;
    		
    		let treeP = OmegaTree.p('all')
@@ -76,10 +78,10 @@ describe("regression tests", () => {
    		expect(() => treeFromP.p('root')).not.to.throw();
    	});
    	
-   	it("(regression 6: Trying to instantiate abstract class Has.)", async () => {
+   	regression("trying to instantiate abstract class Has", async () => {
    		const {Lyph, HasPart} = module.classes;
    		
-   		let sublyph = Lyph.new(
+   		let subLyph = Lyph.new(
    			{ name: 'Sublyph' },
    			{ createAxis: true, createRadialBorders: true }
    		);
@@ -91,7 +93,7 @@ describe("regression tests", () => {
    		
    		let layer2 = Lyph.new({
    			name: 'Blood Layer',
-   			parts: [ sublyph ]
+   			parts: [ subLyph ]
    		}, { createRadialBorders: true });
    		
    		let bloodVessel = Lyph.new({
@@ -99,18 +101,18 @@ describe("regression tests", () => {
    			layers: [ layer1, layer2 ]
    		}, { createAxis: true, createRadialBorders: true });
    		
-   		expect(() => { layer1.parts.add(sublyph) }).not.to.throw();
+   		expect(() => { layer1.parts.add(subLyph) }).not.to.throw();
    		
-   		expect([...layer1.parts])   .to.include(sublyph);
-   		expect([...layer1.children]).to.include(sublyph);
-   		expect([...sublyph.parents]).to.include(layer1);
-   		expect([...sublyph.parents]).to.include(layer2);
-   		expect([...sublyph['<--HasPart']][0]).to.be.instanceOf(HasPart);
-   		expect([...sublyph['<--Has']][0]).to.be.instanceOf(HasPart);
+   		expect([...layer1.parts])   .to.include(subLyph);
+   		expect([...layer1.children]).to.include(subLyph);
+   		expect([...subLyph.parents]).to.include(layer1);
+   		expect([...subLyph.parents]).to.include(layer2);
+   		expect([...subLyph['<--HasPart']][0]).to.be.instanceOf(HasPart);
+   		expect([...subLyph['<--Has']][0]).to.be.instanceOf(HasPart);
    		
    	});
    	
-   	it("(regression 7: Relationship mismatch)", async () => {
+   	regression("relationship mismatch", async () => {
    		const {Lyph, Type} = module.classes;
    		
    		let blood = Lyph.new({ name: "Blood" });
@@ -121,7 +123,7 @@ describe("regression tests", () => {
    	});
    
    
-   	it("(regression 8: Export manually defined plural)", async () => {
+   	regression("export manually defined plural", async () => {
    		const {Process, Causality} = module.classes;
    
    		let process   = Process.new({ name: "Blood advection" });
@@ -131,7 +133,7 @@ describe("regression tests", () => {
    		expect(causality.constructor).to.have.a.property('plural', "causalities");
    	});
 	
-	it("(regression test 9: auto-synchronized border-natures?)", async () => {
+	regression("auto-synchronized border-natures?", async () => {
 		
 		const {Lyph, Border} = module.classes;
 		
@@ -152,7 +154,7 @@ describe("regression tests", () => {
 		
 	});
     
-    it("(regression 10: commit causality resource)", async () => {
+    regression("commit causality resource", async () => {
         const {Measurable, Causality} = module.classes;
 
         let measurable1 =  Measurable.new({ name: "Concentration of water" });
