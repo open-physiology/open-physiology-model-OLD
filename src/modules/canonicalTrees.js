@@ -17,7 +17,7 @@ export default TypedModule.create('canonicalTrees', [
 }) => {
 	
 	
-	const CanonicalTree = M.TYPED_RESOURCE({////////////////////////////////////////
+	const CanonicalTree = M.TYPED_RESOURCE({////////////////////////////////////
 		
 		name: 'CanonicalTree',
 		
@@ -27,7 +27,7 @@ export default TypedModule.create('canonicalTrees', [
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
-	const CanonicalTreeBranch = M.TYPED_RESOURCE({////////////////////////////////////////
+	const CanonicalTreeBranch = M.TYPED_RESOURCE({//////////////////////////////
 		
 		name: 'CanonicalTreeBranch',
 		

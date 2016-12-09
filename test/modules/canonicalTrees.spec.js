@@ -1,6 +1,6 @@
 import {describe, it, expect} from '../test.helper';
 
-import moduleFactory from '../../src/modules/omegaTrees';
+import moduleFactory from '../../src/modules/canonicalTrees';
 
 
 describe("'canonicalTrees' Module", () => {

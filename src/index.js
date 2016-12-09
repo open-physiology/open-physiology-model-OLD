@@ -20,9 +20,15 @@ export default Module.create('all', [
 	groups,
 	measurables,
 	processes,
-	canonicalTrees,
 	research,
 	visualisations,
 	
-	omegaTrees // TODO: <- remove when we've switched to canonical trees
+	omegaTrees, // TODO: <- remove when we've switched to canonical trees
+	canonicalTrees,
+    
+    // FIXME: If omegaTrees is the last module in the list,
+    // FIXME: Lyphs won't have a treeParent field. Likely
+    // FIXME: because OmegaTreePart has `extendedBy: [Lyph]`,
+    // FIXME: and `treeParent` is introduced on IT, rather than
+    // FIXME: on Lyph directly.
 ]);

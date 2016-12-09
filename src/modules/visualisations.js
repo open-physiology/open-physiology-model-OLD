@@ -365,6 +365,8 @@ export default TypedModule.create('visualisations', [
 		[Artefact,             Template   ],
 		[MaterialGlyph,        Material   ],
 		[LyphArtefact,         Lyph       ],
+		[LyphCanvas,           Lyph       ], // TODO: Tests fail if these two
+		[LyphRectangle,        Lyph       ], //     : lines are left out.
 		[BorderLine,           Border     ],
 		[NodeGlyph,            Node       ],
 		[ProcessEdge,          Process    ],

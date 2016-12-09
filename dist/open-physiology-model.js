@@ -17162,8 +17162,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	exports.default = _Module2.default.create('all', [_resources2.default, _typed2.default, _lyphs2.default, _groups2.default, _measurables2.default, _processes2.default, _canonicalTrees2.default, _research2.default, _visualisations2.default, _omegaTrees2.default // TODO: <- remove when we've switched to canonical trees
-	]);
+	exports.default = _Module2.default.create('all', [_resources2.default, _typed2.default, _lyphs2.default, _groups2.default, _measurables2.default, _processes2.default, _research2.default, _visualisations2.default, _omegaTrees2.default, // TODO: <- remove when we've switched to canonical trees
+	_canonicalTrees2.default]);
 	// TODO: ^ remove when we've switched to canonicalTrees
 
 /***/ },
@@ -17213,7 +17213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
 	
 	
-		var CanonicalTree = M.TYPED_RESOURCE({ ////////////////////////////////////////
+		var CanonicalTree = M.TYPED_RESOURCE({ ////////////////////////////////////
 	
 			name: 'CanonicalTree',
 	
@@ -17223,7 +17223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		}); /////////////////////////////////////////////////////////////////////////
 	
-		var CanonicalTreeBranch = M.TYPED_RESOURCE({ ////////////////////////////////////////
+		var CanonicalTreeBranch = M.TYPED_RESOURCE({ //////////////////////////////
 	
 			name: 'CanonicalTreeBranch',
 	
@@ -17906,7 +17906,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		//// Model - Artefact Relationships ////
 		////////////////////////////////////////
 	
-		var _M$RELATIONSHIP = M.RELATIONSHIP([[Artefact, Template], [MaterialGlyph, Material], [LyphArtefact, Lyph], [BorderLine, Border], [NodeGlyph, Node], [ProcessEdge, Process], [MeasurableGlyph, Measurable], [CausalityArrow, Causality], [CoalescenceRectangle, Coalescence]].map(function (_ref2) {
+		var _M$RELATIONSHIP = M.RELATIONSHIP([[Artefact, Template], [MaterialGlyph, Material], [LyphArtefact, Lyph], [LyphCanvas, Lyph], // TODO: Tests fail if these two
+		[LyphRectangle, Lyph], //     : lines are left out.
+		[BorderLine, Border], [NodeGlyph, Node], [ProcessEdge, Process], [MeasurableGlyph, Measurable], [CausalityArrow, Causality], [CoalescenceRectangle, Coalescence]].map(function (_ref2) {
 			var _ref3 = _slicedToArray(_ref2, 2);
 	
 			var ArtefactClass = _ref3[0];
