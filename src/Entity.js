@@ -1,19 +1,19 @@
-import isObject from 'lodash-bound/isObject';
-import defaults from 'lodash-bound/defaults';
-import size     from 'lodash-bound/size';
-import keys     from 'lodash-bound/keys';
-import values   from 'lodash-bound/values';
-import isFunction   from 'lodash-bound/isFunction';
+import isObject    from 'lodash-bound/isObject';
+import defaults    from 'lodash-bound/defaults';
+import size        from 'lodash-bound/size';
+import keys        from 'lodash-bound/keys';
+import values      from 'lodash-bound/values';
+import isFunction  from 'lodash-bound/isFunction';
+import isUndefined from 'lodash-bound/isUndefined';
 
 import _uniqueId from 'lodash/uniqueId';
 
 import assert   from 'power-assert';
 
 import ObservableSet         from './util/ObservableSet';
-import {humanMsg}            from './util/misc';
+import {humanMsg, definePropertiesByValue}            from './util/misc';
 import {Field}               from './fields/fields';
 import ValueTracker, {event, property} from './util/ValueTracker';
-import {tracker}             from './changes/Change';
 import {BehaviorSubject}     from 'rxjs/BehaviorSubject';
 import {filter}              from 'rxjs/operator/filter';
 import {combineLatest}       from 'rxjs/observable/combineLatest';
@@ -22,7 +22,7 @@ import                            'rxjs/add/operator/do';
 import {defineProperties, defineProperty, assign} from 'bound-native-methods';
 
 import babelHelpers from './util/babel-helpers';
-import {constraint} from "./util/misc";
+import {constraint} from './util/misc';
 
 const $$committedEntitiesByHref  = Symbol('$$committedEntitiesByHref');
 const $$committedEntities        = Symbol('$$committedEntities'      );
@@ -33,7 +33,6 @@ const $$deleted                  = Symbol('$$deleted'                );
 const $$entitiesSubject          = Symbol('$$allSubject'             );
 const $$committedEntitiesSubject = Symbol('$$allCommittedSubject'    );
 const $$set                      = Symbol('$$set'                    );
-const $$PreferredClass           = Symbol('$$PreferredClass'         );
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -64,72 +63,51 @@ export default class Entity extends ValueTracker {
 				return ${name};
 			}(Entity);
 		`)(Entity);
-		// const EntitySubclass = class extends Entity {};
 		
 		/* populate it with the necessary data and behavior */
 		EntitySubclass::assign(rest);
-		EntitySubclass::defineProperties({
-			name: { value: name },
-			[Symbol.hasInstance]: {
-				value(instance) { return this.hasInstance(instance) }
+		EntitySubclass::definePropertiesByValue({
+			name,
+			[Symbol.hasInstance](instance) {
+				return this.hasInstance(instance);
 			},
-			hasInstance: {
-				value(instance) {
-					if (!instance) { return false }
-					return this.hasSubclass(instance.constructor);
+			hasInstance(instance) {
+				if (!instance) { return false }
+				return this.hasSubclass(instance.constructor);
+			},
+			allSubclasses() {
+				let result = [this];
+				for (let subClass of this.extendedBy) {
+					result = [...result, ...subClass.allSubclasses()];
 				}
+				return new Set(result);
 			},
-			hasSubclass: {
-				value(otherClass) {
-					// For both sides of this, there are two possibilities:
-					// 1) the class is derived by this library
-					// 2) the class is an extension of such
-					// We need to check both possibilities.
-					// We assume there is no subclass cycle.
-					const isExtension = c => (c && c.__proto__ !== Entity);
-					if (isExtension(this)) {
-						// 'this' is an extension
-						while (isExtension(otherClass) && otherClass !== this) {
-							otherClass = otherClass.__proto__;
-						}
-						return otherClass === this;
-					} else {
-						while (isExtension(otherClass)) {
-							// 'otherClass' is an extension
-							otherClass = otherClass.__proto__;
-						}
-						if (!otherClass) { return false }
-						// both 'this' and 'otherClass' are library-derived
-						if (otherClass === this) { return true }
-						for (let SubClass of this.extendedBy) {
-							if (SubClass.hasSubclass(otherClass)) { return true }
-						}
-						return false;
+			hasSubclass(otherClass) {
+				if (!otherClass)         { return false }
+				if (otherClass === this) { return true  }
+				for (let SubClass of this.extendedBy) {
+					if (SubClass.hasSubclass(otherClass)) {
+						return true;
 					}
 				}
+				return false;
 			},
-			p: {
-				value(name) {
-					switch (name) {
-						case 'all':          return this[$$entitiesSubject];
-						case 'allCommitted': return this[$$committedEntitiesSubject];
-						default: constraint(false, humanMsg`
-							The ${name} property does not exist on ${this.name}.
-						`);
-					}
+			p(name) {
+				switch (name) {
+					case 'all':          return this[$$entitiesSubject];
+					case 'allCommitted': return this[$$committedEntitiesSubject];
+					default: constraint(false, humanMsg`
+						The ${name} property does not exist on ${this.name}.
+					`);
 				}
 			},
-			supersede: {
-				value(factory: (OriginalClass: Class<this>) => Class<this>): Class<this> {
-					return EntitySubclass[$$PreferredClass] = factory(EntitySubclass[$$PreferredClass] || EntitySubclass);
-				}
-			}
+			Change: config.module.Change
 		});
 		
 		/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
-		for (let [$$set, $$subject] of [
-			[$$entities,          $$entitiesSubject         ],
-			[$$committedEntities, $$committedEntitiesSubject]
+		for (let [$$set,               $$subject                 ] of [
+			     [$$entities,          $$entitiesSubject         ],
+			     [$$committedEntities, $$committedEntitiesSubject]
 		]) {
 			const localSet = new ObservableSet();
 			Entity[$$set].e('add'   )::filter(::EntitySubclass.hasInstance).subscribe(localSet.e('add'   ));
@@ -137,6 +115,22 @@ export default class Entity extends ValueTracker {
 			EntitySubclass::defineProperty($$subject, { value: localSet.p('value') });
 		}
 		
+		/* introduce Change subclasses */
+		for (let clsName of [
+			'Change_new',
+		    'Change_load',
+		    'Change_delete',
+		    'Change_edit'
+		]) {
+			EntitySubclass::defineProperty(
+				clsName,
+				{ value: changeClassDefinitions[clsName](EntitySubclass) }
+			);
+		}
+		
+		
+		
+		/***/
 		return EntitySubclass;
 	}
 	
@@ -145,47 +139,13 @@ export default class Entity extends ValueTracker {
 	////////// STATIC (creating / caching / finding instances) //////////
 	/////////////////////////////////////////////////////////////////////
 	
-	
-	static Change_new = class extends tracker.Change {
-		constructor(context, initialValues = {}, options = {}) {
-			super(options);
-			this.context       = context;
-			this.initialValues = initialValues;
-			this.options       = options;
-		}
-
-		run() {
-			if (this.context.behavior.new::isFunction()) {
-				let customResult = this.context.behavior.new(
-					{ ...this.initialValues },
-					{ ...this.options       }
-				);
-				if (customResult) { return customResult }
-			}
-			constraint(!this.context.abstract, humanMsg`
-				Cannot instantiate the abstract
-				class ${this.context.name}.
-			`);
-			return new (this.context[$$PreferredClass] || this.context)(
-				{ ...this.initialValues },
-				{ ...this.options, allowInvokingConstructor: true, new: true }
-			);
-		}
-
-		async commit() {
-			//TODO
-		}
-
-		rollback() {
-			// TODO
-		}
-	};
-	
 	static new(
-		vals:    Object = {},
-	    options: Object = {}
-	): this {
-		return (new this.Change_new(this, vals, options)).run();
+		initialValues: Object = {},
+	    options:       Object = {}
+	) : this {
+		let change = new this.Change_new(initialValues, options);
+		change.run();
+		return change.result;
 	}
 	
 	static get(
@@ -236,14 +196,13 @@ export default class Entity extends ValueTracker {
 		return this[$$singletonObject];
 	}
 	
-	static async load(
-		href:    {href: string} | string | number,
-		options: Object = {} // TODO: filtering, expanding, paging, ...
-	) {
-		
-		// TODO
-
-	}
+	
+	// // TODO: `load` method for informing the module of an existing entity
+	// //     : (retrieved from an external server, for instance)
+	// static async load(
+	// 	href:    {href: string} | string | number,
+	// 	options: Object = {} // TODO: filtering, expanding, paging, ...
+	// ) {}
 	
 	
 	////////////////////////////
@@ -285,7 +244,6 @@ export default class Entity extends ValueTracker {
 			Do not use 'new ${this.constructor.name}(...args)'.
 			Instead, use '${this.constructor.name}.new(...args)'.
 		`);
-		assert(this.constructor === (this.constructor[$$PreferredClass] || this.constructor));
 		
 		/* Treating singleton classes specially? Or do we double-check singleton-ness here? */
 		if (this.constructor.singleton) {
@@ -399,3 +357,149 @@ Entity::assign({
 	
 	[$$committedEntitiesByHref] : {}
 });
+
+
+////////////////////////////////////////////////////////////////////////////////
+///// Change class definitions /////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+const changeClassDefinitions = {};
+
+///// Change_new ///////////////////////////////////////////////////////////////
+
+changeClassDefinitions['Change_new'] = (cls) => class Change_new extends cls.Change {
+	
+	static changeType = 'new';
+	
+	constructor(initialValues = {}, options = {}) {
+		super(options);
+		this.initialValues = initialValues;
+		this.options       = options;
+	}
+
+	result: Entity = null;
+	
+	localRun() {
+		this.result = null;
+		if (!this.result && cls.behavior.new::isFunction()) {
+			this.result = cls.behavior.new(this) || null;
+		}
+		if (!this.result) {
+			constraint(!cls.abstract, humanMsg`
+				Cannot instantiate the abstract
+				class ${cls.name}.
+			`);
+			this.result = new cls(
+				{ ...this.initialValues },
+				{ ...this.options, allowInvokingConstructor: true }
+			);
+		}
+	}
+
+	localRollback() {
+		// TODO
+	}
+};
+
+///// Change_load //////////////////////////////////////////////////////////////
+
+changeClassDefinitions['Change_load'] = (cls) => class Change_load extends cls.Change {
+	
+	static changeType = 'load';
+	
+	constructor(initialValues = {}, options = {}) {
+		// when loading an entity, it starts out committed
+		super({ ...options, committed: true });
+		this.initialValues = initialValues;
+		this.options       = options;
+	}
+
+	result: Entity = null;
+	
+	localRun() {
+		constraint(cls.initialValues.id, humanMsg`
+			Cannot load an instance of the class
+			${cls.name} without a provided 'id' field.
+		`);
+		constraint(!cls.abstract, humanMsg`
+			Cannot load an instance of the abstract
+			class ${cls.name}.
+		`);
+		this.result = new cls(
+			{ ...this.initialValues },
+			{ ...this.options, allowInvokingConstructor: true }
+		);
+	}
+
+	localRollback() {
+	} // intentionally empty
+};
+
+///// Change_delete ////////////////////////////////////////////////////////////
+
+changeClassDefinitions['Change_delete'] = (cls) => class Change_delete extends cls.Change {
+	
+	static changeType = 'delete';
+	
+	constructor(entity, options = {}) {
+		super({ ...options });
+		this.entity = entity;
+	}
+
+	entity: Entity = null;
+	
+	localRun() {
+		constraint(this.entity, humanMsg`
+			Cannot delete an entity
+			that was not specified in
+			the Change_delete constructor.
+		`);
+		
+		// TODO: Either make a separate Change class for Resource and Relationship,
+		// TODO:   or use an if-statement right here.
+		
+		// TODO: Change_delete on all relevant linked entities (test if they're already scheduled for deletion)
+		// TODO: Store a reference to this Change on the entity
+		// TODO: Keep the entity in memory (this.entity) so the deletion can be rolled back.
+	}
+
+	localRollback() {
+		// TODO
+	}
+};
+
+///// Change_delete ////////////////////////////////////////////////////////////
+
+changeClassDefinitions['Change_edit'] = (cls) => class Change_edit extends cls.Change {
+	
+	static changeType = 'edit';
+	
+	constructor(entity, newValues = {}, options = {}) {
+		super({ ...options });
+		this.entity = entity;
+		this.newValues = newValues;
+	}
+
+	entity:    Entity = null;
+	newValues: Object = {};
+	
+	localRun() {
+		constraint(this.entity, humanMsg`
+			Cannot edit an entity
+			that was not specified in
+			the Change_edit constructor.
+		`);
+		
+		// TODO: limit this Change class to simple properties
+		
+		// TODO: store the current values of these properties so we can roll back
+		
+		// TODO: Store a reference to this Change on the entity.
+		// TODO: In fact, we need to maintain a stack, and keep the latest Change
+		// TODO: visible, to be used as a dependency for further changes on the entity.
+	}
+
+	localRollback() {
+		// TODO
+	}
+};

@@ -19,6 +19,8 @@
       <w>polyfill</w>
       <w>pristines</w>
       <w>rdep</w>
+      <w>rollbacked</w>
+      <w>rollbacking</w>
       <w>subclassing</w>
       <w>subcls</w>
       <w>supercls</w>
@@ -26,6 +28,7 @@
       <w>typecheck</w>
       <w>unassert</w>
       <w>undelete</w>
+      <w>wujs</w>
       <w>xdescribe</w>
     </words>
   </dictionary>

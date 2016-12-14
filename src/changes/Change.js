@@ -1,119 +1,161 @@
-import Graph from "graph.js/dist/graph";
+import Graph from 'graph.js/dist/graph';
+import assert from 'power-assert';
 
+import ValueTracker, {property, event} from '../util/ValueTracker';
 
-const $$changes = Symbol('$$changes');
+import {filter, map} from '../util/bound-hybrid-functions';
 
-const $$class   = Symbol('$$class');
-const $$props   = Symbol('$$props');
-const $$revDeps = Symbol('$$revDeps');
-const $$causes  = Symbol('$$causes');
-const $$Change  = Symbol('$$Change');
+const $$graph        = Symbol('$$graph');
+const $$committed    = Symbol('$$committed');
+const $$committing   = Symbol('$$committing');
+const $$rolledBack   = Symbol('$$rolledBack');
+const $$rollingBack  = Symbol('$$rollingBack');
+const $$commitHere   = Symbol('$$commitHere');
+const $$rollbackHere = Symbol('$$rollbackHere');
 
-const $$commitUpToHere = Symbol('$$commitUpToHere');
-const $$commitForcedFromHere  = Symbol('$$commitForcedFromHere' );
-
-const ChangeT = (tracker) => class Change {
+export default ({ onCommit } = {}) => {
 	
-	constructor({ changeDependencies = [], changeCauses = [] } = {}) {
-		const g = tracker[$$changes];
-		g.addVertex(this, this);
-		for (let dep of changeDependencies) { g.addEdge(this, dep, {})               }
-		for (let dep of changeCauses)       { g.addEdge(this, dep, { forced: true }) }
-	}
+	/* track changes in a dependency graph */
+	const changes = new Graph;
 	
-	run() { assert(false, `Change subclass must override 'run'`) }
+	/* create 'commit' and 'rollback' event emitters */
+	const eventTracker = new ValueTracker;
+	eventTracker.newEvent('commit');
+	eventTracker.newEvent('rollback');
 	
-	async commit() {
-		this.committed = true;
-	}
-	
-	rollback() { assert(false, `Change subclass must override 'rollback'`) }
-	
-	async commitUpToHere() {
-		if (!this.committed) {
-			await this[$$commitUpToHere]();
-			await this.commit();
-		}
-		await this[$$commitForcedFromHere]();
-	}
-	
-	async [$$commitUpToHere]() {
-		for (let [dep] of tracker[$$changes].verticesTo(this)) {
-			if (!dep.committed) {
-				await dep[$$commitUpToHere]();
-				await dep.commit();
-			}
+	/***/
+	return class Change {
+		
+		////////// About forced changes //////////
+		// If change A forces change B,
+		// then A runs/commits before B,
+		// but committing   A commits    B,
+		// and rolling back B rolls back A.
+		// Example: A 'new Lyph' change forces
+		//          some 'new Border' changes.
+		//////////////////////////////////////////
+		
+		constructor({
+			changeDependencies = [],
+			changeCauses       = [],
+			committed          = false
+		} = {}) {
+			changes.addVertex(this, this);
+			for (let dep of changeDependencies) { changes.addEdge(dep, this, {})               }
+			for (let dep of changeCauses)       { changes.addEdge(dep, this, { forced: true }) }
+			this[$$committing]  = false;
+			this[$$committed]   = committed;
+			this[$$rollingBack] = false;
+			this[$$rolledBack]  = false;
 		}
 		
-	}
-	
-	async [$$commitForcedFromHere]() {
-		for (let [rdep,, {forced}] of tracker[$$changes].verticesFrom(this)) {
-			if (forced) {
-				if (!rdep.committed) {
-					await rdep.commit();
-				}
-				await rdep[$$commitForcedFromHere]();
-			}
-		}
-	}
-	
-	rollbackToHere() {
+		/// /// /// /// /// static event method /// /// /// /// ///
 		
-	}
+		static e = ::eventTracker.e;
+		
+		/// /// /// /// /// Basic methods /// /// /// /// ///
+		
+		get changeType() { return this.constructor.changeType }
+		
+		localRun()       { assert(false, `Change subclass must override 'localRun'`)            }
+		localRollback()  { assert(false, `Change subclass must override 'localRollback'`)       }
+		
+		get committed()  { return this[$$committed ] }
+		get rolledBack() { return this[$$rolledBack] }
+		
+		/// /// /// /// /// Smart run /// /// /// /// ///
+		
+		// TODO: keep track of whether a change has run or not
+		// TODO:  and only do a `localRun` if it's the first time
+		
+		run() { this.localRun() }
+		
+		/// /// /// /// /// Smart commit /// /// /// /// ///
+		
+		async commit() {
+			if (this[$$committing] || this[$$committed]) { return }
+			this[$$committing] = true;
+			
+			/* scheduling commits that need to happen before this one */
+			const changesToCommitBeforeMe = new Set;
+			
+			// dependency commits
+			for (let [dep] of changes.verticesTo(this)) {
+				if (dep[$$committing] || dep[$$committed]) { continue }
+				dep[$$committing] = true;
+				changesToCommitBeforeMe.add(dep);
+			}
+			
+			// forced change commits
+			for (let [rdep,, {forced}] of changes.verticesFrom(this)) {
+				if (rdep[$$committing] || rdep[$$committed]) { continue }
+				if (!forced)                                 { continue }
+				rdep[$$committing] = true;
+				changesToCommitBeforeMe.add(rdep);
+			}
+			
+			/* await those commits first */
+			await Promise.all(
+				changesToCommitBeforeMe
+					::map(c=>c.commit())
+			);
+			
+			/* then commit this change */
+			eventTracker.e('commit').next(this);
+			this[$$committing] = false;
+			this[$$committed]  = true;
+		}
+		
+		/// /// /// /// /// Smart rollback /// /// /// /// ///
+		
+		rollback() {
+			assert(!this[$$committed],  "Cannot roll back a change that's already committed.");
+			assert(!this[$$committing], "Cannot roll back a change that's in the process of being committed.");
+			if (this[$$rollingBack] || this[$$rolledBack]) { return }
+			this[$$rollingBack] = true;
+			
+			/* scheduling rollbacks that need to happen before this one */
+			const changesToRolledBackBeforeMe = new Set;
+			
+			// dependency rollbacks
+			for (let [rdep] of changes.verticesFrom(this)) {
+				if (rdep[$$rollingBack] || rdep[$$rolledBack]) { continue }
+				rdep[$$rollingBack] = true;
+				changesToRolledBackBeforeMe.add(rdep);
+			}
+			
+			// forced change rollbacks
+			for (let [dep,, {forced}] of changes.verticesTo(this)) {
+				if (dep[$$rollingBack] || dep[$$rolledBack]) { continue }
+				if (!forced)                                 { continue }
+				dep[$$rollingBack] = true;
+				changesToRolledBackBeforeMe.add(dep);
+			}
+			
+			/* await those rollbacks first */
+			for (let c of changesToRolledBackBeforeMe) { c.rollback() }
+			
+			/* then roll back this change */
+			this.localRollback();
+			this[$$rollingBack] = false;
+			this[$$rolledBack]  = true;
+			eventTracker.e('rollback').next(this);
+		}
+		
+	};
 };
-
-class ChangeTracker {
-	
-	get Change() {
-		if (!this[$$Change]) {
-			this[$$Change] = ChangeT(this);
-		}
-		return this[$$Change];
-	}
-	
-	constructor() {
-		this[$$changes] = new Graph();
-	}
-	
-}
-
-export const tracker = new ChangeTracker();
 
 
 // export class CreateEntity extends Change {
-//
-// 	constructor(cls, props = {}, options = {}) {
-// 		super(options);
-// 		this[$$class] = cls;
-// 		this[$$props] = props;
-// 	}
-//
-// 	run() {
-//
-// 	}
-//
-// 	commit() {
-//
-// 	}
-//
-// 	rollback() {
-//
-// 	}
-//
+// 	constructor(cls, props = {}, options = {}) {}
+// 	run() {}
+// 	commit() {}
+// 	rollback() {}
 // }
-//
 // export class DeleteEntity extends Change {}
-//
 // export class SetPropertyField extends Change {}
-//
 // export class SetSideField extends Change {}
-//
 // export class SetRel1Field extends Change {}
-//
 // export class SetRel1ShortcutField extends Change {}
-//
 // export class SetRel$Field extends Change {}
-//
 // export class SetRel$ShortcutField extends Change {}
-

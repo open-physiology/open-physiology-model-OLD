@@ -83,23 +83,24 @@ export default TypedModule.create('lyphs', [
 		},
 		
 		behavior: {
-			new(vals = {}, options = {}) {
-				if (options.customLyphBehaviorDone) { return }
-				
-				vals = { ...vals };
-				vals::defaults({
+			new(change) {
+				let {initialValues = {}, options = {}} = change;
+				initialValues = { ...initialValues };
+				initialValues::defaults({
 					longitudinalBorders: [],
 					radialBorders:       [],
 					axis:              null
 				});
+				// TODO: create a new Change for the border,
+				// TODO: caused by / dependent on this change
 				if (options.createAxis) {
 					const axis = Border.new();
-					vals::assign({ axis });
+					initialValues::assign({ axis });
 				}
-				if (vals.axis) {
-					vals.longitudinalBorders = _union(
-						[...vals.longitudinalBorders],
-						[vals.axis]
+				if (initialValues.axis) {
+					initialValues.longitudinalBorders = _union(
+						[...initialValues.longitudinalBorders],
+						[initialValues.axis]
 					);
 				}
 				if (options.createRadialBorders) {
@@ -107,13 +108,13 @@ export default TypedModule.create('lyphs', [
 						options.createRadialBorders = 2;
 					}
 					const nr = Math.min(options.createRadialBorders , 2);
-					for (let i = vals.radialBorders.length; i < nr; ++i) {
-						vals.radialBorders.push(Border.new());
+					for (let i = initialValues.radialBorders.length; i < nr; ++i) {
+						initialValues.radialBorders.push(Border.new());
 					}
 				}
-				return Lyph.new(
-					vals,
-					{ ...options, customLyphBehaviorDone: true }
+				return new Lyph(
+					initialValues,
+					{ ...options, allowInvokingConstructor: true }
 				);
 			}
 		}

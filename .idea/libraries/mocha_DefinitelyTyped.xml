@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="mocha-DefinitelyTyped" type="javaScript">
     <CLASSES>
-      <root url="file://$APPLICATION_CONFIG_DIR$/javascript/extLibs/http_github.com_DefinitelyTyped_DefinitelyTyped_raw_master_mocha_mocha-node.d.ts" />
       <root url="file://$APPLICATION_CONFIG_DIR$/javascript/extLibs/http_github.com_DefinitelyTyped_DefinitelyTyped_raw_master_mocha_mocha.d.ts" />
+      <root url="file://$APPLICATION_CONFIG_DIR$/javascript/extLibs/http_github.com_DefinitelyTyped_DefinitelyTyped_raw_master_mocha_mocha-node.d.ts" />
     </CLASSES>
     <SOURCES />
   </library>

@@ -8,10 +8,6 @@ import keys        from 'lodash-bound/keys';
 import values      from 'lodash-bound/values';
 import entries     from 'lodash-bound/entries';
 import fromPairs   from 'lodash-bound/fromPairs';
-import map         from 'lodash-bound/map';
-import at          from 'lodash-bound/at';
-import uniq        from 'lodash-bound/uniq';
-import flatten     from 'lodash-bound/flatten';
 
 import _isEqual from 'lodash/isEqual';
 
@@ -26,11 +22,13 @@ import {
 	mapOptionalArray,
 	parseCardinality,
 	wrapInArray,
+	definePropertyByValue,
 	definePropertiesByValue
 } from './util/misc';
 
 import Entity  from './Entity';
 import {Field} from './fields/fields';
+import newChangeClass from './changes/Change';
 
 
 const $$processedFor              = Symbol('$$processedFor');
@@ -67,13 +65,17 @@ export default class Module {
 		return moduleFactory;
 	}
 	
-	classes : Graph; // vertices: name                   -> class
-	                 // edges:    [superclass, subclass] -> undefined
-
-	constructor(name, dependencies = [], graph = new Graph()) {
+	/* class dependency graph */
+	// vertices: name                   -> class
+	// edges:    [superclass, subclass] -> undefined
+	classes : Graph;
+	
+	/* Change class (for tracking changes, and commit / rollback chaining) */
+	Change : Class = newChangeClass();
+	
+	constructor(name, dependencies = [], graph = new Graph) {
 		/* set storage graph */
 		this.classes = graph;
-		
 		/* store the module name */
 		this.name = name;
 	}
@@ -133,6 +135,7 @@ export default class Module {
 			}
 		}
 		
+		/* some default values */
 		config::defaults({
 			behavior: {}
 		});
@@ -276,8 +279,8 @@ export default class Module {
 		// 	/* find all domains relevant to this resource class + field key combo */
 		// 	const relevantDomains = CurrentRelClass[$$relevantDomains] = CurrentRelClass.domainPairs
 		// 		::map(keyInRelationship)
-        //        ::filter(d => (d.resourceClass).hasSubclass(resourceClass)       ||
-        //                      (resourceClass)       .hasSubclass(d.resourceClass) )
+        //      ::filter(d => (d.resourceClass).hasSubclass(resourceClass)       ||
+        //                      (resourceClass).hasSubclass(d.resourceClass) )
 		// 		::groupBy('resourceClass.name')
 		// 		::_values()
 		// 		::map(0); // for now, only using one domain-pair per ResourceClass+RelationshipClass combination
@@ -495,14 +498,14 @@ export default class Module {
 		const OldClass = this.classes.vertexValue(NewClass.name);
 		if (!OldClass) { return NewClass }
 		
-		const chooseOne = (o, n, sep, key) => {
+		function chooseOne(o, n, sep, key) {
 			assert(o::isUndefined() || n::isUndefined() || _isEqual(o, n), humanMsg`
 				Cannot merge values for ${OldClass.name}${sep}${key}.
 				(1) ${JSON.stringify(o)}
 				(2) ${JSON.stringify(n)}
 			`);
 			return o::isUndefined() ? n : o;
-		};
+		}
 		
 		return OldClass::assignWith(NewClass, (vOld, vNew, key) => {
 			switch (key) {

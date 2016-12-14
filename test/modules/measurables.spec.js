@@ -1,4 +1,4 @@
-import {xdescribe, describe, it, expect} from '../test.helper';
+import { describe, it, expect} from '../test.helper';
 
 import moduleFactory from '../../src/modules/measurables';
 
