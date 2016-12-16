@@ -6722,35 +6722,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		var FlowsTo = _M$RELATIONSHIP2[0];
 	
-		var _M$RELATIONSHIP3 = M.RELATIONSHIP([{
-	
-			name: 'provisional_FlowsTo',
-	
-			extends: PullsIntoTypeDefinition,
-	
-			singular: "flows to",
-	
-			1: [Lyph, '0..*', { key: 'outgoingProcesses' }],
-			2: [Process, '0..1', { anchors: true, key: 'sourceLyph' }]
-	
-		}, {
-	
-			name: 'provisional_FlowsTo',
-	
-			extends: PullsIntoTypeDefinition,
-	
-			singular: "flows to",
-	
-			1: [Process, '0..1', { anchors: true, key: 'targetLyph' }],
-			2: [Lyph, '0..*', { key: 'incomingProcesses' }]
-	
-		}]);
-	
-		var _M$RELATIONSHIP4 = _slicedToArray(_M$RELATIONSHIP3, 1);
-	
-		var provisional_FlowsTo = _M$RELATIONSHIP4[0];
-	
-	
 		var ConveysProcess = M.RELATIONSHIP({
 	
 			name: 'ConveysProcess',

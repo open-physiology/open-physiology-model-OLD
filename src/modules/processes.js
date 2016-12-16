@@ -66,31 +66,6 @@ export default TypedModule.create('processes', [
 	}]);
 	
 	
-	const [provisional_FlowsTo] = M.RELATIONSHIP([{
-		
-		name: 'provisional_FlowsTo',
-		
-		extends: PullsIntoTypeDefinition,
-		
-		singular: "flows to",
-		
-		1: [Lyph,    '0..*', {                key: 'outgoingProcesses' }],
-		2: [Process, '0..1', { anchors: true, key: 'sourceLyph'        }],
-		
-	}, {
-		
-		name: 'provisional_FlowsTo',
-		
-		extends: PullsIntoTypeDefinition,
-		
-		singular: "flows to",
-		
-		1: [Process, '0..1', { anchors: true, key: 'targetLyph'        }],
-		2: [Lyph,    '0..*', {                key: 'incomingProcesses' }],
-		
-	}]);
-	
-	
 	const ConveysProcess = M.RELATIONSHIP({
 		
 		name: 'ConveysProcess',
