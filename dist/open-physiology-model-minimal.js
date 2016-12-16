@@ -14937,7 +14937,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			extends: Resource,
 	
-			singular: "canonical tree branch"
+			singular: "canonical tree branch",
+					
+			plural: "canonical tree branches",
 	
 		}); /////////////////////////////////////////////////////////////////////////
 	

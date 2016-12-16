@@ -35,6 +35,8 @@ export default TypedModule.create('canonicalTrees', [
 		
 		singular: "canonical tree branch",
 		
+		plural: "canonical tree branches",
+		
 	});/////////////////////////////////////////////////////////////////////////
 	
 	const [FlowsTo] = M.RELATIONSHIP([{
@@ -68,6 +70,8 @@ export default TypedModule.create('canonicalTrees', [
 		extends: IsRelatedTo,
 		
 		singular: "is conveyed by",
+		
+		plural: "are conveyed by",
 		
 		1: [CanonicalTreeBranch, '0..1', { anchors: true, key: 'conveyingLyphType' }],
 		2: [Lyph.Type,           '0..*', {                                         }],
