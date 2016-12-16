@@ -166,10 +166,9 @@ describe("regression tests", () => {
             effect: measurable2
         });
 
-        expect(() => { measurable1.commit()}).not.to.throw();
-        expect(() => { measurable2.commit()}).not.to.throw();
-        expect(() => { causality1.commit()}).not.to.throw();
-
+		await expect(measurable1.commit()).to.be.fulfilled;
+		await expect(measurable2.commit()).to.be.fulfilled;
+		await expect(causality1.commit()).to.be.fulfilled;
     });
 
 });
