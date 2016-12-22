@@ -26,9 +26,9 @@ import {
 	definePropertiesByValue
 } from './util/misc';
 
-import Entity  from './Entity';
-import {Field} from './fields/fields';
-import newChangeClass from './changes/Change';
+import entityClassFactory from './Entity';
+import {Field}            from './fields/fields';
+import commandClassFactory from './commands/Command';
 
 
 const $$processedFor              = Symbol('$$processedFor');
@@ -41,28 +41,32 @@ const $$processRelationshipDomain = Symbol('$$processRelationshipDomain');
 // Module / Resource / Relationship Factory                                   //
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO: folding same-name classes
-// TODO: folding properties into subclasses
-// TODO: folding multiple 1,2 pairs into same-name relationships and subclass relationships
-
-
 export default class Module {
 	
 	static create(name, dependencies, fn) {
-		let moduleFactory = (memory = {
-			modules: new Map(),
-			classes: new Graph()
-		}) => {
+		return (memory = {}) => {
+			memory::defaults({
+				modules: new Map(),
+				classes: new Graph(),
+				commit:  () => { console.warn('Not supplied a `commit` behavior.') }
+			});
 			if (!memory.modules.has(name)) {
-				let module = new this(name, dependencies.map(m => m(memory)), memory.classes);
+				/* creating module */
+				let module = new this();
+				module::definePropertiesByValue({ name, classes: memory.classes, commit: memory.commit });
+				module::definePropertiesByValue({ Command: memory.Command || commandClassFactory(module) });
+				module::definePropertiesByValue({ Entity: memory.Entity || entityClassFactory(module) });
+				/* updating inter-module memory */
 				memory.modules.set(name, module);
-				if (fn) {
-					fn(module, [...module.classes.vertices()]::fromPairs());
-				}
+				memory.Command = module.Command;
+				memory.Entity = module.Entity;
+				/* creating dependency modules */
+				for (let dep of dependencies) { dep(memory) }
+				/* running provided module definition function */
+				if (fn) { fn(module, [...memory.classes.vertices()]::fromPairs()) }
 			}
 			return memory.modules.get(name);
 		};
-		return moduleFactory;
 	}
 	
 	/* class dependency graph */
@@ -70,19 +74,13 @@ export default class Module {
 	// edges:    [superclass, subclass] -> undefined
 	classes : Graph;
 	
-	/* Change class (for tracking changes, and commit / rollback chaining) */
-	Change : Class = newChangeClass();
+	/* other module-specific fields */
+	name    : string;
+	Command : Class;
+	Entity  : Class;
 	
-	constructor(name, dependencies = [], graph = new Graph) {
-		/* set storage graph */
-		this.classes = graph;
-		/* store the module name */
-		this.name = name;
-	}
-
 	OBJECT(config) {
 		return mapOptionalArray(config, (conf) => {
-			conf.module = this;
 			this.basicNormalization(conf);
 			this.register(conf);
 			return conf;
@@ -92,13 +90,12 @@ export default class Module {
 	RESOURCE(config) {
 		return mapOptionalArray(config, (conf) => {
 			conf.isResource = true;
-			conf.module = this;
-			this.basicNormalization                      (conf                    );
-			let constructor = this.mergeSameNameResources(Entity.createClass(conf));
-			this.register                                (constructor             );
-			this.mergeSuperclassFields                   (constructor             );
-			// jsonSchemaConfig                          (constructor             ); // TODO
-			Field.augmentClass                           (constructor             );
+			this.basicNormalization                      (conf                         );
+			let constructor = this.mergeSameNameResources(this.Entity.createClass(conf));
+			this.register                                (constructor                  );
+			this.mergeSuperclassFields                   (constructor                  );
+			// jsonSchemaConfig                          (constructor                  ); // TODO
+			Field.augmentClass                           (constructor                  );
 			return constructor;
 		});
 	}
@@ -106,9 +103,8 @@ export default class Module {
 	RELATIONSHIP(config) {
 		return mapOptionalArray(config, (conf) => {
 			conf.isRelationship = true;
-			conf.module = this;
 			this.basicNormalization                      (conf);
-			let constructor = Entity.createClass         (conf);
+			let constructor = this.Entity.createClass    (conf);
 			this.normalizeRelationshipSides              (constructor);
 			constructor = this.mergeSameNameRelationships(constructor);
 			this.register                                (constructor);
@@ -462,12 +458,11 @@ export default class Module {
 		
 	}
 	
-	mergeSameNameResources(NewClass) : Class<Entity> {
+	mergeSameNameResources(NewClass) : Class {
 		const OldClass = this.classes.vertexValue(NewClass.name);
 		if (!OldClass) { return NewClass }
 		return OldClass::assignWith(NewClass, (vOld, vNew, key) => {
 			switch (key) {
-				case 'module': return vOld;
 				case 'extends':
 				case 'extendedBy': return new Set([...vOld, ...vNew]);
 				case 'properties':
@@ -494,7 +489,7 @@ export default class Module {
 		});
 	}
 	
-	mergeSameNameRelationships(NewClass) : Class<Entity> {
+	mergeSameNameRelationships(NewClass) : Class {
 		const OldClass = this.classes.vertexValue(NewClass.name);
 		if (!OldClass) { return NewClass }
 		
@@ -509,8 +504,6 @@ export default class Module {
 		
 		return OldClass::assignWith(NewClass, (vOld, vNew, key) => {
 			switch (key) {
-				case 'module':
-					return vOld;
 				case 'extends':
 				case 'extendedBy':
 					return new Set([...vOld, ...vNew]);

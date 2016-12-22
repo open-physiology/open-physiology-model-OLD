@@ -160,4 +160,16 @@ describe("integrated workflow", () => {
 
 	});
 	
+	// it("uses the Command design pattern", async () => {
+	// 	const {Lyph, Border} = module.classes;
+	//
+	// 	let lyph = Lyph.new({
+	// 		name: "Lyph"
+	// 	});
+	//
+	//
+	//
+	//
+	// });
+	
 });

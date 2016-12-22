@@ -151,3 +151,9 @@ export function constraint(constraint, message) {
 		throw new Error('Constraint Failure: ' + (message || '(no message)'));
 	}
 }
+
+export function repeat(count, str) {
+	let result = '';
+	for (let i = 0; i < count; ++i) { result += str }
+	return result;
+}

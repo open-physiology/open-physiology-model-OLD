@@ -5,11 +5,6 @@ import typed     from './typed';
 import groups    from './groups';
 import lyphs     from './lyphs';
 
-
-// TODO: remove this file when we've switched to canonicalTrees module
-console.warn('Natallia: Note that the canonicalTrees module is now available. Give me a call on how to switch.');
-
-
 export default TypedModule.create('canonicalTrees', [
 	resources, typed, groups, lyphs
 ], (M, {

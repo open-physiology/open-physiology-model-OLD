@@ -83,16 +83,16 @@ export default TypedModule.create('lyphs', [
 		},
 		
 		behavior: {
-			new(change) {
-				let {initialValues = {}, options = {}} = change;
+			new(command) {
+				let {initialValues = {}, options = {}} = command;
 				initialValues = { ...initialValues };
 				initialValues::defaults({
 					longitudinalBorders: [],
 					radialBorders:       [],
 					axis:              null
 				});
-				// TODO: create a new Change for the border,
-				// TODO: caused by / dependent on this change
+				// TODO: create a new Command for the border,
+				// TODO: caused by / dependent on this command
 				if (options.createAxis) {
 					const axis = Border.new();
 					initialValues::assign({ axis });

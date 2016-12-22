@@ -21,9 +21,9 @@ import {constraint} from "../util/misc";
 
 Field[$$registerFieldClass](class PropertyField extends Field {
 	
-	//////////////////
-	// Change class //
-	//////////////////
+	///////////////////
+	// Command class //
+	///////////////////
 	
 	
 	

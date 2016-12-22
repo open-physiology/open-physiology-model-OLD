@@ -28,7 +28,7 @@ export const afterEach  = mocha.afterEach  || (global || window).afterEach;
 export const expect = chai.expect;
 
 /* special function for regression tests */
-export function regression(metaOrDesc, descOrFn, optFn) {
+function regression_(itFn, metaOrDesc, descOrFn, optFn) {
 	let issue, date, description, fn;
 	if (metaOrDesc::isPlainObject()) {
 		[{issue, date}, description, fn   ] =
@@ -37,9 +37,18 @@ export function regression(metaOrDesc, descOrFn, optFn) {
 		[description, fn      ] =
 		[metaOrDesc , descOrFn];
 	}
-	it(`(regression${
+	return itFn(`(regression${
 		issue ? `: issue #${issue}` : date ? `: ${date}` : ''
 	})${
 		description ? ` ${description}` : ''
 	}`, fn);
 }
+export function regression(metaOrDesc, descOrFn, optFn) {
+	return regression_(it, metaOrDesc, descOrFn, optFn);
+}
+regression.skip = function skip(metaOrDesc, descOrFn, optFn) {
+	return regression_(::it.skip, metaOrDesc, descOrFn, optFn);
+};
+regression.only = function only(metaOrDesc, descOrFn, optFn) {
+	return regression_(::it.only, metaOrDesc, descOrFn, optFn);
+};
