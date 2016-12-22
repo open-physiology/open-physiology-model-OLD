@@ -78,14 +78,6 @@ export default class Module {
 	name    : string;
 	Command : Class;
 	Entity  : Class;
-	
-	OBJECT(config) {
-		return mapOptionalArray(config, (conf) => {
-			this.basicNormalization(conf);
-			this.register(conf);
-			return conf;
-		});
-	}
 
 	RESOURCE(config) {
 		return mapOptionalArray(config, (conf) => {
