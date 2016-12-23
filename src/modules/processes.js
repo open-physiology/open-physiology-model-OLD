@@ -41,29 +41,31 @@ export default TypedModule.create('processes', [
 	});/////////////////////////////////////////////////////////////////////////
 	
 	
-	const [FlowsTo] = M.RELATIONSHIP([{
+	const IsSourceFor = M.RELATIONSHIP({
 		
-		name: 'FlowsTo',
+		name: 'IsSourceFor',
 		
 		extends: PullsIntoTypeDefinition,
 		
-		singular: "flows to",
+		singular: "is source for",
 		
 		1: [Node,    '0..*', {                key: 'outgoingProcesses' }],
 		2: [Process, '0..1', { anchors: true, key: 'source'            }],
 		
-	}, {
+	});
+	
+	const HasTarget = M.RELATIONSHIP({
 		
-		name: 'FlowsTo',
+		name: 'HasTarget',
 		
 		extends: PullsIntoTypeDefinition,
 		
-		singular: "flows to",
+		singular: "has target",
 		
 		1: [Process, '0..1', { anchors: true, key: 'target'            }],
 		2: [Node,    '0..*', {                key: 'incomingProcesses' }],
 		
-	}]);
+	});
 	
 	
 	const ConveysProcess = M.RELATIONSHIP({
@@ -112,23 +114,32 @@ export default TypedModule.create('processes', [
 	});
 	
 	
-	const [HasChannel] = M.RELATIONSHIP([Process, Node].map(Class => ({
+	const HasProcessChannel = M.RELATIONSHIP({
 		
-		name: 'HasChannel',
+		name: 'HasProcessChannel',
 		
 		extends: Has,
 		
-		singular: "has channel",
+		singular: "has process-channel",
 		
-		1: [Class, '0..*', { anchors: true, key: 'channels' }],
-		2: [Class, '0..*',                                   ],
+		1: [Process, '0..*', { anchors: true, key: 'channels' }],
+		2: [Process, '0..*',                                   ],
 		
-		// TODO: make a class for the transitional closure
-		//     : of a relationship, which can be used to
-		//     : manually specify part-hood without excluding
-		//     : the possibility of parts being 'inbetween'.
+	});
+	
+	
+	const HasNodeChannel = M.RELATIONSHIP({
 		
-	})));
+		name: 'HasNodeChannel',
+		
+		extends: Has,
+		
+		singular: "has node-channel",
+		
+		1: [Node, '0..*', { anchors: true, key: 'channels' }],
+		2: [Node, '0..*',                                   ],
+		
+	});
 	
 	
 });

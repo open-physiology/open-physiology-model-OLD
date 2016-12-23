@@ -361,31 +361,47 @@ export default TypedModule.create('visualisations', [
 	//// Model - Artefact Relationships ////
 	////////////////////////////////////////
 	
-	const [PresentsModel] = M.RELATIONSHIP([
-		[Artefact,             Template   ],
-		[MaterialGlyph,        Material   ],
-		[LyphArtefact,         Lyph       ],
-		[LyphCanvas,           Lyph       ], // TODO: Tests fail if these two
-		[LyphRectangle,        Lyph       ], //     : lines are left out.
-		[BorderLine,           Border     ],
-		[NodeGlyph,            Node       ],
-		[ProcessEdge,          Process    ],
-		[MeasurableGlyph,      Measurable ],
-		[CausalityArrow,       Causality  ],
-		[CoalescenceRectangle, Coalescence],
-	].map(([ArtefactClass, ModelClass]) => ({
+	const PresentsModel = M.RELATIONSHIP({
 		
 		name: 'PresentsModel',
+		
+		abstract: true,
 		
 		extends: IsRelatedTo,
 		
 		singular: "presents model",
 		
-		1: [ArtefactClass, '1..1', { anchors: true, key: 'model' }],
-		2: [ModelClass,    '0..*',                                ],
+		1: [Artefact, '1..1', { anchors: true, key: 'model' }],
+		2: [Template, '0..*',                                ],
 		
-	})));
+	});
 	
+	
+	for (let [ArtefactClass,        ModelClass ] of [
+		     [MaterialGlyph,        Material   ],
+		     [LyphArtefact,         Lyph       ],
+		     [LyphCanvas,           Lyph       ], // TODO: Tests fail if these two
+		     [LyphRectangle,        Lyph       ], //       lines are left out.
+		     [BorderLine,           Border     ],
+		     [NodeGlyph,            Node       ],
+		     [ProcessEdge,          Process    ],
+		     [MeasurableGlyph,      Measurable ],
+		     [CausalityArrow,       Causality  ],
+		     [CoalescenceRectangle, Coalescence],
+	]) {
+		M.RELATIONSHIP({
+			
+			name: `Presents${ArtefactClass.name}Model`,
+			
+			extends: PresentsModel,
+			
+			singular: `presents ${ArtefactClass.singular}-model`,
+			
+			1: [ArtefactClass, '1..1', { anchors: true, key: 'model' }],
+			2: [ModelClass,    '0..*',                                ],
+			
+		});
+	}
 	
 });
 

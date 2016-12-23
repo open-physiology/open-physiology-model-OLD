@@ -80,32 +80,28 @@ export default class Module {
 	Entity  : Class;
 
 	RESOURCE(config) {
-		return mapOptionalArray(config, (conf) => {
-			conf.isResource = true;
-			this.basicNormalization                      (conf                         );
-			let constructor = this.mergeSameNameResources(this.Entity.createClass(conf));
-			this.register                                (constructor                  );
-			this.mergeSuperclassFields                   (constructor                  );
-			// jsonSchemaConfig                          (constructor                  ); // TODO
-			Field.augmentClass                           (constructor                  );
-			return constructor;
-		});
+		config.isResource = true;
+		this.basicNormalization                      (config                         );
+		let constructor = this.mergeSameNameResources(this.Entity.createClass(config));
+		this.register                                (constructor                    );
+		this.mergeSuperclassFields                   (constructor                    );
+		// jsonSchemaConfig                          (constructor                    ); // TODO
+		Field.augmentClass                           (constructor                    );
+		return constructor;
 	}
 
 	RELATIONSHIP(config) {
-		return mapOptionalArray(config, (conf) => {
-			conf.isRelationship = true;
-			this.basicNormalization                      (conf);
-			let constructor = this.Entity.createClass    (conf);
-			this.normalizeRelationshipSides              (constructor);
-			constructor = this.mergeSameNameRelationships(constructor);
-			this.register                                (constructor);
-			this.mergeSuperclassFields                   (constructor);
-			// jsonSchemaConfig                          (constructor); // TODO
-			this.resolveRelationshipDomains              (constructor);
-			Field.augmentClass                           (constructor);
-			return constructor;
-		});
+		config.isRelationship = true;
+		this.basicNormalization                      (config);
+		let constructor = this.Entity.createClass    (config);
+		this.normalizeRelationshipSides              (constructor);
+		constructor = this.mergeSameNameRelationships(constructor);
+		this.register                                (constructor);
+		this.mergeSuperclassFields                   (constructor);
+		// jsonSchemaConfig                          (constructor); // TODO
+		this.resolveRelationshipDomains              (constructor);
+		Field.augmentClass                           (constructor);
+		return constructor;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////

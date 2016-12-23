@@ -2626,37 +2626,29 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(Module, [{
 			key: 'RESOURCE',
 			value: function RESOURCE(config) {
-				var _this = this;
-	
-				return (0, _misc.mapOptionalArray)(config, function (conf) {
-					conf.isResource = true;
-					_this.basicNormalization(conf);
-					var constructor = _this.mergeSameNameResources(_this.Entity.createClass(conf));
-					_this.register(constructor);
-					_this.mergeSuperclassFields(constructor);
-					// jsonSchemaConfig                          (constructor                  ); // TODO
-					_fields.Field.augmentClass(constructor);
-					return constructor;
-				});
+				config.isResource = true;
+				this.basicNormalization(config);
+				var constructor = this.mergeSameNameResources(this.Entity.createClass(config));
+				this.register(constructor);
+				this.mergeSuperclassFields(constructor);
+				// jsonSchemaConfig                          (constructor                    ); // TODO
+				_fields.Field.augmentClass(constructor);
+				return constructor;
 			}
 		}, {
 			key: 'RELATIONSHIP',
 			value: function RELATIONSHIP(config) {
-				var _this2 = this;
-	
-				return (0, _misc.mapOptionalArray)(config, function (conf) {
-					conf.isRelationship = true;
-					_this2.basicNormalization(conf);
-					var constructor = _this2.Entity.createClass(conf);
-					_this2.normalizeRelationshipSides(constructor);
-					constructor = _this2.mergeSameNameRelationships(constructor);
-					_this2.register(constructor);
-					_this2.mergeSuperclassFields(constructor);
-					// jsonSchemaConfig                          (constructor); // TODO
-					_this2.resolveRelationshipDomains(constructor);
-					_fields.Field.augmentClass(constructor);
-					return constructor;
-				});
+				config.isRelationship = true;
+				this.basicNormalization(config);
+				var constructor = this.Entity.createClass(config);
+				this.normalizeRelationshipSides(constructor);
+				constructor = this.mergeSameNameRelationships(constructor);
+				this.register(constructor);
+				this.mergeSuperclassFields(constructor);
+				// jsonSchemaConfig                          (constructor); // TODO
+				this.resolveRelationshipDomains(constructor);
+				_fields.Field.augmentClass(constructor);
+				return constructor;
 			}
 	
 			////////////////////////////////////////////////////////////////////////////
@@ -3292,7 +3284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}], [{
 			key: 'create',
 			value: function create(name, dependencies, fn) {
-				var _this3 = this;
+				var _this = this;
 	
 				return function () {
 					var memory = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -3306,7 +3298,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					});
 					if (!memory.modules.has(name)) {
 						/* creating module */
-						var module = new _this3();
+						var module = new _this();
 						_misc.definePropertiesByValue.call(module, { name: name, classes: memory.classes, commit: memory.commit });
 						_misc.definePropertiesByValue.call(module, { Command: memory.Command || (0, _Command2.default)(module) });
 						_misc.definePropertiesByValue.call(module, { Entity: memory.Entity || (0, _Entity2.default)(module) });
@@ -5339,8 +5331,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _TypedModule = __webpack_require__(31);
@@ -5457,31 +5447,31 @@ return /******/ (function(modules) { // webpackBootstrap
 		}); /////////////////////////////////////////////////////////////////////////
 	
 	
-		var _M$RELATIONSHIP = M.RELATIONSHIP([{
+		var IsCauseOf = M.RELATIONSHIP({
 	
-			name: 'Causes',
+			name: 'IsCauseOf',
 	
 			extends: PullsIntoTypeDefinition,
 	
-			singular: "causes",
+			singular: "is cause of",
 	
 			1: [Measurable, '0..*', { key: 'effects' }],
 			2: [Causality, '1..1', { anchors: true, key: 'cause' }]
 	
-		}, {
+		});
 	
-			name: 'Causes',
+		var HasEffect = M.RELATIONSHIP({
+	
+			name: 'HasEffect',
 	
 			extends: PullsIntoTypeDefinition,
+	
+			singular: "has effect",
 	
 			1: [Causality, '1..1', { anchors: true, key: 'effect' }],
 			2: [Measurable, '0..*', { key: 'causes' }]
 	
-		}]);
-	
-		var _M$RELATIONSHIP2 = _slicedToArray(_M$RELATIONSHIP, 1);
-	
-		var Causes = _M$RELATIONSHIP2[0];
+		});
 	});
 
 /***/ },
@@ -5493,8 +5483,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
@@ -5554,34 +5542,31 @@ return /******/ (function(modules) { // webpackBootstrap
 		}); /////////////////////////////////////////////////////////////////////////
 	
 	
-		var _M$RELATIONSHIP = M.RELATIONSHIP([{
+		var IsSourceFor = M.RELATIONSHIP({
 	
-			name: 'FlowsTo',
+			name: 'IsSourceFor',
 	
 			extends: PullsIntoTypeDefinition,
 	
-			singular: "flows to",
+			singular: "is source for",
 	
 			1: [Node, '0..*', { key: 'outgoingProcesses' }],
 			2: [Process, '0..1', { anchors: true, key: 'source' }]
 	
-		}, {
+		});
 	
-			name: 'FlowsTo',
+		var HasTarget = M.RELATIONSHIP({
+	
+			name: 'HasTarget',
 	
 			extends: PullsIntoTypeDefinition,
 	
-			singular: "flows to",
+			singular: "has target",
 	
 			1: [Process, '0..1', { anchors: true, key: 'target' }],
 			2: [Node, '0..*', { key: 'incomingProcesses' }]
 	
-		}]);
-	
-		var _M$RELATIONSHIP2 = _slicedToArray(_M$RELATIONSHIP, 1);
-	
-		var FlowsTo = _M$RELATIONSHIP2[0];
-	
+		});
 	
 		var ConveysProcess = M.RELATIONSHIP({
 	
@@ -5622,24 +5607,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		});
 	
-		var _M$RELATIONSHIP3 = M.RELATIONSHIP([Process, Node].map(function (Class) {
-			return {
+		var HasProcessChannel = M.RELATIONSHIP({
 	
-				name: 'HasChannel',
+			name: 'HasProcessChannel',
 	
-				extends: Has,
+			extends: Has,
 	
-				singular: "has channel",
+			singular: "has process-channel",
 	
-				1: [Class, '0..*', { anchors: true, key: 'channels' }],
-				2: [Class, '0..*']
+			1: [Process, '0..*', { anchors: true, key: 'channels' }],
+			2: [Process, '0..*']
 	
-			};
-		}));
+		});
 	
-		var _M$RELATIONSHIP4 = _slicedToArray(_M$RELATIONSHIP3, 1);
+		var HasNodeChannel = M.RELATIONSHIP({
 	
-		var HasChannel = _M$RELATIONSHIP4[0];
+			name: 'HasNodeChannel',
+	
+			extends: Has,
+	
+			singular: "has node-channel",
+	
+			1: [Node, '0..*', { anchors: true, key: 'channels' }],
+			2: [Node, '0..*']
+	
+		});
 	});
 
 /***/ },
@@ -16153,30 +16145,43 @@ return /******/ (function(modules) { // webpackBootstrap
 		//// Model - Artefact Relationships ////
 		////////////////////////////////////////
 	
-		var _M$RELATIONSHIP = M.RELATIONSHIP([[Artefact, Template], [MaterialGlyph, Material], [LyphArtefact, Lyph], [LyphCanvas, Lyph], // TODO: Tests fail if these two
-		[LyphRectangle, Lyph], //     : lines are left out.
-		[BorderLine, Border], [NodeGlyph, Node], [ProcessEdge, Process], [MeasurableGlyph, Measurable], [CausalityArrow, Causality], [CoalescenceRectangle, Coalescence]].map(function (_ref2) {
-			var _ref3 = _slicedToArray(_ref2, 2);
+		var PresentsModel = M.RELATIONSHIP({
 	
-			var ArtefactClass = _ref3[0];
-			var ModelClass = _ref3[1];
-			return {
+			name: 'PresentsModel',
 	
-				name: 'PresentsModel',
+			abstract: true,
 	
-				extends: IsRelatedTo,
+			extends: IsRelatedTo,
 	
-				singular: "presents model",
+			singular: "presents model",
+	
+			1: [Artefact, '1..1', { anchors: true, key: 'model' }],
+			2: [Template, '0..*']
+	
+		});
+	
+		var _arr = [[MaterialGlyph, Material], [LyphArtefact, Lyph], [LyphCanvas, Lyph], // TODO: Tests fail if these two
+		[LyphRectangle, Lyph], //       lines are left out.
+		[BorderLine, Border], [NodeGlyph, Node], [ProcessEdge, Process], [MeasurableGlyph, Measurable], [CausalityArrow, Causality], [CoalescenceRectangle, Coalescence]];
+		for (var _i = 0; _i < _arr.length; _i++) {
+			var _arr$_i = _slicedToArray(_arr[_i], 2);
+	
+			var ArtefactClass = _arr$_i[0];
+			var ModelClass = _arr$_i[1];
+	
+			M.RELATIONSHIP({
+	
+				name: 'Presents' + ArtefactClass.name + 'Model',
+	
+				extends: PresentsModel,
+	
+				singular: 'presents ' + ArtefactClass.singular + '-model',
 	
 				1: [ArtefactClass, '1..1', { anchors: true, key: 'model' }],
 				2: [ModelClass, '0..*']
 	
-			};
-		}));
-	
-		var _M$RELATIONSHIP2 = _slicedToArray(_M$RELATIONSHIP, 1);
-	
-		var PresentsModel = _M$RELATIONSHIP2[0];
+			});
+		}
 	});
 
 /***/ },

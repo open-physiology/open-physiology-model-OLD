@@ -14,11 +14,13 @@ describe("'processes' Module", () => {
 			'Process'
 		);
 		expect(module.classes).to.contain.relationships(
-			'FlowsTo',
+			'IsSourceFor',
+			'HasTarget',
 			'ConveysProcess',
 			'TransportsMaterial',
 			'HasSegment',
-			'HasChannel'
+			'HasProcessChannel',
+			'HasNodeChannel'
 		);
 
 	});

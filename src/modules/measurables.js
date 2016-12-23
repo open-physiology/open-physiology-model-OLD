@@ -98,27 +98,31 @@ export default TypedModule.create('measurables', [
 	});/////////////////////////////////////////////////////////////////////////
 	
 	
-	const [Causes] = M.RELATIONSHIP([{
+	const IsCauseOf = M.RELATIONSHIP({
 		
-		name: 'Causes',
+		name: 'IsCauseOf',
 		
 		extends: PullsIntoTypeDefinition,
 		
-		singular: "causes",
+		singular: "is cause of",
 		
 		1: [Measurable, '0..*', {                key: 'effects' }],
 		2: [Causality,  '1..1', { anchors: true, key: 'cause'   }],
 		
-	}, {
+	});
+	
+	const HasEffect = M.RELATIONSHIP({
 		
-		name: 'Causes',
+		name: 'HasEffect',
 		
 		extends: PullsIntoTypeDefinition,
+		
+		singular: "has effect",
 		
 		1: [Causality,  '1..1', { anchors: true, key: 'effect' }],
 		2: [Measurable, '0..*', {                key: 'causes' }],
 		
-	}]);
+	});
 
 
 });

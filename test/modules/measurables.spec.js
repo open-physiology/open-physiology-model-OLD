@@ -16,7 +16,8 @@ describe("'measurables' Module", () => {
 		expect(module.classes).to.contain.relationships(
 			'MeasuresMaterial',
 			'HasMeasurable',
-			'Causes'
+			'IsCauseOf',
+			'HasEffect'
 		);
 
 	});
