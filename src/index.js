@@ -8,9 +8,6 @@ import canonicalTrees from './modules/canonicalTrees';
 import research       from './modules/research';
 import visualisations from './modules/visualisations';
 
-import omegaTrees     from './modules/omegaTrees';
-// TODO: ^ remove when we've switched to canonicalTrees
-
 import Module from './Module';
 
 export default Module.create('all', [
@@ -22,13 +19,5 @@ export default Module.create('all', [
 	processes,
 	research,
 	visualisations,
-	
-	omegaTrees, // TODO: <- remove when we've switched to canonical trees
 	canonicalTrees,
-    
-    // FIXME: If omegaTrees is the last module in the list,
-    // FIXME: Lyphs won't have a treeParent field. Likely
-    // FIXME: because OmegaTreePart has `extendedBy: [Lyph]`,
-    // FIXME: and `treeParent` is introduced on IT, rather than
-    // FIXME: on Lyph directly.
 ]);

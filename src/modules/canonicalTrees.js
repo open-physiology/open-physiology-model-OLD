@@ -34,18 +34,20 @@ export default TypedModule.create('canonicalTrees', [
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
-	const [FlowsTo] = M.RELATIONSHIP([{
+	const HasBranch = M.RELATIONSHIP({
 		
-		name: 'BranchesTo',
+		name: 'HasBranch',
 		
 		extends: PullsIntoTypeDefinition,
 		
-		singular: "branches to",
+		singular: "has branch",
 		
 		1: [CanonicalTree,       '0..*', {                key: 'childBranches' }],
 		2: [CanonicalTreeBranch, '1..1', { anchors: true, key: 'parentTree'    }],
 		
-	}, {
+	});
+	
+	const BranchesTo = M.RELATIONSHIP({
 		
 		name: 'BranchesTo',
 		
@@ -56,7 +58,7 @@ export default TypedModule.create('canonicalTrees', [
 		1: [CanonicalTreeBranch, '1..1', { anchors: true, key: 'childTree'    }],
 		2: [CanonicalTree,       '0..1', {                key: 'parentBranch' }],
 		
-	}]);
+	});
 	
 	const IsConveyedBy = M.RELATIONSHIP({
 		

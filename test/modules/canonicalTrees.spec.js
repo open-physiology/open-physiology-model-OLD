@@ -15,6 +15,7 @@ describe("'canonicalTrees' Module", () => {
 			'CanonicalTreeBranch'
 		);
 		expect(module.classes).to.contain.relationships(
+			'HasBranch',
 			'BranchesTo',
 			'IsConveyedBy'
 		);
