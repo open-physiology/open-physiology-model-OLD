@@ -13,20 +13,20 @@ describe("regression tests", () => {
     beforeEach(() => { module = moduleFactory() });
     
 	regression("HasType[2] set to null?", async () => {
-   		const {OmegaTree, Lyph, HasMaterial} = module.classes;
+   		const {Group, Lyph, HasMaterial} = module.classes;
    		
    		let lyph1 = Lyph.new();
    		let lyph2 = Lyph.new();
-   		let omegaTree = OmegaTree.new();
+   		let group = Group.new();
    
-   		omegaTree.elements.add(lyph1);
-   		omegaTree.elements.add(lyph2);
+   		group.elements.add(lyph1);
+   		group.elements.add(lyph2);
    		
    		await lyph1.commit();
    		await lyph2.commit();
-   		await omegaTree.commit();
+   		await group.commit();
    
-   		expect([...omegaTree.elements]).to.eql([lyph1, lyph2]);
+   		expect([...group.elements]).to.eql([lyph1, lyph2]);
    		
    	});
    
@@ -35,47 +35,6 @@ describe("regression tests", () => {
    		let t1 = Lyph.new({ name: "Renal hilum" });
    		await t1.commit();
    		// await expect(t1.commit()).to.not.be.rejected;
-   	});
-   
-   	regression("missing 'treeParent' field in Lyph", async () => {
-   		const {Lyph, OmegaTree} = module.classes;
-   		let lyph = Lyph.new();
-   
-   		expect(lyph.fields).to.have.a.property('treeParent');
-   		expect(lyph)       .to.have.a.property('treeParent');
-   
-   		let tree = OmegaTree.new();
-   		lyph.treeParent = tree;
-   
-   		expect([...tree.treeChildren]).to.include(lyph);
-	    
-   		// TODO: remove this test after we've switched to canonicalTree module
-   	});
-   
-   	regression("no property called 'root'", async () => {
-   		const {OmegaTree} = module.classes;
-   
-   		let tree = OmegaTree.new({ name: "Tree" });
-   
-   		expect(()=>tree.p('root')).not.to.throw();
-   	});
-   
-   	regression("no property '...' exists", async () => {
-   		const {OmegaTree} = module.classes;
-   		
-   		let treeP = OmegaTree.p('all')
-   			::filter(s => s.size > 0)
-   			::take(1)
-   			::map(s => [...s][0])
-   			::toPromise();
-   		
-   		let tree = OmegaTree.new();
-   		
-   		let treeFromP = await treeP;
-   			
-   		expect(treeFromP).to.be.instanceOf(OmegaTree);
-   		
-   		expect(() => treeFromP.p('root')).not.to.throw();
    	});
    	
    	regression("trying to instantiate abstract class Has", async () => {
