@@ -15564,7 +15564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			name: 'CanonicalTree',
 	
-			extends: Resource,
+			extends: Template,
 	
 			singular: "canonical tree"
 	
@@ -15574,7 +15574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			name: 'CanonicalTreeBranch',
 	
-			extends: Resource,
+			extends: Template,
 	
 			singular: "canonical tree branch",
 	

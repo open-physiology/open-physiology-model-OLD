@@ -16,7 +16,7 @@ export default TypedModule.create('canonicalTrees', [
 		
 		name: 'CanonicalTree',
 		
-		extends: Resource,
+		extends: Template,
 		
 		singular: "canonical tree",
 		
@@ -26,7 +26,7 @@ export default TypedModule.create('canonicalTrees', [
 		
 		name: 'CanonicalTreeBranch',
 		
-		extends: Resource,
+		extends: Template,
 		
 		singular: "canonical tree branch",
 		
