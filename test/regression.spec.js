@@ -1,5 +1,6 @@
 import {regression, describe, expect} from './test.helper';
 import moduleFactory from '../src/index';
+import {simpleMockHandlers} from "./mock-handlers.helper";
 
 import {map} from 'rxjs/operator/map';
 import {take} from 'rxjs/operator/take';
@@ -9,8 +10,11 @@ import {filter} from '../src/util/bound-hybrid-functions';
 
 describe("regression tests", () => {
 
-    let module;
-    beforeEach(() => { module = moduleFactory() });
+	let module, backend;
+	beforeEach(() => {
+		backend = simpleMockHandlers();
+		module  = moduleFactory(backend.frontendInterface);
+	});
     
 	regression("HasType[2] set to null?", async () => {
    		const {Group, Lyph, HasMaterial} = module.classes;
@@ -113,8 +117,7 @@ describe("regression tests", () => {
 		
 	});
     
-	// TODO: fix this bug, if it isn't fixed after the refactoring
-    regression.skip("commit causality resource", async () => {
+    regression("commit causality resource", async () => {
         const {Measurable, Causality} = module.classes;
 
         let measurable1 = Measurable.new({ name: "Concentration of water" });

@@ -42,7 +42,7 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		if (cls.prototype.hasOwnProperty(key)) { return }
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
-			...(readonly ? undefined : {
+			...(readonly ? {} : {
 				set(val) { this.fields[key].set(val)}
 			}),
 			enumerable:   true,

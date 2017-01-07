@@ -21,6 +21,7 @@ import {
 	$$desc,
 	$$initSet,
 	$$entriesIn,
+	$$destruct
 } from './symbols';
 import {constraint} from "../util/misc";
 
@@ -40,9 +41,7 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
 			...(readonly ? {} : {
-				set(val) {
-					this.fields[key].set(val)
-				}
+				set(val) { this.fields[key].set(val) }
 			}),
 			enumerable:   true,
 			configurable: false
@@ -94,15 +93,26 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 			.subscribe((scValue) => {
 				const relValue = owner.fields[desc.keyInResource].get();
 				if (relValue) {
-					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null);
+					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null, { createEditCommand: false });
 				} else if (scValue && !desc.relationshipClass.abstract) {
 					// TODO: Is the abstractness test above really the best way?
-					owner.fields[desc.keyInResource].set(desc.relationshipClass.new({
+					const rel = desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: scValue
-					}));
+					});
+					owner.fields[desc.keyInResource].set(rel, { createEditCommand: false });
 				}
 			});
+	}
+	
+	[$$destruct]() {
+		this.set(null, {
+			ignoreReadonly:   true,
+			ignoreValidation: true,
+			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
+			createEditCommand:  false
+		});
+		super[$$destruct]();
 	}
 		
 	validate(val, stages = []) {

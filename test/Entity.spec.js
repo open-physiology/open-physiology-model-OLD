@@ -1,10 +1,14 @@
-import {xdescribe, describe, it, expect} from './test.helper';
+import {describe, it, expect} from './test.helper';
 import moduleFactory from '../src/index';
+import {simpleMockHandlers}   from "./mock-handlers.helper";
 
 describe("Entity classes", () => {
 	
-	let module;
-	beforeEach(() => { module = moduleFactory() });
+	let module, backend;
+	beforeEach(() => {
+		backend = simpleMockHandlers();
+		module  = moduleFactory(backend.frontendInterface);
+	});
 	
 	it("can list its possible subclasses", () => {
 		const {Resource, ExternalResource, Type, Lyph} = module.classes;

@@ -7,6 +7,7 @@ import pick        from 'lodash-bound/pick';
 import isFunction  from 'lodash-bound/isFunction';
 import isUndefined from 'lodash-bound/isUndefined';
 import values      from 'lodash-bound/values';
+import entries     from 'lodash-bound/entries';
 
 import {defineProperties, defineProperty} from 'bound-native-methods';
 
@@ -22,10 +23,11 @@ import {
 	$$key,
 	$$desc,
 	$$value,
-	$$pristine,
+	// $$pristine, // TODO: remove all 'pristine' related stuff from the field classes
 	$$initSet,
 	$$entriesIn,
-	$$initialized
+	$$initialized,
+	$$destruct
 } from './symbols';
 import {constraint} from "../util/misc";
 
@@ -102,6 +104,12 @@ export class Field extends ValueTracker {
 		constructingOwner.complete();
 	}
 	
+	static destructEntity(owner) {
+		for (let field of owner.fields::values()) {
+			field[$$destruct]();
+		}
+	}
+	
 	static isEqual(a, b) { return a === b }
 	
 	
@@ -112,7 +120,7 @@ export class Field extends ValueTracker {
 	@event() commitEvent;
 	@event() rollbackEvent;
 	
-	@property({ initial: true, readonly: true }) isPristine;
+	// @property({ initial: true, readonly: true }) isPristine;// TODO: remove all 'pristine' related stuff from the field classes
 	@property() value;
 	
 	
@@ -133,27 +141,40 @@ export class Field extends ValueTracker {
 		this[$$desc]  = desc;
 		if (setValueThroughSignal) {
 			// allow signal-push to change value
-			this.p('value').subscribe(::this.set);
+			this.p('value').subscribe((v) => { this.set(v, { createEditCommand: false }) });
 		}
-		this.p('value')
-			::map(v => this.constructor.isEqual(v, this[$$pristine]))
-			.subscribe( this.pSubject('isPristine') );
+		// this.p('value') // TODO: remove all 'pristine' related stuff from the field classes
+		// 	::map(v => this.constructor.isEqual(v, this[$$pristine]))
+		// 	.subscribe( this.pSubject('isPristine') );
 	}
 	
 	//noinspection JSDuplicatedDeclaration // (to suppress warning due to Webstorm bug)
 	get() { return this[$$value] }
 	
-	set(val, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
-		if (!this.constructor.isEqual(this[$$value], val)) {
+	set(newValue, options = {}) {
+		const { createEditCommand = true } = options;
+		if (createEditCommand) {
+			
+			this[$$owner].edit({ [this[$$key]]: newValue }, options);
+			
+		} else if (!this.constructor.isEqual(this[$$value], newValue)) {
+			
+			const { ignoreReadonly = false, ignoreValidation = false, updatePristine = false, createEditCommand = true } = options;
+			
 			constraint(ignoreReadonly || !this[$$desc].readonly, humanMsg`
 				Tried to set the readonly field
 				'${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
-			if (!ignoreValidation) { this.validate(val, ['set']) }
-			if (updatePristine)    { this[$$pristine] = val      }
-			this[$$value] = val;
-			this.pSubject('value').next(val);
+			if (!ignoreValidation) { this.validate(newValue, ['set']) }
+			// if (updatePristine) { this[$$pristine] = newValue } // TODO: remove all 'pristine' related stuff from the field classes
+			this[$$value] = newValue;
+			this.pSubject('value').next(newValue);
+			
 		}
+	}
+	
+	[$$destruct]() {
+		// to be implemented in subclasses
 	}
 	
 	[$$initSet](...alternatives) {
@@ -167,7 +188,8 @@ export class Field extends ValueTracker {
 				this.set(val, {
 					ignoreReadonly:   true,
 					ignoreValidation: true,
-					updatePristine:   true
+					// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
+					createEditCommand:  false
 				});
 				return;
 			}
@@ -187,16 +209,16 @@ export class Field extends ValueTracker {
 	
 	validate(val, stages = []) {}
 	
-	async commit() {
-		this.validate(this[$$value], ['commit']);
-		this[$$pristine] = this[$$value];
-		this.pSubject('isPristine').next(true);
-	}
-	
-	rollback() {
-		this.set(this[$$pristine]);
-		this.pSubject('isPristine').next(true);
-	}
+	// async commit() {
+	// 	this.validate(this[$$value], ['commit']);
+	// 	this[$$pristine] = this[$$value];
+	// 	this.pSubject('isPristine').next(true);
+	// }
+	//
+	// rollback() {
+	// 	this.set(this[$$pristine]);
+	// 	this.pSubject('isPristine').next(true);
+	// }
 	
 }
 
@@ -220,6 +242,7 @@ export class RelField extends Field {
 		/* manage the 'possibleValues' property */
 		desc.codomain.resourceClass.p('all')
 		    .subscribe(this.pSubject('possibleValues'));
+		// TODO: use smarter filtering for the possible values
 	}
 	
 }

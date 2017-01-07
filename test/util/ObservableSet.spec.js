@@ -1,4 +1,4 @@
-import {xdescribe, describe, it, expect, beforeEach} from '../test.helper';
+import {describe, it, expect, beforeEach} from '../test.helper';
 
 import ObservableSet, {setEquals} from '../../src/util/ObservableSet';
 

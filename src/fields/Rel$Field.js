@@ -25,8 +25,9 @@ import {
 	$$key,
 	$$desc,
 	$$value,
-	$$pristine,
-	$$entriesIn
+	// $$pristine,// TODO: remove all 'pristine' related stuff from the field classes
+	$$entriesIn,
+	$$destruct
 } from './symbols';
 
 
@@ -45,7 +46,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		if (cls.prototype.hasOwnProperty(key)) { return }
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
-			...(readonly ? undefined : {
+			...(readonly ? {} : {
 				set(val) { this.fields[key].set(val)}
 			}),
 			enumerable:   true,
@@ -75,11 +76,10 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, constructingOwner, related } = options;
 		
-		this::defineProperty($$pristine, { value: new Set           });
+		// this::defineProperty($$pristine, { value: new Set           });// TODO: remove all 'pristine' related stuff from the field classes
 		this::defineProperty($$value,    { value: new ObservableSet });
 		
 		/* mirror stuff that happens in sub-fields */
-		
 		constructingOwner.subscribe({complete: () => {
 			for (let subCls of desc.relationshipClass.extendedBy) {
 				const subFieldKey = subCls.keyInResource[desc.keyInRelationship];
@@ -103,10 +103,10 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		/* update relationships that are added or deleted here */
 		this[$$value].e('add')
 			::waitUntilConstructed()
-			.subscribe((rel) => { rel.fields[desc.keyInRelationship].set(this[$$owner]) });
-		this[$$value].e('delete')
-			::waitUntilConstructed()
-			.subscribe((rel) => { rel.delete() });
+			.subscribe((rel) => { rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) });
+		// this[$$value].e('delete') // TODO: note that this was commented because rel.delete() has a new meaning since the old days (
+		// 	::waitUntilConstructed()
+		// 	.subscribe((rel) => { rel.delete() });
 		
 		/* decouple a relationship when it decouples from this resource */
 		this[$$value].e('add')
@@ -120,11 +120,11 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		if (initialValue && initialValue[Symbol.iterator]) {
 			for (let rel of initialValue) {
 				if (!rel.fields[desc.keyInRelationship].get()) {
-					rel.fields[desc.keyInRelationship].set(this);
+					rel.fields[desc.keyInRelationship].set(this, { createEditCommand: false });
 				}
 				assert(rel[desc.keyInRelationship] === this);
 				
-				this[$$pristine].add(rel);
+				// this[$$pristine].add(rel);// TODO: remove all 'pristine' related stuff from the field classes
 				this[$$value]   .add(rel);
 			}
 		} else if (related::get([desc.shortcutKey, 'initialValue'])) {
@@ -137,11 +137,18 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		if (desc.options.auto) {
 			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
 			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
-				const rel = desc.relationshipClass.new({
-					[desc.keyInRelationship]         : this[$$owner],
-					[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.newOrSingleton()
+				// TODO: did we need to keep .newOrSingleton() here instead of .new()?
+				// let otherEntity = desc.codomain.resourceClass.newOrSingleton();
+				let otherEntity = desc.codomain.resourceClass.new({}, {
+					commandCauses: [owner.originCommand]
 				});
-				this[$$pristine].add(rel);
+				const rel = desc.relationshipClass.new({
+					[desc.keyInRelationship]         : owner,
+					[desc.codomain.keyInRelationship]: otherEntity
+				}, {
+					commandCauses: [owner.originCommand]
+				});
+				// this[$$pristine].add(rel); // TODO: remove 'pristine' related stuff everywhere except commands
 				this[$$value]   .add(rel);
 			}
 		}
@@ -153,8 +160,18 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
 		constraint(ignoreReadonly || !this[$$desc].readonly);
 		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
-		if (updatePristine)    { copySetContent(this[$$pristine], newValue) }
+		// if (updatePristine)    { copySetContent(this[$$pristine], newValue) }// TODO: remove all 'pristine' related stuff from the field classes
 		copySetContent(this[$$value], newValue);
+	}
+		
+	[$$destruct]() {
+		this.set(new Set(), {
+			ignoreReadonly:   true,
+			ignoreValidation: true,
+			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
+			createEditCommand:  false
+		});
+		super[$$destruct]();
 	}
 	
 	validate(val, stages = []) {
@@ -183,14 +200,24 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 	}
 	
 	async commit() {
-		this.validate(this[$$value], ['commit']);
-		copySetContent(this[$$pristine], this[$$value]);
-		this.e('commit').next(this[$$value]);
+		
+		assert(false, "THIS CODE SHOULD NOT BE RUNNING ANYMORE");
+		
+		// TODO: REMOVE
+		
+		// this.validate(this[$$value], ['commit']);
+		// copySetContent(this[$$pristine], this[$$value]);
+		// this.e('commit').next(this[$$value]);
 	}
 	
 	rollback() {
-		copySetContent(this[$$value], this[$$pristine]);
-		this.e('rollback').next(this[$$value]);
+		
+		assert(false, "THIS CODE SHOULD NOT BE RUNNING ANYMORE");
+		
+		// TODO: REMOVE
+		
+		// copySetContent(this[$$value], this[$$pristine]);
+		// this.e('rollback').next(this[$$value]);
 	}
 	
 });

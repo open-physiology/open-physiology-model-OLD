@@ -1,4 +1,4 @@
-import {xdescribe, describe, it, expect, beforeEach} from '../test.helper';
+import {describe, it, expect, beforeEach} from '../test.helper';
 
 import ValueTracker, {property} from '../../src/util/ValueTracker';
 

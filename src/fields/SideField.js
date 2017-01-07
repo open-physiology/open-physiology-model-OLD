@@ -22,6 +22,7 @@ import {
 	$$desc,
 	$$initSet,
 	$$entriesIn,
+	$$destruct
 } from './symbols';
 import {constraint} from "../util/misc";
 
@@ -71,7 +72,7 @@ Field[$$registerFieldClass](class SideField extends Field {
 		this[$$initSet](
 			[initialValue::isObject() || initialValue::isNull(), initialValue                     ],
 			[desc.resourceClass.singleton,                       ::desc.resourceClass.getSingleton],
-			[desc.options.auto,                                  ::desc.resourceClass.new         ]
+			[desc.options.auto,                                  ::desc.resourceClass.new         ] // TODO: command dependencies?
 		);
 		
 		/* if one side becomes null, then so does the other, */
@@ -88,15 +89,27 @@ Field[$$registerFieldClass](class SideField extends Field {
 			::pairwise()
 			.subscribe(([prev, curr]) => {
 				if (desc.cardinality.max === 1) {
-					if (prev) { prev.fields[desc.keyInResource].set(null)          }
-					if (curr) { curr.fields[desc.keyInResource].set(this[$$owner]) }
+					if (prev) { prev.fields[desc.keyInResource].set(null,  { createEditCommand: false }) }
+					if (curr) { curr.fields[desc.keyInResource].set(owner, { createEditCommand: false }) }
 				} else {
-					if (prev) { prev.fields[desc.keyInResource].get().delete(this[$$owner]) }
-					if (curr) { curr.fields[desc.keyInResource].get().add   (this[$$owner]) }
+					if (prev) {
+						prev.fields[desc.keyInResource].get().delete(owner)
+					} // TODO: , { createEditCommand: false } ?
+					if (curr) {
+						curr.fields[desc.keyInResource].get().add   (owner)
+					}
 				}
 			});
+	}
 		
-		
+	[$$destruct]() {
+		this.set(null, {
+			ignoreReadonly:   true,
+			ignoreValidation: true,
+			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
+			createEditCommand: false
+		});
+		super[$$destruct]();
 	}
 	
 	validate(val, stages = []) {

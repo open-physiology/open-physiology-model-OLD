@@ -1,13 +1,17 @@
-import {xdescribe, describe, it, expect} from '../test.helper';
+import {describe, it, expect} from '../test.helper';
 
 import moduleFactory from '../../src/modules/lyphs';
 
 import map from 'lodash-bound/map';
+import {simpleMockHandlers} from "../mock-handlers.helper";
 
 describe("'lyphs' Module", () => {
 	
-	let module;
-	beforeEach(() => { module = moduleFactory() });
+	let module, backend;
+	beforeEach(() => {
+		backend = simpleMockHandlers();
+		module  = moduleFactory(backend.frontendInterface);
+	});
 	
 	it("exports the expected classes", () => {
 		

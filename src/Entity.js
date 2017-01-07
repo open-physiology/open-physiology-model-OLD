@@ -1,19 +1,15 @@
 import isObject    from 'lodash-bound/isObject';
 import defaults    from 'lodash-bound/defaults';
-import size        from 'lodash-bound/size';
-import keys        from 'lodash-bound/keys';
-import values      from 'lodash-bound/values';
 
-import _uniqueId   from 'lodash/uniqueId';
-
-import ObservableSet                   from './util/ObservableSet';
 import {humanMsg, definePropertiesByValue, definePropertyByValue} from './util/misc';
+import ObservableSet                   from './util/ObservableSet';
 import {Field}                         from './fields/fields';
 import ValueTracker, {event, property} from './util/ValueTracker';
 import {BehaviorSubject}               from 'rxjs/BehaviorSubject';
-import {filter}                        from 'rxjs/operator/filter';
 import {combineLatest}                 from 'rxjs/observable/combineLatest';
 import                                      'rxjs/add/operator/do';
+
+import {filter, map} from './util/bound-hybrid-functions';
 
 import {defineProperties, defineProperty, assign} from 'bound-native-methods';
 
@@ -21,27 +17,30 @@ import babelHelpers from './util/babel-helpers';
 import {constraint} from './util/misc';
 
 import command_newClassFactory    from './commands/Command_new';
-import command_loadClassFactory   from './commands/Command_load';
 import command_deleteClassFactory from './commands/Command_delete';
 import command_editClassFactory   from './commands/Command_edit';
 
-const $$committedEntitiesByHref  = Symbol('$$committedEntitiesByHref');
-const $$committedEntities        = Symbol('$$committedEntities'      );
-const $$entities                 = Symbol('$$allEntities'            );
-const $$singletonObject          = Symbol('$$singletonObject'        );
-const $$newEntitySubject         = Symbol('$$newEntitySubject'       );
-const $$deleted                  = Symbol('$$deleted'                );
-const $$entitiesSubject          = Symbol('$$allSubject'             );
-const $$committedEntitiesSubject = Symbol('$$allCommittedSubject'    );
-const $$set                      = Symbol('$$set'                    );
+import {
+	$$committedEntitiesByHref,
+	$$committedEntities,
+	$$entities
+} from './symbols';
+const $$singletonObject          = Symbol('$$singletonObject'    );
+const $$newEntitySubject         = Symbol('$$newEntitySubject'   );
+const $$deleted                  = Symbol('$$deleted'            );
+const $$entitiesSubject          = Symbol('$$allSubject'         );
+const $$committedEntitiesSubject = Symbol('$$allCommittedSubject');
+const $$set                      = Symbol('$$set'                );
 
 ////////////////////////////////////////////////////////////////////////////////
 
 let moduleCount = 0;
 
-export default (module) => {
+export default (environment) => {
 	
 	class Entity extends ValueTracker {
+		
+		static get Entity() { return Entity }
 		
 		////////////////////////////////////////////////////////////
 		////////// STATIC (building Entity-based classes) //////////
@@ -106,7 +105,7 @@ export default (module) => {
 						`);
 					}
 				},
-				Command: module.Command
+				Command: environment.Command
 			});
 			
 			/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
@@ -122,7 +121,6 @@ export default (module) => {
 			
 			/* introduce Command subclasses */
 			EntitySubclass::definePropertyByValue('Command_new',    command_newClassFactory   (EntitySubclass));
-			EntitySubclass::definePropertyByValue('Command_load',   command_loadClassFactory  (EntitySubclass));
 			EntitySubclass::definePropertyByValue('Command_delete', command_deleteClassFactory(EntitySubclass));
 			EntitySubclass::definePropertyByValue('Command_edit',   command_editClassFactory  (EntitySubclass));
 			
@@ -130,6 +128,50 @@ export default (module) => {
 			return EntitySubclass;
 		}
 		
+		//////////////////////////////////////////////////
+		////////// EXPLICITLY CREATING COMMANDS //////////
+		//////////////////////////////////////////////////
+		
+		//// new
+		
+		static commandNew(
+			initialValues: Object = {},
+		    options:       Object = {}
+		) {
+			return this.Command_new.create(initialValues, options);
+		}
+		
+		//// edit
+		
+		static commandEdit(
+			entity,
+			newValues: Object = {},
+		    options:   Object = {}
+		) {
+			return this.Command_edit.create(entity, newValues, options);
+		}
+		
+		commandEdit(
+			newValues: Object = {},
+		    options:   Object = {}
+		) {
+			return this.constructor.commandEdit(this, newValues, options);
+		}
+		
+		//// delete
+		
+		static commandDelete(
+			entity,
+		    options: Object = {}
+		) {
+			return this.Command_delete.create(entity, options);
+		}
+		
+		commandDelete(
+		    options: Object = {}
+		) {
+			return this.constructor.commandDelete(this, options);
+		}
 		
 		/////////////////////////////////////////////////////////////////////
 		////////// STATIC (creating / caching / finding instances) //////////
@@ -139,46 +181,24 @@ export default (module) => {
 			initialValues: Object = {},
 		    options:       Object = {}
 		) : this {
-			const command = new this.Command_new(initialValues, options);
-			command.run();
-			return command.result;
+			return this.commandNew(initialValues, { ...options, run: true }).result;
 		}
 		
-		static load(
-			values:  Object = {},
-		    options: Object = {}
-		) : this {
-			const command = new this.Command_load(values, options);
-			command.run();
-			return command.result;
+		edit(
+			newValues: Object,
+		    options:   Object = {}
+		) {
+			this.commandEdit(newValues, { ...options, run: true });
 		}
 		
-		edit(newValues) {
-			const command = new this.constructor.Command_edit(this, newValues);
-			command.run();
-		}
-		
-		// TODO: make this method create and run a new Command instance
-		// this is the synchronous delete operation;
-		// a `.commit()` call is required before it
-		// is actually deleted from asynchronous storage.
-		// That means we need to be able to rollback a deletion.
-		// We need to create a partially ordered
-		// log of performed actions (since last commit),
-		// that also allows undo. This will replace storing 'pristine' ops.
-		// (This is the Command design pattern.)
-		delete() {
-			if (this.isDeleted) { return }
-			console.warn("The delete operation does not yet use the Command pattern.");
-			this.pSubject('isDeleted') .next(true);
-			this.pSubject('isPristine').next(false);
-			Entity[$$entities].delete(this);
+		delete(options: Object = {}) {
+			this.commandDelete({ ...options, run: true });
 		}
 		
 		static get(
 			href:    { href: string } | string | number,
 			options: Object = {} // TODO: filtering, expanding, paging, ...
-		): this {
+		) : this {
 			if (href::isObject()) { href = {href} }
 			let entity;
 			if (href in Entity[$$committedEntitiesByHref]) {
@@ -206,6 +226,9 @@ export default (module) => {
 		static getAllCommitted() {
 			return new Set([...this[$$committedEntities]].filter(::this.hasInstance));
 		}
+		
+		// TODO: Double-check singleton-related stuff;
+		//       Haven't looked at this in a while, and many things have changed.
 		
 		static newOrSingleton() {
 			return this.singleton ? this.getSingleton() : this.new();
@@ -246,25 +269,32 @@ export default (module) => {
 		get [Symbol.toStringTag]() { return this.constructor.name }
 		
 		constructor(
-			initialValues: Object                = {},
-			{ allowInvokingConstructor = false } = {}
+			initialValues: Object = {},
+			options               = {}
 		) {
 			
 			/* initialize value tracking */
 			super();
 			super.setValueTrackerOptions({
 				takeUntil: combineLatest(
-					this.p('isDeleted'), this.p('isPristine'), this.p('isNew'),
-					(isDeleted, isPristine, isNew) => isDeleted && (isPristine || isNew)
-				)::filter(isGone => isGone),
+					this.p('isDeleted'),
+					this.p('isPristine'),
+					this.p('isNew'),
+					(d, p, n) => d && (p || n)
+				)::filter(v=>!!v),
 				filterAllBy: () => this.isDeleted.getValue()
 			});
 			
 			/* make sure this constructor was invoked under proper conditions */
-			constraint(allowInvokingConstructor, humanMsg`
+			constraint(options.allowInvokingConstructor, humanMsg`
 				Do not use 'new ${this.constructor.name}(...args)'.
 				Instead, use '${this.constructor.name}.new(...args)'.
 			`);
+			
+			/* keeping track of related commands */
+			this.originCommand = options.command;
+			this.editCommands  = [];
+			this.deleteCommand = null;
 			
 			/* Treating singleton classes specially? Or do we double-check singleton-ness here? */
 			if (this.constructor.singleton) {
@@ -281,14 +311,12 @@ export default (module) => {
 			/* initialize all fields in this entity */
 			Field.initializeEntity(this, initialValues);
 			
-			/* entity is pristine if all its fields are pristine */
-			combineLatest(
-				...this.fields::values().map(f=>f.p('isPristine')),
-				(...fieldPristines) => fieldPristines.every(v=>!!v)
-			).subscribe( this.pSubject('isPristine') );
-			
-			/* register this entity */
-			Entity[$$entities].add(this);
+			// TODO: remove this? Fields are no longer 'in charge' of committing
+			// /* entity is pristine if all its fields are pristine */
+			// combineLatest(
+			// 	...this.fields::values()::map(f=>f.p('isPristine')),
+			// 	(...fieldPristines) => fieldPristines.every(v=>!!v)
+			// ).subscribe( this.pSubject('isPristine') );
 			
 			// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
 			
@@ -301,40 +329,25 @@ export default (module) => {
 		set(key, val, options) { return this.fields[key].set(val, options) }
 		
 		
-		// TODO: make this method call .commit on the related Command instances
-		async commit(...keysToCommit) {
+		// TODO: remove 'per-field'-commit/rollback code (using commands now)
+		async commit() {
+			/* commit all latest commands associated with this entity */
+			// NOTE: committing the latest commands also commits their
+			//       dependencies, i.e., commits every associated command
 			
-			/* commit each field individually */ // TODO: commit all in a single transaction?
-			if (keysToCommit::size() === 0) { keysToCommit = this.fields::keys() }
-			await Promise.all(keysToCommit.map((key) => this.fields[key].commit()));
+			const latestCommands = [...environment.Command.latest({entity: this, committable: true})];
 			
-			/* setting up as a committed entity */
-			// TODO: remove when the server actually does this
-			if (this.get('id') === null) {
-				/* id and href are set here until actual server communication is set up */
-				const newId   = parseInt(_uniqueId());
-				const newHref = `cache://${newId}`;
-				const opts = { ignoreReadonly: true, updatePristine: true };
-				this.set('id',   newId,   opts);
-				this.set('href', newHref, opts);
-				
-				/* after it's first committed, it's no longer new */
-				this.pSubject('isNew').next(false);
-				
-				/* maintain caches */
-				Entity[$$committedEntitiesByHref][newHref] = this;
-				Entity[$$committedEntities].add(this);
-			}
-			
-			/* directly after a commit, it's pristine */
-			this.pSubject('isPristine').next(true);
-			
+			await Promise.all( latestCommands.map(cmd => cmd.commit()) );
 		}
 		
-		rollback(...keysToRollback) {
-			if (keysToRollback::size() === 0) { keysToRollback = this.fields::keys() }
-			keysToRollback.map((key) => { this.fields[key].rollback() });
-			this.e('rollback').next(this);
+		rollback() {
+			/* commit all latest commands associated with this entity */
+			// NOTE: committing the latest commands also commits their
+			//       dependencies, i.e., commits every associated command
+			for (let cmd of environment.Command.earliest({entity: this, rollbackable: true})) {
+				cmd.rollback();
+			} // TODO: test
+			
 		}
 		
 		//noinspection JSCheckFunctionSignatures

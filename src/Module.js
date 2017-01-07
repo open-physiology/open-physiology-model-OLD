@@ -19,7 +19,6 @@ import {assign, defineProperty} from 'bound-native-methods';
 
 import {
 	humanMsg,
-	mapOptionalArray,
 	parseCardinality,
 	wrapInArray,
 	definePropertyByValue,
@@ -38,47 +37,80 @@ const $$processRelationshipDomain = Symbol('$$processRelationshipDomain');
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Environment class                                                         //
+////////////////////////////////////////////////////////////////////////////////
+
+class Environment {
+	
+	// vertices: name                   -> class
+	// edges:    [superclass, subclass] -> undefined
+	classes : Graph;
+	
+	Command : Class;
+	Entity  : Class;
+	
+	constructor(env) {
+		/* if the passed object is already an environment, return it now */
+		if (env instanceof Environment) { return env }
+		
+		/* initialize commit and load implementations */
+		/* issue an error if/when commit or load were called but not provided */
+		this.commit = env.commit ? ::env.commit : (() => { console.error(humanMsg`No 'commit' behavior was specified to the module.`) });
+		this.load   = env.load   ? ::env.load   : (() => { console.error(humanMsg`No 'load'   behavior was specified to the module.`) });
+		
+		/* start tracking modules and classes */
+		this::definePropertiesByValue({
+			modules: new Map,
+			classes: new Graph
+		});
+		
+		/* create a version of the Command and Entity classes */
+		this::definePropertyByValue('Command', commandClassFactory(this));
+		this::definePropertyByValue('Entity' , entityClassFactory (this));
+	}
+	
+	registerModule(module, dependencies, fn) {
+		/* only register each module once */
+		if (this.modules.has(module.name)) { return }
+		/* register module */
+		this.modules.set(module.name, module);
+		/* set some useful module properties */
+		module::definePropertiesByValue({
+			environment: this,
+			classes:     this.classes,
+			Entity:      this.Entity,
+			Command:     this.Command
+		});
+		/* creating dependency modules */
+		for (let dep of dependencies) { dep(this) }
+		/* running provided module definition function */
+		if (fn) { fn(module, [...this.classes.vertices()]::fromPairs()) }
+	}
+	
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Module / Resource / Relationship Factory                                   //
 ////////////////////////////////////////////////////////////////////////////////
 
 export default class Module {
 	
 	static create(name, dependencies, fn) {
-		return (memory = {}) => {
-			memory::defaults({
-				modules: new Map(),
-				classes: new Graph(),
-				commit:  () => { console.warn('Not supplied a `commit` behavior.') }
-			});
-			if (!memory.modules.has(name)) {
-				/* creating module */
-				let module = new this();
-				module::definePropertiesByValue({ name, classes: memory.classes, commit: memory.commit });
-				module::definePropertiesByValue({ Command: memory.Command || commandClassFactory(module) });
-				module::definePropertiesByValue({ Entity: memory.Entity || entityClassFactory(module) });
-				/* updating inter-module memory */
-				memory.modules.set(name, module);
-				memory.Command = module.Command;
-				memory.Entity = module.Entity;
-				/* creating dependency modules */
-				for (let dep of dependencies) { dep(memory) }
-				/* running provided module definition function */
-				if (fn) { fn(module, [...memory.classes.vertices()]::fromPairs()) }
-			}
-			return memory.modules.get(name);
+		return (environment = {}) => {
+			environment  = new Environment(environment);
+			const module = new this(name);
+			environment.registerModule(module, dependencies, fn);
+			return environment;
 		};
 	}
 	
-	/* class dependency graph */
-	// vertices: name                   -> class
-	// edges:    [superclass, subclass] -> undefined
-	classes : Graph;
+	name: string;
 	
-	/* other module-specific fields */
-	name    : string;
-	Command : Class;
-	Entity  : Class;
-
+	constructor(name) {
+		this::definePropertyByValue('name', name);
+	}
+	
 	RESOURCE(config) {
 		config.isResource = true;
 		this.basicNormalization                      (config                         );

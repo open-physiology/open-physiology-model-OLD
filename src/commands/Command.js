@@ -3,7 +3,7 @@ import assert from 'power-assert';
 
 import ValueTracker, {property, event} from '../util/ValueTracker';
 
-import {filter, map} from '../util/bound-hybrid-functions';
+import {map, filter} from '../util/bound-hybrid-functions';
 
 const $$graph        = Symbol('$$graph');
 const $$running      = Symbol('$$running');
@@ -15,7 +15,7 @@ const $$rollingBack  = Symbol('$$rollingBack');
 const $$commitHere   = Symbol('$$commitHere');
 const $$rollbackHere = Symbol('$$rollbackHere');
 
-export default (module) => {
+export default (backend) => {
 	
 	/* track commands in a dependency graph */
 	const commands = new Graph;
@@ -26,8 +26,152 @@ export default (module) => {
 	eventTracker.newEvent('commit');
 	eventTracker.newEvent('rollback');
 	
+	// // TODO: remove debugging below
+	// commands.on('vertex-added', ([k, v]) => {
+	// 	switch (k.commandType) {
+	// 		case 'new':    console.log('+   NEW ', k.entityClass.name, k.initialValues.name); break;
+	// 		case 'edit':   console.log('+   EDIT', k.entityClass.name, k.entity.name);        break;
+	// 		case 'delete': console.log('+   DEL ', k.entityClass.name, k.entity.name);        break;
+	// 	}
+	// });
+	// commands.on('edge-added', ([[f, t], e]) => {
+	// 	let fromCmd, toCmd;
+	// 	switch (f.commandType) {
+	// 		case 'new':    fromCmd = ('NEW  ' + f.entityClass.name + ' ' + f.initialValues.name); break;
+	// 		case 'edit':   fromCmd = ('EDIT ' + f.entityClass.name + ' ' + f.entity.name);        break;
+	// 		case 'delete': fromCmd = ('DEL  ' + f.entityClass.name + ' ' + f.entity.name);        break;
+	// 	}
+	// 	switch (t.commandType) {
+	// 		case 'new':    toCmd = ('NEW  ' + t.entityClass.name + ' ' + t.initialValues.name); break;
+	// 		case 'edit':   toCmd = ('EDIT ' + t.entityClass.name + ' ' + t.entity.name);        break;
+	// 		case 'delete': toCmd = ('DEL  ' + t.entityClass.name + ' ' + t.entity.name);        break;
+	// 	}
+	// 	console.log(`+  (${fromCmd}) --> (${toCmd})`, e);
+	// });
+	// commands.on('vertex-removed', (k) => {
+	// 	switch (k.commandType) {
+	// 		case 'new':    console.log('-   NEW ', k.entityClass.name, k.initialValues.name); break;
+	// 		case 'edit':   console.log('-   EDIT', k.entityClass.name, k.entity.name);        break;
+	// 		case 'delete': console.log('-   DEL ', k.entityClass.name, k.entity.name);        break;
+	// 	}
+	// });
+	// commands.on('edge-removed', ([f, t]) => {
+	// 	let fromCmd, toCmd;
+	// 	switch (f.commandType) {
+	// 		case 'new':    fromCmd = ('NEW  ' + f.entityClass.name + ' ' + f.initialValues.name); break;
+	// 		case 'edit':   fromCmd = ('EDIT ' + f.entityClass.name + ' ' + f.entity.name);        break;
+	// 		case 'delete': fromCmd = ('DEL  ' + f.entityClass.name + ' ' + f.entity.name);        break;
+	// 	}
+	// 	switch (t.commandType) {
+	// 		case 'new':    toCmd = ('NEW  ' + t.entityClass.name + ' ' + t.initialValues.name); break;
+	// 		case 'edit':   toCmd = ('EDIT ' + t.entityClass.name + ' ' + t.entity.name);        break;
+	// 		case 'delete': toCmd = ('DEL  ' + t.entityClass.name + ' ' + t.entity.name);        break;
+	// 	}
+	// 	console.log(`-  (${fromCmd}) --> (${toCmd})`);
+	// });
+	
 	/***/
 	return class Command {
+		
+		////////////
+		// Static //
+		////////////
+		
+		get entityClass() { return this.constructor.entityClass }
+		
+		static create(...args) {
+			let cmd = new this(...args);
+			
+			commands.addVertex(cmd, cmd);
+			for (let dep of cmd.options.commandDependencies || []) { commands.addEdge(dep, cmd, {})               }
+			for (let dep of cmd.options.commandCauses       || []) { commands.addEdge(dep, cmd, { forced: true }) }
+			
+			if (cmd.options.run) { cmd.run() }
+			return cmd;
+		}
+		
+		static latest({entity, committable} = {}) {
+			/* checking if a command is a candidate */
+			const isCandidate = (cmd) => (
+				!entity ||
+				cmd.associatedEntities.has(entity)
+			) && (
+				!committable ||
+				!cmd[$$committed]  &&
+				!cmd[$$committing] &&
+				!cmd[$$rolledBack] &&
+				!cmd[$$rollingBack]
+			);
+			
+			/* if an associated entity is not given, just return the non-dependency commands */
+			if (!entity) {
+				return new Set(commands.sinks()
+					::filter(([key, cmd]) => isCandidate(cmd))
+					::map(([key]) => key));
+			}
+			
+			/* otherwise, find all associated commands that are not dependencies of other associated commands */
+			const result = new Set(commands.vertices()
+				::filter(([key, cmd]) => isCandidate(cmd))
+				::map(([key]) => key));
+			const visited = new WeakSet;
+			function eliminateCandidates(cmd, latestAssociatedCmd) {
+				if (visited.has(cmd)) { return }
+				visited.add(cmd);
+				for (let [postCmd] of commands.verticesFrom(cmd)) {
+					if (isCandidate(postCmd)) {
+						result.delete(latestAssociatedCmd);
+						eliminateCandidates(postCmd, postCmd);
+					} else {
+						eliminateCandidates(postCmd, latestAssociatedCmd);
+					}
+				}
+			}
+			for (let cmd of result) { eliminateCandidates(cmd, cmd) }
+			return result;
+		}
+		
+		static earliest({entity, rollbackable} = {}) {
+			/* checking if a command is a candidate */
+			const isCandidate = (cmd) => (
+				!entity ||
+				cmd.associatedEntities.has(entity)
+			) && (
+				!rollbackable ||
+				!cmd[$$committed]  &&
+				!cmd[$$committing] &&
+				!cmd[$$rolledBack] &&
+				!cmd[$$rollingBack]
+			);
+			
+			/* if an associated entity is not given, just return all non-dependent commands */
+			if (!entity) {
+				return new Set(commands.sources()
+					::filter(([key, cmd]) => isCandidate(cmd))
+					::map(([key]) => key));
+			}
+			
+			/* otherwise, find all associated commands that are not dependencies of other associated commands */
+			const result = new Set(commands.vertices()
+				::filter(([key, cmd]) => isCandidate(cmd))
+				::map(([key]) => key));
+			const visited = new WeakSet;
+			const eliminateCandidates = (cmd, latestAssociatedCmd) => {
+				if (visited.has(cmd)) { return }
+				visited.add(cmd);
+				for (let [preCmd] of commands.verticesTo(cmd)) {
+					if (isCandidate(preCmd)) {
+						result.delete(latestAssociatedCmd);
+						eliminateCandidates(preCmd, preCmd);
+					} else {
+						eliminateCandidates(preCmd, latestAssociatedCmd);
+					}
+				}
+			};
+			for (let cmd of result) { eliminateCandidates(cmd, cmd) }
+			return result;
+		}
+		
 		
 		////////// About forced commands //////////
 		// If command A forces command B,
@@ -38,16 +182,16 @@ export default (module) => {
 		//          some 'new Border' commands.
 		//////////////////////////////////////////
 		
-		constructor({
-			commandDependencies = [],
-			commandCauses       = [],
-			hasRun              = false,
-			committed           = false,
-			rolledBack          = false
-		} = {}) {
-			commands.addVertex(this, this);
-			for (let dep of commandDependencies) { commands.addEdge(dep, this, {})               }
-			for (let dep of commandCauses)       { commands.addEdge(dep, this, { forced: true }) }
+		constructor(options = {}) {
+			let {
+				commandDependencies = [],
+				commandCauses       = [],
+				run                 = false,
+				hasRun              = false,
+				committed           = false,
+				rolledBack          = false
+			} = this.options = options;
+			this.options.command = this;
 			this[$$running]     = false;
 			this[$$hasRun]      = hasRun;
 			this[$$committing]  = false;
@@ -72,14 +216,8 @@ export default (module) => {
 		get committed()  { return this[$$committed ] }
 		get rolledBack() { return this[$$rolledBack] }
 		
-		/// /// /// /// /// Entity association /// /// /// /// ///
-		
-		associations = new Set;
 		
 		/// /// /// /// /// Smart run /// /// /// /// ///
-		
-		// TODO: keep track of whether a command has run or not
-		// TODO:  and only do a `localRun` if it's the first time
 		
 		run() {
 			if (this[$$running] || this[$$hasRun]) { return }
@@ -117,6 +255,7 @@ export default (module) => {
 		/// /// /// /// /// Smart commit /// /// /// /// ///
 		
 		async commit() {
+			
 			assert(this[$$hasRun], "Cannot commit a command that hasn't yet run.");
 			if (this[$$committing] || this[$$committed]) { return }
 			this[$$committing] = true;
@@ -127,7 +266,6 @@ export default (module) => {
 			// dependency commits
 			for (let [dep] of commands.verticesTo(this)) {
 				if (dep[$$committing] || dep[$$committed]) { continue }
-				dep[$$committing] = true;
 				commandsToCommitBeforeMe.add(dep);
 			}
 			
@@ -135,22 +273,18 @@ export default (module) => {
 			for (let [rdep,, {forced}] of commands.verticesFrom(this)) {
 				if (!forced)                                 { continue }
 				if (rdep[$$committing] || rdep[$$committed]) { continue }
-				rdep[$$committing] = true;
 				commandsToCommitBeforeMe.add(rdep);
 			}
 			
 			/* await those commits first */
-			await Promise.all(
-				commandsToCommitBeforeMe
-					::map(c=>c.commit())
-			);
+			await Promise.all([...commandsToCommitBeforeMe].map(c=>c.commit()));
 			
 			/* then commit this command */
-			await this.localCommit();
+			const commitResponse = await backend.commit(this);
+			await this.localCommit(commitResponse);
 			this[$$committing] = false;
 			this[$$committed]  = true;
-			module.commit(this); // TODO: test
-			// eventTracker.e('commit').next(this);
+			eventTracker.e('commit').next(this);
 		}
 		
 		/// /// /// /// /// Smart rollback /// /// /// /// ///
@@ -168,7 +302,6 @@ export default (module) => {
 			// dependency rollbacks
 			for (let [rdep] of commands.verticesFrom(this)) {
 				if (rdep[$$rollingBack] || rdep[$$rolledBack]) { continue }
-				rdep[$$rollingBack] = true;
 				commandsToRolledBackBeforeMe.add(rdep);
 			}
 			
@@ -176,7 +309,6 @@ export default (module) => {
 			for (let [dep,, {forced}] of commands.verticesTo(this)) {
 				if (!forced)                                 { continue }
 				if (dep[$$rollingBack] || dep[$$rolledBack]) { continue }
-				dep[$$rollingBack] = true;
 				commandsToRolledBackBeforeMe.add(dep);
 			}
 			
@@ -187,6 +319,7 @@ export default (module) => {
 			this.localRollback();
 			this[$$rollingBack] = false;
 			this[$$rolledBack]  = true;
+			commands.destroyVertex(this);
 			eventTracker.e('rollback').next(this);
 			// NOTE: in theory, a rolled back command can be run again,
 			//       but we do not support this yet.

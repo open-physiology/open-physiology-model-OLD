@@ -25,8 +25,9 @@ import {
 	$$key,
 	$$desc,
 	$$value,
-	$$pristine,
+	// $$pristine,// TODO: remove all 'pristine' related stuff from the field classes
 	$$entriesIn,
+	$$destruct
 } from './symbols';
 import {constraint} from "../util/misc";
 
@@ -46,7 +47,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		if (cls.prototype.hasOwnProperty(key)) { return }
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
-			...(readonly ? undefined : {
+			...(readonly ? {} : {
 				set(val) { this.fields[key].set(val)}
 			}),
 			enumerable:   true,
@@ -76,7 +77,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, related } = options;
 		
-		this::defineProperty($$pristine, { value: new Set           });
+		// this::defineProperty($$pristine, { value: new Set           });// TODO: remove all 'pristine' related stuff from the field classes
 		this::defineProperty($$value,    { value: new ObservableSet });
 
 		/* syncing with relationship field */
@@ -106,10 +107,11 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 					.find(rel => rel.fields[desc.keyInRelationship]         .get() === owner &&
 					             rel.fields[desc.codomain.keyInRelationship].get() === newRes);
 				if (!rel) {
-					correspondingRelField.add(desc.relationshipClass.new({
+					rel = desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: newRes
-					}));
+					});
+					correspondingRelField.add(rel);
 				}
 			});
 		
@@ -120,7 +122,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 				//     :   then go get it
 				//     : - It may also be a description of a new resource;
 				//     :   then create it
-				this[$$pristine].add(res);
+				// this[$$pristine].add(res);// TODO: remove all 'pristine' related stuff from the field classes
 				this[$$value]   .add(res);
 			}
 		}
@@ -137,8 +139,18 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 			You're trying to set a readonly field ${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
 		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
-		if (updatePristine)    { copySetContent(this[$$pristine], newValue) }
+		// if (updatePristine)    { copySetContent(this[$$pristine], newValue) }// TODO: remove all 'pristine' related stuff from the field classes
 		copySetContent(this[$$value], newValue);
+	}
+		
+	[$$destruct]() {
+		this.set(new Set(), {
+			ignoreReadonly:   true,
+			ignoreValidation: true,
+			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
+			createEditCommand:  false
+		});
+		super[$$destruct]();
 	}
 	
 	validate(val, stages = []) {
@@ -166,15 +178,15 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		}
 	}
 	
-	async commit() {
-		this.validate(this[$$value], ['commit']);
-		copySetContent(this[$$pristine], this[$$value]);
-		this.e('commit').next(this[$$value]);
-	}
-	
-	rollback() {
-		copySetContent(this[$$value], this[$$pristine]);
-		this.e('rollback').next(this[$$value]);
-	}
+	// async commit() {// TODO: remove all 'pristine' related stuff from the field classes
+	// 	this.validate(this[$$value], ['commit']);
+	// 	copySetContent(this[$$pristine], this[$$value]);
+	// 	this.e('commit').next(this[$$value]);
+	// }
+	//
+	// rollback() {
+	// 	copySetContent(this[$$value], this[$$pristine]);
+	// 	this.e('rollback').next(this[$$value]);
+	// }
 	
 });

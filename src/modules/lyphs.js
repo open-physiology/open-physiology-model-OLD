@@ -94,7 +94,7 @@ export default TypedModule.create('lyphs', [
 				// TODO: create a new Command for the border,
 				// TODO: caused by / dependent on this command
 				if (options.createAxis) {
-					const axis = Border.new();
+					const axis = Border.new({}, { commandDependencies: [command] });
 					initialValues::assign({ axis });
 				}
 				if (initialValues.axis) {
@@ -109,7 +109,9 @@ export default TypedModule.create('lyphs', [
 					}
 					const nr = Math.min(options.createRadialBorders , 2);
 					for (let i = initialValues.radialBorders.length; i < nr; ++i) {
-						initialValues.radialBorders.push(Border.new());
+						initialValues.radialBorders.push(
+							Border.new({}, { commandDependencies: [command] })
+						);
 					}
 				}
 				return new Lyph(

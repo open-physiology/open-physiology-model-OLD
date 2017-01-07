@@ -27,6 +27,7 @@ import {
 	$$desc,
 	$$initSet,
 	$$entriesIn,
+	$$destruct
 } from './symbols';
 
 
@@ -45,7 +46,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		if (cls.prototype.hasOwnProperty(key)) { return }
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
-			...(readonly ? undefined : {
+			...(readonly ? {} : {
 				set(val) { this.fields[key].set(val) }
 			}),
 			enumerable:   true,
@@ -56,12 +57,12 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 	static [$$entriesIn](cls) {
 		if (!cls.isResource) { return [] }
 		return cls.relationships::entries()
-		             .filter(([,desc]) => desc.cardinality.max === 1)
-		             .map(([key, desc]) => ({
-		                 key,
-		                 desc,
-		                 relatedKeys: desc.shortcutKey ? [desc.shortcutKey] : []
-		             }));
+             .filter(([,desc]) => desc.cardinality.max === 1)
+             .map(([key, desc]) => ({
+                 key,
+                 desc,
+                 relatedKeys: desc.shortcutKey ? [desc.shortcutKey] : []
+             }));
 	}
 	
 	
@@ -84,14 +85,30 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		this[$$initSet](
 			[initialValue, initialValue],
 			[givenShortcutInitialValue ],
-			[desc.options.auto, () => desc.relationshipClass.new({
-				[desc.keyInRelationship]         : this[$$owner],
-				[desc.codomain.keyInRelationship]: desc.codomain.resourceClass.newOrSingleton()
-			})],
-			[desc.options.default, () => desc.relationshipClass.new({
-				[desc.keyInRelationship]         : this[$$owner],
-				[desc.codomain.keyInRelationship]: desc.options.default::callOrReturn()
-			})],
+			[desc.options.auto, () => {
+				// TODO: did we need to keep .newOrSingleton() here instead of .new()?
+				// let otherEntity = desc.codomain.resourceClass.newOrSingleton();
+				let otherEntity = desc.codomain.resourceClass.new({}, {
+					commandCauses: [owner.originCommand]
+				});
+				return desc.relationshipClass.new({
+					[desc.keyInRelationship]         : owner,
+					[desc.codomain.keyInRelationship]: otherEntity
+				}, {
+					commandCauses: [owner.originCommand]
+				});
+			}],
+			[desc.options.default, () => {
+				let otherEntity = desc.options.default::callOrReturn({
+					commandCauses: [owner.originCommand]
+				});
+				return desc.relationshipClass.new({
+					[desc.keyInRelationship]         : owner,
+					[desc.codomain.keyInRelationship]: otherEntity
+				}, {
+					commandCauses: [owner.originCommand]
+				});
+			}],
 			[desc.cardinality.min === 0, null]
 		);
 		
@@ -111,8 +128,8 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			::startWith(null)
 			::pairwise()
 			.subscribe(([prev, curr]) => {
-				if (prev) { prev.fields[desc.keyInRelationship].set(null)          }
-				if (curr) { curr.fields[desc.keyInRelationship].set(this[$$owner]) }
+				if (prev) { prev.fields[desc.keyInRelationship].set(null,  { createEditCommand: false }) }
+				if (curr) { curr.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) }
 			});
 		
 		/* set the value of this field to null when the relationship replaces this resource */
@@ -123,6 +140,16 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			::filter(res => res !== owner)
 			::map(()=>null)
 			.subscribe( this.p('value') );
+	}
+	
+	[$$destruct]() {
+		this.set(null, {
+			ignoreReadonly:   true,
+			ignoreValidation: true,
+			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
+			createEditCommand:  false
+		});
+		super[$$destruct]();
 	}
 	
 	validate(val, stages = []) {

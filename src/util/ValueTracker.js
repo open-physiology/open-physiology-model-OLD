@@ -183,7 +183,6 @@ export default class ValueTracker {
 		} else if (name) {
 			let head = name, sep, tail;
 			const match = name.match(/^(.+?)(\??\.)(.+)$/);
-			// console.log('(p-regex)', name, match); // TODO: remove
 			if (match) {
 				[,head,sep,tail] = match;
 				let loose = (sep === '?.');

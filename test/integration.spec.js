@@ -1,10 +1,17 @@
 import {describe, it, expect} from './test.helper';
-import moduleFactory from '../src/index';
+import moduleFactory          from '../src/index';
+import {simpleMockHandlers}   from "./mock-handlers.helper";
+
+import entries from 'lodash-bound/entries';
+
 
 describe("integrated workflow", () => {
 	
-	let module;
-	beforeEach(() => { module = moduleFactory() });
+	let module, backend;
+	beforeEach(() => {
+		backend = simpleMockHandlers();
+		module  = moduleFactory(backend.frontendInterface);
+	});
 	
 	it("can track available entities with a stream per class", async () => {
 
@@ -94,6 +101,7 @@ describe("integrated workflow", () => {
 		let water = Material.new({
 			name: "waiter"
 		});
+		
 		let waterType = Type.new({
 			definition: water
 		});
@@ -108,35 +116,36 @@ describe("integrated workflow", () => {
 
 		expect(water).to.have.a.property('name', "water");
 
-		water.rollback();
-
-		expect(water).to.have.a.property('id'  ).which.is.null;
-		expect(water).to.have.a.property('href').which.is.null;
-		expect(water).to.have.a.property('class', 'Material');
-		expect(water).to.have.a.property('name', "waiter");
+		water.rollback(); // NOTE: rolls back the creation of `water` too
+		
+		// TODO: verify that `water` was removed
+		
 		expect(waterType).to.have.a.property('definition').which.is.null;
+		
+		let newWater = Material.new({
+			name: "water"
+		});
+		
+		waterType.definition = newWater;
 
-		water.name = "water";
-		waterType.definition = water;
-
-		await water.commit();
+		await newWater.commit();
 		await waterType.commit();
 
-		expect(water).to.have.a.property('id'  ).which.is.a('number');
-		expect(water).to.have.a.property('href').which.is.a('string');
-		expect(water).to.have.a.property('name', "water");
+		expect(newWater).to.have.a.property('id'  ).which.is.a('number');
+		expect(newWater).to.have.a.property('href').which.is.a('string');
+		expect(newWater).to.have.a.property('name', "water");
 
 		const {
 			id:   waterId,
 			href: waterHref,
 			name: waterName
-		} = water;
+		} = newWater;
 
-		water.rollback();
+		newWater.rollback();
 
-		expect(water).to.have.a.property('id'  , waterId  );
-		expect(water).to.have.a.property('href', waterHref);
-		expect(water).to.have.a.property('name', waterName);
+		expect(newWater).to.have.a.property('id'  , waterId  );
+		expect(newWater).to.have.a.property('href', waterHref);
+		expect(newWater).to.have.a.property('name', waterName);
 
 		let bloodHasWater = ContainsMaterial.new({
 			1: blood,
@@ -160,16 +169,32 @@ describe("integrated workflow", () => {
 
 	});
 	
-	// it("uses the Command design pattern", async () => {
-	// 	const {Lyph, Border} = module.classes;
-	//
-	// 	let lyph = Lyph.new({
-	// 		name: "Lyph"
-	// 	});
-	//
-	//
-	//
-	//
-	// });
+	it("uses the Command design pattern", async () => {
+		const {Lyph, Border} = module.classes;
+		
+		expect(backend.allStoredEntities()::entries()).to.have.length(0);
+		
+		let lyph = Lyph.new({
+			name: "Lyph"
+		});
+		
+		expect(backend.allStoredEntities()::entries()).to.have.length(0);
+		
+		await lyph.commit();
+		
+		expect(backend.allStoredEntities()::entries()).to.have.length(5);
+		// ⬑ 1 lyph, 2 borders, 2 relationships
+		
+		// TODO: The commit cycle has a flaw; (INTERDEPENDENT NEW HREFs)
+		//       If a lyph is committed, its borders also have to be committed,
+		//       but both require a reference to the other while serialized,
+		//       which has to be an href, which is right now only assigned
+		//       one-by-one on the backend, so there's a kind of deadlock
+		//       where neither can be committed because they are incomplete.
+		//
+		//       We need a batch REST operation which supports temporary hrefs,
+		//       which the backend can then replace.
+		
+	});
 	
 });
