@@ -25,8 +25,8 @@ import {
 	definePropertiesByValue
 } from './util/misc';
 
-import entityClassFactory from './Entity';
-import {Field}            from './fields/fields';
+import entityClassFactory  from './Entity';
+import {Field}             from './fields/fields';
 import commandClassFactory from './commands/Command';
 
 
@@ -49,14 +49,25 @@ class Environment {
 	Command : Class;
 	Entity  : Class;
 	
-	constructor(env) {
+	constructor(envOrBackend) {
 		/* if the passed object is already an environment, return it now */
-		if (env instanceof Environment) { return env }
+		if (envOrBackend instanceof Environment) { return envOrBackend }
 		
 		/* initialize commit and load implementations */
 		/* issue an error if/when commit or load were called but not provided */
-		this.commit = env.commit ? ::env.commit : (() => { console.error(humanMsg`No 'commit' behavior was specified to the module.`) });
-		this.load   = env.load   ? ::env.load   : (() => { console.error(humanMsg`No 'load'   behavior was specified to the module.`) });
+		this.backend = {};
+		for (let op of [
+	        'commit_new',
+	        'commit_edit',
+	        'commit_delete',
+	        'load',
+	        'loadAll'
+		]) {
+			this.backend[op] = this[op] =
+				envOrBackend[op]
+				? (::envOrBackend[op])
+				: (() => { console.error(humanMsg`No '${op}' behavior was specified to the module.`) });
+		}
 		
 		/* start tracking modules and classes */
 		this::definePropertiesByValue({

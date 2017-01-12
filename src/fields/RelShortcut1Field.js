@@ -10,7 +10,7 @@ import {defineProperty} from 'bound-native-methods';
 
 import assert from 'power-assert';
 
-import {humanMsg} from "../util/misc";
+import {humanMsg} from '../util/misc';
 
 import {Field, RelField} from './Field';
 
@@ -23,7 +23,7 @@ import {
 	$$entriesIn,
 	$$destruct
 } from './symbols';
-import {constraint} from "../util/misc";
+import {constraint} from '../util/misc';
 
 Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 	
@@ -105,12 +105,21 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 			});
 	}
 	
+	static valueToJSON(value, options = {}) {
+		if (!value) { return value }
+		return {
+			id  : value.id,
+			href: value.href
+		};
+	}
+	
 	[$$destruct]() {
 		this.set(null, {
-			ignoreReadonly:   true,
-			ignoreValidation: true,
-			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
-			createEditCommand:  false
+			ignoreReadonly:    true,
+			ignoreValidation:  true,
+			createEditCommand: false,
+			// updatePristine: true
+			// TODO: remove all 'pristine' related stuff from the field classes
 		});
 		super[$$destruct]();
 	}

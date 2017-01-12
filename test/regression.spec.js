@@ -10,10 +10,10 @@ import {filter} from '../src/util/bound-hybrid-functions';
 
 describe("regression tests", () => {
 
-	let module, backend;
+	let module, backend, frontend;
 	beforeEach(() => {
-		backend = simpleMockHandlers();
-		module  = moduleFactory(backend.frontendInterface);
+		({backend, frontend} = simpleMockHandlers());
+		module = moduleFactory(frontend);
 	});
     
 	regression("HasType[2] set to null?", async () => {
@@ -121,10 +121,10 @@ describe("regression tests", () => {
         const {Measurable, Causality} = module.classes;
 
         let measurable1 = Measurable.new({ name: "Concentration of water" });
-        let measurable2 = Measurable.new({ name: "Concentration of ion" });
+        let measurable2 = Measurable.new({ name: "Concentration of ion"   });
 
         let causality1 = Causality.new({
-            name:   "Functional dependency",
+            name:  "Functional dependency",
             cause:  measurable1,
             effect: measurable2
         });

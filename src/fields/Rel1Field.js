@@ -86,8 +86,6 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			[initialValue, initialValue],
 			[givenShortcutInitialValue ],
 			[desc.options.auto, () => {
-				// TODO: did we need to keep .newOrSingleton() here instead of .new()?
-				// let otherEntity = desc.codomain.resourceClass.newOrSingleton();
 				let otherEntity = desc.codomain.resourceClass.new({}, {
 					commandCauses: [owner.originCommand]
 				});
@@ -140,6 +138,14 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			::filter(res => res !== owner)
 			::map(()=>null)
 			.subscribe( this.p('value') );
+	}
+	
+	static valueToJSON(value, options = {}) {
+		if (value === null) { return null }
+		return {
+			id  : value.id,
+			href: value.href
+		};
 	}
 	
 	[$$destruct]() {

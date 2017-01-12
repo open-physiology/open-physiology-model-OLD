@@ -1,5 +1,11 @@
-import isObject    from 'lodash-bound/isObject';
 import defaults    from 'lodash-bound/defaults';
+import isString    from 'lodash-bound/isString';
+import isInteger   from 'lodash-bound/isInteger';
+import isSet       from 'lodash-bound/isSet';
+import isObject    from 'lodash-bound/isObject';
+import isUndefined from 'lodash-bound/isUndefined';
+import pick        from 'lodash-bound/pick';
+import entries     from 'lodash-bound/entries';
 
 import {humanMsg, definePropertiesByValue, definePropertyByValue} from './util/misc';
 import ObservableSet                   from './util/ObservableSet';
@@ -19,26 +25,28 @@ import {constraint} from './util/misc';
 import command_newClassFactory    from './commands/Command_new';
 import command_deleteClassFactory from './commands/Command_delete';
 import command_editClassFactory   from './commands/Command_edit';
+import command_loadClassFactory   from './commands/Command_load';
+const $$Command_load = Symbol('$$Command_load');
 
 import {
 	$$committedEntitiesByHref,
 	$$committedEntities,
 	$$entities
 } from './symbols';
-const $$singletonObject          = Symbol('$$singletonObject'    );
 const $$newEntitySubject         = Symbol('$$newEntitySubject'   );
 const $$deleted                  = Symbol('$$deleted'            );
 const $$entitiesSubject          = Symbol('$$allSubject'         );
 const $$committedEntitiesSubject = Symbol('$$allCommittedSubject');
-const $$set                      = Symbol('$$set'                );
 
 ////////////////////////////////////////////////////////////////////////////////
 
-let moduleCount = 0;
-
 export default (environment) => {
 	
+	let {Command, backend} = environment;
+	
 	class Entity extends ValueTracker {
+		
+		static get environment() { return environment }
 		
 		static get Entity() { return Entity }
 		
@@ -105,7 +113,7 @@ export default (environment) => {
 						`);
 					}
 				},
-				Command: environment.Command
+				Command: Command
 			});
 			
 			/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
@@ -123,6 +131,7 @@ export default (environment) => {
 			EntitySubclass::definePropertyByValue('Command_new',    command_newClassFactory   (EntitySubclass));
 			EntitySubclass::definePropertyByValue('Command_delete', command_deleteClassFactory(EntitySubclass));
 			EntitySubclass::definePropertyByValue('Command_edit',   command_editClassFactory  (EntitySubclass));
+			EntitySubclass::definePropertyByValue($$Command_load,   command_loadClassFactory  (EntitySubclass));
 			
 			/***/
 			return EntitySubclass;
@@ -135,8 +144,8 @@ export default (environment) => {
 		//// new
 		
 		static commandNew(
-			initialValues: Object = {},
-		    options:       Object = {}
+			initialValues: {} = {},
+		    options:       {} = {}
 		) {
 			return this.Command_new.create(initialValues, options);
 		}
@@ -178,75 +187,69 @@ export default (environment) => {
 		/////////////////////////////////////////////////////////////////////
 		
 		static new(
-			initialValues: Object = {},
-		    options:       Object = {}
+			initialValues: {} = {},
+		    options:       {} = {}
 		) : this {
 			return this.commandNew(initialValues, { ...options, run: true }).result;
 		}
 		
 		edit(
-			newValues: Object,
-		    options:   Object = {}
+			newValues: {},
+		    options:   {} = {}
 		) {
 			this.commandEdit(newValues, { ...options, run: true });
 		}
 		
-		delete(options: Object = {}) {
+		delete(options: {} = {}) {
 			this.commandDelete({ ...options, run: true });
 		}
 		
-		static get(
-			href:    { href: string } | string | number,
-			options: Object = {} // TODO: filtering, expanding, paging, ...
+		static async get(
+			address: { href: string } | { id: number } | string | number,
+			options: {} = {} // TODO: filtering, expanding, paging, ...
 		) : this {
-			if (href::isObject()) { href = {href} }
-			let entity;
-			if (href in Entity[$$committedEntitiesByHref]) {
-				entity = Entity[$$committedEntitiesByHref][href];
-			} else {
-				// We're assuming that this is solely a synchronous method call,
-				// so we can't query the server here.
-				return null;
+			/* normalize address */
+			if (address::isString())  { address = { href: address } }
+			if (address::isInteger()) { address = { id:   address } }
+			
+			/* if it's not yet cached, load it now (async) */
+			if (!Entity[$$committedEntitiesByHref][address.href]) {
+				const values = await backend.load(address, options);
+				const cmd    = this[$$Command_load].create(values);
+				Entity[$$committedEntitiesByHref][address.href] = cmd.result;
 			}
+			
+			/* fetch the entity from the cache */
+			let entity = Entity[$$committedEntitiesByHref][address.href];
+			
+			/* make sure the retrieved entity is of the expected class */
 			constraint(this.hasInstance(entity), humanMsg`
-				The entity at '${JSON.stringify(href)}'
+				The entity at '${JSON.stringify(address.href)}'
 				is not of class '${this.name}'
 				but of class '${entity.constructor.name}'.
 			`);
+			
 			return entity;
 		}
-		// TODO: also create async method for requesting an entity from whatever
-		// TODO: backend is connected to this library (e.g., REST client or database)
-		// TODO: (support filtering, expanding, paging,...)
 		
-		static getAll() {
-			return new Set([...this[$$entities]].filter(::this.hasInstance));
-		}
-		
-		static getAllCommitted() {
-			return new Set([...this[$$committedEntities]].filter(::this.hasInstance));
-		}
-		
-		// TODO: Double-check singleton-related stuff;
-		//       Haven't looked at this in a while, and many things have changed.
-		
-		static newOrSingleton() {
-			return this.singleton ? this.getSingleton() : this.new();
-		}
-		
-		static getSingleton() {
-			constraint(this.singleton, humanMsg`
-				The '${this.name}' class is not a singleton class.
-			`);
-			if (!this[$$singletonObject]) {
-				this[$$singletonObject] = this.new({
-					name: this.singular
-				});
-				this[$$singletonObject].commit();
-				// TODO: make sure that the singleton object is always loaded,
-				//     : so this can be done synchronously
+		static async getAll(
+			options: {} = {} // TODO: filtering, expanding, paging, ...
+		) : this {
+
+			let response = await backend.loadAll(this, options);
+			let result = new Set;
+
+			/* cache response */
+			for (let values of response) {
+				if (!Entity[$$committedEntitiesByHref][values.href]) {
+					Entity[$$committedEntitiesByHref][values.href] = values;
+					const cmd = this[$$Command_load].create(values);
+					Entity[$$committedEntitiesByHref][cmd.result.href] = cmd.result;
+					result.add(cmd.result);
+				}
 			}
-			return this[$$singletonObject];
+
+			return result;
 		}
 		
 		
@@ -266,11 +269,9 @@ export default (environment) => {
 		////////// INSTANCES //////////
 		///////////////////////////////
 		
-		get [Symbol.toStringTag]() { return this.constructor.name }
-		
 		constructor(
-			initialValues: Object = {},
-			options               = {}
+			initialValues: {} = {},
+			options      : {} = {}
 		) {
 			
 			/* initialize value tracking */
@@ -281,25 +282,21 @@ export default (environment) => {
 					this.p('isPristine'),
 					this.p('isNew'),
 					(d, p, n) => d && (p || n)
-				)::filter(v=>!!v),
-				filterAllBy: () => this.isDeleted.getValue()
+				)::filter(v=>!!v)
 			});
 			
 			/* make sure this constructor was invoked under proper conditions */
 			constraint(options.allowInvokingConstructor, humanMsg`
 				Do not use 'new ${this.constructor.name}(...args)'.
-				Instead, use '${this.constructor.name}.new(...args)'.
+				Instead, use '${this.constructor.name}.new(...args)'
+				          or '${this.constructor.name}.get(...args)'.
 			`);
+			delete options.allowInvokingConstructor;
 			
 			/* keeping track of related commands */
 			this.originCommand = options.command;
 			this.editCommands  = [];
 			this.deleteCommand = null;
-			
-			/* Treating singleton classes specially? Or do we double-check singleton-ness here? */
-			if (this.constructor.singleton) {
-				// TODO
-			}
 			
 			/* set defaults for the core initial field values */
 			initialValues::defaults({
@@ -311,53 +308,79 @@ export default (environment) => {
 			/* initialize all fields in this entity */
 			Field.initializeEntity(this, initialValues);
 			
-			// TODO: remove this? Fields are no longer 'in charge' of committing
-			// /* entity is pristine if all its fields are pristine */
-			// combineLatest(
-			// 	...this.fields::values()::map(f=>f.p('isPristine')),
-			// 	(...fieldPristines) => fieldPristines.every(v=>!!v)
-			// ).subscribe( this.pSubject('isPristine') );
-			
-			// TODO: CHECK CROSS-PROPERTY CONSTRAINTS?
-			
 		}
 		
-		// NOTE: a method .undelete was here, but we'll now use
-		// NOTE: the Command system to undo that kind of thing
+		get [Symbol.toStringTag]() {
+			return `${this.constructor.name}: ${this.href || this.name}`;
+		}
+		
+		
+		//// Transforming to/from JSON
+		
+		static getIdentificationObjectFrom(val) {
+			if (val::isString())  { return { href: val }           }
+			if (val::isInteger()) { return { id:   val }           }
+			if (val::isObject())  { return val::pick('href', 'id') }
+			assert(false);
+		}
+		
+		static objectToJSON(obj, options = {}) {
+			let { sourceEntity } = options;
+			// TODO: rather than sourceEntity, accept an entity class,
+			//       which should have a good description of the fields
+			let result = {};
+			for (let [key, value] of obj::entries()) {
+				result[key] = sourceEntity.fields[key].constructor.valueToJSON(value, options);
+			}
+		}
+		
+		toJSON(options = {}) {
+			let { minimal } = options;
+			let result = {};
+			for (let [key, field] of this.fields::entries()) {
+				if (!minimal || (field.constructor !== RelShortcut$Field
+				              && field.constructor !== RelShortcut1Field)) {
+					result[key] = field.value;
+				}
+			}
+			return this.constructor.objectToJSON(result, { ...options, sourceEntity: this });
+		}
+		
+		
+		//// Setting / getting of fields
 		
 		get(key)               { return this.fields[key].get()             }
 		set(key, val, options) { return this.fields[key].set(val, options) }
 		
 		
-		// TODO: remove 'per-field'-commit/rollback code (using commands now)
+		//// Commit & Rollback
+		
+		/**
+		 * Commit all changes to this entity,
+		 * taking the command dependency tree into account.
+		 * @returns {Promise.<void>}
+		 */
 		async commit() {
 			/* commit all latest commands associated with this entity */
 			// NOTE: committing the latest commands also commits their
 			//       dependencies, i.e., commits every associated command
-			
-			const latestCommands = [...environment.Command.latest({entity: this, committable: true})];
-			
-			await Promise.all( latestCommands.map(cmd => cmd.commit()) );
+			const latestCommands = Command.latest({ entity: this, committable: true });
+			await Promise.all( latestCommands::map(cmd => cmd.commit()) );
 		}
 		
+		/**
+		 * Roll back all changes to this entity,
+		 * taking the command dependency tree into account.
+		 */
 		rollback() {
 			/* commit all latest commands associated with this entity */
-			// NOTE: committing the latest commands also commits their
-			//       dependencies, i.e., commits every associated command
-			for (let cmd of environment.Command.earliest({entity: this, rollbackable: true})) {
+			// NOTE: rolling back the earliest commands also rolls back their
+			//       reverse dependencies, i.e., rolls back every associated command
+			for (let cmd of Command.earliest({ entity: this, rollbackable: true })) {
 				cmd.rollback();
-			} // TODO: test
-			
+			}
 		}
 		
-		//noinspection JSCheckFunctionSignatures
-		p(key, t) {
-			// Provide easier access to field property observables
-			return (this.fields && this.fields[key])
-				? this.fields[key].p('value', t)
-				: super.p(key, t);
-		}
-	
 	}
 
 	Entity::assign({
@@ -372,3 +395,26 @@ export default (environment) => {
 	
 	return Entity;
 }
+
+
+
+///// FROM Entity CLASS
+// // TODO: check if getAll / getAllCommitted are ever used by any of our apps
+// static getAll() {
+// 	return new Set([...this[$$entities]].filter(::this.hasInstance));
+// }
+//
+// static getAllCommitted() {
+// 	return new Set([...this[$$committedEntities]].filter(::this.hasInstance));
+// }
+
+///// FROM Entity CONSTRUCTOR
+// // TODO: remove this? Fields are no longer 'in charge' of committing
+// /* entity is pristine if all its fields are pristine */
+// combineLatest(
+// 	...this.fields::values()::map(f=>f.p('isPristine')),
+// 	(...fieldPristines) => fieldPristines.every(v=>!!v)
+// ).subscribe( this.pSubject('isPristine') );
+
+///// FROM Entity CONSTRUCTOR
+// // TODO: CHECK CROSS-PROPERTY CONSTRAINTS?

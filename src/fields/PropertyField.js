@@ -84,6 +84,11 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		);
 	}
 	
+	static valueToJSON(value, {flattenFieldValues = false} = {}) {
+		if (flattenFieldValues) { value = JSON.stringify(value) }
+		return value;
+	}
+	
 	validate(val, stages = []) {
 		
 		if (stages.includes('commit')) {

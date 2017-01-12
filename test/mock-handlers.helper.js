@@ -2,10 +2,13 @@ import isInteger   from 'lodash-bound/isInteger';
 import isString    from 'lodash-bound/isString';
 import isUndefined from 'lodash-bound/isUndefined';
 import entries     from 'lodash-bound/entries';
+import values      from 'lodash-bound/values';
+import pickBy      from 'lodash-bound/pickBy';
 
 import assert from 'power-assert';
 
 import _uniqueId from 'lodash/uniqueId';
+import {humanMsg} from "../src/util/misc";
 
 /* convenience functions */
 function valueOrReference(val) {
@@ -15,11 +18,15 @@ function valueOrReference(val) {
 		return val;
 	}
 }
-function hrefFromIdOrHref(idOrHref) {
-	if (idOrHref::isString()) {
-		return idOrHref;
-	} else if (idOrHref::isInteger()) {
-		return `mock-server://${idOrHref}`;
+function hrefFromIdOrHref(address = {}) {
+	if (address::isString())  { address = { href: address } }
+	if (address::isInteger()) { address = { id  : address } }
+	if (address.href) {
+		return address.href;
+	} else if (address.id) {
+		return `mock-server://${address.id}`;
+	} else {
+		throw new Error(humanMsg`The given value ${address} is not a recognized identifier.`);
 	}
 }
 
@@ -33,21 +40,18 @@ export const simpleMockHandlers = () => {
 	/* and the frontend interface (implementing commit & load) */
 	const backend = {
 		
-		create(entity) {
-			const id     = parseInt(_uniqueId());
-			const href   = hrefFromIdOrHref(id);
-			const object = { id, href };
-			for (let [key, field] of entity.fields::entries()) {
-				if (key === 'id' || key === 'href') { continue }
-				if (field.value::isUndefined())     { continue }
-				object[key] = valueOrReference(field.value);
-			}
-			storageByHref[object.href] = object;
-			return { id, href };
+		create(values) {
+			const id   = parseInt(_uniqueId());
+			const href = hrefFromIdOrHref(id);
+			return storageByHref[href] = { ...values, id, href };
 		},
 		
 		read(idOrHref) {
 			return storageByHref[hrefFromIdOrHref(idOrHref)];
+		},
+		
+		readAll() {
+			return storageByHref::values();
 		},
 		
 		update(idOrHref, newValues) {
@@ -59,26 +63,29 @@ export const simpleMockHandlers = () => {
 		
 		delete(idOrHref) {
 			delete storageByHref[hrefFromIdOrHref(idOrHref)];
-		},
-		
-		allStoredEntities() {
-			return storageByHref;
-		},
-		
-		/* the interface to hand to the library when instantiating a module */
-		frontendInterface: {
-			async commit(command) {
-				switch (command.commandType) {
-					case 'new':    return backend.create(command.result);
-					case 'edit':   return backend.update(command.entity.href, command.newValues);
-					case 'delete': return backend.delete(command.entity.href);
-				}
-			},
-			async load(idOrHref) {
-				return backend.read(idOrHref);
-			}
 		}
 		
 	};
-	return backend;
+	
+	/* the interface to hand to the library when instantiating a module */
+	const frontend = {
+		async commit_new(values) {
+			return backend.create(values);
+		},
+		async commit_edit(href, newValues) {
+			return backend.update(href, newValues);
+		},
+		async commit_delete(href) {
+			return backend.delete(href);
+		},
+		async load(idOrHref, options = {}) {
+			return backend.read(idOrHref);
+		},
+		async loadAll(cls, options = {}) {
+			// return backend.readAll()::pickBy(e => e.class === cls.name);
+			return backend.readAll().filter(e => cls.hasSubclass(cls.environment.classes[e.class]));
+		}
+	};
+	
+	return { backend, frontend };
 };

@@ -8,6 +8,8 @@ function hybrid(ld, rx, wuFn) {
 			return this::rx(...args);
 		} else if (typeof this.next === 'function') {
 			return wu(this)[wuFn](...args);
+		} else if (this instanceof Set) {
+			return new Set([...this]::ld(...args));
 		} else {
 			return this::ld(...args);
 		}

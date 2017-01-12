@@ -7,6 +7,10 @@ export default (cls) => class Command_delete extends cls.Command {
 	
 	static get entityClass() { return cls }
 	
+	static create(entity, options = {}) {
+		return super.create([entity], options);
+	}
+	
 	constructor(entity, options = {}) {
 		super({
 			...options,
@@ -35,7 +39,6 @@ export default (cls) => class Command_delete extends cls.Command {
 		
 		
 		// TODO: Command_delete on all relevant linked entities (test if they're already scheduled for deletion)
-		// TODO: Store a reference to this Command on the entity
 		// TODO: Keep the entity in memory (this.entity) so the deletion can be rolled back.
 		// TODO: decide how and when to trigger signals about this deletion
 		
@@ -55,7 +58,10 @@ export default (cls) => class Command_delete extends cls.Command {
 	}
 	
 	async localCommit() {
-		// TODO
+		let response = await cls.environment.backend.commit_delete(this);
+		// TODO: integrate response
+		// TODO: catch possible exception (meaning the commit failed)
+		// TODO: other stuff?
 	}
 
 	localRollback() {
@@ -63,6 +69,6 @@ export default (cls) => class Command_delete extends cls.Command {
 		/* untrack this command in the entity */
 		this.entity.deleteCommand = null;
 		
-		// TODO
+		// TODO: other stuff?
 	}
 };

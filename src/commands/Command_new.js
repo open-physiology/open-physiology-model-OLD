@@ -4,7 +4,7 @@ import assert     from 'power-assert';
 import {constraint, humanMsg} from '../util/misc';
 
 import {$$entities, $$committedEntitiesByHref, $$committedEntities} from '../symbols';
-import {Field} from "../fields/Field";
+import {Field} from '../fields/Field';
 // import {$$commands} from './symbols';
 
 export default (cls) => class Command_new extends cls.Command {
@@ -12,6 +12,10 @@ export default (cls) => class Command_new extends cls.Command {
 	static commandType = 'new';
 	
 	static get entityClass() { return cls }
+	
+	static create(initialValues = {}, options = {}) {
+		return super.create([initialValues], options);
+	}
 	
 	constructor(initialValues = {}, options = {}) {
 		super({
@@ -41,7 +45,6 @@ export default (cls) => class Command_new extends cls.Command {
 	
 	localRun() {
 		/* sanity checks */
-		if (this.result) { return }
 		constraint(!cls.abstract, humanMsg`
 			Cannot instantiate the abstract
 			class ${cls.name}.
@@ -64,7 +67,10 @@ export default (cls) => class Command_new extends cls.Command {
 		cls.Entity[$$entities].add(this.result);
 	}
 	
-	async localCommit({id, href}) {
+	async localCommit() {
+		const backend = cls.environment.backend;
+		const {id, href} = await backend.commit_new(this.result.toJSON());
+		
 		assert(id && href, humanMsg`
 			Command_new#localCommit needs to
 			receive both id and href arguments.
@@ -72,12 +78,12 @@ export default (cls) => class Command_new extends cls.Command {
 		
 		/* set id and href */
 		const opts = {
-			ignoreReadonly:  true,
-			updatePristine:  true, // TODO: does this option make sense?
+			ignoreReadonly:    true,
+			updatePristine:    true, // TODO: does this option make sense?
 			createEditCommand: false
 		};
-		this.result.set('id',   id,   opts);
-		this.result.set('href', href, opts);
+		this.result.fields['id']  .set(id,   opts);
+		this.result.fields['href'].set(href, opts);
 		
 		/* after it's first committed, it's no longer new, but is pristine */
 		this.result.pSubject('isNew')     .next(false);

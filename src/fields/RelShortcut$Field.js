@@ -1,4 +1,3 @@
-import {filter}                   from 'rxjs/operator/filter';
 import {pairwise}                 from 'rxjs/operator/pairwise';
 import {takeUntil}                from 'rxjs/operator/takeUntil';
 import {take}                     from 'rxjs/operator/take';
@@ -16,6 +15,7 @@ import assert from 'power-assert';
 
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
 import {humanMsg} from "../util/misc";
+import {map, filter} from '../util/bound-hybrid-functions';
 
 import {Field, RelField} from './Field';
 
@@ -132,6 +132,13 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 			::waitUntilConstructed()
 			.subscribe(this.p('value'));
 		
+	}
+	
+	static valueToJSON(value, options = {}) {
+		return value::map(e => ({
+			id:   e.id,
+			href: e.href
+		}));
 	}
 	
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {

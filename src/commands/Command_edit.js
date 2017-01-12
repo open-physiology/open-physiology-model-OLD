@@ -15,13 +15,18 @@ export default (cls) => class Command_edit extends cls.Command {
 	
 	static get entityClass() { return cls }
 	
+	static create(entity, newValues = {}, options = {}) {
+		return super.create([entity, newValues], options);
+	}
+	
 	constructor(entity, newValues = {}, options = {}) {
 		super({
 			...options,
 			commandDependencies: [
 				entity.originCommand,
-				...(entity.editCommands         || []), // TODO: only dependent on edit commands with shared property keys
+				...(entity.editCommands         || []),
 				...(options.commandDependencies || [])
+				// TODO: only dependent on edit commands with shared property keys
 			]
 		});
 		this.entity    = entity;
@@ -34,14 +39,6 @@ export default (cls) => class Command_edit extends cls.Command {
 
 	entity;
 	oldValues = null;
-	
-	// get newValues() {
-	// 	const result = {};
-	// 	for (let key of oldValues::keys()) {
-	// 		result[key] = this.entity.fields[key].value;
-	// 	}
-	// 	return result;
-	// }
 	
 	localRun() {
 		/* sanity checks */
@@ -76,6 +73,13 @@ export default (cls) => class Command_edit extends cls.Command {
 	}
 	
 	async localCommit() {
+		const backend = cls.environment.backend;
+		let response = await backend.commit_edit(
+			this.entity.href,
+			this.entity.constructor.objectToJSON(this.newValues, { sourceEntity: this.entity })
+		);
+		// TODO: integrate response
+		// TODO: catch possible exception, meaning the commit failed
 		/* after it's first committed, it may be pristine */
 		if ([this.entity.originCommand, ...this.entity.editCommands].every(cmd => cmd === this || cmd.committed || cmd.rolledBack)) {
 			this.entity.pSubject('isPristine').next(true);

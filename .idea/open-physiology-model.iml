@@ -10,5 +10,6 @@
     <orderEntry type="library" name="mocha-DefinitelyTyped" level="project" />
     <orderEntry type="library" name="power-assert-DefinitelyTyped" level="project" />
     <orderEntry type="library" name="rx-DefinitelyTyped" level="project" />
+    <orderEntry type="library" name="lodash-DefinitelyTyped" level="application" />
   </component>
 </module>

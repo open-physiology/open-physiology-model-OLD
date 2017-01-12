@@ -7,15 +7,15 @@ import entries from 'lodash-bound/entries';
 
 describe("integrated workflow", () => {
 	
-	let module, backend;
+	let environment, backend, frontend;
 	beforeEach(() => {
-		backend = simpleMockHandlers();
-		module  = moduleFactory(backend.frontendInterface);
+		({backend, frontend} = simpleMockHandlers());
+		environment = moduleFactory(frontend);
 	});
 	
 	it("can track available entities with a stream per class", async () => {
 
-		const {Resource, Template, Material} = module.classes;
+		const {Resource, Template, Material} = environment.classes;
 
 		let gathered_Materials  = new Set;
 		let gathered_Templates  = new Set;
@@ -64,24 +64,16 @@ describe("integrated workflow", () => {
 		expect([...gathered_Templates]).to.eql([blood, water]);
 		expect([...gathered_Resources]).to.eql([blood, water]);
 
-		expect([...Material.getAll()]).to.eql([blood, water]);
-		expect([...Template.getAll()]).to.eql([blood, water]);
-		expect([...Resource.getAll()]).to.eql([blood, water]);
-
 		await water.commit();
 
 		expect([...committed_Materials]).to.eql([blood, water]);
 		expect([...committed_Templates]).to.eql([blood, water]);
 		expect([...committed_Resources]).to.eql([blood, water]);
 
-		expect([...Material.getAllCommitted()]).to.eql([blood, water]);
-		expect([...Template.getAllCommitted()]).to.eql([blood, water]);
-		expect([...Resource.getAllCommitted()]).to.eql([blood, water]);
-
 	});
 
 	it("can create new Materials and link them", async () => {
-		const {Material, ContainsMaterial, Type} = module.classes;
+		const {Material, ContainsMaterial, Type} = environment.classes;
 
 		let blood = Material.new({
 			name: "blood"
@@ -101,6 +93,7 @@ describe("integrated workflow", () => {
 		let water = Material.new({
 			name: "waiter"
 		});
+		// let waterHref = water.href;
 		
 		let waterType = Type.new({
 			definition: water
@@ -128,7 +121,7 @@ describe("integrated workflow", () => {
 		
 		waterType.definition = newWater;
 
-		await newWater.commit();
+		await newWater .commit();
 		await waterType.commit();
 
 		expect(newWater).to.have.a.property('id'  ).which.is.a('number');
@@ -136,16 +129,16 @@ describe("integrated workflow", () => {
 		expect(newWater).to.have.a.property('name', "water");
 
 		const {
-			id:   waterId,
-			href: waterHref,
-			name: waterName
+			id:   waterId2,
+			href: waterHref2,
+			name: waterName2
 		} = newWater;
 
 		newWater.rollback();
 
-		expect(newWater).to.have.a.property('id'  , waterId  );
-		expect(newWater).to.have.a.property('href', waterHref);
-		expect(newWater).to.have.a.property('name', waterName);
+		expect(newWater).to.have.a.property('id'  , waterId2  );
+		expect(newWater).to.have.a.property('href', waterHref2);
+		expect(newWater).to.have.a.property('name', waterName2);
 
 		let bloodHasWater = ContainsMaterial.new({
 			1: blood,
@@ -169,21 +162,104 @@ describe("integrated workflow", () => {
 
 	});
 	
-	it("uses the Command design pattern", async () => {
-		const {Lyph, Border} = module.classes;
+	it("can retrieve an existing entity from the backend (1)", async () => {
+		const {Material} = environment.classes;
 		
-		expect(backend.allStoredEntities()::entries()).to.have.length(0);
+		let {href} = backend.create({
+			class: 'Material',
+			name: "Created Material"
+		});
+		expect(backend.readAll()).to.have.length(1);
+		
+		let lyph = await Material.get(href);
+		
+		expect(lyph).to.be.instanceof(Material);
+		expect(lyph.href).to.equal(href);
+		expect(lyph.name).to.equal("Created Material");
+	});
+	
+	it("can retrieve an existing entity from the backend (2)", async () => {
+		const {Template, Material} = environment.classes;
+		
+		let {href} = backend.create({
+			class: 'Material',
+			name: "Created Material"
+		});
+		expect(backend.readAll()).to.have.length(1);
+		
+		let lyph = await Template.get(href);
+		
+		expect(lyph).to.be.instanceof(Material);
+		expect(lyph.href).to.equal(href);
+		expect(lyph.name).to.equal("Created Material");
+	});
+	
+	it("can retrieve all existing entities from the backend (1)", async () => {
+		const {Material} = environment.classes;
+
+		let {href} = backend.create({
+			class: 'Material',
+			name: "Created Material"
+		});
+		expect(backend.readAll()).to.have.length(1);
+
+		let allMaterials = [...await Material.getAll()];
+
+		expect(allMaterials).to.have.length(1);
+		
+		let lyph = allMaterials[0];
+		expect(lyph).to.be.instanceof(Material);
+		expect(lyph.href).to.equal(href);
+		expect(lyph.name).to.equal("Created Material");
+
+	});
+	
+	it("can retrieve all existing entities from the backend (2)", async () => {
+		const {Template, CanonicalTree, Material} = environment.classes;
+
+		let { href: href1 } = backend.create({
+			class: 'Material',
+			name: "Created Material"
+		});
+		let { href: href2 } = backend.create({
+			class: 'CanonicalTree',
+			name: "Created Canonical Tree"
+		});
+		expect(href1).to.not.equal(href2);
+		expect(backend.readAll()).to.have.length(2);
+		
+		let allTemplates = [...await Template.getAll()];
+
+		expect(allTemplates).to.have.length(2);
+		
+		let template1 = allTemplates.filter(t=>t.href===href1)[0];
+		expect(template1).to.be.instanceof(Material);
+		expect(template1.name).to.equal("Created Material");
+		
+		let template2 = allTemplates.filter(t=>t.href===href2)[0];
+		expect(template2).to.be.instanceof(CanonicalTree);
+		expect(template2.name).to.equal("Created Canonical Tree");
+
+	});
+	
+	it("uses the Command design pattern", async () => {
+		const {Lyph, Border} = environment.classes;
+		
+		expect(backend.readAll()).to.have.length(0);
 		
 		let lyph = Lyph.new({
 			name: "Lyph"
 		});
 		
-		expect(backend.allStoredEntities()::entries()).to.have.length(0);
+		expect(backend.readAll()).to.have.length(0);
 		
 		await lyph.commit();
 		
-		expect(backend.allStoredEntities()::entries()).to.have.length(5);
+		expect(backend.readAll()).to.have.length(5);
 		// ⬑ 1 lyph, 2 borders, 2 relationships
+		
+		
+		
 		
 		// TODO: The commit cycle has a flaw; (INTERDEPENDENT NEW HREFs)
 		//       If a lyph is committed, its borders also have to be committed,

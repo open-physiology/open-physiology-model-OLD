@@ -4,10 +4,10 @@ import {simpleMockHandlers}   from "./mock-handlers.helper";
 
 describe("Entity classes", () => {
 	
-	let module, backend;
+	let module, backend, frontend;
 	beforeEach(() => {
-		backend = simpleMockHandlers();
-		module  = moduleFactory(backend.frontendInterface);
+		({backend, frontend} = simpleMockHandlers());
+		module = moduleFactory(frontend);
 	});
 	
 	it("can list its possible subclasses", () => {

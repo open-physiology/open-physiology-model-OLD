@@ -1,9 +1,15 @@
 import Graph from 'graph.js/dist/graph';
 import assert from 'power-assert';
 
-import ValueTracker, {property, event} from '../util/ValueTracker';
+import isUndefined from 'lodash-bound/isUndefined';
+import defaults    from 'lodash-bound/defaults';
+import last        from 'lodash-bound/last';
+import initial     from 'lodash-bound/initial';
+
+import ValueTracker from '../util/ValueTracker';
 
 import {map, filter} from '../util/bound-hybrid-functions';
+import {constraint, humanMsg} from "../util/misc";
 
 const $$graph        = Symbol('$$graph');
 const $$running      = Symbol('$$running');
@@ -79,14 +85,39 @@ export default (backend) => {
 		
 		get entityClass() { return this.constructor.entityClass }
 		
-		static create(...args) {
-			let cmd = new this(...args);
+		static create(initialArgs, options) {
 			
+			let cmd = new this(...initialArgs, { ...options, allowInvokingConstructor: true });
+			cmd.options.command = cmd;
+			
+			let {
+				commandDependencies,
+				commandCauses,
+				run,
+				hasRun,
+				committed,
+				rolledBack
+			} = cmd.options;
+			
+			/* option normalization and sanity-check */
+			assert(!committed || !rolledBack);
+			assert(!committed && !rolledBack || hasRun !== false);
+			assert(!run || !hasRun);
+			
+			/* update command dependency graph */
 			commands.addVertex(cmd, cmd);
-			for (let dep of cmd.options.commandDependencies || []) { commands.addEdge(dep, cmd, {})               }
-			for (let dep of cmd.options.commandCauses       || []) { commands.addEdge(dep, cmd, { forced: true }) }
+			for (let dep of commandDependencies || []) { commands.addEdge(dep, cmd, {})               }
+			for (let dep of commandCauses       || []) { commands.addEdge(dep, cmd, { forced: true }) }
 			
-			if (cmd.options.run) { cmd.run() }
+			/* handle state */
+			this[$$running]     = false;
+			this[$$committing]  = false;
+			this[$$rollingBack] = false;
+			if (run) { cmd.run() }
+			this[$$hasRun]      = hasRun;
+			this[$$committed]   = committed;
+			this[$$rolledBack]  = rolledBack;
+			
 			return cmd;
 		}
 		
@@ -183,21 +214,17 @@ export default (backend) => {
 		//////////////////////////////////////////
 		
 		constructor(options = {}) {
-			let {
-				commandDependencies = [],
-				commandCauses       = [],
-				run                 = false,
-				hasRun              = false,
-				committed           = false,
-				rolledBack          = false
-			} = this.options = options;
-			this.options.command = this;
-			this[$$running]     = false;
-			this[$$hasRun]      = hasRun;
-			this[$$committing]  = false;
-			this[$$committed]   = committed;
-			this[$$rollingBack] = false;
-			this[$$rolledBack]  = rolledBack;
+			this.options = options::defaults({
+				commandDependencies: [],
+				commandCauses      : []
+			});
+			
+			/* make sure this constructor was invoked under proper conditions */
+			constraint(options.allowInvokingConstructor, humanMsg`
+				Do not use 'new ${this.constructor.name}(...args)'.
+				Instead, use '${this.constructor.name}.create(...args)'.
+			`);
+			delete options.allowInvokingConstructor;
 		}
 		
 		/// /// /// /// /// static event method /// /// /// /// ///
@@ -269,7 +296,7 @@ export default (backend) => {
 				commandsToCommitBeforeMe.add(dep);
 			}
 			
-			// forced command commits
+			// forced commits
 			for (let [rdep,, {forced}] of commands.verticesFrom(this)) {
 				if (!forced)                                 { continue }
 				if (rdep[$$committing] || rdep[$$committed]) { continue }
@@ -280,8 +307,7 @@ export default (backend) => {
 			await Promise.all([...commandsToCommitBeforeMe].map(c=>c.commit()));
 			
 			/* then commit this command */
-			const commitResponse = await backend.commit(this);
-			await this.localCommit(commitResponse);
+			await this.localCommit();
 			this[$$committing] = false;
 			this[$$committed]  = true;
 			eventTracker.e('commit').next(this);
@@ -327,18 +353,3 @@ export default (backend) => {
 		
 	};
 };
-
-
-// export class CreateEntity extends Command {
-// 	constructor(cls, props = {}, options = {}) {}
-// 	run() {}
-// 	commit() {}
-// 	rollback() {}
-// }
-// export class DeleteEntity extends Command {}
-// export class SetPropertyField extends Command {}
-// export class SetSideField extends Command {}
-// export class SetRel1Field extends Command {}
-// export class SetRel1ShortcutField extends Command {}
-// export class SetRel$Field extends Command {}
-// export class SetRel$ShortcutField extends Command {}

@@ -148,6 +148,10 @@ export class Field extends ValueTracker {
 		// 	.subscribe( this.pSubject('isPristine') );
 	}
 	
+	static valueToJSON() { assert(false, humanMsg`Field.valueToJSON must be implemented in subclasses.`) }
+	
+	valueToJSON(options = {}) { return this.constructor.toJSON(this.value, options) }
+	
 	//noinspection JSDuplicatedDeclaration // (to suppress warning due to Webstorm bug)
 	get() { return this[$$value] }
 	

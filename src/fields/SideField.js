@@ -70,8 +70,7 @@ Field[$$registerFieldClass](class SideField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[initialValue::isObject() || initialValue::isNull(), initialValue                     ],
-			[desc.resourceClass.singleton,                       ::desc.resourceClass.getSingleton],
+			[initialValue::isObject() || initialValue::isNull(),   initialValue                   ],
 			[desc.options.auto,                                  ::desc.resourceClass.new         ] // TODO: command dependencies?
 		);
 		
@@ -92,14 +91,18 @@ Field[$$registerFieldClass](class SideField extends Field {
 					if (prev) { prev.fields[desc.keyInResource].set(null,  { createEditCommand: false }) }
 					if (curr) { curr.fields[desc.keyInResource].set(owner, { createEditCommand: false }) }
 				} else {
-					if (prev) {
-						prev.fields[desc.keyInResource].get().delete(owner)
-					} // TODO: , { createEditCommand: false } ?
-					if (curr) {
-						curr.fields[desc.keyInResource].get().add   (owner)
-					}
+					if (prev) { prev.fields[desc.keyInResource].get().delete(owner) }
+					if (curr) { curr.fields[desc.keyInResource].get().add   (owner) }
+					// TODO: , { createEditCommand: false } ?
 				}
 			});
+	}
+	
+	static valueToJSON(value, options = {}) {
+		return {
+			id  : value.id,
+			href: value.href
+		};
 	}
 		
 	[$$destruct]() {

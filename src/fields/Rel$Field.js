@@ -1,14 +1,14 @@
-import {map}       from 'rxjs/operator/map';
 import {filter}    from 'rxjs/operator/filter';
 import {switchMap} from 'rxjs/operator/switchMap';
 import {startWith} from 'rxjs/operator/startWith';
 import {pairwise}  from 'rxjs/operator/pairwise';
 import 'rxjs/add/operator/do';
 
-import inRange from 'lodash-bound/inRange';
-import get     from 'lodash-bound/get';
-import size    from 'lodash-bound/size';
-import entries from 'lodash-bound/entries';
+import inRange     from 'lodash-bound/inRange';
+import get         from 'lodash-bound/get';
+import size        from 'lodash-bound/size';
+import entries     from 'lodash-bound/entries';
+import isUndefined from 'lodash-bound/isUndefined';
 
 import {defineProperty} from 'bound-native-methods';
 
@@ -16,6 +16,7 @@ import assert from 'power-assert';
 
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
 import {humanMsg, constraint} from '../util/misc';
+import {map} from '../util/bound-hybrid-functions';
 
 import {Field, RelField} from './Field';
 
@@ -137,8 +138,6 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		if (desc.options.auto) {
 			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
 			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
-				// TODO: did we need to keep .newOrSingleton() here instead of .new()?
-				// let otherEntity = desc.codomain.resourceClass.newOrSingleton();
 				let otherEntity = desc.codomain.resourceClass.new({}, {
 					commandCauses: [owner.originCommand]
 				});
@@ -162,6 +161,13 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
 		// if (updatePristine)    { copySetContent(this[$$pristine], newValue) }// TODO: remove all 'pristine' related stuff from the field classes
 		copySetContent(this[$$value], newValue);
+	}
+	
+	static valueToJSON(value, options = {}) {
+		return value::map(e => ({
+			id:   e.id,
+			href: e.href
+		}));
 	}
 		
 	[$$destruct]() {

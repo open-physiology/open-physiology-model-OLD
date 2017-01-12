@@ -5,10 +5,10 @@ import {simpleMockHandlers} from "../mock-handlers.helper";
 
 describe("'research' Module", () => {
 	
-	let module, backend;
+	let module, backend, frontend;
 	beforeEach(() => {
-		backend = simpleMockHandlers();
-		module  = moduleFactory(backend.frontendInterface);
+		({backend, frontend} = simpleMockHandlers());
+		module = moduleFactory(frontend);
 	});
 	
 	it("exports the expected classes", () => {
