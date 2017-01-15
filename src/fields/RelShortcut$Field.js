@@ -116,14 +116,9 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 			});
 		
 		/* handle initial values */
-		if (initialValue !== undefined) {
-			for (let res of initialValue) {
-				// TODO: - rel may be a reference to an existing resource;
-				//     :   then go get it
-				//     : - It may also be a description of a new resource;
-				//     :   then create it
-				// this[$$pristine].add(res);// TODO: remove all 'pristine' related stuff from the field classes
-				this[$$value]   .add(res);
+		if (initialValue && initialValue[Symbol.iterator]) {
+			for (let res of this.jsonToValue(initialValue)) {
+				this[$$value].add(res);
 			}
 		}
 		
@@ -141,12 +136,23 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		}));
 	}
 	
+	jsonToValue(json, options = {}) {
+		const Entity = this[$$owner].constructor.Entity;
+		let result = new Set;
+		for (let thing of json) {
+			let entity = Entity.getLocal(thing, options);
+			if (!entity) { entity = this[$$owner].constructor.setPlaceholder(thing, options) }
+			result.add(entity);
+		}
+		return result;
+	}
+	
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
 		constraint(ignoreReadonly || !this[$$desc].readonly, humanMsg`
-			You're trying to set a readonly field ${this[$$owner].constructor.name}#${this[$$key]}.
+			You're trying to set a readonly field
+			${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
-		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
-		// if (updatePristine)    { copySetContent(this[$$pristine], newValue) }// TODO: remove all 'pristine' related stuff from the field classes
+		if (!ignoreValidation) { this.validate(newValue, ['set']) }
 		copySetContent(this[$$value], newValue);
 	}
 		

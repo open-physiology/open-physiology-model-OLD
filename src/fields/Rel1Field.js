@@ -143,9 +143,17 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 	static valueToJSON(value, options = {}) {
 		if (value === null) { return null }
 		return {
-			id  : value.id,
+			id:   value.id,
 			href: value.href
 		};
+	}
+	
+	jsonToValue(json, options = {}) {
+		if (json === null) { return null }
+		const Entity = this[$$owner].constructor.Entity;
+		let result = Entity.getLocal(json, options);
+		if (!result) { result = Entity.setPlaceholder(json, options) }
+		return result;
 	}
 	
 	[$$destruct]() {

@@ -108,11 +108,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isNumber2 = _interopRequireDefault(_isNumber);
 	
-	var _isObject = __webpack_require__(69);
+	var _isObject = __webpack_require__(70);
 	
 	var _isObject2 = _interopRequireDefault(_isObject);
 	
-	var _isFunction = __webpack_require__(50);
+	var _isFunction = __webpack_require__(51);
 	
 	var _isFunction2 = _interopRequireDefault(_isFunction);
 	
@@ -124,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isWeakSet2 = _interopRequireDefault(_isWeakSet);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
@@ -132,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _rearg2 = _interopRequireDefault(_rearg);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _filter = __webpack_require__(30);
 	
@@ -439,12 +439,69 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+	
+	exports.__esModule = true;
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+	
+	function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+	
+	var _object = __webpack_require__(223);
+	
+	_defaults(exports, _interopRequireWildcard(_object));
+	
+	var _symbolJs = __webpack_require__(224);
+	
+	_defaults(exports, _interopRequireWildcard(_symbolJs));
+	
+	var _numberJs = __webpack_require__(222);
+	
+	_defaults(exports, _interopRequireWildcard(_numberJs));
+	
+	var _mathJs = __webpack_require__(221);
+	
+	_defaults(exports, _interopRequireWildcard(_mathJs));
+	
+	var _dateJs = __webpack_require__(219);
+	
+	_defaults(exports, _interopRequireWildcard(_dateJs));
+	
+	var _arrayJs = __webpack_require__(218);
+	
+	_defaults(exports, _interopRequireWildcard(_arrayJs));
+	
+	var _arrayBufferJs = __webpack_require__(217);
+	
+	_defaults(exports, _interopRequireWildcard(_arrayBufferJs));
+	
+	var _jsonJs = __webpack_require__(220);
+	
+	_defaults(exports, _interopRequireWildcard(_jsonJs));
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var fn = __webpack_require__(373);
+	
+	module.exports = function entries() {
+	  return fn.apply(undefined, [this].concat(Array.prototype.slice.apply(arguments)));
+	};
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var baseHas = __webpack_require__(159),
 	    baseKeys = __webpack_require__(295),
 	    indexKeys = __webpack_require__(169),
 	    isArrayLike = __webpack_require__(24),
-	    isIndex = __webpack_require__(55),
-	    isPrototype = __webpack_require__(76);
+	    isIndex = __webpack_require__(56),
+	    isPrototype = __webpack_require__(77);
 	
 	/**
 	 * Creates an array of the own enumerable property names of `object`.
@@ -495,63 +552,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	module.exports = keys;
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	exports.__esModule = true;
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-	
-	function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
-	
-	var _object = __webpack_require__(223);
-	
-	_defaults(exports, _interopRequireWildcard(_object));
-	
-	var _symbolJs = __webpack_require__(224);
-	
-	_defaults(exports, _interopRequireWildcard(_symbolJs));
-	
-	var _numberJs = __webpack_require__(222);
-	
-	_defaults(exports, _interopRequireWildcard(_numberJs));
-	
-	var _mathJs = __webpack_require__(221);
-	
-	_defaults(exports, _interopRequireWildcard(_mathJs));
-	
-	var _dateJs = __webpack_require__(219);
-	
-	_defaults(exports, _interopRequireWildcard(_dateJs));
-	
-	var _arrayJs = __webpack_require__(218);
-	
-	_defaults(exports, _interopRequireWildcard(_arrayJs));
-	
-	var _arrayBufferJs = __webpack_require__(217);
-	
-	_defaults(exports, _interopRequireWildcard(_arrayBufferJs));
-	
-	var _jsonJs = __webpack_require__(220);
-	
-	_defaults(exports, _interopRequireWildcard(_jsonJs));
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var fn = __webpack_require__(373);
-	
-	module.exports = function entries() {
-	  return fn.apply(undefined, [this].concat(Array.prototype.slice.apply(arguments)));
-	};
 
 
 /***/ },
@@ -1021,7 +1021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var root_1 = __webpack_require__(88);
+	var root_1 = __webpack_require__(89);
 	var toSubscriber_1 = __webpack_require__(431);
 	var symbol_observable_1 = __webpack_require__(187);
 	/**
@@ -1182,9 +1182,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t\tTried to set the readonly field\n\t\t\t\t\'', '#', '\'.\n\t\t\t'], ['\n\t\t\t\tTried to set the readonly field\n\t\t\t\t\'', '#', '\'.\n\t\t\t']);
 	
-	var _Subject = __webpack_require__(81);
+	var _Subject = __webpack_require__(82);
 	
-	var _map = __webpack_require__(82);
+	var _map = __webpack_require__(83);
 	
 	var _concat = __webpack_require__(413);
 	
@@ -1194,7 +1194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _pick2 = _interopRequireDefault(_pick);
 	
-	var _isFunction = __webpack_require__(50);
+	var _isFunction = __webpack_require__(51);
 	
 	var _isFunction2 = _interopRequireDefault(_isFunction);
 	
@@ -1206,11 +1206,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _values2 = _interopRequireDefault(_values);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _ValueTracker2 = __webpack_require__(97);
 	
@@ -1599,28 +1599,28 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'set',
 			value: function set(newValue) {
 				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-				var _options$createEditCo = options.createEditCommand;
-				var createEditCommand = _options$createEditCo === undefined ? true : _options$createEditCo;
 	
-				if (createEditCommand) {
+				if (options.createEditCommand) {
 	
 					this[_symbols.$$owner].edit(_defineProperty({}, this[_symbols.$$key], newValue), options);
 				} else if (!this.constructor.isEqual(this[_symbols.$$value], newValue)) {
+					var _context2;
+	
 					var _options$ignoreReadon = options.ignoreReadonly;
 					var ignoreReadonly = _options$ignoreReadon === undefined ? false : _options$ignoreReadon;
 					var _options$ignoreValida = options.ignoreValidation;
 					var ignoreValidation = _options$ignoreValida === undefined ? false : _options$ignoreValida;
-					var _options$updatePristi = options.updatePristine;
-					var updatePristine = _options$updatePristi === undefined ? false : _options$updatePristi;
-					var _options$createEditCo2 = options.createEditCommand;
+					var _options$createEditCo = options.createEditCommand;
+					var createEditCommand = _options$createEditCo === undefined ? true : _options$createEditCo;
 	
-					var _createEditCommand = _options$createEditCo2 === undefined ? true : _options$createEditCo2;
 	
 					(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly, (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 					if (!ignoreValidation) {
 						this.validate(newValue, ['set']);
 					}
-					// if (updatePristine) { this[$$pristine] = newValue } // TODO: remove all 'pristine' related stuff from the field classes
+					if ((_context2 = this.jsonToValue, _isFunction2.default).call(_context2)) {
+						newValue = this.jsonToValue(newValue, options);
+					}
 					this[_symbols.$$value] = newValue;
 					this.pSubject('value').next(newValue);
 				}
@@ -1661,7 +1661,6 @@ return /******/ (function(modules) { // webpackBootstrap
 							this.set(val, {
 								ignoreReadonly: true,
 								ignoreValidation: true,
-								// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
 								createEditCommand: false
 							});
 							return;
@@ -1786,8 +1785,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getLength = __webpack_require__(328),
-	    isFunction = __webpack_require__(79),
-	    isLength = __webpack_require__(80);
+	    isFunction = __webpack_require__(80),
+	    isLength = __webpack_require__(81);
 	
 	/**
 	 * Checks if `value` is array-like. A value is considered array-like if it's
@@ -1845,9 +1844,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var $$fieldClasses = exports.$$fieldClasses = Symbol('$$fieldClasses');
 	var $$owner = exports.$$owner = Symbol('$$owner');
 	var $$key = exports.$$key = Symbol('$$key');
-	var $$desc = exports.$$desc = Symbol('$$key');
+	var $$desc = exports.$$desc = Symbol('$$desc');
 	var $$value = exports.$$value = Symbol('$$value');
-	// export const $$pristine     = Symbol('$$pristine');// TODO: remove all 'pristine' related stuff from the field classes
 	var $$initSet = exports.$$initSet = Symbol('$$initSet');
 	var $$entriesIn = exports.$$entriesIn = Symbol('$$entriesIn');
 	var $$initialized = exports.$$initialized = Symbol('$$initialized');
@@ -2130,11 +2128,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module3 = _interopRequireDefault(_Module2);
 	
-	var _defaults = __webpack_require__(49);
+	var _defaults = __webpack_require__(50);
 	
 	var _defaults2 = _interopRequireDefault(_defaults);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -2418,7 +2416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isSymbol = __webpack_require__(59);
+	var isSymbol = __webpack_require__(60);
 	
 	/** Used as references for various `Number` constants. */
 	var INFINITY = 1 / 0;
@@ -2481,8 +2479,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var root_1 = __webpack_require__(88);
-	var isArray_1 = __webpack_require__(86);
+	var root_1 = __webpack_require__(89);
+	var isArray_1 = __webpack_require__(87);
 	var isPromise_1 = __webpack_require__(428);
 	var Observable_1 = __webpack_require__(20);
 	var iterator_1 = __webpack_require__(424);
@@ -2586,7 +2584,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isInteger2 = _interopRequireDefault(_isInteger);
 	
-	var _defaults = __webpack_require__(49);
+	var _defaults = __webpack_require__(50);
 	
 	var _defaults2 = _interopRequireDefault(_defaults);
 	
@@ -2602,7 +2600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _values2 = _interopRequireDefault(_values);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
@@ -2618,7 +2616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _graph2 = _interopRequireDefault(_graph);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -3581,7 +3579,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _union3 = _interopRequireDefault(_union2);
 	
-	var _defaults = __webpack_require__(49);
+	var _defaults = __webpack_require__(50);
 	
 	var _defaults2 = _interopRequireDefault(_defaults);
 	
@@ -3960,10 +3958,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 46 */,
+/* 46 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var $$committedEntities = exports.$$committedEntities = Symbol('$$committedEntities');
+	var $$entitiesByHref = exports.$$entitiesByHref = Symbol('$$entitiesByHref');
+	var $$entities = exports.$$entities = Symbol('$$entities');
+	var $$isPlaceholder = exports.$$isPlaceholder = Symbol('$$isPlaceholder');
+
+/***/ },
 /* 47 */,
 /* 48 */,
-/* 49 */
+/* 49 */,
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3976,12 +3988,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var fn = __webpack_require__(79);
+	var fn = __webpack_require__(80);
 	
 	module.exports = function isFunction() {
 	  return fn.apply(undefined, [this].concat(Array.prototype.slice.apply(arguments)));
@@ -3989,7 +4001,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports) {
 
 	/**
@@ -4016,7 +4028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 52 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var apply = __webpack_require__(152);
@@ -4057,10 +4069,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assignValue = __webpack_require__(72);
+	var assignValue = __webpack_require__(73);
 	
 	/**
 	 * Copies properties of `source` to `object`.
@@ -4094,7 +4106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 54 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var DataView = __webpack_require__(264),
@@ -4169,7 +4181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 55 */
+/* 56 */
 /***/ function(module, exports) {
 
 	/** Used as references for various `Number` constants. */
@@ -4197,11 +4209,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 56 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var isArray = __webpack_require__(6),
-	    isSymbol = __webpack_require__(59);
+	    isSymbol = __webpack_require__(60);
 	
 	/** Used to match property names within property paths. */
 	var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
@@ -4232,7 +4244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 57 */
+/* 58 */
 /***/ function(module, exports) {
 
 	/**
@@ -4275,7 +4287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 58 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var isArray = __webpack_require__(6),
@@ -4320,7 +4332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 59 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var isObjectLike = __webpack_require__(17);
@@ -4364,7 +4376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 60 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4376,7 +4388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Observable_1 = __webpack_require__(20);
 	var ScalarObservable_1 = __webpack_require__(180);
 	var EmptyObservable_1 = __webpack_require__(124);
-	var isScheduler_1 = __webpack_require__(87);
+	var isScheduler_1 = __webpack_require__(88);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -4491,11 +4503,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ArrayObservable.js.map
 
 /***/ },
-/* 61 */,
 /* 62 */,
 /* 63 */,
 /* 64 */,
-/* 65 */
+/* 65 */,
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4521,7 +4533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _map2 = _interopRequireDefault(_map);
 	
-	var _map3 = __webpack_require__(82);
+	var _map3 = __webpack_require__(83);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -4552,10 +4564,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var map = exports.map = hybrid(_map2.default, _map3.map, 'map');
 
 /***/ },
-/* 66 */,
 /* 67 */,
 /* 68 */,
-/* 69 */
+/* 69 */,
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4568,7 +4580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var listCacheClear = __webpack_require__(345),
@@ -4606,7 +4618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var root = __webpack_require__(16);
@@ -4618,10 +4630,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var eq = __webpack_require__(57);
+	var eq = __webpack_require__(58);
 	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -4651,10 +4663,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 73 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var eq = __webpack_require__(57);
+	var eq = __webpack_require__(58);
 	
 	/**
 	 * Gets the index at which the `key` is found in `array` of key-value pairs.
@@ -4678,7 +4690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 74 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseFindIndex = __webpack_require__(281),
@@ -4712,7 +4724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var isKeyable = __webpack_require__(342);
@@ -4736,7 +4748,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 77 */
 /***/ function(module, exports) {
 
 	/** Used for built-in method references. */
@@ -4760,7 +4772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 77 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(38);
@@ -4772,7 +4784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 78 */
+/* 79 */
 /***/ function(module, exports) {
 
 	/**
@@ -4796,7 +4808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 79 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var isObject = __webpack_require__(12);
@@ -4844,7 +4856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports) {
 
 	/** Used as references for various `Number` constants. */
@@ -4886,7 +4898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5051,7 +5063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Subject.js.map
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5142,7 +5154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=map.js.map
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5224,15 +5236,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=pairwise.js.map
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ArrayObservable_1 = __webpack_require__(60);
+	var ArrayObservable_1 = __webpack_require__(61);
 	var ScalarObservable_1 = __webpack_require__(180);
 	var EmptyObservable_1 = __webpack_require__(124);
 	var concat_1 = __webpack_require__(182);
-	var isScheduler_1 = __webpack_require__(87);
+	var isScheduler_1 = __webpack_require__(88);
 	/**
 	 * Returns an Observable that emits the items in a specified Iterable before it begins to emit items emitted by the
 	 * source Observable.
@@ -5272,7 +5284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=startWith.js.map
 
 /***/ },
-/* 85 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5416,7 +5428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=switchMap.js.map
 
 /***/ },
-/* 86 */
+/* 87 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5424,7 +5436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=isArray.js.map
 
 /***/ },
-/* 87 */
+/* 88 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5435,7 +5447,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=isScheduler.js.map
 
 /***/ },
-/* 88 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module, global) {"use strict";
@@ -5459,11 +5471,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(127)(module), (function() { return this; }())))
 
 /***/ },
-/* 89 */,
 /* 90 */,
 /* 91 */,
 /* 92 */,
-/* 93 */
+/* 93 */,
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5490,7 +5502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lyphs2 = _interopRequireDefault(_lyphs);
 	
-	var _processes = __webpack_require__(94);
+	var _processes = __webpack_require__(95);
 	
 	var _processes2 = _interopRequireDefault(_processes);
 	
@@ -5616,7 +5628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 94 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5776,19 +5788,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 95 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var $$committedEntities = exports.$$committedEntities = Symbol('$$committedEntities');
-	var $$committedEntitiesByHref = exports.$$committedEntitiesByHref = Symbol('$$committedEntitiesByHref');
-	var $$entities = exports.$$entities = Symbol('$$entities');
-
-/***/ },
 /* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -5809,7 +5808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.setEquals = setEquals;
 	exports.copySetContent = copySetContent;
 	
-	var _Subject2 = __webpack_require__(81);
+	var _Subject2 = __webpack_require__(82);
 	
 	var _BehaviorSubject = __webpack_require__(122);
 	
@@ -6123,11 +6122,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _set2 = _interopRequireDefault(_set);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
-	var _isFunction = __webpack_require__(50);
+	var _isFunction = __webpack_require__(51);
 	
 	var _isFunction2 = _interopRequireDefault(_isFunction);
 	
@@ -6137,7 +6136,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(2);
 	
-	var _Subject = __webpack_require__(81);
+	var _Subject = __webpack_require__(82);
 	
 	var _BehaviorSubject = __webpack_require__(122);
 	
@@ -6155,11 +6154,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skip = __webpack_require__(421);
 	
-	var _map = __webpack_require__(82);
+	var _map = __webpack_require__(83);
 	
 	var _withLatestFrom = __webpack_require__(423);
 	
-	var _switchMap = __webpack_require__(85);
+	var _switchMap = __webpack_require__(86);
 	
 	__webpack_require__(25);
 	
@@ -6644,7 +6643,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var fn = __webpack_require__(58);
+	var fn = __webpack_require__(59);
 	
 	module.exports = function isString() {
 	  return fn.apply(undefined, [this].concat(Array.prototype.slice.apply(arguments)));
@@ -6706,7 +6705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ListCache = __webpack_require__(70),
+	var ListCache = __webpack_require__(71),
 	    stackClear = __webpack_require__(359),
 	    stackDelete = __webpack_require__(360),
 	    stackGet = __webpack_require__(361),
@@ -6837,7 +6836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 115 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseRest = __webpack_require__(52),
+	var baseRest = __webpack_require__(53),
 	    isIterateeCall = __webpack_require__(341);
 	
 	/**
@@ -7090,7 +7089,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Subject_1 = __webpack_require__(81);
+	var Subject_1 = __webpack_require__(82);
 	var throwError_1 = __webpack_require__(430);
 	var ObjectUnsubscribedError_1 = __webpack_require__(184);
 	/**
@@ -7140,7 +7139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var isArray_1 = __webpack_require__(86);
+	var isArray_1 = __webpack_require__(87);
 	var isObject_1 = __webpack_require__(427);
 	var isFunction_1 = __webpack_require__(185);
 	var tryCatch_1 = __webpack_require__(186);
@@ -7375,7 +7374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var root_1 = __webpack_require__(88);
+	var root_1 = __webpack_require__(89);
 	var Symbol = root_1.root.Symbol;
 	exports.$$rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
 	    Symbol.for('rxSubscriber') : '@@rxSubscriber';
@@ -10963,7 +10962,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var fn = __webpack_require__(9);
+	var fn = __webpack_require__(11);
 	
 	module.exports = function keys() {
 	  return fn.apply(undefined, [this].concat(Array.prototype.slice.apply(arguments)));
@@ -11265,7 +11264,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var castPath = __webpack_require__(113),
-	    isKey = __webpack_require__(56),
+	    isKey = __webpack_require__(57),
 	    toKey = __webpack_require__(39);
 	
 	/**
@@ -11427,8 +11426,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(71),
-	    isSymbol = __webpack_require__(59);
+	var Symbol = __webpack_require__(72),
+	    isSymbol = __webpack_require__(60);
 	
 	/** Used as references for various `Number` constants. */
 	var INFINITY = 1 / 0;
@@ -11630,8 +11629,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var baseTimes = __webpack_require__(162),
 	    isArguments = __webpack_require__(119),
 	    isArray = __webpack_require__(6),
-	    isLength = __webpack_require__(80),
-	    isString = __webpack_require__(58);
+	    isLength = __webpack_require__(81),
+	    isString = __webpack_require__(59);
 	
 	/**
 	 * Creates an array of index keys for `object` values of arrays,
@@ -11876,9 +11875,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isFunction = __webpack_require__(79),
+	var isFunction = __webpack_require__(80),
 	    isObject = __webpack_require__(12),
-	    isSymbol = __webpack_require__(59);
+	    isSymbol = __webpack_require__(60);
 	
 	/** Used as references for various `Number` constants. */
 	var NAN = 0 / 0;
@@ -11984,7 +11983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseValues = __webpack_require__(306),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/**
 	 * Creates an array of the own enumerable string keyed property values of `object`.
@@ -12087,9 +12086,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var isScheduler_1 = __webpack_require__(87);
-	var isArray_1 = __webpack_require__(86);
-	var ArrayObservable_1 = __webpack_require__(60);
+	var isScheduler_1 = __webpack_require__(88);
+	var isArray_1 = __webpack_require__(87);
+	var ArrayObservable_1 = __webpack_require__(61);
 	var combineLatest_1 = __webpack_require__(417);
 	/* tslint:enable:max-line-length */
 	/**
@@ -12163,8 +12162,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var isScheduler_1 = __webpack_require__(87);
-	var ArrayObservable_1 = __webpack_require__(60);
+	var isScheduler_1 = __webpack_require__(88);
+	var ArrayObservable_1 = __webpack_require__(61);
 	var mergeAll_1 = __webpack_require__(420);
 	/**
 	 * Creates an output Observable which sequentially emits all values from every
@@ -12459,7 +12458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tThe entity at \'', '\'\n\t\t\t\tis not of class \'', '\'\n\t\t\t\tbut of class \'', '\'.\n\t\t\t'], ['\n\t\t\t\tThe entity at \'', '\'\n\t\t\t\tis not of class \'', '\'\n\t\t\t\tbut of class \'', '\'.\n\t\t\t']),
 	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tDo not use \'new ', '(...args)\'.\n\t\t\t\tInstead, use \'', '.new(...args)\'\n\t\t\t\t          or \'', '.get(...args)\'.\n\t\t\t'], ['\n\t\t\t\tDo not use \'new ', '(...args)\'.\n\t\t\t\tInstead, use \'', '.new(...args)\'\n\t\t\t\t          or \'', '.get(...args)\'.\n\t\t\t']);
 	
-	var _defaults = __webpack_require__(49);
+	var _defaults = __webpack_require__(50);
 	
 	var _defaults2 = _interopRequireDefault(_defaults);
 	
@@ -12475,7 +12474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isSet2 = _interopRequireDefault(_isSet);
 	
-	var _isObject = __webpack_require__(69);
+	var _isObject = __webpack_require__(70);
 	
 	var _isObject2 = _interopRequireDefault(_isObject);
 	
@@ -12487,7 +12486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _pick2 = _interopRequireDefault(_pick);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
@@ -12509,9 +12508,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	__webpack_require__(25);
 	
-	var _boundHybridFunctions = __webpack_require__(65);
+	var _boundHybridFunctions = __webpack_require__(66);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _babelHelpers = __webpack_require__(216);
 	
@@ -12533,11 +12532,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Command_load2 = _interopRequireDefault(_Command_load);
 	
-	var _symbols = __webpack_require__(95);
+	var _symbols = __webpack_require__(46);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
 	function _initDefineProp(target, property, descriptor, context) {
 		if (!descriptor) return;
@@ -12550,6 +12547,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	
+	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
@@ -12634,9 +12633,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					return this.constructor.commandDelete(this, options);
 				}
 	
-				/////////////////////////////////////////////////////////////////////
-				////////// STATIC (creating / caching / finding instances) //////////
-				/////////////////////////////////////////////////////////////////////
+				////////////////////////////////////////////////////
+				////////// Synchronous Model Manipulation //////////
+				////////////////////////////////////////////////////
 	
 			}, {
 				key: 'edit',
@@ -12652,14 +12651,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					this.commandDelete(_extends({}, options, { run: true }));
 				}
-			}], [{
-				key: 'createClass',
+			}, {
+				key: 'isPlaceholder',
+				get: function get() {
+					return this[_symbols.$$isPlaceholder];
+				}
 	
+				////////////////////////////////////////////
+				////////// Caching Model Entities //////////
+				////////////////////////////////////////////
+	
+			}], [{
+				key: 'normalizeAddress',
+				value: function normalizeAddress(address) {
+					if (_isString2.default.call(address)) {
+						return { class: this.name, href: address };
+					}
+					if (_isInteger2.default.call(address)) {
+						return { class: this.name, id: address };
+					}
+					if (_isObject2.default.call(address)) {
+						return _extends({ class: this.name }, _pick2.default.call(address, 'href', 'id', 'class'));
+					}
+				}
 	
 				////////////////////////////////////////////////////////////
 				////////// STATIC (building Entity-based classes) //////////
 				////////////////////////////////////////////////////////////
 	
+			}, {
+				key: 'createClass',
 				value: function createClass(config) {
 					var _definePropertiesByVa;
 	
@@ -12829,61 +12850,113 @@ return /******/ (function(modules) { // webpackBootstrap
 					return this.commandNew(initialValues, _extends({}, options, { run: true })).result;
 				}
 			}, {
+				key: 'hasCache',
+				value: function hasCache(entityOrAddress) {
+					var entity = this.getLocal(entityOrAddress);
+					return entity && !entity[_symbols.$$isPlaceholder];
+				}
+			}, {
+				key: 'hasPlaceholder',
+				value: function hasPlaceholder(entityOrAddress) {
+					var entity = this.getLocal(entityOrAddress);
+					return entity && entity[_symbols.$$isPlaceholder];
+				}
+			}, {
+				key: 'hasLocal',
+				value: function hasLocal(entityOrAddress) {
+					return !!this.getLocal(entityOrAddress);
+				}
+			}, {
+				key: 'getLocal',
+				value: function getLocal( // TODO: make private?
+				entityOrAddress) {
+					/* is it already a local entity? */
+					if (_instanceof(entityOrAddress, Entity)) {
+						return entityOrAddress;
+					}
+	
+					/* normalize address */
+					var address = this.normalizeAddress(entityOrAddress);
+	
+					/* if it's not yet cached, return undefined */
+					if (!Entity[_symbols.$$entitiesByHref][address.href]) {
+						return;
+					}
+	
+					/* fetch the entity (or placeholder) from the cache */
+					var entity = Entity[_symbols.$$entitiesByHref][address.href];
+	
+					/* make sure the retrieved entity is of the expected class */
+					(0, _misc.constraint)(this.hasInstance(entity), (0, _misc.humanMsg)(_templateObject2, JSON.stringify(address.href), this.name, entity.constructor.name));
+	
+					return entity;
+				}
+			}, {
+				key: 'setPlaceholder',
+				value: function setPlaceholder(address) {
+					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+					address = this.normalizeAddress(address);
+					var placeholder = this[$$Command_load].create(address, _extends({}, options, { placeholder: true })).result;
+					return placeholder;
+				}
+			}, {
+				key: 'setCache',
+				value: function setCache( // TODO: make private
+				values) {
+					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+					if (_instanceof(values, Entity)) {
+						return values;
+					}
+					var entity = this[$$Command_load].create(values, options).result;
+					return entity;
+				}
+	
+				////////////////////////////////////////////////////////////////
+				////////// Asynchronous Entity Retrieval from Backend //////////
+				////////////////////////////////////////////////////////////////
+	
+			}, {
 				key: 'get',
 				value: function () {
 					var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(address) {
-						var _context2;
-	
 						var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-						var values, cmd, entity;
-						return regeneratorRuntime.wrap(function _callee$(_context3) {
+						var values;
+						return regeneratorRuntime.wrap(function _callee$(_context2) {
 							while (1) {
-								switch (_context3.prev = _context3.next) {
+								switch (_context2.prev = _context2.next) {
 									case 0:
 										/* normalize address */
-										if ((_context2 = address, _isString2.default).call(_context2)) {
-											address = { href: address };
-										}
-										if ((_context2 = address, _isInteger2.default).call(_context2)) {
-											address = { id: address };
-										}
+										address = this.normalizeAddress(address);
 	
-										/* if it's not yet cached, load it now (async) */
+										/* if it's not yet cached, load and cache it now (async) */
 	
-										if (Entity[_symbols.$$committedEntitiesByHref][address.href]) {
-											_context3.next = 8;
+										if (this.hasCache(address.href)) {
+											_context2.next = 6;
 											break;
 										}
 	
-										_context3.next = 5;
+										_context2.next = 4;
 										return backend.load(address, options);
 	
-									case 5:
-										values = _context3.sent;
-										cmd = this[$$Command_load].create(values);
+									case 4:
+										values = _context2.sent;
 	
-										Entity[_symbols.$$committedEntitiesByHref][address.href] = cmd.result;
+										this.setCache(values); // TODO: do we need to mix in the address?
 	
-									case 8:
+									case 6:
+										return _context2.abrupt('return', this.getLocal(address, options));
 	
-										/* fetch the entity from the cache */
-										entity = Entity[_symbols.$$committedEntitiesByHref][address.href];
-	
-										/* make sure the retrieved entity is of the expected class */
-	
-										(0, _misc.constraint)(this.hasInstance(entity), (0, _misc.humanMsg)(_templateObject2, JSON.stringify(address.href), this.name, entity.constructor.name));
-	
-										return _context3.abrupt('return', entity);
-	
-									case 11:
+									case 7:
 									case 'end':
-										return _context3.stop();
+										return _context2.stop();
 								}
 							}
 						}, _callee, this);
 					}));
 	
-					function get(_x13, _x14) {
+					function get(_x15, _x16) {
 						return _ref.apply(this, arguments);
 					}
 	
@@ -12895,17 +12968,17 @@ return /******/ (function(modules) { // webpackBootstrap
 					var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
 						var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	
-						var response, result, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, values, cmd;
+						var response, result, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, values, entity;
 	
-						return regeneratorRuntime.wrap(function _callee2$(_context4) {
+						return regeneratorRuntime.wrap(function _callee2$(_context3) {
 							while (1) {
-								switch (_context4.prev = _context4.next) {
+								switch (_context3.prev = _context3.next) {
 									case 0:
-										_context4.next = 2;
+										_context3.next = 2;
 										return backend.loadAll(this, options);
 	
 									case 2:
-										response = _context4.sent;
+										response = _context3.sent;
 										result = new Set();
 	
 										/* cache response */
@@ -12913,64 +12986,65 @@ return /******/ (function(modules) { // webpackBootstrap
 										_iteratorNormalCompletion3 = true;
 										_didIteratorError3 = false;
 										_iteratorError3 = undefined;
-										_context4.prev = 7;
+										_context3.prev = 7;
 										for (_iterator3 = response[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 											values = _step3.value;
 	
-											if (!Entity[_symbols.$$committedEntitiesByHref][values.href]) {
-												Entity[_symbols.$$committedEntitiesByHref][values.href] = values;
-												cmd = this[$$Command_load].create(values);
+											if (!this.hasCache(values.href)) {
+												entity = this.setCache(values);
 	
-												Entity[_symbols.$$committedEntitiesByHref][cmd.result.href] = cmd.result;
-												result.add(cmd.result);
+												result.add(entity);
+											} else {
+												// TODO: if it's only loaded as a stub, then
+												//       augment the existing entity; do not replace it
 											}
 										}
 	
-										_context4.next = 15;
+										_context3.next = 15;
 										break;
 	
 									case 11:
-										_context4.prev = 11;
-										_context4.t0 = _context4['catch'](7);
+										_context3.prev = 11;
+										_context3.t0 = _context3['catch'](7);
 										_didIteratorError3 = true;
-										_iteratorError3 = _context4.t0;
+										_iteratorError3 = _context3.t0;
 	
 									case 15:
-										_context4.prev = 15;
-										_context4.prev = 16;
+										_context3.prev = 15;
+										_context3.prev = 16;
 	
 										if (!_iteratorNormalCompletion3 && _iterator3.return) {
 											_iterator3.return();
 										}
 	
 									case 18:
-										_context4.prev = 18;
+										_context3.prev = 18;
 	
 										if (!_didIteratorError3) {
-											_context4.next = 21;
+											_context3.next = 21;
 											break;
 										}
 	
 										throw _iteratorError3;
 	
 									case 21:
-										return _context4.finish(18);
+										return _context3.finish(18);
 	
 									case 22:
-										return _context4.finish(15);
+										return _context3.finish(15);
 	
 									case 23:
-										return _context4.abrupt('return', result);
+										return _context3.abrupt('return', result);
 	
 									case 24:
 									case 'end':
-										return _context4.stop();
+										return _context3.stop();
 								}
 							}
 						}, _callee2, this, [[7, 11, 15, 23], [16,, 18, 22]]);
 					}));
 	
-					function getAll(_x16) {
+					function getAll(_x18) {
 						return _ref2.apply(this, arguments);
 					}
 	
@@ -12998,7 +13072,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			///////////////////////////////
 	
 			function Entity() {
-				var _context5;
+				var _context4;
 	
 				var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
@@ -13023,9 +13097,9 @@ return /******/ (function(modules) { // webpackBootstrap
 				_initDefineProp(_this, 'isNew', _descriptor6, _this);
 	
 				_get(Object.getPrototypeOf(Entity.prototype), 'setValueTrackerOptions', _this).call(_this, {
-					takeUntil: (_context5 = (0, _combineLatest.combineLatest)(_this.p('isDeleted'), _this.p('isPristine'), _this.p('isNew'), function (d, p, n) {
+					takeUntil: (_context4 = (0, _combineLatest.combineLatest)(_this.p('isDeleted'), _this.p('isPristine'), _this.p('isNew'), function (d, p, n) {
 						return d && (p || n);
-					}), _boundHybridFunctions.filter).call(_context5, function (v) {
+					}), _boundHybridFunctions.filter).call(_context4, function (v) {
 						return !!v;
 					})
 				});
@@ -13064,8 +13138,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					var _iteratorError4 = undefined;
 	
 					try {
-						for (var _iterator4 = (_context6 = this.fields, _entries2.default).call(_context6)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-							var _context6;
+						for (var _iterator4 = (_context5 = this.fields, _entries2.default).call(_context5)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+							var _context5;
 	
 							var _step4$value = _slicedToArray(_step4.value, 2);
 	
@@ -13120,22 +13194,22 @@ return /******/ (function(modules) { // webpackBootstrap
 				value: function () {
 					var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
 						var latestCommands;
-						return regeneratorRuntime.wrap(function _callee3$(_context7) {
+						return regeneratorRuntime.wrap(function _callee3$(_context6) {
 							while (1) {
-								switch (_context7.prev = _context7.next) {
+								switch (_context6.prev = _context6.next) {
 									case 0:
 										/* commit all latest commands associated with this entity */
 										// NOTE: committing the latest commands also commits their
 										//       dependencies, i.e., commits every associated command
 										latestCommands = Command.latest({ entity: this, committable: true });
-										_context7.next = 3;
+										_context6.next = 3;
 										return Promise.all(_boundHybridFunctions.map.call(latestCommands, function (cmd) {
 											return cmd.commit();
 										}));
 	
 									case 3:
 									case 'end':
-										return _context7.stop();
+										return _context6.stop();
 								}
 							}
 						}, _callee3, this);
@@ -13266,7 +13340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		})), _class));
 	
 	
-		_boundNativeMethods.assign.call(Entity, (_assign$call = {}, _defineProperty(_assign$call, _symbols.$$entities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$entitiesSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _defineProperty(_assign$call, _symbols.$$committedEntities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$committedEntitiesSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _defineProperty(_assign$call, _symbols.$$committedEntitiesByHref, {}), _assign$call));
+		_boundNativeMethods.assign.call(Entity, (_assign$call = {}, _defineProperty(_assign$call, _symbols.$$entities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$entitiesSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _defineProperty(_assign$call, _symbols.$$committedEntities, new _ObservableSet2.default()), _defineProperty(_assign$call, $$committedEntitiesSubject, new _BehaviorSubject.BehaviorSubject(new Set())), _defineProperty(_assign$call, _symbols.$$entitiesByHref, {}), _assign$call));
 	
 		return Entity;
 	};
@@ -13318,7 +13392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isUndefined2 = _interopRequireDefault(_isUndefined);
 	
-	var _defaults = __webpack_require__(49);
+	var _defaults = __webpack_require__(50);
 	
 	var _defaults2 = _interopRequireDefault(_defaults);
 	
@@ -13334,7 +13408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ValueTracker2 = _interopRequireDefault(_ValueTracker);
 	
-	var _boundHybridFunctions = __webpack_require__(65);
+	var _boundHybridFunctions = __webpack_require__(66);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -14263,9 +14337,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tCannot delete an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_delete constructor.\n\t\t'], ['\n\t\t\tCannot delete an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_delete constructor.\n\t\t']);
+	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tCannot delete an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_delete constructor.\n\t\t'], ['\n\t\t\tCannot delete an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_delete constructor.\n\t\t']),
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tCannot delete a placeholder.\n\t\t\tLoad the entity fully before editing.\n\t\t'], ['\n\t\t\tCannot delete a placeholder.\n\t\t\tLoad the entity fully before editing.\n\t\t']);
 	
 	var _misc = __webpack_require__(2);
+	
+	var _symbols = __webpack_require__(46);
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
@@ -14321,23 +14398,16 @@ return /******/ (function(modules) { // webpackBootstrap
 				value: function localRun() {
 					/* sanity checks */
 					(0, _misc.constraint)(this.entity, (0, _misc.humanMsg)(_templateObject));
+					(0, _misc.constraint)(!this.entity[_symbols.$$isPlaceholder], (0, _misc.humanMsg)(_templateObject2));
 	
 					// TODO: Command_delete on all relevant linked entities (test if they're already scheduled for deletion)
 					// TODO: Keep the entity in memory (this.entity) so the deletion can be rolled back.
-					// TODO: decide how and when to trigger signals about this deletion
 	
 	
 					/* track this command in the entity */
 					this.entity.deleteCommand = this;
-	
-					//////// old Entity#delete method:
-					// Entity#delete() {
-					// 	if (this.isDeleted) { return }
-					// 	console.warn("The delete operation does not yet use the Command pattern.");
-					// 	this.pSubject('isDeleted') .next(true);
-					// 	this.pSubject('isPristine').next(false);
-					// 	Entity[$$entities].delete(this);
-					// }
+					this.pSubject('isDeleted').next(true);
+					this.pSubject('isPristine').next(false);
 				}
 			}, {
 				key: 'localCommit',
@@ -14354,7 +14424,12 @@ return /******/ (function(modules) { // webpackBootstrap
 									case 2:
 										response = _context.sent;
 	
-									case 3:
+										this.pSubject('isPristine').next(true);
+										// TODO: integrate response
+										// TODO: catch possible exception (meaning the commit failed)
+										// TODO: other stuff?
+	
+									case 4:
 									case 'end':
 										return _context.stop();
 								}
@@ -14371,7 +14446,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'localRollback',
 				value: function localRollback() {
+					var _this2 = this;
 	
+					/* after it's rolled back, it may be pristine */
+					if ([this.entity.originCommand].concat(_toConsumableArray(this.entity.editCommands)).every(function (cmd) {
+						return cmd === _this2 || cmd.committed || cmd.rolledBack;
+					})) {
+						this.entity.pSubject('isPristine').next(true);
+					}
 					/* untrack this command in the entity */
 					this.entity.deleteCommand = null;
 	
@@ -14406,7 +14488,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tCannot edit an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_edit constructor.\n\t\t'], ['\n\t\t\tCannot edit an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_edit constructor.\n\t\t']);
+	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tCannot edit an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_edit constructor.\n\t\t'], ['\n\t\t\tCannot edit an entity\n\t\t\tthat was not specified in\n\t\t\tthe Command_edit constructor.\n\t\t']),
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tCannot edit a placeholder.\n\t\t\tLoad the entity fully before editing.\n\t\t'], ['\n\t\t\tCannot edit a placeholder.\n\t\t\tLoad the entity fully before editing.\n\t\t']);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -14414,9 +14497,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _keys2 = _interopRequireDefault(_keys);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
+	
+	var _symbols = __webpack_require__(46);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -14433,9 +14518,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	// import {$$commands} from './symbols';
-	
 	
 	// TODO: Make all field-setter code use this command
 	
@@ -14482,6 +14564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				value: function localRun() {
 					/* sanity checks */
 					(0, _misc.constraint)(this.entity, (0, _misc.humanMsg)(_templateObject));
+					(0, _misc.constraint)(!this.entity[_symbols.$$isPlaceholder], (0, _misc.humanMsg)(_templateObject2));
 	
 					/* store old values so we have the ability to roll back */
 					this.oldValues = {};
@@ -14657,15 +14740,21 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
-	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tCannot instantiate the abstract\n\t\t\tclass ', '.\n\t\t'], ['\n\t\t\tCannot instantiate the abstract\n\t\t\tclass ', '.\n\t\t']);
+	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t\tCannot instantiate the abstract\n\t\t\t\tclass ', '.\n\t\t\t'], ['\n\t\t\t\tCannot instantiate the abstract\n\t\t\t\tclass ', '.\n\t\t\t']),
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tExpected ', ' to be\n\t\t\t\ta subclass of ', '.\n\t\t\t'], ['\n\t\t\t\tExpected ', ' to be\n\t\t\t\ta subclass of ', '.\n\t\t\t']),
+	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tCannot load data into the ', '\n\t\t\t\twith href="', '", because it has local changes.\n\t\t\t'], ['\n\t\t\t\tCannot load data into the ', '\n\t\t\t\twith href="', '", because it has local changes.\n\t\t\t']),
+	    _templateObject4 = _taggedTemplateLiteral(['\n\t\t\t\t\tExpected ', ' to be\n\t\t\t\t\ta subclass of ', '.\n\t\t\t\t'], ['\n\t\t\t\t\tExpected ', ' to be\n\t\t\t\t\ta subclass of ', '.\n\t\t\t\t']),
+	    _templateObject5 = _taggedTemplateLiteral(['\n\t\t\t\t\tExpected ', ' to be ', '.\n\t\t\t\t'], ['\n\t\t\t\t\tExpected ', ' to be ', '.\n\t\t\t\t']);
 	
-	var _isFunction = __webpack_require__(50);
+	var _isFunction = __webpack_require__(51);
 	
 	var _isFunction2 = _interopRequireDefault(_isFunction);
 	
@@ -14673,7 +14762,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isString2 = _interopRequireDefault(_isString);
 	
-	var _symbols = __webpack_require__(95);
+	var _entries = __webpack_require__(10);
+	
+	var _entries2 = _interopRequireDefault(_entries);
+	
+	var _boundNativeMethods = __webpack_require__(9);
+	
+	var _symbols = __webpack_require__(46);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -14721,6 +14816,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					run: true,
 					committed: true,
 					commandDependencies: [].concat(_toConsumableArray(options.commandDependencies || []), _toConsumableArray(function () {
+						var entity = cls.getLocal(values);
+						return entity && entity.originCommand ? [entity.originCommand] : [];
+					}()), _toConsumableArray(function () {
 						var r = [];
 						if (cls.isRelationship) {
 							var _arr = [1, 2];
@@ -14736,41 +14834,103 @@ return /******/ (function(modules) { // webpackBootstrap
 					}()))
 				})));
 	
-				_this.result = null;
-	
 				_this.values = values;
+				_this.placeholder = options.placeholder;
 				return _this;
 			}
 	
 			_createClass(Command_load, [{
 				key: 'localRun',
 				value: function localRun() {
-					var _context;
+					this.result = cls.getLocal(this.values);
+					if (!this.result) {
+						var _context;
 	
-					/* identify class */
-					var realCls = (_context = this.values.class, _isString2.default).call(_context) ? cls.environment.classes[this.values.class] : cls;
-					/* sanity checks */
-					// TODO: check that realCls is subclass of cls
+						/* identify class */
+						var realCls = (_context = this.values.class, _isString2.default).call(_context) ? cls.environment.classes[this.values.class] : cls;
 	
-					(0, _misc.constraint)(!realCls.abstract || (0, _misc.humanMsg)(_templateObject, realCls.name));
-					/* construct entity */
-					this.result = new realCls(_extends({}, this.values), _extends({}, this.options, { allowInvokingConstructor: true }));
-					/* track this command in the entity */
-					/* this is already done in the Entity constructor (earlier than this) */
-					// this.result.originCommand = this;
+						/* sanity checks */
+						(0, _misc.constraint)(!realCls.abstract, (0, _misc.humanMsg)(_templateObject, realCls.name));
+						(0, _misc.constraint)(cls.hasSubclass(realCls), (0, _misc.humanMsg)(_templateObject2, realCls.name, cls.name));
 	
-					var Entity = cls.Entity;
+						/* construct entity */
+						this.result = new realCls(_extends({}, this.values), _extends({}, this.options, { allowInvokingConstructor: true }));
+						this.result[_symbols.$$isPlaceholder] = this.placeholder;
 	
-					/* register this entity */
-					Entity[_symbols.$$entities].add(this.result);
+						/* track this command in the entity */
+						this.result.originCommand = this; // TODO: maintain array of originCommands instead
 	
-					/* after it's first committed, it's no longer new, but is pristine */
-					this.result.pSubject('isNew').next(false);
-					this.result.pSubject('isPristine').next(true);
+						/* register this entity */
+						cls[_symbols.$$entities].add(this.result);
+						cls[_symbols.$$entitiesByHref][this.result.href] = this.result;
+						cls[_symbols.$$committedEntities].add(this.result);
 	
-					/* maintain caches */
-					Entity[_symbols.$$committedEntitiesByHref][this.result.href] = this.result;
-					Entity[_symbols.$$committedEntities].add(this.result);
+						/* after it's first committed, it's no longer new, but is pristine */
+						this.result.pSubject('isNew').next(false);
+						this.result.pSubject('isPristine').next(true);
+					} else {
+						/* sanity checks */
+						(0, _misc.constraint)(this.result.isPristine, (0, _misc.humanMsg)(_templateObject3, this.result.class, this.result.href));
+	
+						/* check class compatibility */
+						var oldCls = cls.environment.classes[this.result.class];
+						var newCls = cls.environment.classes[this.values.class];
+						if (this.result.isPlaceholder) {
+							(0, _misc.constraint)(oldCls.hasSubclass(newCls), (0, _misc.humanMsg)(_templateObject4, newCls.name, oldCls.name));
+							if (oldCls !== newCls) {
+								var _context2;
+	
+								(_context2 = this.result, _boundNativeMethods.setPrototype).call(_context2, newCls.prototype);
+							}
+						} else {
+							(0, _misc.constraint)(oldCls === newCls, (0, _misc.humanMsg)(_templateObject5, newCls.name, oldCls.name));
+						}
+	
+						/* track this command in the entity */
+						this.result.originCommand = this; // TODO: maintain array of originCommands instead
+	
+						/* if we're loading a placeholder, we're done now */
+						if (this.placeholder) {
+							return;
+						}
+	
+						/* otherwise, set the values */
+						var _iteratorNormalCompletion = true;
+						var _didIteratorError = false;
+						var _iteratorError = undefined;
+	
+						try {
+							for (var _iterator = (_context3 = this.values, _entries2.default).call(_context3)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+								var _context3;
+	
+								var _step$value = _slicedToArray(_step.value, 2);
+	
+								var key = _step$value[0];
+								var value = _step$value[1];
+	
+								this.result.fields[key].set(value, {
+									createEditCommand: false,
+									ignoreReadonly: true,
+									ignoreValidation: true
+								});
+							}
+						} catch (err) {
+							_didIteratorError = true;
+							_iteratorError = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion && _iterator.return) {
+									_iterator.return();
+								}
+							} finally {
+								if (_didIteratorError) {
+									throw _iteratorError;
+								}
+							}
+						}
+	
+						this.result[_symbols.$$isPlaceholder] = false;
+					}
 				}
 			}, {
 				key: 'localCommit',
@@ -14810,13 +14970,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tCannot instantiate the abstract\n\t\t\tclass ', '.\n\t\t'], ['\n\t\t\tCannot instantiate the abstract\n\t\t\tclass ', '.\n\t\t']);
 	
-	var _isFunction = __webpack_require__(50);
+	var _isFunction = __webpack_require__(51);
 	
 	var _isFunction2 = _interopRequireDefault(_isFunction);
 	
 	var _misc = __webpack_require__(2);
 	
-	var _symbols = __webpack_require__(95);
+	var _symbols = __webpack_require__(46);
 	
 	var _Field = __webpack_require__(21);
 	
@@ -14901,9 +15061,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					} else {
 						this.result = new cls(_extends({}, this.initialValues), _extends({}, this.options, { allowInvokingConstructor: true }));
 					}
+					this.result[_symbols.$$isPlaceholder] = false;
 					/* track this command in the entity */
-					/* this is already done in the Entity constructor (earlier than this) */
-					// this.result.originCommand = this;
+					this.result.originCommand = this;
 					/* register as new */
 					this.result.pSubject('isNew').next(true);
 					/* register this entity */
@@ -14932,7 +15092,6 @@ return /******/ (function(modules) { // webpackBootstrap
 										/* set id and href */
 										opts = {
 											ignoreReadonly: true,
-											updatePristine: true, // TODO: does this option make sense?
 											createEditCommand: false
 										};
 	
@@ -14944,7 +15103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 										this.result.pSubject('isPristine').next(true);
 	
 										/* maintain caches */
-										cls.Entity[_symbols.$$committedEntitiesByHref][href] = this.result;
+										cls.Entity[_symbols.$$entitiesByHref][href] = this.result;
 										cls.Entity[_symbols.$$committedEntities].add(this.result);
 	
 									case 13:
@@ -14965,11 +15124,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'localRollback',
 				value: function localRollback() {
 					/* destruct each field */
-					_Field.Field.destructEntity(this.result); // TODO: test
+					_Field.Field.destructEntity(this.result);
 	
 					/* un-register the entity */
+					delete cls.Entity[_symbols.$$entitiesByHref][this.result.href];
 					cls.Entity[_symbols.$$entities].delete(this.result);
-					// TODO: remove other traces of the entity
+					cls.Entity[_symbols.$$committedEntities].delete(this.result);
 	
 					/* untrack this command in the entity */
 					this.result.originCommand = null;
@@ -15007,7 +15167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isUndefined2 = _interopRequireDefault(_isUndefined);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
@@ -15015,7 +15175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _cloneDeep2 = _interopRequireDefault(_cloneDeep);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -15175,11 +15335,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _filter = __webpack_require__(30);
 	
-	var _switchMap = __webpack_require__(85);
+	var _switchMap = __webpack_require__(86);
 	
-	var _startWith = __webpack_require__(84);
+	var _startWith = __webpack_require__(85);
 	
-	var _pairwise = __webpack_require__(83);
+	var _pairwise = __webpack_require__(84);
 	
 	__webpack_require__(25);
 	
@@ -15195,7 +15355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _size2 = _interopRequireDefault(_size);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
@@ -15203,7 +15363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isUndefined2 = _interopRequireDefault(_isUndefined);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _ObservableSet = __webpack_require__(96);
 	
@@ -15211,7 +15371,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(2);
 	
-	var _boundHybridFunctions = __webpack_require__(65);
+	var _boundHybridFunctions = __webpack_require__(66);
 	
 	var _Field = __webpack_require__(21);
 	
@@ -15316,7 +15476,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			var constructingOwner = options.constructingOwner;
 			var related = options.related;
 	
-			// this::defineProperty($$pristine, { value: new Set           });// TODO: remove all 'pristine' related stuff from the field classes
 	
 			_boundNativeMethods.defineProperty.call(_this, _symbols.$$value, { value: new _ObservableSet2.default() });
 	
@@ -15377,9 +15536,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			(_context4 = _this[_symbols.$$value].e('add'), waitUntilConstructed).call(_context4).subscribe(function (rel) {
 				rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false });
 			});
-			// this[$$value].e('delete') // TODO: note that this was commented because rel.delete() has a new meaning since the old days (
-			// 	::waitUntilConstructed()
-			// 	.subscribe((rel) => { rel.delete() });
 	
 			/* decouple a relationship when it decouples from this resource */
 			(_context4 = (_context4 = _this[_symbols.$$value].e('add'), waitUntilConstructed).call(_context4), _switchMap.switchMap).call(_context4, function (newRel) {
@@ -15399,15 +15555,13 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _iteratorError2 = undefined;
 	
 				try {
-					for (var _iterator2 = initialValue[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					for (var _iterator2 = _this.jsonToValue(initialValue)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var rel = _step2.value;
 	
 						if (!rel.fields[desc.keyInRelationship].get()) {
 							rel.fields[desc.keyInRelationship].set(_this, { createEditCommand: false });
 						}
 	
-	
-						// this[$$pristine].add(rel);// TODO: remove all 'pristine' related stuff from the field classes
 						_this[_symbols.$$value].add(rel);
 					}
 				} catch (err) {
@@ -15472,12 +15626,49 @@ return /******/ (function(modules) { // webpackBootstrap
 				(0, _ObservableSet.copySetContent)(this[_symbols.$$value], newValue);
 			}
 		}, {
+			key: 'jsonToValue',
+			value: function jsonToValue(json) {
+				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+				var Entity = this[_symbols.$$owner].constructor.Entity;
+				var result = new Set();
+				var _iteratorNormalCompletion3 = true;
+				var _didIteratorError3 = false;
+				var _iteratorError3 = undefined;
+	
+				try {
+					for (var _iterator3 = json[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+						var thing = _step3.value;
+	
+						var entity = Entity.getLocal(thing, options);
+						if (!entity) {
+							entity = Entity.setPlaceholder(thing, options);
+						}
+						result.add(entity);
+					}
+				} catch (err) {
+					_didIteratorError3 = true;
+					_iteratorError3 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion3 && _iterator3.return) {
+							_iterator3.return();
+						}
+					} finally {
+						if (_didIteratorError3) {
+							throw _iteratorError3;
+						}
+					}
+				}
+	
+				return result;
+			}
+		}, {
 			key: _symbols.$$destruct,
 			value: function value() {
 				this.set(new Set(), {
 					ignoreReadonly: true,
 					ignoreValidation: true,
-					// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
 					createEditCommand: false
 				});
 				_get(Object.getPrototypeOf(Rel$Field.prototype), _symbols.$$destruct, this).call(this);
@@ -15566,15 +15757,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\t\tNo value given for required field\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tNo value given for required field\n\t\t\t\t', '#', '.\n\t\t\t']),
 	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t'], ['\n\t\t\tInvalid value \'', '\' given for field ', '#', '.\n\t\t']);
 	
-	var _map = __webpack_require__(82);
+	var _map = __webpack_require__(83);
 	
 	var _filter = __webpack_require__(30);
 	
-	var _pairwise = __webpack_require__(83);
+	var _pairwise = __webpack_require__(84);
 	
-	var _switchMap = __webpack_require__(85);
+	var _switchMap = __webpack_require__(86);
 	
-	var _startWith = __webpack_require__(84);
+	var _startWith = __webpack_require__(85);
 	
 	__webpack_require__(25);
 	
@@ -15590,7 +15781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isNull2 = _interopRequireDefault(_isNull);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
@@ -15598,7 +15789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isObject3 = _interopRequireDefault(_isObject2);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -15791,6 +15982,21 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		_createClass(Rel1Field, [{
+			key: 'jsonToValue',
+			value: function jsonToValue(json) {
+				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+				if (json === null) {
+					return null;
+				}
+				var Entity = this[_symbols.$$owner].constructor.Entity;
+				var result = Entity.getLocal(json, options);
+				if (!result) {
+					result = Entity.setPlaceholder(json, options);
+				}
+				return result;
+			}
+		}, {
 			key: _symbols.$$destruct,
 			value: function value() {
 				this.set(null, {
@@ -15854,18 +16060,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tYou\'re trying to set a readonly field ', '#', '.\n\t\t'], ['\n\t\t\tYou\'re trying to set a readonly field ', '#', '.\n\t\t']),
+	var _templateObject = _taggedTemplateLiteral(['\n\t\t\tYou\'re trying to set a readonly field\n\t\t\t', '#', '.\n\t\t'], ['\n\t\t\tYou\'re trying to set a readonly field\n\t\t\t', '#', '.\n\t\t']),
 	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t'], ['\n\t\t\tThe value ', ' given for ', '#', '\n\t\t\tis not an iterable collection (like array or set).\n\t\t']),
 	    _templateObject3 = _taggedTemplateLiteral(['\n\t\t\t\tThe number of values in field ', '#', '\n\t\t\t\tis not within the expected range [', ', ', '].\n\t\t\t'], ['\n\t\t\t\tThe number of values in field ', '#', '\n\t\t\t\tis not within the expected range [', ', ', '].\n\t\t\t']),
 	    _templateObject4 = _taggedTemplateLiteral(['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t'], ['\n\t\t\t\tInvalid value ', ' given as element for\n\t\t\t\t', '#', '.\n\t\t\t']);
 	
-	var _pairwise = __webpack_require__(83);
+	var _pairwise = __webpack_require__(84);
 	
 	var _takeUntil = __webpack_require__(183);
 	
 	var _take = __webpack_require__(422);
 	
-	var _startWith = __webpack_require__(84);
+	var _startWith = __webpack_require__(85);
 	
 	__webpack_require__(25);
 	
@@ -15877,11 +16083,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _size2 = _interopRequireDefault(_size);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _ObservableSet = __webpack_require__(96);
 	
@@ -15889,7 +16095,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(2);
 	
-	var _boundHybridFunctions = __webpack_require__(65);
+	var _boundHybridFunctions = __webpack_require__(66);
 	
 	var _Field = __webpack_require__(21);
 	
@@ -16037,20 +16243,15 @@ return /******/ (function(modules) { // webpackBootstrap
 			});
 	
 			/* handle initial values */
-			if (initialValue !== undefined) {
+			if (initialValue && initialValue[Symbol.iterator]) {
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
 	
 				try {
-					for (var _iterator = initialValue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					for (var _iterator = _this.jsonToValue(initialValue)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var res = _step.value;
 	
-						// TODO: - rel may be a reference to an existing resource;
-						//     :   then go get it
-						//     : - It may also be a description of a new resource;
-						//     :   then create it
-						// this[$$pristine].add(res);// TODO: remove all 'pristine' related stuff from the field classes
 						_this[_symbols.$$value].add(res);
 					}
 				} catch (err) {
@@ -16076,6 +16277,44 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		_createClass(RelShortcut$Field, [{
+			key: 'jsonToValue',
+			value: function jsonToValue(json) {
+				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+				var Entity = this[_symbols.$$owner].constructor.Entity;
+				var result = new Set();
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
+	
+				try {
+					for (var _iterator2 = json[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var thing = _step2.value;
+	
+						var entity = Entity.getLocal(thing, options);
+						if (!entity) {
+							entity = this[_symbols.$$owner].constructor.setPlaceholder(thing, options);
+						}
+						result.add(entity);
+					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
+						}
+					}
+				}
+	
+				return result;
+			}
+		}, {
 			key: 'set',
 			value: function set(newValue) {
 				var _ref8 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
@@ -16091,7 +16330,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (!ignoreValidation) {
 					this.validate(newValue, ['set']);
 				}
-				// if (updatePristine)    { copySetContent(this[$$pristine], newValue) }// TODO: remove all 'pristine' related stuff from the field classes
 				(0, _ObservableSet.copySetContent)(this[_symbols.$$value], newValue);
 			}
 		}, {
@@ -16178,21 +16416,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _filter = __webpack_require__(30);
 	
-	var _switchMap = __webpack_require__(85);
+	var _switchMap = __webpack_require__(86);
 	
 	var _defer = __webpack_require__(414);
 	
 	__webpack_require__(25);
 	
-	var _entries = __webpack_require__(11);
+	var _entries = __webpack_require__(10);
 	
 	var _entries2 = _interopRequireDefault(_entries);
 	
-	var _isObject = __webpack_require__(69);
+	var _isObject = __webpack_require__(70);
 	
 	var _isObject2 = _interopRequireDefault(_isObject);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -16334,6 +16572,21 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		_createClass(RelShortcut1Field, [{
+			key: 'jsonToValue',
+			value: function jsonToValue(json) {
+				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+				if (json === null) {
+					return null;
+				}
+				var Entity = this[_symbols.$$owner].constructor.Entity;
+				var result = Entity.getLocal(json, options);
+				if (!result) {
+					result = Entity.setPlaceholder(json, options);
+				}
+				return result;
+			}
+		}, {
 			key: _symbols.$$destruct,
 			value: function value() {
 				this.set(null, {
@@ -16393,13 +16646,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _templateObject = _taggedTemplateLiteral(['\n\t\t\t    No resource specified for side ', ' of\n\t\t\t\tthis \'', '\'.\n\t\t\t'], ['\n\t\t\t    No resource specified for side ', ' of\n\t\t\t\tthis \'', '\'.\n\t\t\t']),
-	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tInvalid value \'', '\' given for ', '#', '.\n\t\t'], ['\n\t\t\tInvalid value \'', '\' given for ', '#', '.\n\t\t']);
+	    _templateObject2 = _taggedTemplateLiteral(['\n\t\t\tInvalid value ', ' given for ', '#', '\n\t\t\t(', ').\n\t\t'], ['\n\t\t\tInvalid value ', ' given for ', '#', '\n\t\t\t(', ').\n\t\t']);
 	
 	var _filter = __webpack_require__(30);
 	
-	var _pairwise = __webpack_require__(83);
+	var _pairwise = __webpack_require__(84);
 	
-	var _startWith = __webpack_require__(84);
+	var _startWith = __webpack_require__(85);
 	
 	__webpack_require__(25);
 	
@@ -16411,11 +16664,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _isNull2 = _interopRequireDefault(_isNull);
 	
-	var _isObject = __webpack_require__(69);
+	var _isObject = __webpack_require__(70);
 	
 	var _isObject2 = _interopRequireDefault(_isObject);
 	
-	var _boundNativeMethods = __webpack_require__(10);
+	var _boundNativeMethods = __webpack_require__(9);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -16541,6 +16794,21 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	
 		_createClass(SideField, [{
+			key: 'jsonToValue',
+			value: function jsonToValue(json) {
+				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+				if (json === null) {
+					return null;
+				}
+				var Entity = this[_symbols.$$owner].constructor.Entity;
+				var result = Entity.getLocal(json, options);
+				if (!result) {
+					result = Entity.setPlaceholder(json, options);
+				}
+				return result;
+			}
+		}, {
 			key: _symbols.$$destruct,
 			value: function value() {
 				this.set(null, {
@@ -16565,7 +16833,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 	
 				/* the value must be of the proper domain */
-				(0, _misc.constraint)(notGiven || this[_symbols.$$desc].resourceClass.hasInstance(val), (0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
+				var foobar = this[_symbols.$$desc];
+				(0, _misc.constraint)(notGiven || this[_symbols.$$desc].resourceClass.hasInstance(val), (0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key], this[_symbols.$$desc].resourceClass));
 	
 				// TODO: these should not be assertions, but proper constraint-checks,
 				//     : recording errors, possibly allowing them temporarily, etc.
@@ -16611,11 +16880,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _groups2 = _interopRequireDefault(_groups);
 	
-	var _measurables = __webpack_require__(93);
+	var _measurables = __webpack_require__(94);
 	
 	var _measurables2 = _interopRequireDefault(_measurables);
 	
-	var _processes = __webpack_require__(94);
+	var _processes = __webpack_require__(95);
 	
 	var _processes2 = _interopRequireDefault(_processes);
 	
@@ -16763,7 +17032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
-	var _measurables = __webpack_require__(93);
+	var _measurables = __webpack_require__(94);
 	
 	var _measurables2 = _interopRequireDefault(_measurables);
 	
@@ -16900,11 +17169,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _typed2 = _interopRequireDefault(_typed);
 	
-	var _processes = __webpack_require__(94);
+	var _processes = __webpack_require__(95);
 	
 	var _processes2 = _interopRequireDefault(_processes);
 	
-	var _measurables = __webpack_require__(93);
+	var _measurables = __webpack_require__(94);
 	
 	var _measurables2 = _interopRequireDefault(_measurables);
 	
@@ -17824,7 +18093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 272 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIndexOf = __webpack_require__(74);
+	var baseIndexOf = __webpack_require__(75);
 	
 	/**
 	 * A specialized version of `_.includes` for arrays without support for
@@ -17904,7 +18173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 275 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var eq = __webpack_require__(57);
+	var eq = __webpack_require__(58);
 	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -17937,8 +18206,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 276 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var copyObject = __webpack_require__(53),
-	    keys = __webpack_require__(9);
+	var copyObject = __webpack_require__(54),
+	    keys = __webpack_require__(11);
 	
 	/**
 	 * The base implementation of `_.assign` without support for multiple sources
@@ -17962,13 +18231,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stack = __webpack_require__(110),
 	    arrayEach = __webpack_require__(271),
-	    assignValue = __webpack_require__(72),
+	    assignValue = __webpack_require__(73),
 	    baseAssign = __webpack_require__(276),
 	    cloneBuffer = __webpack_require__(311),
 	    copyArray = __webpack_require__(318),
 	    copySymbols = __webpack_require__(319),
 	    getAllKeys = __webpack_require__(327),
-	    getTag = __webpack_require__(54),
+	    getTag = __webpack_require__(55),
 	    initCloneArray = __webpack_require__(337),
 	    initCloneByTag = __webpack_require__(338),
 	    initCloneObject = __webpack_require__(339),
@@ -17976,7 +18245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    isBuffer = __webpack_require__(381),
 	    isHostObject = __webpack_require__(116),
 	    isObject = __webpack_require__(12),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -18129,7 +18398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 279 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isSymbol = __webpack_require__(59);
+	var isSymbol = __webpack_require__(60);
 	
 	/**
 	 * The base implementation of methods like `_.max` and `_.min` which accepts a
@@ -18247,7 +18516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseFor = __webpack_require__(282),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/**
 	 * The base implementation of `_.forOwn` without support for iteratee shorthands.
@@ -18389,7 +18658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    equalArrays = __webpack_require__(165),
 	    equalByTag = __webpack_require__(325),
 	    equalObjects = __webpack_require__(326),
-	    getTag = __webpack_require__(54),
+	    getTag = __webpack_require__(55),
 	    isArray = __webpack_require__(6),
 	    isHostObject = __webpack_require__(116),
 	    isTypedArray = __webpack_require__(387);
@@ -18559,7 +18828,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 292 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isFunction = __webpack_require__(79),
+	var isFunction = __webpack_require__(80),
 	    isHostObject = __webpack_require__(116),
 	    isMasked = __webpack_require__(343),
 	    isObject = __webpack_require__(12),
@@ -18612,7 +18881,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 293 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getTag = __webpack_require__(54),
+	var getTag = __webpack_require__(55),
 	    isObjectLike = __webpack_require__(17);
 	
 	/** `Object#toString` result references. */
@@ -18636,7 +18905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 294 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(80),
+	var isLength = __webpack_require__(81),
 	    isObjectLike = __webpack_require__(17);
 	
 	/** `Object#toString` result references. */
@@ -18834,7 +19103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var baseIsEqual = __webpack_require__(111),
 	    get = __webpack_require__(174),
 	    hasIn = __webpack_require__(376),
-	    isKey = __webpack_require__(56),
+	    isKey = __webpack_require__(57),
 	    isStrictComparable = __webpack_require__(170),
 	    matchesStrictComparable = __webpack_require__(171),
 	    toKey = __webpack_require__(39);
@@ -18949,10 +19218,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 303 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assignValue = __webpack_require__(72),
+	var assignValue = __webpack_require__(73),
 	    castPath = __webpack_require__(113),
-	    isIndex = __webpack_require__(55),
-	    isKey = __webpack_require__(56),
+	    isIndex = __webpack_require__(56),
+	    isKey = __webpack_require__(57),
 	    isObject = __webpack_require__(12),
 	    toKey = __webpack_require__(39);
 	
@@ -19001,7 +19270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 304 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayMap = __webpack_require__(51);
+	var arrayMap = __webpack_require__(52);
 	
 	/**
 	 * The base implementation of `_.toPairs` and `_.toPairsIn` which creates an array
@@ -19030,7 +19299,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    arrayIncludesWith = __webpack_require__(273),
 	    cacheHas = __webpack_require__(307),
 	    createSet = __webpack_require__(323),
-	    setToArray = __webpack_require__(78);
+	    setToArray = __webpack_require__(79);
 	
 	/** Used as the size to enable large array optimizations. */
 	var LARGE_ARRAY_SIZE = 200;
@@ -19103,7 +19372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 306 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayMap = __webpack_require__(51);
+	var arrayMap = __webpack_require__(52);
 	
 	/**
 	 * The base implementation of `_.values` and `_.valuesIn` which creates an
@@ -19171,7 +19440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 309 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIndexOf = __webpack_require__(74);
+	var baseIndexOf = __webpack_require__(75);
 	
 	/**
 	 * Used by `_.trim` and `_.trimEnd` to get the index of the last string symbol
@@ -19196,7 +19465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 310 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIndexOf = __webpack_require__(74);
+	var baseIndexOf = __webpack_require__(75);
 	
 	/**
 	 * Used by `_.trim` and `_.trimStart` to get the index of the first string symbol
@@ -19318,7 +19587,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var addSetEntry = __webpack_require__(270),
 	    arrayReduce = __webpack_require__(155),
-	    setToArray = __webpack_require__(78);
+	    setToArray = __webpack_require__(79);
 	
 	/**
 	 * Creates a clone of `set`.
@@ -19341,7 +19610,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 316 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(71);
+	var Symbol = __webpack_require__(72);
 	
 	/** Used to convert symbols to primitives and strings. */
 	var symbolProto = Symbol ? Symbol.prototype : undefined,
@@ -19413,7 +19682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 319 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var copyObject = __webpack_require__(53),
+	var copyObject = __webpack_require__(54),
 	    getSymbols = __webpack_require__(168);
 	
 	/**
@@ -19518,7 +19787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Set = __webpack_require__(149),
 	    noop = __webpack_require__(395),
-	    setToArray = __webpack_require__(78);
+	    setToArray = __webpack_require__(79);
 	
 	/** Used as references for various `Number` constants. */
 	var INFINITY = 1 / 0;
@@ -19542,7 +19811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseToPairs = __webpack_require__(304),
-	    getTag = __webpack_require__(54),
+	    getTag = __webpack_require__(55),
 	    mapToArray = __webpack_require__(117),
 	    setToPairs = __webpack_require__(358);
 	
@@ -19577,12 +19846,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 325 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(71),
+	var Symbol = __webpack_require__(72),
 	    Uint8Array = __webpack_require__(151),
-	    eq = __webpack_require__(57),
+	    eq = __webpack_require__(58),
 	    equalArrays = __webpack_require__(165),
 	    mapToArray = __webpack_require__(117),
-	    setToArray = __webpack_require__(78);
+	    setToArray = __webpack_require__(79);
 	
 	/** Used to compose bitmasks for comparison styles. */
 	var UNORDERED_COMPARE_FLAG = 1,
@@ -19697,7 +19966,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseHas = __webpack_require__(159),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/** Used to compose bitmasks for comparison styles. */
 	var PARTIAL_COMPARE_FLAG = 2;
@@ -19789,7 +20058,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseGetAllKeys = __webpack_require__(284),
 	    getSymbols = __webpack_require__(168),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/**
 	 * Creates an array of own enumerable property names and symbols of `object`.
@@ -19832,7 +20101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isStrictComparable = __webpack_require__(170),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/**
 	 * Gets the property names, values, and compare flags of `object`.
@@ -19883,10 +20152,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var castPath = __webpack_require__(113),
 	    isArguments = __webpack_require__(119),
 	    isArray = __webpack_require__(6),
-	    isIndex = __webpack_require__(55),
-	    isKey = __webpack_require__(56),
-	    isLength = __webpack_require__(80),
-	    isString = __webpack_require__(58),
+	    isIndex = __webpack_require__(56),
+	    isKey = __webpack_require__(57),
+	    isLength = __webpack_require__(81),
+	    isString = __webpack_require__(59),
 	    toKey = __webpack_require__(39);
 	
 	/**
@@ -19927,7 +20196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 332 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var nativeCreate = __webpack_require__(77);
+	var nativeCreate = __webpack_require__(78);
 	
 	/**
 	 * Removes all key-value entries from the hash.
@@ -19968,7 +20237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 334 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var nativeCreate = __webpack_require__(77);
+	var nativeCreate = __webpack_require__(78);
 	
 	/** Used to stand-in for `undefined` hash values. */
 	var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -20004,7 +20273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 335 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var nativeCreate = __webpack_require__(77);
+	var nativeCreate = __webpack_require__(78);
 	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -20033,7 +20302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 336 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var nativeCreate = __webpack_require__(77);
+	var nativeCreate = __webpack_require__(78);
 	
 	/** Used to stand-in for `undefined` hash values. */
 	var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -20181,7 +20450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseCreate = __webpack_require__(278),
 	    getPrototype = __webpack_require__(167),
-	    isPrototype = __webpack_require__(76);
+	    isPrototype = __webpack_require__(77);
 	
 	/**
 	 * Initializes an object clone.
@@ -20203,7 +20472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 340 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(71),
+	var Symbol = __webpack_require__(72),
 	    isArguments = __webpack_require__(119),
 	    isArray = __webpack_require__(6);
 	
@@ -20229,9 +20498,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 341 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var eq = __webpack_require__(57),
+	var eq = __webpack_require__(58),
 	    isArrayLike = __webpack_require__(24),
-	    isIndex = __webpack_require__(55),
+	    isIndex = __webpack_require__(56),
 	    isObject = __webpack_require__(12);
 	
 	/**
@@ -20354,7 +20623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 346 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assocIndexOf = __webpack_require__(73);
+	var assocIndexOf = __webpack_require__(74);
 	
 	/** Used for built-in method references. */
 	var arrayProto = Array.prototype;
@@ -20394,7 +20663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 347 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assocIndexOf = __webpack_require__(73);
+	var assocIndexOf = __webpack_require__(74);
 	
 	/**
 	 * Gets the list cache value for `key`.
@@ -20419,7 +20688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 348 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assocIndexOf = __webpack_require__(73);
+	var assocIndexOf = __webpack_require__(74);
 	
 	/**
 	 * Checks if a list cache value for `key` exists.
@@ -20441,7 +20710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 349 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assocIndexOf = __webpack_require__(73);
+	var assocIndexOf = __webpack_require__(74);
 	
 	/**
 	 * Sets the list cache `key` to `value`.
@@ -20473,7 +20742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var Hash = __webpack_require__(265),
-	    ListCache = __webpack_require__(70),
+	    ListCache = __webpack_require__(71),
 	    Map = __webpack_require__(108);
 	
 	/**
@@ -20498,7 +20767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 351 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getMapData = __webpack_require__(75);
+	var getMapData = __webpack_require__(76);
 	
 	/**
 	 * Removes `key` and its value from the map.
@@ -20520,7 +20789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 352 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getMapData = __webpack_require__(75);
+	var getMapData = __webpack_require__(76);
 	
 	/**
 	 * Gets the map value for `key`.
@@ -20542,7 +20811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 353 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getMapData = __webpack_require__(75);
+	var getMapData = __webpack_require__(76);
 	
 	/**
 	 * Checks if a map value for `key` exists.
@@ -20564,7 +20833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 354 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getMapData = __webpack_require__(75);
+	var getMapData = __webpack_require__(76);
 	
 	/**
 	 * Sets the map `key` to `value`.
@@ -20676,7 +20945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 359 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ListCache = __webpack_require__(70);
+	var ListCache = __webpack_require__(71);
 	
 	/**
 	 * Removes all key-value entries from the stack.
@@ -20756,7 +21025,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 363 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ListCache = __webpack_require__(70),
+	var ListCache = __webpack_require__(71),
 	    Map = __webpack_require__(108),
 	    MapCache = __webpack_require__(109);
 	
@@ -20928,12 +21197,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 367 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assignValue = __webpack_require__(72),
-	    copyObject = __webpack_require__(53),
+	var assignValue = __webpack_require__(73),
+	    copyObject = __webpack_require__(54),
 	    createAssigner = __webpack_require__(115),
 	    isArrayLike = __webpack_require__(24),
-	    isPrototype = __webpack_require__(76),
-	    keys = __webpack_require__(9);
+	    isPrototype = __webpack_require__(77),
+	    keys = __webpack_require__(11);
 	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -20998,7 +21267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 368 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var copyObject = __webpack_require__(53),
+	var copyObject = __webpack_require__(54),
 	    createAssigner = __webpack_require__(115),
 	    keysIn = __webpack_require__(390);
 	
@@ -21042,9 +21311,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 369 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var copyObject = __webpack_require__(53),
+	var copyObject = __webpack_require__(54),
 	    createAssigner = __webpack_require__(115),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/**
 	 * This method is like `_.assign` except that it accepts `customizer`
@@ -21119,7 +21388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var apply = __webpack_require__(152),
 	    assignInDefaults = __webpack_require__(275),
 	    assignInWith = __webpack_require__(368),
-	    baseRest = __webpack_require__(52);
+	    baseRest = __webpack_require__(53);
 	
 	/**
 	 * Assigns own and inherited enumerable string keyed properties of source
@@ -21396,9 +21665,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 378 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIndexOf = __webpack_require__(74),
+	var baseIndexOf = __webpack_require__(75),
 	    isArrayLike = __webpack_require__(24),
-	    isString = __webpack_require__(58),
+	    isString = __webpack_require__(59),
 	    toInteger = __webpack_require__(121),
 	    values = __webpack_require__(179);
 	
@@ -21872,8 +22141,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseKeysIn = __webpack_require__(296),
 	    indexKeys = __webpack_require__(169),
-	    isIndex = __webpack_require__(55),
-	    isPrototype = __webpack_require__(76);
+	    isIndex = __webpack_require__(56),
+	    isPrototype = __webpack_require__(77);
 	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -21957,7 +22226,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 392 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayMap = __webpack_require__(51),
+	var arrayMap = __webpack_require__(52),
 	    baseIteratee = __webpack_require__(160),
 	    baseMap = __webpack_require__(297),
 	    isArray = __webpack_require__(6);
@@ -22153,10 +22422,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 396 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayMap = __webpack_require__(51),
+	var arrayMap = __webpack_require__(52),
 	    baseFlatten = __webpack_require__(157),
 	    basePick = __webpack_require__(300),
-	    baseRest = __webpack_require__(52),
+	    baseRest = __webpack_require__(53),
 	    toKey = __webpack_require__(39);
 	
 	/**
@@ -22189,7 +22458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseProperty = __webpack_require__(112),
 	    basePropertyDeep = __webpack_require__(302),
-	    isKey = __webpack_require__(56),
+	    isKey = __webpack_require__(57),
 	    toKey = __webpack_require__(39);
 	
 	/**
@@ -22266,11 +22535,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 399 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getTag = __webpack_require__(54),
+	var getTag = __webpack_require__(55),
 	    isArrayLike = __webpack_require__(24),
 	    isObjectLike = __webpack_require__(17),
-	    isString = __webpack_require__(58),
-	    keys = __webpack_require__(9),
+	    isString = __webpack_require__(59),
+	    keys = __webpack_require__(11),
 	    stringSize = __webpack_require__(364);
 	
 	/** `Object#toString` result references. */
@@ -22376,7 +22645,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var createToPairs = __webpack_require__(324),
-	    keys = __webpack_require__(9);
+	    keys = __webpack_require__(11);
 	
 	/**
 	 * Creates an array of own enumerable string keyed-value pairs for `object`
@@ -22467,7 +22736,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseFlatten = __webpack_require__(157),
-	    baseRest = __webpack_require__(52),
+	    baseRest = __webpack_require__(53),
 	    baseUniq = __webpack_require__(305),
 	    isArrayLikeObject = __webpack_require__(120);
 	
@@ -22499,7 +22768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var arrayFilter = __webpack_require__(153),
-	    arrayMap = __webpack_require__(51),
+	    arrayMap = __webpack_require__(52),
 	    baseProperty = __webpack_require__(112),
 	    baseTimes = __webpack_require__(162),
 	    isArrayLikeObject = __webpack_require__(120);
@@ -22549,7 +22818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 406 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseRest = __webpack_require__(52),
+	var baseRest = __webpack_require__(53),
 	    unzip = __webpack_require__(405);
 	
 	/**
@@ -23005,7 +23274,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ArrayObservable_1 = __webpack_require__(60);
+	var ArrayObservable_1 = __webpack_require__(61);
 	exports.of = ArrayObservable_1.ArrayObservable.of;
 	//# sourceMappingURL=of.js.map
 
@@ -23019,8 +23288,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var ArrayObservable_1 = __webpack_require__(60);
-	var isArray_1 = __webpack_require__(86);
+	var ArrayObservable_1 = __webpack_require__(61);
+	var isArray_1 = __webpack_require__(87);
 	var OuterSubscriber_1 = __webpack_require__(40);
 	var subscribeToResult_1 = __webpack_require__(41);
 	var none = {};
@@ -23765,7 +24034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var root_1 = __webpack_require__(88);
+	var root_1 = __webpack_require__(89);
 	var Symbol = root_1.root.Symbol;
 	if (typeof Symbol === 'function') {
 	    if (Symbol.iterator) {

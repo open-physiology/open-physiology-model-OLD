@@ -1,8 +1,9 @@
 import {describe, it, expect} from './test.helper';
 import moduleFactory          from '../src/index';
-import {simpleMockHandlers}   from "./mock-handlers.helper";
-
-import entries from 'lodash-bound/entries';
+import {simpleMockHandlers}   from './mock-handlers.helper';
+import {map} from '../src/util/bound-hybrid-functions';
+import at    from 'lodash-bound/at';
+import keyBy from 'lodash-bound/keyBy';
 
 
 describe("integrated workflow", () => {
@@ -171,11 +172,11 @@ describe("integrated workflow", () => {
 		});
 		expect(backend.readAll()).to.have.length(1);
 		
-		let lyph = await Material.get(href);
+		let material = await Material.get(href);
 		
-		expect(lyph).to.be.instanceof(Material);
-		expect(lyph.href).to.equal(href);
-		expect(lyph.name).to.equal("Created Material");
+		expect(material).to.be.instanceof(Material);
+		expect(material.href).to.equal(href);
+		expect(material.name).to.equal("Created Material");
 	});
 	
 	it("can retrieve an existing entity from the backend (2)", async () => {
@@ -187,11 +188,11 @@ describe("integrated workflow", () => {
 		});
 		expect(backend.readAll()).to.have.length(1);
 		
-		let lyph = await Template.get(href);
+		let material = await Template.get(href);
 		
-		expect(lyph).to.be.instanceof(Material);
-		expect(lyph.href).to.equal(href);
-		expect(lyph.name).to.equal("Created Material");
+		expect(material).to.be.instanceof(Material);
+		expect(material.href).to.equal(href);
+		expect(material.name).to.equal("Created Material");
 	});
 	
 	it("can retrieve all existing entities from the backend (1)", async () => {
@@ -239,10 +240,42 @@ describe("integrated workflow", () => {
 		let template2 = allTemplates.filter(t=>t.href===href2)[0];
 		expect(template2).to.be.instanceof(CanonicalTree);
 		expect(template2.name).to.equal("Created Canonical Tree");
-
 	});
 	
-	it("uses the Command design pattern", async () => {
+	it("accepts id/href in a reference", async () => {
+		const {Lyph} = environment.classes;
+
+		let { href: href1 } = backend.create({
+			class: 'Lyph',
+			name:  "Lyph 1"
+		});
+		let { href: href2 } = backend.create({
+			class: 'Lyph',
+			name:  "Lyph 2"
+		});
+		
+		let parentLyph = Lyph.new({
+			name: "Parent Lyph",
+			parts: [href1, href2]
+		});
+		
+		let childLyphs = [...parentLyph.parts];
+		expect(childLyphs::map('href'))
+			.to.have.length(2).and
+			.to.have.members([href1, href2]);
+		
+		let [ph1, ph2] = childLyphs::keyBy('href')::at([href1, href2]);
+		
+		expect(ph1.isPlaceholder).to.be.true;
+		expect(ph1.name).to.be.undefined;
+		let entity1 = await Lyph.get(href1);
+		expect(entity1).to.equal(ph1);
+		expect(entity1.name).to.equal("Lyph 1");
+		expect(entity1.isPlaceholder).to.be.false;
+		
+	});
+	
+	it("automatically creates certain command dependencies", async () => {
 		const {Lyph, Border} = environment.classes;
 		
 		expect(backend.readAll()).to.have.length(0);

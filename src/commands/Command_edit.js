@@ -4,7 +4,9 @@ import assert  from 'power-assert';
 import keys    from 'lodash-bound/keys';
 import entries from 'lodash-bound/entries';
 
-// import {$$commands} from './symbols';
+import {
+	$$isPlaceholder
+} from '../symbols';
 
 
 // TODO: Make all field-setter code use this command
@@ -46,6 +48,10 @@ export default (cls) => class Command_edit extends cls.Command {
 			Cannot edit an entity
 			that was not specified in
 			the Command_edit constructor.
+		`);
+		constraint(!this.entity[$$isPlaceholder], humanMsg`
+			Cannot edit a placeholder.
+			Load the entity fully before editing.
 		`);
 		
 		/* store old values so we have the ability to roll back */

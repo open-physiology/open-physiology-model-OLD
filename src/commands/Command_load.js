@@ -1,10 +1,13 @@
 import isFunction from 'lodash-bound/isFunction';
 import isString   from 'lodash-bound/isString';
+import entries    from 'lodash-bound/entries';
 import assert     from 'power-assert';
+import {setPrototype} from 'bound-native-methods';
 import {
 	$$entities,
-	$$committedEntitiesByHref,
-	$$committedEntities
+	$$entitiesByHref,
+	$$committedEntities,
+	$$isPlaceholder
 } from '../symbols';
 import {constraint, humanMsg} from '../util/misc';
 
@@ -26,6 +29,12 @@ export default (cls) => class Command_load extends cls.Command {
 			commandDependencies: [
 				...(options.commandDependencies || []),
 				...(()=>{
+					let entity = cls.getLocal(values);
+					return entity && entity.originCommand
+						? [entity.originCommand]
+						: [];
+				})(),
+				...(()=>{
 					let r = [];
 					if (cls.isRelationship) {
 						for (let side of [1, 2]) {
@@ -38,49 +47,94 @@ export default (cls) => class Command_load extends cls.Command {
 				})()
 			]
 		});
-		this.values = values;
+		this.values      = values;
+		this.placeholder = options.placeholder;
 	}
 	
 	get associatedEntities() {
 		return new Set(this.result ? [this.result] : []);
 	}
 	
-	result = null;
+	values;
+	placeholder;
+	result;
 	
 	localRun() {
-		/* identify class */
-		const realCls = this.values.class::isString()
-			? cls.environment.classes[this.values.class]
-			: cls;
-		/* sanity checks */
-		// TODO: check that realCls is subclass of cls
-		
-		constraint(!realCls.abstract || humanMsg`
-			Cannot instantiate the abstract
-			class ${realCls.name}.
-		`);
-		/* construct entity */
-		this.result = new realCls(
-			{ ...this.values },
-			{ ...this.options, allowInvokingConstructor: true }
-		);
-		/* track this command in the entity */
-		/* this is already done in the Entity constructor (earlier than this) */
-		// this.result.originCommand = this;
-		
-		const Entity = cls.Entity;
-		
-		/* register this entity */
-		Entity[$$entities].add(this.result);
-		
-		/* after it's first committed, it's no longer new, but is pristine */
-		this.result.pSubject('isNew')     .next(false);
-		this.result.pSubject('isPristine').next(true);
-		
-		/* maintain caches */
-		Entity[$$committedEntitiesByHref][this.result.href] = this.result;
-		Entity[$$committedEntities].add(this.result);
-		
+		this.result = cls.getLocal(this.values);
+		if (!this.result) {
+			/* identify class */
+			const realCls = this.values.class::isString()
+				? cls.environment.classes[this.values.class]
+				: cls;
+			
+			/* sanity checks */
+			constraint(!realCls.abstract, humanMsg`
+				Cannot instantiate the abstract
+				class ${realCls.name}.
+			`);
+			constraint(cls.hasSubclass(realCls), humanMsg`
+				Expected ${realCls.name} to be
+				a subclass of ${cls.name}.
+			`);
+			
+			/* construct entity */
+			this.result = new realCls(
+				{ ...this.values },
+				{ ...this.options, allowInvokingConstructor: true }
+			);
+			this.result[$$isPlaceholder] = this.placeholder;
+			
+			/* track this command in the entity */
+			this.result.originCommand = this; // TODO: maintain array of originCommands instead
+			
+			/* register this entity */
+			cls[$$entities].add(this.result);
+			cls[$$entitiesByHref][this.result.href] = this.result;
+			cls[$$committedEntities].add(this.result);
+			
+			/* after it's first committed, it's no longer new, but is pristine */
+			this.result.pSubject('isNew')     .next(false);
+			this.result.pSubject('isPristine').next(true);
+		} else {
+			/* sanity checks */
+			constraint(this.result.isPristine, humanMsg`
+				Cannot load data into the ${this.result.class}
+				with href="${this.result.href}", because it has local changes.
+			`);
+			
+			/* check class compatibility */
+			const oldCls = cls.environment.classes[this.result.class];
+			const newCls = cls.environment.classes[this.values.class];
+			if (this.result.isPlaceholder) {
+				constraint(oldCls.hasSubclass(newCls), humanMsg`
+					Expected ${newCls.name} to be
+					a subclass of ${oldCls.name}.
+				`);
+				if (oldCls !== newCls) {
+					this.result::setPrototype(newCls.prototype);
+				}
+			} else {
+				constraint(oldCls === newCls, humanMsg`
+					Expected ${newCls.name} to be ${oldCls.name}.
+				`);
+			}
+			
+			/* track this command in the entity */
+			this.result.originCommand = this; // TODO: maintain array of originCommands instead
+			
+			/* if we're loading a placeholder, we're done now */
+			if (this.placeholder) { return }
+			
+			/* otherwise, set the values */
+			for (let [key, value] of this.values::entries()) {
+				this.result.fields[key].set(value, {
+					createEditCommand: false,
+					ignoreReadonly:    true,
+					ignoreValidation:  true
+				});
+			}
+			this.result[$$isPlaceholder] = false;
+		}
 	}
 	
 	localCommit({id, href}) {

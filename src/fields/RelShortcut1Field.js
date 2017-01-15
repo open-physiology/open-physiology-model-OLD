@@ -113,6 +113,14 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		};
 	}
 	
+	jsonToValue(json, options = {}) {
+		if (json === null) { return null }
+		const Entity  = this[$$owner].constructor.Entity;
+		let result = Entity.getLocal(json, options);
+		if (!result) { result = Entity.setPlaceholder(json, options) }
+		return result;
+	}
+	
 	[$$destruct]() {
 		this.set(null, {
 			ignoreReadonly:    true,

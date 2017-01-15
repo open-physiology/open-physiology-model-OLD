@@ -156,21 +156,26 @@ export class Field extends ValueTracker {
 	get() { return this[$$value] }
 	
 	set(newValue, options = {}) {
-		const { createEditCommand = true } = options;
-		if (createEditCommand) {
+		if (options.createEditCommand) {
 			
 			this[$$owner].edit({ [this[$$key]]: newValue }, options);
 			
 		} else if (!this.constructor.isEqual(this[$$value], newValue)) {
 			
-			const { ignoreReadonly = false, ignoreValidation = false, updatePristine = false, createEditCommand = true } = options;
+			const {
+				ignoreReadonly    = false,
+				ignoreValidation  = false,
+				createEditCommand = true
+			} = options;
 			
 			constraint(ignoreReadonly || !this[$$desc].readonly, humanMsg`
 				Tried to set the readonly field
 				'${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
 			if (!ignoreValidation) { this.validate(newValue, ['set']) }
-			// if (updatePristine) { this[$$pristine] = newValue } // TODO: remove all 'pristine' related stuff from the field classes
+			if (this.jsonToValue::isFunction()) {
+				newValue = this.jsonToValue(newValue, options);
+			}
 			this[$$value] = newValue;
 			this.pSubject('value').next(newValue);
 			
@@ -190,10 +195,9 @@ export class Field extends ValueTracker {
 				if (this.constructor.isEqual(this[$$value], val)) { return }
 				this.validate(val, ['initialize', 'set']);
 				this.set(val, {
-					ignoreReadonly:   true,
-					ignoreValidation: true,
-					// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
-					createEditCommand:  false
+					ignoreReadonly:    true,
+					ignoreValidation:  true,
+					createEditCommand: false
 				});
 				return;
 			}

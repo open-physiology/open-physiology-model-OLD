@@ -3,43 +3,35 @@ import assert     from 'power-assert';
 
 import {constraint, humanMsg} from '../util/misc';
 
-import {
-	$$entities,
-	$$entitiesByHref,
-	$$committedEntities,
-	$$isPlaceholder
-} from '../symbols';
+import {$$entities} from '../symbols';
 import {Field} from '../fields/Field';
 // import {$$commands} from './symbols';
 
-export default (cls) => class Command_new extends cls.Command {
+export default (cls) => class Command_batch extends cls.Command {
 	
-	static commandType = 'new';
+	static commandType = 'batch';
 	
 	static get entityClass() { return cls }
 	
-	static create(initialValues = {}, options = {}) {
-		return super.create([initialValues], options);
+	static create(commands, options = {}) {
+		return super.create([commands], options);
 	}
 	
-	constructor(initialValues = {}, options = {}) {
+	constructor(commands, options = {}) {
 		super({
 			...options,
 			commandDependencies: [
 				...(options.commandDependencies || []),
-				...(()=>{
-					if (!cls.isRelationship) { return [] }
-					let r = [];
-					for (let side of [1, 2]) {
-						if (initialValues[side]) {
-							r.push(initialValues[side].originCommand);
-						}
+				...(() => {
+					let deps = [];
+					for (let cmd of commands) {
+						// TODO: Do we need a concept of dependencies?
+						//       Or will we always make batch a one-off thing?
 					}
-					return r;
 				})()
 			]
 		});
-		this.initialValues = initialValues;
+		this.commands = commands;
 	}
 	
 	get associatedEntities() {
@@ -63,9 +55,9 @@ export default (cls) => class Command_new extends cls.Command {
 				{ ...this.options, allowInvokingConstructor: true }
 			);
 		}
-		this.result[$$isPlaceholder] = false;
 		/* track this command in the entity */
-		this.result.originCommand = this;
+		/* this is already done in the Entity constructor (earlier than this) */
+		// this.result.originCommand = this;
 		/* register as new */
 		this.result.pSubject('isNew').next(true);
 		/* register this entity */
@@ -84,6 +76,7 @@ export default (cls) => class Command_new extends cls.Command {
 		/* set id and href */
 		const opts = {
 			ignoreReadonly:    true,
+			updatePristine:    true, // TODO: does this option make sense?
 			createEditCommand: false
 		};
 		this.result.fields['id']  .set(id,   opts);
@@ -100,12 +93,11 @@ export default (cls) => class Command_new extends cls.Command {
 
 	localRollback() {
 		/* destruct each field */
-		Field.destructEntity(this.result);
+		Field.destructEntity(this.result); // TODO: test
 		
 		/* un-register the entity */
-		delete cls.Entity[$$entitiesByHref][this.result.href];
 		cls.Entity[$$entities].delete(this.result);
-		cls.Entity[$$committedEntities].delete(this.result);
+		// TODO: remove other traces of the entity
 		
 		/* untrack this command in the entity */
 		this.result.originCommand = null;

@@ -77,7 +77,6 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, constructingOwner, related } = options;
 		
-		// this::defineProperty($$pristine, { value: new Set           });// TODO: remove all 'pristine' related stuff from the field classes
 		this::defineProperty($$value,    { value: new ObservableSet });
 		
 		/* mirror stuff that happens in sub-fields */
@@ -105,9 +104,6 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		this[$$value].e('add')
 			::waitUntilConstructed()
 			.subscribe((rel) => { rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) });
-		// this[$$value].e('delete') // TODO: note that this was commented because rel.delete() has a new meaning since the old days (
-		// 	::waitUntilConstructed()
-		// 	.subscribe((rel) => { rel.delete() });
 		
 		/* decouple a relationship when it decouples from this resource */
 		this[$$value].e('add')
@@ -119,14 +115,12 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		
 		/* handle initial values */
 		if (initialValue && initialValue[Symbol.iterator]) {
-			for (let rel of initialValue) {
+			for (let rel of this.jsonToValue(initialValue)) {
 				if (!rel.fields[desc.keyInRelationship].get()) {
 					rel.fields[desc.keyInRelationship].set(this, { createEditCommand: false });
 				}
 				assert(rel[desc.keyInRelationship] === this);
-				
-				// this[$$pristine].add(rel);// TODO: remove all 'pristine' related stuff from the field classes
-				this[$$value]   .add(rel);
+				this[$$value].add(rel);
 			}
 		} else if (related::get([desc.shortcutKey, 'initialValue'])) {
 			// OK, a shortcut was given
@@ -169,13 +163,23 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 			href: e.href
 		}));
 	}
+	
+	jsonToValue(json, options = {}) {
+		const Entity = this[$$owner].constructor.Entity;
+		let result = new Set;
+		for (let thing of json) {
+			let entity = Entity.getLocal(thing, options);
+			if (!entity) { entity = Entity.setPlaceholder(thing, options) }
+			result.add(entity);
+		}
+		return result;
+	}
 		
 	[$$destruct]() {
 		this.set(new Set(), {
-			ignoreReadonly:   true,
-			ignoreValidation: true,
-			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
-			createEditCommand:  false
+			ignoreReadonly:    true,
+			ignoreValidation:  true,
+			createEditCommand: false
 		});
 		super[$$destruct]();
 	}

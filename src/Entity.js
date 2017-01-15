@@ -17,7 +17,7 @@ import                                      'rxjs/add/operator/do';
 
 import {filter, map} from './util/bound-hybrid-functions';
 
-import {defineProperties, defineProperty, assign} from 'bound-native-methods';
+import {defineProperties, defineProperty, assign, setPrototype} from 'bound-native-methods';
 
 import babelHelpers from './util/babel-helpers';
 import {constraint} from './util/misc';
@@ -29,9 +29,10 @@ import command_loadClassFactory   from './commands/Command_load';
 const $$Command_load = Symbol('$$Command_load');
 
 import {
-	$$committedEntitiesByHref,
+	$$entitiesByHref,
 	$$committedEntities,
-	$$entities
+	$$entities,
+	$$isPlaceholder
 } from './symbols';
 const $$newEntitySubject         = Symbol('$$newEntitySubject'   );
 const $$deleted                  = Symbol('$$deleted'            );
@@ -49,6 +50,13 @@ export default (environment) => {
 		static get environment() { return environment }
 		
 		static get Entity() { return Entity }
+		
+		static normalizeAddress(address) {
+			if (address::isString())  { return { class: this.name, href: address                           } }
+			if (address::isInteger()) { return { class: this.name, id:   address                           } }
+			if (address::isObject())  { return { class: this.name, ...address::pick('href', 'id', 'class') } }
+			assert(false, humanMsg`${JSON.stringify(address)} is not a valid entity identifier.`);
+		}
 		
 		////////////////////////////////////////////////////////////
 		////////// STATIC (building Entity-based classes) //////////
@@ -137,6 +145,7 @@ export default (environment) => {
 			return EntitySubclass;
 		}
 		
+				
 		//////////////////////////////////////////////////
 		////////// EXPLICITLY CREATING COMMANDS //////////
 		//////////////////////////////////////////////////
@@ -182,9 +191,9 @@ export default (environment) => {
 			return this.constructor.commandDelete(this, options);
 		}
 		
-		/////////////////////////////////////////////////////////////////////
-		////////// STATIC (creating / caching / finding instances) //////////
-		/////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////
+		////////// Synchronous Model Manipulation //////////
+		////////////////////////////////////////////////////
 		
 		static new(
 			initialValues: {} = {},
@@ -204,23 +213,46 @@ export default (environment) => {
 			this.commandDelete({ ...options, run: true });
 		}
 		
-		static async get(
-			address: { href: string } | { id: number } | string | number,
-			options: {} = {} // TODO: filtering, expanding, paging, ...
+		get isPlaceholder() { return this[$$isPlaceholder] }
+		
+		////////////////////////////////////////////
+		////////// Caching Model Entities //////////
+		////////////////////////////////////////////
+		
+		static hasCache(
+			entityOrAddress: Entity | { href: string } | { id: number } | string | number
+		) {
+			let entity = this.getLocal(entityOrAddress);
+			return entity && !entity[$$isPlaceholder];
+		}
+		
+		static hasPlaceholder(
+			entityOrAddress: Entity | { href: string } | { id: number } | string | number
+		) {
+			let entity = this.getLocal(entityOrAddress);
+			return entity && entity[$$isPlaceholder];
+		}
+		
+		static hasLocal(
+			entityOrAddress: Entity | { href: string } | { id: number } | string | number
+		) {
+			return !!this.getLocal(entityOrAddress);
+		}
+		
+		static getLocal( // TODO: make private?
+			entityOrAddress: Entity | { href: string } | { id: number } | string | number
 		) : this {
+			/* is it already a local entity? */
+			if (entityOrAddress instanceof Entity) { return entityOrAddress }
+			
 			/* normalize address */
-			if (address::isString())  { address = { href: address } }
-			if (address::isInteger()) { address = { id:   address } }
+			const address = this.normalizeAddress(entityOrAddress);
 			
-			/* if it's not yet cached, load it now (async) */
-			if (!Entity[$$committedEntitiesByHref][address.href]) {
-				const values = await backend.load(address, options);
-				const cmd    = this[$$Command_load].create(values);
-				Entity[$$committedEntitiesByHref][address.href] = cmd.result;
-			}
+			/* if it's not yet cached, return undefined */
+			if (!Entity[$$entitiesByHref][address.href]) { return }
 			
-			/* fetch the entity from the cache */
-			let entity = Entity[$$committedEntitiesByHref][address.href];
+			/* fetch the entity (or placeholder) from the cache */
+			let entity = Entity[$$entitiesByHref][address.href];
 			
 			/* make sure the retrieved entity is of the expected class */
 			constraint(this.hasInstance(entity), humanMsg`
@@ -232,20 +264,60 @@ export default (environment) => {
 			return entity;
 		}
 		
+		static setPlaceholder(
+			address: string | number | { href: string } | { id: number },
+			options: {} = {}
+		) {
+			address = this.normalizeAddress(address);
+			let placeholder = this[$$Command_load].create(address, { ...options, placeholder: true}).result;
+			return placeholder;
+		}
+		
+		static setCache( // TODO: make private
+			values:  Entity | { href: string } | { id: number },
+			options: {} = {}
+		) {
+			if (values instanceof Entity) { return values }
+			let entity = this[$$Command_load].create(values, options).result;
+			return entity;
+		}
+		
+		////////////////////////////////////////////////////////////////
+		////////// Asynchronous Entity Retrieval from Backend //////////
+		////////////////////////////////////////////////////////////////
+		
+		static async get(
+			address: { href: string } | { id: number } | string | number,
+			options: {} = {} // TODO: filtering, expanding, paging, ...
+		) : this {
+			/* normalize address */
+			address = this.normalizeAddress(address);
+			
+			/* if it's not yet cached, load and cache it now (async) */
+			if (!this.hasCache(address.href)) {
+				const values = await backend.load(address, options);
+				this.setCache(values); // TODO: do we need to mix in the address?
+			}
+			
+			/* fetch the entity from the cache */
+			return this.getLocal(address, options);
+		}
+		
 		static async getAll(
 			options: {} = {} // TODO: filtering, expanding, paging, ...
 		) : this {
 
 			let response = await backend.loadAll(this, options);
-			let result = new Set;
-
+			let result   = new Set;
+			
 			/* cache response */
 			for (let values of response) {
-				if (!Entity[$$committedEntitiesByHref][values.href]) {
-					Entity[$$committedEntitiesByHref][values.href] = values;
-					const cmd = this[$$Command_load].create(values);
-					Entity[$$committedEntitiesByHref][cmd.result.href] = cmd.result;
-					result.add(cmd.result);
+				if (!this.hasCache(values.href)) {
+					let entity = this.setCache(values);
+					result.add(entity);
+				} else {
+					// TODO: if it's only loaded as a stub, then
+					//       augment the existing entity; do not replace it
 				}
 			}
 
@@ -390,12 +462,11 @@ export default (environment) => {
 		[$$committedEntities]       : new ObservableSet(),
 		[$$committedEntitiesSubject]: new BehaviorSubject(new Set()),
 		
-		[$$committedEntitiesByHref] : {}
+		[$$entitiesByHref] :          {}
 	});
 	
 	return Entity;
 }
-
 
 
 ///// FROM Entity CLASS

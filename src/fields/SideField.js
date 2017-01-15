@@ -104,6 +104,14 @@ Field[$$registerFieldClass](class SideField extends Field {
 			href: value.href
 		};
 	}
+	
+	jsonToValue(json, options = {}) {
+		if (json === null) { return null }
+		const Entity  = this[$$owner].constructor.Entity;
+		let result = Entity.getLocal(json, options);
+		if (!result) { result = Entity.setPlaceholder(json, options) }
+		return result;
+	}
 		
 	[$$destruct]() {
 		this.set(null, {
@@ -128,8 +136,10 @@ Field[$$registerFieldClass](class SideField extends Field {
 		}
 		
 		/* the value must be of the proper domain */
+		let foobar = this[$$desc];
 		constraint(notGiven || this[$$desc].resourceClass.hasInstance(val), humanMsg`
-			Invalid value '${val}' given for ${this[$$owner].constructor.name}#${this[$$key]}.
+			Invalid value ${val} given for ${this[$$owner].constructor.name}#${this[$$key]}
+			(${this[$$desc].resourceClass}).
 		`);
 		
 		// TODO: these should not be assertions, but proper constraint-checks,
