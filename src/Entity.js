@@ -1,11 +1,13 @@
 import defaults    from 'lodash-bound/defaults';
 import isString    from 'lodash-bound/isString';
 import isInteger   from 'lodash-bound/isInteger';
+import isArray     from 'lodash-bound/isArray';
 import isSet       from 'lodash-bound/isSet';
 import isObject    from 'lodash-bound/isObject';
 import isUndefined from 'lodash-bound/isUndefined';
 import pick        from 'lodash-bound/pick';
 import entries     from 'lodash-bound/entries';
+import reject      from 'lodash-bound/reject';
 
 import {humanMsg, definePropertiesByValue, definePropertyByValue} from './util/misc';
 import ObservableSet                   from './util/ObservableSet';
@@ -316,20 +318,26 @@ export default (environment) => {
 		////////////////////////////////////////////////////////////////
 		
 		static async get(
-			address: { href: string } | string | number,
-			options: {} = {} // TODO: filtering, expanding, paging, ...
+			addresses: Array | { href: string } | string | number,
+			options:   {} = {} // TODO: filtering, expanding, paging, ...
 		) : this {
-			/* normalize address */
-			address = this.normalizeAddress(address);
+			const useArray = addresses::isArray();
+			if (!useArray) { addresses = [addresses] }
 			
-			/* if it's not yet cached, load and cache it now (async) */
-			if (!this.hasCache(address.href)) {
-				const values = await backend.load(address, options);
-				this.setCache(values); // TODO: do we need to mix in the address?
+			/* for the ones that aren't yet cached, load and cache them now (async) */
+			const absentAddresses = addresses
+				::map(::this.normalizeAddress)
+				::reject(::this.hasCache);
+			if (absentAddresses.length > 0) {
+				for (let response of await backend.load(absentAddresses, options)) {
+					this.setCache(response);
+				}
 			}
 			
-			/* fetch the entity from the cache */
-			return this.getLocal(address, options);
+			/* fetch the entities from the cache */
+			let result = addresses::map(addr => this.getLocal(addr, options));
+			if (!useArray) { result = result[0] }
+			return result;
 		}
 		
 		static async getAll(
@@ -450,11 +458,8 @@ export default (environment) => {
 		
 		//// Setting / getting of fields
 		
-		get(key)                    { return this.fields[key].get()             }
-		set(key, val, options = {}) {
-			options::defaults({ createEditCommand: true });
-			return this.fields[key].set(val, options)
-		}
+		get(key)                    { return this.fields[key].get()                                             }
+		set(key, val, options = {}) { return this.fields[key].set(val, { createEditCommand: true, ...options }) }
 		
 		
 		//// Commit & Rollback

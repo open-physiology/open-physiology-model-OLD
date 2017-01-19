@@ -122,11 +122,6 @@ describe("integrated workflow", () => {
 		waterType.definition = newWater;
 
 		await newWater.commit();
-		
-		// debugger;
-		
-		// FIXME: waterType.commit() will first commit 'new', and then 'edit',
-		//        but the initial commit will be missing its '.definition' field, and bail out
 		await waterType.commit();
 
 		expect(newWater).to.have.a.property('href').which.is.a('string');
@@ -300,18 +295,36 @@ describe("integrated workflow", () => {
 
 		expect(backend.readAll()).to.have.length(5);
 		// ⬑ 1 lyph, 2 borders, 2 relationships
+	});
+	
+	it("can load either one or multiple entities per request", async () => {
+		const {Material} = environment.classes;
 		
+		let { href: href1 } = backend.create({
+			class: 'Material',
+			name:  "Material 1"
+		});
+		let { href: href2 } = backend.create({
+			class: 'Material',
+			name:  "Material 2"
+		});
+		let { href: href3 } = backend.create({
+			class: 'Material',
+			name:  "Material 3"
+		});
 		
-		// TODO: The commit cycle has a flaw; (INTERDEPENDENT NEW HREFs)
-		//       If a lyph is committed, its borders also have to be committed,
-		//       but both require a reference to the other while serialized,
-		//       which has to be an href, which is right now only assigned
-		//       one-by-one on the backend, so there's a kind of deadlock
-		//       where neither can be committed because they are incomplete.
-		//
-		//       We need a batch REST operation which supports temporary hrefs,
-		//       which the backend can then replace.
+		let material1 = await Material.get(href1);
+		expect(material1)
+			.is.an.instanceof(Material)
+			.with.property('name', "Material 1");
 		
+		let [material2, material3] = await Material.get([href2, href3]);
+		expect(material2)
+			.is.an.instanceof(Material)
+			.with.property('name', "Material 2");
+		expect(material3)
+			.is.an.instanceof(Material)
+			.with.property('name', "Material 3");
 	});
 	
 });

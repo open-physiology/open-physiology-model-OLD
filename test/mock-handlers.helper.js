@@ -167,8 +167,8 @@ export const simpleMockHandlers = () => {
 			/***/
 			return response::cloneDeep();
 		},
-		async load(address, options = {}) {
-			return backend.read(address)::cloneDeep();
+		async load(addresses, options = {}) {
+			return addresses.map(addr => backend.read(addr)::cloneDeep());
 		},
 		async loadAll(cls, options = {}) {
 			return backend.readAll().filter(e => cls.hasSubclass(cls.environment.classes[e.class]))::cloneDeep();
