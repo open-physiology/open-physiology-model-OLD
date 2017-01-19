@@ -13158,15 +13158,12 @@ return /******/ (function(modules) { // webpackBootstrap
 										_context4.prev = 7;
 										for (_iterator4 = response[Symbol.iterator](); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 											values = _step4.value;
+											entity = this.getLocal(values.href);
 	
-											if (!this.hasCache(values.href)) {
+											if (!entity) {
 												entity = this.setCache(values);
-	
-												result.add(entity);
-											} else {
-												// TODO: if it's only loaded as a stub, then
-												//       augment the existing entity; do not replace it
 											}
+											result.add(entity);
 										}
 	
 										_context4.next = 15;

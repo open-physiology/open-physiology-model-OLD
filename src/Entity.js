@@ -349,13 +349,9 @@ export default (environment) => {
 			
 			/* cache response */
 			for (let values of response) {
-				if (!this.hasCache(values.href)) {
-					let entity = this.setCache(values);
-					result.add(entity);
-				} else {
-					// TODO: if it's only loaded as a stub, then
-					//       augment the existing entity; do not replace it
-				}
+				let entity = this.getLocal(values.href);
+				if (!entity) { entity = this.setCache(values) }
+				result.add(entity);
 			}
 
 			return result;
