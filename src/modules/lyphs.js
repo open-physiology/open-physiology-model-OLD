@@ -91,10 +91,8 @@ export default TypedModule.create('lyphs', [
 					radialBorders:       [],
 					axis:              null
 				});
-				// TODO: create a new Command for the border,
-				// TODO: caused by / dependent on this command
 				if (options.createAxis) {
-					const axis = Border.new({}, { commandDependencies: [command] });
+					const axis = Border.new({}, { forcedDependencies: [command] });
 					initialValues::assign({ axis });
 				}
 				if (initialValues.axis) {
@@ -110,7 +108,7 @@ export default TypedModule.create('lyphs', [
 					const nr = Math.min(options.createRadialBorders , 2);
 					for (let i = initialValues.radialBorders.length; i < nr; ++i) {
 						initialValues.radialBorders.push(
-							Border.new({}, { commandDependencies: [command] })
+							Border.new({}, { forcedDependencies: [command] })
 						);
 					}
 				}
@@ -247,7 +245,7 @@ export default TypedModule.create('lyphs', [
 			1: [Lyph,   c1, { ...options, sustains: true, anchors: true, expand: true, key }],
 			2: [Border, c2                                                                  ],
 			
-			// The 'readonly' flag above implies that when a lyph is created,
+			// The 'readonly' and 'auto' flags below imply that when a lyph is created,
 			// its borders are also automatically created.
 			
 			// Two lyphs never share the same border, formally speaking.

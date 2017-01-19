@@ -99,10 +99,9 @@ Field[$$registerFieldClass](class SideField extends Field {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		return {
-			id  : value.id,
-			href: value.href
-		};
+		const {entityToTemporaryHref = new Map} = options;
+		if (!value) { return value }
+		return { href: value.href || entityToTemporaryHref.get(value) };
 	}
 	
 	jsonToValue(json, options = {}) {

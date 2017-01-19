@@ -11,7 +11,7 @@ import {
 } from '../symbols';
 import {constraint, humanMsg} from '../util/misc';
 
-export default (cls) => class Command_load extends cls.Command {
+export default (cls) => class Command_load extends cls.TrackedCommand {
 	
 	static commandType = 'load';
 	
@@ -26,6 +26,30 @@ export default (cls) => class Command_load extends cls.Command {
 			...options,
 			run:       true,
 			committed: true,
+			commitDependencies: [
+				...(options.commitDependencies || []),
+				...(()=>{
+					if (!cls.isResource) { return [] }
+					let r = [];
+					for (let [key, value] of values::entries()) {
+						if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
+							// TODO: loop for rel$ class fields
+							r.push(value.originCommand);
+						}
+					}
+					return r;
+				})(),
+				...(()=>{
+					if (!cls.isRelationship) { return [] }
+					let r = [];
+					for (let side of [1, 2]) {
+						if (values[side]) {
+							r.push(values[side].originCommand);
+						}
+					}
+					return r;
+				})()
+			],
 			commandDependencies: [
 				...(options.commandDependencies || []),
 				...(()=>{
@@ -68,7 +92,7 @@ export default (cls) => class Command_load extends cls.Command {
 				: cls;
 			
 			/* sanity checks */
-			constraint(!realCls.abstract, humanMsg`
+			constraint(this.placeholder || !realCls.abstract, humanMsg`
 				Cannot instantiate the abstract
 				class ${realCls.name}.
 			`);
@@ -92,9 +116,8 @@ export default (cls) => class Command_load extends cls.Command {
 			cls[$$entitiesByHref][this.result.href] = this.result;
 			cls[$$committedEntities].add(this.result);
 			
-			/* after it's first committed, it's no longer new, but is pristine */
-			this.result.pSubject('isNew')     .next(false);
-			this.result.pSubject('isPristine').next(true);
+			/* after it's first committed, it's no longer new */
+			this.result.pSubject('isNew').next(false);
 		} else {
 			/* sanity checks */
 			constraint(this.result.isPristine, humanMsg`
@@ -137,13 +160,23 @@ export default (cls) => class Command_load extends cls.Command {
 		}
 	}
 	
-	localCommit({id, href}) {
+	toJSON(options = {}) {
+		assert(false, humanMsg`
+			Command_load#toJSON should never be called.
+			It is meant for commands that can be serialized and transmitted.
+		`);
+	}
+	
+	localCommit() {
 		assert(false, humanMsg`
 			Command_load#localCommit should never be called,
 			because a load command starts out as being committed.
 			(${href})
 		`);
 	}
+	
+	handleCommitResponse(response) {
+	} // intentionally empty
 
 	localRollback() {
 		assert(false, humanMsg`

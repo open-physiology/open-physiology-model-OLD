@@ -133,13 +133,13 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
 			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
 				let otherEntity = desc.codomain.resourceClass.new({}, {
-					commandCauses: [owner.originCommand]
+					forcedDependencies: [owner.originCommand]
 				});
 				const rel = desc.relationshipClass.new({
 					[desc.keyInRelationship]         : owner,
 					[desc.codomain.keyInRelationship]: otherEntity
 				}, {
-					commandCauses: [owner.originCommand]
+					forcedDependencies: [owner.originCommand]
 				});
 				// this[$$pristine].add(rel); // TODO: remove 'pristine' related stuff everywhere except commands
 				this[$$value]   .add(rel);
@@ -158,10 +158,8 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		return value::map(e => ({
-			id:   e.id,
-			href: e.href
-		}));
+		const {entityToTemporaryHref = new Map} = options;
+		return value::map(e => ({ href: e.href || entityToTemporaryHref.get(e) }));
 	}
 	
 	jsonToValue(json, options = {}) {

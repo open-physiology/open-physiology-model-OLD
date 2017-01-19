@@ -6,19 +6,21 @@ import {simpleMockHandlers} from "../mock-handlers.helper";
 
 describe("'canonicalTrees' Module", () => {
 	
-	let module, backend, frontend;
+	let environment, backend, frontend;
 	beforeEach(() => {
-		({backend, frontend} = simpleMockHandlers());
-		module = moduleFactory(frontend);
+		let registerEnvironment;
+		({backend, frontend, registerEnvironment} = simpleMockHandlers());
+		environment = moduleFactory(frontend);
+		registerEnvironment(environment);
 	});
 	
 	it("exports the expected classes", () => {
 		
-		expect(module.classes).to.contain.resources(
+		expect(environment.classes).to.contain.resources(
 			'CanonicalTree',
 			'CanonicalTreeBranch'
 		);
-		expect(module.classes).to.contain.relationships(
+		expect(environment.classes).to.contain.relationships(
 			'HasBranch',
 			'BranchesTo',
 			'IsConveyedBy'

@@ -7,6 +7,7 @@ import 'rxjs/add/operator/do';
 import inRange     from 'lodash-bound/inRange';
 import size        from 'lodash-bound/size';
 import entries     from 'lodash-bound/entries';
+import isUndefined from 'lodash-bound/isUndefined';
 
 
 import {defineProperties, defineProperty} from 'bound-native-methods';
@@ -78,7 +79,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		const { owner, desc, initialValue, waitUntilConstructed, related } = options;
 		
 		// this::defineProperty($$pristine, { value: new Set           });// TODO: remove all 'pristine' related stuff from the field classes
-		this::defineProperty($$value,    { value: new ObservableSet });
+		this::defineProperty($$value, { value: new ObservableSet });
 
 		/* syncing with relationship field */
 		const correspondingRelField = owner.fields[desc.keyInResource][$$value];
@@ -130,10 +131,8 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		return value::map(e => ({
-			id:   e.id,
-			href: e.href
-		}));
+		const {entityToTemporaryHref = new Map} = options;
+		return value::map(e => ({ href: e.href || entityToTemporaryHref.get(e) }));
 	}
 	
 	jsonToValue(json, options = {}) {

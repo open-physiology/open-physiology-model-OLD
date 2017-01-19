@@ -60,6 +60,7 @@ class Environment {
 	        'commit_new',
 	        'commit_edit',
 	        'commit_delete',
+	        'commit_batch',
 	        'load',
 	        'loadAll'
 		]) {
@@ -76,8 +77,17 @@ class Environment {
 		});
 		
 		/* create a version of the Command and Entity classes */
-		this::definePropertyByValue('Command', commandClassFactory(this));
-		this::definePropertyByValue('Entity' , entityClassFactory (this));
+		const {Command, TrackedCommand, Command_batch} = commandClassFactory(this);
+		this::definePropertyByValue('Command',        Command                 );
+		this::definePropertyByValue('TrackedCommand', TrackedCommand          );
+		this::definePropertyByValue('Command_batch',  Command_batch           );
+		this::definePropertyByValue('Entity',         entityClassFactory(this));
+		
+		/* make Entity behave more like all its subclasses */
+		this.classes.ensureVertex('Entity', this.Entity);
+		this.classes['Entity'] = this.Entity;
+		this.Entity.extends    = new Set;
+		this.Entity.extendedBy = new Set;
 	}
 	
 	registerModule(module, dependencies, fn) {
@@ -390,7 +400,10 @@ export default class Module {
 		}
 		
 		/* add subclassing edges and cross-register sub/superclasses */
-		for (let extendee of (cls.extends) || []) {
+		if (!cls.extends || [...cls.extends].length === 0) {
+			cls.extends = [this.Entity];
+		}
+		for (let extendee of cls.extends) {
 			this.classes.addEdge(extendee.name, cls.name);
 			extendee.extendedBy.add(cls);
 		}

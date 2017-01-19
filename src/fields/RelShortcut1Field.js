@@ -5,6 +5,7 @@ import 'rxjs/add/operator/do';
 
 import entries     from 'lodash-bound/entries';
 import isObject    from 'lodash-bound/isObject';
+import isUndefined from 'lodash-bound/isUndefined';
 
 import {defineProperty} from 'bound-native-methods';
 
@@ -106,14 +107,14 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
+		const {entityToTemporaryHref = new Map} = options;
+		//debugger;
 		if (!value) { return value }
-		return {
-			id  : value.id,
-			href: value.href
-		};
+		return { href: value.href || entityToTemporaryHref.get(value) };
 	}
 	
 	jsonToValue(json, options = {}) {
+		// TODO: expect and use option temporaryToPermanentHref
 		if (json === null) { return null }
 		const Entity  = this[$$owner].constructor.Entity;
 		let result = Entity.getLocal(json, options);

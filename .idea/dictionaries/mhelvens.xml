@@ -1,6 +1,7 @@
 <component name="ProjectDictionaryState">
   <dictionary name="mhelvens">
     <words>
+      <w>addr</w>
       <w>advection</w>
       <w>arrayify</w>
       <w>coalescences</w>
@@ -10,6 +11,7 @@
       <w>descs</w>
       <w>espower</w>
       <w>extendee</w>
+      <w>hrefs</w>
       <w>iface</w>
       <w>instanceof</w>
       <w>iterable</w>

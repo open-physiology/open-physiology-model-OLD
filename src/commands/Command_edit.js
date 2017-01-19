@@ -3,6 +3,7 @@ import {constraint, humanMsg} from '../util/misc';
 import assert  from 'power-assert';
 import keys    from 'lodash-bound/keys';
 import entries from 'lodash-bound/entries';
+import isArray from 'lodash-bound/isArray';
 
 import {
 	$$isPlaceholder
@@ -11,7 +12,7 @@ import {
 
 // TODO: Make all field-setter code use this command
 
-export default (cls) => class Command_edit extends cls.Command {
+export default (cls) => class Command_edit extends cls.TrackedCommand {
 	
 	static commandType = 'edit';
 	
@@ -24,11 +25,35 @@ export default (cls) => class Command_edit extends cls.Command {
 	constructor(entity, newValues = {}, options = {}) {
 		super({
 			...options,
+			commitDependencies: [
+				...(options.commitDependencies || []),
+				...(()=>{
+					if (!cls.isResource) { return [] }
+					let r = [];
+					for (let [key, value] of newValues::entries()) {
+						if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
+							if (!value::isArray()) { value = [value] }
+							r.push(...value.map(addr=>cls.Entity.getLocalOrPlaceholder(addr).originCommand));
+						}
+					}
+					return r;
+				})(),
+				...(()=>{
+					if (!cls.isRelationship) { return [] }
+					let r = [];
+					for (let side of [1, 2]) {
+						if (newValues[side]) {
+							r.push(cls.Entity.getLocalOrPlaceholder(newValues[side]).originCommand);
+						}
+					}
+					return r;
+				})()
+			],
 			commandDependencies: [
 				entity.originCommand,
 				...(entity.editCommands         || []),
-				...(options.commandDependencies || [])
 				// TODO: only dependent on edit commands with shared property keys
+				...(options.commandDependencies || [])
 			]
 		});
 		this.entity    = entity;
@@ -78,18 +103,24 @@ export default (cls) => class Command_edit extends cls.Command {
 		}
 	}
 	
+	toJSON(options = {}) {
+		return {
+			commandType: 'edit',
+			entity:    this.entity.constructor.normalizeAddress(this.entity, options),
+			newValues: this.entity.constructor.objectToJSON(this.newValues, { sourceEntity: this.entity })
+		};
+	}
+	
 	async localCommit() {
 		const backend = cls.environment.backend;
-		let response = await backend.commit_edit(
-			this.entity.href,
-			this.entity.constructor.objectToJSON(this.newValues, { sourceEntity: this.entity })
-		);
-		// TODO: integrate response
-		// TODO: catch possible exception, meaning the commit failed
-		/* after it's first committed, it may be pristine */
-		if ([this.entity.originCommand, ...this.entity.editCommands].every(cmd => cmd === this || cmd.committed || cmd.rolledBack)) {
-			this.entity.pSubject('isPristine').next(true);
-		}
+		// debugger;
+		let response = await backend.commit_edit(this.toJSON());
+		// debugger;
+		this.handleCommitResponse(response);
+	}
+	
+	handleCommitResponse(response) {
+		// TODO: (update fields that changed since commit?)
 	}
 
 	localRollback() {

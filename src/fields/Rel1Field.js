@@ -87,24 +87,24 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			[givenShortcutInitialValue ],
 			[desc.options.auto, () => {
 				let otherEntity = desc.codomain.resourceClass.new({}, {
-					commandCauses: [owner.originCommand]
+					forcedDependencies: [owner.originCommand]
 				});
 				return desc.relationshipClass.new({
 					[desc.keyInRelationship]         : owner,
 					[desc.codomain.keyInRelationship]: otherEntity
 				}, {
-					commandCauses: [owner.originCommand]
+					forcedDependencies: [owner.originCommand]
 				});
 			}],
 			[desc.options.default, () => {
 				let otherEntity = desc.options.default::callOrReturn({
-					commandCauses: [owner.originCommand]
+					forcedDependencies: [owner.originCommand]
 				});
 				return desc.relationshipClass.new({
 					[desc.keyInRelationship]         : owner,
 					[desc.codomain.keyInRelationship]: otherEntity
 				}, {
-					commandCauses: [owner.originCommand]
+					forcedDependencies: [owner.originCommand]
 				});
 			}],
 			[desc.cardinality.min === 0, null]
@@ -141,11 +141,9 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
+		const {entityToTemporaryHref = new Map} = options;
 		if (value === null) { return null }
-		return {
-			id:   value.id,
-			href: value.href
-		};
+		return { href: value.href || entityToTemporaryHref.get(value) };
 	}
 	
 	jsonToValue(json, options = {}) {

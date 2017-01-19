@@ -10,14 +10,16 @@ import {filter} from '../src/util/bound-hybrid-functions';
 
 describe("regression tests", () => {
 
-	let module, backend, frontend;
+	let environment, backend, frontend;
 	beforeEach(() => {
-		({backend, frontend} = simpleMockHandlers());
-		module = moduleFactory(frontend);
+		let registerEnvironment;
+		({backend, frontend, registerEnvironment} = simpleMockHandlers());
+		environment = moduleFactory(frontend);
+		registerEnvironment(environment);
 	});
     
 	regression("HasType[2] set to null?", async () => {
-   		const {Group, Lyph, HasMaterial} = module.classes;
+   		const {Group, Lyph, HasMaterial} = environment.classes;
    		
    		let lyph1 = Lyph.new();
    		let lyph2 = Lyph.new();
@@ -35,14 +37,14 @@ describe("regression tests", () => {
    	});
    
    	regression("setting type in initializer fails at commit", async () => {
-   		const {Lyph} = module.classes;
+   		const {Lyph} = environment.classes;
    		let t1 = Lyph.new({ name: "Renal hilum" });
    		await t1.commit();
    		// await expect(t1.commit()).to.not.be.rejected;
    	});
    	
    	regression("trying to instantiate abstract class Has", async () => {
-   		const {Lyph, HasPart} = module.classes;
+   		const {Lyph, HasPart} = environment.classes;
    		
    		let subLyph = Lyph.new(
    			{ name: 'Sublyph' },
@@ -76,7 +78,7 @@ describe("regression tests", () => {
    	});
    	
    	regression("relationship mismatch", async () => {
-   		const {Lyph, Type} = module.classes;
+   		const {Lyph, Type} = environment.classes;
    		
    		let blood = Lyph.new({ name: "Blood" });
    		let bloodType = Type.new({ name: blood.name, definition: blood });
@@ -87,7 +89,7 @@ describe("regression tests", () => {
    
    
    	regression("export manually defined plural", async () => {
-   		const {Process, Causality} = module.classes;
+   		const {Process, Causality} = environment.classes;
    
    		let process   = Process.new({ name: "Blood advection" });
    		let causality = Causality.new({});
@@ -98,7 +100,7 @@ describe("regression tests", () => {
 	
 	regression("auto-synchronized border-natures?", async () => {
 		
-		const {Lyph, Border} = module.classes;
+		const {Lyph, Border} = environment.classes;
 		
 		let lyph = Lyph.new();
 		
@@ -118,7 +120,7 @@ describe("regression tests", () => {
 	});
     
     regression("commit causality resource", async () => {
-        const {Measurable, Causality} = module.classes;
+        const {Measurable, Causality} = environment.classes;
 
         let measurable1 = Measurable.new({ name: "Concentration of water" });
         let measurable2 = Measurable.new({ name: "Concentration of ion"   });

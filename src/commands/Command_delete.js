@@ -4,7 +4,7 @@ import {
 	$$isPlaceholder
 } from '../symbols';
 
-export default (cls) => class Command_delete extends cls.Command {
+export default (cls) => class Command_delete extends cls.TrackedCommand {
 	
 	static commandType = 'delete';
 	
@@ -52,24 +52,27 @@ export default (cls) => class Command_delete extends cls.Command {
 		/* track this command in the entity */
 		this.entity.deleteCommand = this;
 		this.pSubject('isDeleted') .next(true);
-		this.pSubject('isPristine').next(false);
-		
+	}
+	
+	toJSON(options = {}) {
+		return {
+			commandType: 'delete',
+			entity: this.entity.constructor.normalizeAddress(this, options)
+		};
 	}
 	
 	async localCommit() {
-		let response = await cls.environment.backend.commit_delete(this);
-		this.pSubject('isPristine').next(true);
-		// TODO: integrate response
-		// TODO: catch possible exception (meaning the commit failed)
-		// TODO: other stuff?
+		const backend = cls.environment.backend;
+		const response = await backend.commit_delete(this.toJSON());
+		this.handleCommitResponse(response);
+	}
+	
+	handleCommitResponse(response) {
+		// TODO: stuff?
 	}
 
 	localRollback() {
 		
-		/* after it's rolled back, it may be pristine */
-		if ([this.entity.originCommand, ...this.entity.editCommands].every(cmd => cmd === this || cmd.committed || cmd.rolledBack)) {
-			this.entity.pSubject('isPristine').next(true);
-		}
 		/* untrack this command in the entity */
 		this.entity.deleteCommand = null;
 		

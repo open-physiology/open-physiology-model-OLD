@@ -4,14 +4,16 @@ import {simpleMockHandlers}   from "./mock-handlers.helper";
 
 describe("Entity classes", () => {
 	
-	let module, backend, frontend;
+	let environment, backend, frontend;
 	beforeEach(() => {
-		({backend, frontend} = simpleMockHandlers());
-		module = moduleFactory(frontend);
+		let registerEnvironment;
+		({backend, frontend, registerEnvironment} = simpleMockHandlers());
+		environment = moduleFactory(frontend);
+		registerEnvironment(environment);
 	});
 	
 	it("can list its possible subclasses", () => {
-		const {Resource, ExternalResource, Type, Lyph} = module.classes;
+		const {Resource, ExternalResource, Type, Lyph} = environment.classes;
 		
 		const resourceSubclasses = Resource.allSubclasses();
 		

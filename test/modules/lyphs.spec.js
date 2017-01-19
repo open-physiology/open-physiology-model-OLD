@@ -7,15 +7,17 @@ import {simpleMockHandlers} from "../mock-handlers.helper";
 
 describe("'lyphs' Module", () => {
 	
-	let module, backend, frontend;
+	let environment, backend, frontend;
 	beforeEach(() => {
-		({backend, frontend} = simpleMockHandlers());
-		module = moduleFactory(frontend);
+		let registerEnvironment;
+		({backend, frontend, registerEnvironment} = simpleMockHandlers());
+		environment = moduleFactory(frontend);
+		registerEnvironment(environment);
 	});
 	
 	it("exports the expected classes", () => {
 		
-		expect(module.classes).to.contain.resources(
+		expect(environment.classes).to.contain.resources(
 			'Material',
 			'Lyph',
 			'Border',
@@ -23,7 +25,7 @@ describe("'lyphs' Module", () => {
 			'CoalescenceScenario',
 			'Coalescence'
 		);
-		expect(module.classes).to.contain.relationships(
+		expect(environment.classes).to.contain.relationships(
 			'ContainsMaterial',
 			'HasPart',
 			'HasLayer',
@@ -46,7 +48,7 @@ describe("'lyphs' Module", () => {
 			Material,
 			Lyph,
 			Border
-		} = module.classes;
+		} = environment.classes;
 		
 		let material = Material.new();
 		let lyph     = Lyph.new();
@@ -64,7 +66,7 @@ describe("'lyphs' Module", () => {
 			Has,
 			HasBorder,
 			HasLongitudinalBorder
-		} = module.classes;
+		} = environment.classes;
 		
 		let lyph1 = Lyph.new({}, {
 			createRadialBorders: 1
@@ -106,7 +108,7 @@ describe("'lyphs' Module", () => {
 	
 	it("exports classes that have the properties, relationships and relationshipShortcuts of their superclasses", () => {
 		
-		const {Lyph} = module.classes;
+		const {Lyph} = environment.classes;
 		
 		expect(Lyph.properties           ).to.have.property('href');
 		expect(Lyph.relationships        ).to.have.property('-->ContainsMaterial');
@@ -116,7 +118,7 @@ describe("'lyphs' Module", () => {
 	
 	it("exports lyph classes that can have layers", () => {
 		
-		const {Lyph} = module.classes;
+		const {Lyph} = environment.classes;
 		
 		let lyph = Lyph.new();
 		
@@ -137,7 +139,7 @@ describe("'lyphs' Module", () => {
 	
 	it("exports lyph classes that can have segments", () => {
 		
-		const {Lyph} = module.classes;
+		const {Lyph} = environment.classes;
 		
 		let lyph = Lyph.new();
 		

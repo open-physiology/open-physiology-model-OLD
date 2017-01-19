@@ -26,7 +26,6 @@ import command_newClassFactory    from './commands/Command_new';
 import command_deleteClassFactory from './commands/Command_delete';
 import command_editClassFactory   from './commands/Command_edit';
 import command_loadClassFactory   from './commands/Command_load';
-const $$Command_load = Symbol('$$Command_load');
 
 import {
 	$$entitiesByHref,
@@ -38,12 +37,23 @@ const $$newEntitySubject         = Symbol('$$newEntitySubject'   );
 const $$deleted                  = Symbol('$$deleted'            );
 const $$entitiesSubject          = Symbol('$$allSubject'         );
 const $$committedEntitiesSubject = Symbol('$$allCommittedSubject');
+const $$Command_load             = Symbol('$$Command_load');
 
 ////////////////////////////////////////////////////////////////////////////////
 
 export default (environment) => {
 	
-	let {Command, backend} = environment;
+	let {Command, TrackedCommand, Command_batch, backend} = environment;
+	
+	function createCommandClasses(cls) {
+		cls::definePropertyByValue('Command',        Command                        );
+		cls::definePropertyByValue('TrackedCommand', TrackedCommand                 );
+		cls::definePropertyByValue('Command_batch',  Command_batch                  );
+		cls::definePropertyByValue('Command_new',    command_newClassFactory   (cls));
+		cls::definePropertyByValue('Command_delete', command_deleteClassFactory(cls));
+		cls::definePropertyByValue('Command_edit',   command_editClassFactory  (cls));
+		cls::definePropertyByValue($$Command_load,   command_loadClassFactory  (cls));
+	}
 	
 	class Entity extends ValueTracker {
 		
@@ -51,10 +61,13 @@ export default (environment) => {
 		
 		static get Entity() { return Entity }
 		
-		static normalizeAddress(address) {
-			if (address::isString())  { return { class: this.name, href: address                           } }
-			if (address::isInteger()) { return { class: this.name, id:   address                           } }
-			if (address::isObject())  { return { class: this.name, ...address::pick('href', 'id', 'class') } }
+		static normalizeAddress(address, options = {}) {
+			const {entityToTemporaryHref} = options;
+			if (address::isString()) { return { class: this.name, href: address } }
+			if (address::isObject()) {
+				let href = address.href || entityToTemporaryHref.get(address);
+				return { class: address.class || this.name, href };
+			}
 			assert(false, humanMsg`${JSON.stringify(address)} is not a valid entity identifier.`);
 		}
 		
@@ -87,41 +100,7 @@ export default (environment) => {
 			/* populate it with the necessary data and behavior */
 			EntitySubclass::assign(rest);
 			EntitySubclass::definePropertiesByValue({
-				name,
-				[Symbol.hasInstance](instance) {
-					return this.hasInstance(instance);
-				},
-				hasInstance(instance) {
-					if (!instance) { return false }
-					return this.hasSubclass(instance.constructor);
-				},
-				allSubclasses() {
-					let result = [this];
-					for (let subClass of this.extendedBy) {
-						result = [...result, ...subClass.allSubclasses()];
-					}
-					return new Set(result);
-				},
-				hasSubclass(otherClass) {
-					if (!otherClass)         { return false }
-					if (otherClass === this) { return true  }
-					for (let SubClass of this.extendedBy) {
-						if (SubClass.hasSubclass(otherClass)) {
-							return true;
-						}
-					}
-					return false;
-				},
-				p(name) {
-					switch (name) {
-						case 'all':          return this[$$entitiesSubject];
-						case 'allCommitted': return this[$$committedEntitiesSubject];
-						default: constraint(false, humanMsg`
-							The ${name} property does not exist on ${this.name}.
-						`);
-					}
-				},
-				Command: Command
+				name
 			});
 			
 			/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
@@ -136,16 +115,57 @@ export default (environment) => {
 			}
 			
 			/* introduce Command subclasses */
-			EntitySubclass::definePropertyByValue('Command_new',    command_newClassFactory   (EntitySubclass));
-			EntitySubclass::definePropertyByValue('Command_delete', command_deleteClassFactory(EntitySubclass));
-			EntitySubclass::definePropertyByValue('Command_edit',   command_editClassFactory  (EntitySubclass));
-			EntitySubclass::definePropertyByValue($$Command_load,   command_loadClassFactory  (EntitySubclass));
+			createCommandClasses(EntitySubclass);
 			
 			/***/
 			return EntitySubclass;
 		}
 		
+		
 				
+		///////////////////////////////////////////////////
+		////////// STATIC CLASS ANALYSIS METHODS //////////
+		///////////////////////////////////////////////////
+		
+		static hasInstance(instance) {
+			if (!instance) { return false }
+			return this.hasSubclass(instance.constructor);
+		}
+		
+		static hasSubclass(otherClass) {
+			if (!otherClass || otherClass.Entity !== this.Entity) { return false }
+			if (this === this.Entity)                             { return true  }
+			if (otherClass === this)                              { return true  }
+			for (let SubClass of this.extendedBy) {
+				if (SubClass.hasSubclass(otherClass)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		static allSubclasses() {
+			let result = [this];
+			for (let subClass of this.extendedBy) {
+				result = [...result, ...subClass.allSubclasses()];
+			}
+			return new Set(result);
+		}
+		
+		static [Symbol.hasInstance](instance) {
+			return this.hasInstance(instance);
+		}
+		
+		static p(name) {
+			switch (name) {
+				case 'all':          return this[$$entitiesSubject];
+				case 'allCommitted': return this[$$committedEntitiesSubject];
+				default: constraint(false, humanMsg`
+					The ${name} property does not exist on ${this.name}.
+				`);
+			}
+		}
+						
 		//////////////////////////////////////////////////
 		////////// EXPLICITLY CREATING COMMANDS //////////
 		//////////////////////////////////////////////////
@@ -220,27 +240,27 @@ export default (environment) => {
 		////////////////////////////////////////////
 		
 		static hasCache(
-			entityOrAddress: Entity | { href: string } | { id: number } | string | number
+			entityOrAddress: Entity | { href: string } | string | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
 			return entity && !entity[$$isPlaceholder];
 		}
 		
 		static hasPlaceholder(
-			entityOrAddress: Entity | { href: string } | { id: number } | string | number
+			entityOrAddress: Entity | { href: string } | string | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
 			return entity && entity[$$isPlaceholder];
 		}
 		
 		static hasLocal(
-			entityOrAddress: Entity | { href: string } | { id: number } | string | number
+			entityOrAddress: Entity | { href: string } | string | number
 		) {
 			return !!this.getLocal(entityOrAddress);
 		}
 		
 		static getLocal( // TODO: make private?
-			entityOrAddress: Entity | { href: string } | { id: number } | string | number
+			entityOrAddress: Entity | { href: string } | string
 		) : this {
 			/* is it already a local entity? */
 			if (entityOrAddress instanceof Entity) { return entityOrAddress }
@@ -264,17 +284,26 @@ export default (environment) => {
 			return entity;
 		}
 		
+		static getLocalOrPlaceholder( // TODO: make private?
+			entityOrAddress: Entity | { href: string } | string,
+			options: {} = {}
+		) : this {
+			let result = this.getLocal(entityOrAddress);
+			if (!result) { result = this.setPlaceholder(entityOrAddress, options) }
+			return result;
+		}
+		
 		static setPlaceholder(
-			address: string | number | { href: string } | { id: number },
+			address: string | number | { href: string },
 			options: {} = {}
 		) {
 			address = this.normalizeAddress(address);
-			let placeholder = this[$$Command_load].create(address, { ...options, placeholder: true}).result;
+			let placeholder = this[$$Command_load].create(address, { ...options, placeholder: true }).result;
 			return placeholder;
 		}
 		
 		static setCache( // TODO: make private
-			values:  Entity | { href: string } | { id: number },
+			values:  Entity | { href: string },
 			options: {} = {}
 		) {
 			if (values instanceof Entity) { return values }
@@ -287,7 +316,7 @@ export default (environment) => {
 		////////////////////////////////////////////////////////////////
 		
 		static async get(
-			address: { href: string } | { id: number } | string | number,
+			address: { href: string } | string | number,
 			options: {} = {} // TODO: filtering, expanding, paging, ...
 		) : this {
 			/* normalize address */
@@ -372,7 +401,6 @@ export default (environment) => {
 			
 			/* set defaults for the core initial field values */
 			initialValues::defaults({
-				id:    null,
 				href:  null,
 				class: this.constructor.name
 			});
@@ -389,25 +417,23 @@ export default (environment) => {
 		
 		//// Transforming to/from JSON
 		
-		static getIdentificationObjectFrom(val) {
-			if (val::isString())  { return { href: val }           }
-			if (val::isInteger()) { return { id:   val }           }
-			if (val::isObject())  { return val::pick('href', 'id') }
-			assert(false);
-		}
-		
 		static objectToJSON(obj, options = {}) {
-			let { sourceEntity } = options;
+			let { minimal, sourceEntity } = options;
 			// TODO: rather than sourceEntity, accept an entity class,
 			//       which should have a good description of the fields
 			let result = {};
 			for (let [key, value] of obj::entries()) {
-				result[key] = sourceEntity.fields[key].constructor.valueToJSON(value, options);
+				const field = sourceEntity.fields[key];
+				if (!minimal || (field.constructor.name !== 'RelShortcut$Field'
+				              && field.constructor.name !== 'RelShortcut1Field')) {
+					result[key] = field.constructor.valueToJSON(value, options);
+				}
 			}
+			return result;
 		}
 		
 		toJSON(options = {}) {
-			let { minimal } = options;
+			let { minimal, entityToTemporaryHref } = options;
 			let result = {};
 			for (let [key, field] of this.fields::entries()) {
 				if (!minimal || (field.constructor !== RelShortcut$Field
@@ -415,14 +441,20 @@ export default (environment) => {
 					result[key] = field.value;
 				}
 			}
+			if (!result.href && entityToTemporaryHref.has(this)) {
+				result.href = entityToTemporaryHref.get(this);
+			}
 			return this.constructor.objectToJSON(result, { ...options, sourceEntity: this });
 		}
 		
 		
 		//// Setting / getting of fields
 		
-		get(key)               { return this.fields[key].get()             }
-		set(key, val, options) { return this.fields[key].set(val, options) }
+		get(key)                    { return this.fields[key].get()             }
+		set(key, val, options = {}) {
+			options::defaults({ createEditCommand: true });
+			return this.fields[key].set(val, options)
+		}
 		
 		
 		//// Commit & Rollback
@@ -436,9 +468,29 @@ export default (environment) => {
 			/* commit all latest commands associated with this entity */
 			// NOTE: committing the latest commands also commits their
 			//       dependencies, i.e., commits every associated command
-			const latestCommands = Command.latest({ entity: this, committable: true });
-			await Promise.all( latestCommands::map(cmd => cmd.commit()) );
+			// const latestCommands = TrackedCommand.latest({ entity: this, committable: true });
+			// await Promise.all( latestCommands::map(cmd => cmd.commit()) );
+			
+			// trying to always use batchCommit; TODO: see if that works
+			await this.batchCommit();
+			
 		}
+		
+		// FOR TESTING BATCH COMMAND COMMITS; TODO: integrate properly
+		async batchCommit() {
+			const latestCommands = TrackedCommand.latest({ entity: this, committable: true });
+			const gatheredCommands = new Set;
+			for (let command of latestCommands) {
+				command.commitDependencies(gatheredCommands);
+			}
+			// debugger;
+			let batchCommand = Command_batch.create(gatheredCommands);
+			// debugger;
+			await batchCommand.commit();
+			// debugger;
+			
+		}
+		
 		
 		/**
 		 * Roll back all changes to this entity,
@@ -448,13 +500,14 @@ export default (environment) => {
 			/* commit all latest commands associated with this entity */
 			// NOTE: rolling back the earliest commands also rolls back their
 			//       reverse dependencies, i.e., rolls back every associated command
-			for (let cmd of Command.earliest({ entity: this, rollbackable: true })) {
+			for (let cmd of TrackedCommand.earliest({ entity: this, rollbackable: true })) {
 				cmd.rollback();
 			}
 		}
 		
 	}
 
+	createCommandClasses(Entity);
 	Entity::assign({
 		[$$entities]                : new ObservableSet(),
 		[$$entitiesSubject]         : new BehaviorSubject(new Set()),

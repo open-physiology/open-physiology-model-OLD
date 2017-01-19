@@ -14,10 +14,10 @@ export default Module.create('resources', [], (M) => {
 		singular: "resource",
 		
 		properties: {
-			'id':    { ...idSchema,         readonly: true },
 			'href':  { ...uriSchema,        readonly: true },
 			'class': { ...identifierSchema, readonly: true },
-			'name':  { type: 'string' }
+			'name':  { type: 'string' },
+			'id':    { ...idSchema } // TODO: when server has been updated, remove 'id' entirely
 		}
 		
 	});//////////////////////////////////////////////////////////////////////////
@@ -35,9 +35,9 @@ export default Module.create('resources', [], (M) => {
 		2: [Resource, '0..*'],
 		
 		properties: {
-			'id':    { ...idSchema,         readonly: true },
 			'href':  { ...uriSchema,        readonly: true },
-			'class': { ...identifierSchema, readonly: true }
+			'class': { ...identifierSchema, readonly: true },
+			'id':    { ...idSchema } // TODO: when server has been updated, remove 'id' entirely
 		}
 		
 	});

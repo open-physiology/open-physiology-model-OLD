@@ -10,8 +10,10 @@ describe("integrated workflow", () => {
 	
 	let environment, backend, frontend;
 	beforeEach(() => {
-		({backend, frontend} = simpleMockHandlers());
+		let registerEnvironment;
+		({backend, frontend, registerEnvironment} = simpleMockHandlers());
 		environment = moduleFactory(frontend);
+		registerEnvironment(environment);
 	});
 	
 	it("can track available entities with a stream per class", async () => {
@@ -81,14 +83,12 @@ describe("integrated workflow", () => {
 		});
 
 		expect(blood).to.be.an.instanceOf(Material);
-		expect(blood).to.have.a.property('id'  ).which.is.null;
 		expect(blood).to.have.a.property('href').which.is.null;
 		expect(blood).to.have.a.property('class', 'Material');
 		expect(blood).to.have.a.property('name', "blood");
 
 		await blood.commit();
 
-		expect(blood).to.have.a.property('id'  ).which.is.a('number');
 		expect(blood).to.have.a.property('href').which.is.a('string');
 
 		let water = Material.new({
@@ -101,7 +101,6 @@ describe("integrated workflow", () => {
 		});
 		
 		expect(waterType).to.be.instanceOf(Material.Type);
-
 		expect(water).to.be.an.instanceOf(Material);
 		expect(water).to.have.a.property('name', "waiter");
 		expect(waterType).to.have.a.property('definition', water);
@@ -122,22 +121,28 @@ describe("integrated workflow", () => {
 		
 		waterType.definition = newWater;
 
-		await newWater .commit();
+		await newWater.commit();
+		
+		// debugger;
+		
+		// FIXME: waterType.commit() will first commit 'new', and then 'edit',
+		//        but the initial commit will be missing its '.definition' field, and bail out
 		await waterType.commit();
 
-		expect(newWater).to.have.a.property('id'  ).which.is.a('number');
 		expect(newWater).to.have.a.property('href').which.is.a('string');
 		expect(newWater).to.have.a.property('name', "water");
 
 		const {
-			id:   waterId2,
 			href: waterHref2,
 			name: waterName2
 		} = newWater;
 
+		// debugger;
+
 		newWater.rollback();
 
-		expect(newWater).to.have.a.property('id'  , waterId2  );
+		// debugger;
+
 		expect(newWater).to.have.a.property('href', waterHref2);
 		expect(newWater).to.have.a.property('name', waterName2);
 
@@ -146,19 +151,21 @@ describe("integrated workflow", () => {
 			2: waterType
 		});
 
+		// debugger;
+
 		expect(bloodHasWater).to.have.property(1, blood);
 		expect(bloodHasWater).to.have.property(2, waterType);
 		expect([...blood    ['-->ContainsMaterial']]).to.include(bloodHasWater);
 		expect([...blood    .materials            ] ).to.include(waterType    );
 		expect([...waterType['<--ContainsMaterial']]).to.include(bloodHasWater);
 
-		expect(bloodHasWater).to.have.a.property('id'  ).which.is.null;
 		expect(bloodHasWater).to.have.a.property('href').which.is.null;
 		expect(bloodHasWater).to.have.a.property('class', 'ContainsMaterial');
 
 		await bloodHasWater.commit();
 	
-		expect(bloodHasWater).to.have.a.property('id'  ).which.is.a('number');
+		// debugger;
+	
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 
 	});
@@ -242,7 +249,7 @@ describe("integrated workflow", () => {
 		expect(template2.name).to.equal("Created Canonical Tree");
 	});
 	
-	it("accepts id/href in a reference", async () => {
+	it("accepts href in a reference", async () => {
 		const {Lyph} = environment.classes;
 
 		let { href: href1 } = backend.create({
@@ -256,7 +263,10 @@ describe("integrated workflow", () => {
 		
 		let parentLyph = Lyph.new({
 			name: "Parent Lyph",
-			parts: [href1, href2]
+			parts: [
+				{ href: href1, class: 'Lyph' },
+				{ href: href2, class: 'Lyph' }
+			]
 		});
 		
 		let childLyphs = [...parentLyph.parts];
@@ -287,11 +297,9 @@ describe("integrated workflow", () => {
 		expect(backend.readAll()).to.have.length(0);
 		
 		await lyph.commit();
-		
+
 		expect(backend.readAll()).to.have.length(5);
 		// ⬑ 1 lyph, 2 borders, 2 relationships
-		
-		
 		
 		
 		// TODO: The commit cycle has a flaw; (INTERDEPENDENT NEW HREFs)

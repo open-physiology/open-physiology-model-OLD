@@ -8,6 +8,7 @@ import isFunction  from 'lodash-bound/isFunction';
 import isUndefined from 'lodash-bound/isUndefined';
 import values      from 'lodash-bound/values';
 import entries     from 'lodash-bound/entries';
+import defaults    from 'lodash-bound/defaults';
 
 import {defineProperties, defineProperty} from 'bound-native-methods';
 
@@ -156,6 +157,7 @@ export class Field extends ValueTracker {
 	get() { return this[$$value] }
 	
 	set(newValue, options = {}) {
+		options::defaults({ createEditCommand: true });
 		if (options.createEditCommand) {
 			
 			this[$$owner].edit({ [this[$$key]]: newValue }, options);
@@ -172,10 +174,10 @@ export class Field extends ValueTracker {
 				Tried to set the readonly field
 				'${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
-			if (!ignoreValidation) { this.validate(newValue, ['set']) }
 			if (this.jsonToValue::isFunction()) {
 				newValue = this.jsonToValue(newValue, options);
 			}
+			if (!ignoreValidation) { this.validate(newValue, ['set']) }
 			this[$$value] = newValue;
 			this.pSubject('value').next(newValue);
 			
