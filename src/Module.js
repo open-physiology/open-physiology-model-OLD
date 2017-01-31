@@ -8,6 +8,8 @@ import keys        from 'lodash-bound/keys';
 import values      from 'lodash-bound/values';
 import entries     from 'lodash-bound/entries';
 import fromPairs   from 'lodash-bound/fromPairs';
+import cloneDeep   from 'lodash-bound/cloneDeep';
+import isArray     from 'lodash-bound/isArray';
 
 import _isEqual from 'lodash/isEqual';
 
@@ -55,19 +57,99 @@ class Environment {
 		
 		/* initialize commit and load implementations */
 		/* issue an error if/when commit or load were called but not provided */
+		const noOpMsg = (op) => async () => { console.error(humanMsg`No '${op}' behavior was specified to the module.`) };
+		const thisEnvironment = this;
+		async function defaultBatchCommitter({temporaryHrefs, commands}) {
+			/* a function to replace temporary href with new href */
+			function replaceTemporaryHrefs({futureCommand, temporaryHref, newHref}) {
+				let hrefObjects = [];
+				switch (futureCommand.commandType) {
+					case 'new': {
+						const cls = thisEnvironment.classes[futureCommand.values.class];
+						const fieldKeys = cls.isResource
+							? [...cls.relationships::keys(), ...cls.relationshipShortcuts::keys()]
+							: [1, 2];
+						for (let key of fieldKeys) {
+							if (futureCommand.values[key]::isArray()) {
+								hrefObjects.push(...futureCommand.values[key]);
+							} else {
+								hrefObjects.push(futureCommand.values[key]);
+							}
+						}
+					} break;
+					case 'edit': {
+						hrefObjects.push(futureCommand.entity);
+						const cls = thisEnvironment.classes[futureCommand.entity.class];
+						const fieldKeys = cls.isResource
+							? [...cls.relationships::keys(), ...cls.relationshipShortcuts::keys()]
+							: [1, 2];
+						for (let key of fieldKeys) {
+							if (futureCommand.newValues[key]::isArray()) {
+								hrefObjects.push(...futureCommand.newValues[key]);
+							} else {
+								hrefObjects.push(futureCommand.newValues[key]);
+							}
+						}
+					} break;
+					case 'delete': {
+						hrefObjects.push(futureCommand.entity);
+					} break;
+				}
+				for (let hrefObject of hrefObjects) {
+					if (hrefObject && hrefObject.href === temporaryHref) {
+						hrefObject.href = newHref;
+					}
+				}
+			}
+			
+			/* prepare response object */
+			let response = {
+				temporaryHrefs: {},
+				commands: []
+			};
+			
+			/* handle all commands in order */
+			for (let i = 0; i < commands.length; ++i) {
+				const localCommand = commands[i];
+				let localResponse;
+				switch(localCommand.commandType) {
+					case 'new': {
+						localResponse = await this.commit_new(localCommand);
+						if (temporaryHrefs.includes(localCommand.values.href)) {
+							const temporaryHref = localCommand.values.href;
+							const newHref       = localResponse.href;
+							response.temporaryHrefs[temporaryHref] = newHref;
+							for (let j = i+1; j < commands.length; ++j) {
+								const futureCommand = commands[j];
+								replaceTemporaryHrefs({futureCommand, temporaryHref, newHref});
+							}
+						}
+					} break;
+					case 'edit': {
+						localResponse = await this.commit_edit(localCommand);
+					} break;
+					case 'delete': {
+						localResponse = await this.commit_delete(localCommand);
+					} break;
+					default: assert(false)
+				}
+				response.commands.push(localResponse);
+			}
+			
+			/***/
+			return response::cloneDeep();
+		}
 		this.backend = {};
-		for (let op of [
-	        'commit_new',
-	        'commit_edit',
-	        'commit_delete',
-	        'commit_batch',
-	        'load',
-	        'loadAll'
+		for (let [op,         defaultOp] of [
+	        ['commit_new',    noOpMsg('commit_new')   ],
+	        ['commit_edit',   noOpMsg('commit_edit')  ],
+	        ['commit_delete', noOpMsg('commit_delete')],
+	        ['commit_batch',  defaultBatchCommitter   ],
+	        ['load',          noOpMsg('load')         ],
+	        ['loadAll',       noOpMsg('loadAll')      ],
 		]) {
 			this.backend[op] = this[op] =
-				envOrBackend[op]
-				? (::envOrBackend[op])
-				: (() => { console.error(humanMsg`No '${op}' behavior was specified to the module.`) });
+				envOrBackend[op] ? ::envOrBackend[op] : defaultOp;
 		}
 		
 		/* start tracking modules and classes */

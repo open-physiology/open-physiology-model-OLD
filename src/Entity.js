@@ -286,7 +286,7 @@ export default (environment) => {
 			return entity;
 		}
 		
-		static getLocalOrPlaceholder( // TODO: make private?
+		static getLocalOrNewPlaceholder( // TODO: make private?
 			entityOrAddress: Entity | { href: string } | string,
 			options: {} = {}
 		) : this {
@@ -296,11 +296,11 @@ export default (environment) => {
 		}
 		
 		static setPlaceholder(
-			address: string | number | { href: string },
+			address: string | { href: string },
 			options: {} = {}
 		) {
-			address = this.normalizeAddress(address);
-			let placeholder = this[$$Command_load].create(address, { ...options, placeholder: true }).result;
+			const addressObj = this.normalizeAddress(address);
+			let placeholder = this[$$Command_load].create(addressObj, { ...options, placeholder: true }).result;
 			return placeholder;
 		}
 		
@@ -349,11 +349,11 @@ export default (environment) => {
 			
 			/* cache response */
 			for (let values of response) {
-				let entity = this.getLocal(values.href);
+				let entity = this.getLocal(values);
 				if (!entity) { entity = this.setCache(values) }
 				result.add(entity);
 			}
-
+			
 			return result;
 		}
 		

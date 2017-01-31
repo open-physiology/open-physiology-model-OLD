@@ -35,7 +35,7 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 					for (let [key, value] of initialValues::entries()) {
 						if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
 							if (!value::isArray()) { value = [value] }
-							r.push(...value.map(addr=>cls.Entity.getLocalOrPlaceholder(addr).originCommand));
+							r.push(...value.map(addr=>cls.Entity.getLocalOrNewPlaceholder(addr).originCommand));
 						}
 					}
 					return r;
@@ -45,7 +45,7 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 					let r = [];
 					for (let side of [1, 2]) {
 						if (initialValues[side]) {
-							r.push(cls.Entity.getLocalOrPlaceholder(initialValues[side]).originCommand);
+							r.push(cls.Entity.getLocalOrNewPlaceholder(initialValues[side]).originCommand);
 						}
 					}
 					return r;
