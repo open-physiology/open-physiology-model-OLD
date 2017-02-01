@@ -33,8 +33,9 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 					if (!cls.isResource) { return [] }
 					let r = [];
 					for (let [key, value] of initialValues::entries()) {
-						if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
-							if (!value::isArray()) { value = [value] }
+						const relDesc = (cls.relationships[key] || cls.relationshipShortcuts[key]);
+						if (relDesc && value) {
+							if (relDesc.cardinality.max <= 1) { value = [value] }
 							r.push(...value.map(addr=>cls.Entity.getLocalOrNewPlaceholder(addr).originCommand));
 						}
 					}

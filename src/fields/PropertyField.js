@@ -21,15 +21,6 @@ import {constraint} from "../util/misc";
 
 Field[$$registerFieldClass](class PropertyField extends Field {
 	
-	///////////////////
-	// Command class //
-	///////////////////
-	
-	
-	
-	
-	
-	
 	// this[$$owner] instanceof RelatedTo | Resource
 	// this[$$key]   instanceof "name" | "class" | "href" | ...
 	// this[$$value] instanceof any

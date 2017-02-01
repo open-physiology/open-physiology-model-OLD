@@ -43,7 +43,7 @@ Field[$$registerFieldClass](class SideField extends Field {
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
 			...(readonly ? undefined : {
-				set(val) { this.fields[key].set(val)}
+				set(val) { this.fields[key].set(val) }
 			}),
 			enumerable:   true,
 			configurable: false
@@ -87,12 +87,13 @@ Field[$$registerFieldClass](class SideField extends Field {
 			::waitUntilConstructed()
 			::pairwise()
 			.subscribe(([prev, curr]) => {
+				// TODO: prev or curr being placeholders may be a complex situation; model it properly
 				if (desc.cardinality.max === 1) {
-					if (prev) { prev.fields[desc.keyInResource].set(null,  { createEditCommand: false }) }
-					if (curr) { curr.fields[desc.keyInResource].set(owner, { createEditCommand: false }) }
+					if (prev && !prev.isPlaceholder) { prev.fields[desc.keyInResource].set(null,  { createEditCommand: false }) }
+					if (curr && !curr.isPlaceholder) { curr.fields[desc.keyInResource].set(owner, { createEditCommand: false }) }
 				} else {
-					if (prev) { prev.fields[desc.keyInResource].get().delete(owner) }
-					if (curr) { curr.fields[desc.keyInResource].get().add   (owner) }
+					if (prev && !prev.isPlaceholder) { prev.fields[desc.keyInResource].get().delete(owner) }
+					if (curr && !curr.isPlaceholder) { curr.fields[desc.keyInResource].get().add   (owner) }
 					// TODO: , { createEditCommand: false } ?
 				}
 			});
@@ -114,9 +115,8 @@ Field[$$registerFieldClass](class SideField extends Field {
 		
 	[$$destruct]() {
 		this.set(null, {
-			ignoreReadonly:   true,
-			ignoreValidation: true,
-			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
+			ignoreReadonly:    true,
+			ignoreValidation:  true,
 			createEditCommand: false
 		});
 		super[$$destruct]();

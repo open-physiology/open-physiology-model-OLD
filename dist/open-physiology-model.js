@@ -15157,9 +15157,11 @@ return /******/ (function(modules) { // webpackBootstrap
 							var key = _step5$value[0];
 							var field = _step5$value[1];
 	
-							if (!minimal || field.constructor !== RelShortcut$Field && field.constructor !== RelShortcut1Field) {
-								result[key] = field.value;
+							var fieldIsShortcut = field.constructor === RelShortcut$Field || field.constructor === RelShortcut1Field;
+							if (minimal && fieldIsShortcut) {
+								continue;
 							}
+							result[key] = field.value;
 						}
 					} catch (err) {
 						_didIteratorError5 = true;
@@ -17556,9 +17558,14 @@ return /******/ (function(modules) { // webpackBootstrap
 								var key = _step$value[0];
 								var value = _step$value[1];
 	
-								if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
-									// TODO: loop for rel$ class fields
-									r.push(value.originCommand);
+								var relDesc = cls.relationships[key] || cls.relationshipShortcuts[key];
+								if (relDesc && value) {
+									if (relDesc.cardinality.max <= 1) {
+										value = [value];
+									}
+									r.push.apply(r, _toConsumableArray(value.map(function (addr) {
+										return cls.Entity.getLocalOrNewPlaceholder(addr).originCommand;
+									})));
 								}
 							}
 						} catch (err) {
@@ -17582,11 +17589,13 @@ return /******/ (function(modules) { // webpackBootstrap
 							return [];
 						}
 						var r = [];
+						var Entity = cls.environment.Entity;
 						var _arr = [1, 2];
 						for (var _i = 0; _i < _arr.length; _i++) {
 							var side = _arr[_i];
 							if (values[side]) {
-								r.push(values[side].originCommand);
+								var localEntity = Entity.getLocalOrNewPlaceholder(values[side]);
+								r.push(localEntity.originCommand);
 							}
 						}
 						return r;
@@ -17833,10 +17842,9 @@ return /******/ (function(modules) { // webpackBootstrap
 								var key = _step$value[0];
 								var value = _step$value[1];
 	
-								if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
-									var _context;
-	
-									if (!(_context = value, _isArray2.default).call(_context)) {
+								var relDesc = cls.relationships[key] || cls.relationshipShortcuts[key];
+								if (relDesc && value) {
+									if (relDesc.cardinality.max <= 1) {
 										value = [value];
 									}
 									r.push.apply(r, _toConsumableArray(value.map(function (addr) {
@@ -17885,12 +17893,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(Command_new, [{
 				key: 'localRun',
 				value: function localRun() {
-					var _context2;
+					var _context;
 	
 					/* sanity checks */
 					(0, _misc.constraint)(!cls.abstract, (0, _misc.humanMsg)(_templateObject, cls.name));
 					/* construct entity */
-					if ((_context2 = cls.behavior['new'], _isFunction2.default).call(_context2)) {
+					if ((_context = cls.behavior['new'], _isFunction2.default).call(_context)) {
 						this.result = cls.behavior['new'](this) || null;
 					} else {
 						this.result = new cls(_extends({}, this.initialValues), _extends({}, this.options, { allowInvokingConstructor: true }));
@@ -17924,25 +17932,25 @@ return /******/ (function(modules) { // webpackBootstrap
 				value: function () {
 					var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
 						var backend, response;
-						return regeneratorRuntime.wrap(function _callee$(_context3) {
+						return regeneratorRuntime.wrap(function _callee$(_context2) {
 							while (1) {
-								switch (_context3.prev = _context3.next) {
+								switch (_context2.prev = _context2.next) {
 									case 0:
 										backend = cls.environment.backend;
 										//debugger;
 	
-										_context3.next = 3;
+										_context2.next = 3;
 										return backend.commit_new(this.toJSON());
 	
 									case 3:
-										response = _context3.sent;
+										response = _context2.sent;
 	
 										//debugger;
 										this.handleCommitResponse(response);
 	
 									case 5:
 									case 'end':
-										return _context3.stop();
+										return _context2.stop();
 								}
 							}
 						}, _callee, this);
@@ -18080,11 +18088,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		_createClass(PropertyField, null, [{
 			key: 'initClass',
-	
-	
-			///////////////////
-			// Command class //
-			///////////////////
 	
 	
 			// this[$$owner] instanceof RelatedTo | Resource
@@ -18438,6 +18441,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					for (var _iterator2 = _this.jsonToValue(initialValue)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var rel = _step2.value;
 	
+						if (rel.isPlaceholder) {
+							continue;
+						} // TODO: this may be a complex situation; model it properly
 						if (!rel.fields[desc.keyInRelationship].get()) {
 							rel.fields[desc.keyInRelationship].set(_this, { createEditCommand: false });
 						}
@@ -18465,6 +18471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 			/* fill up missing required values with 'auto'matic ones */
+			// TODO: only when creating a new entity, right? And this can also be called for a load-command now.
 			if (desc.options.auto) {
 				var shortcutInitial = _get3.default.call(related, [desc.shortcutKey, 'initialValue']);
 				for (var i = (_context6 = _this[_symbols.$$value], _size2.default).call(_context6) + _size2.default.call(shortcutInitial); i < desc.cardinality.min; ++i) {
@@ -18841,10 +18848,11 @@ return /******/ (function(modules) { // webpackBootstrap
 				var prev = _ref7[0];
 				var curr = _ref7[1];
 	
-				if (prev) {
+				// TODO: prev or curr being placeholders may be a complex situation; model it properly
+				if (prev && !prev.isPlaceholder) {
 					prev.fields[desc.keyInRelationship].set(null, { createEditCommand: false });
 				}
-				if (curr) {
+				if (curr && !curr.isPlaceholder) {
 					curr.fields[desc.keyInRelationship].set(owner, { createEditCommand: false });
 				}
 			});
@@ -19220,7 +19228,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				this.set(new Set(), {
 					ignoreReadonly: true,
 					ignoreValidation: true,
-					// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
 					createEditCommand: false
 				});
 				_get(Object.getPrototypeOf(RelShortcut$Field.prototype), _symbols.$$destruct, this).call(this);
@@ -19659,18 +19666,19 @@ return /******/ (function(modules) { // webpackBootstrap
 				var prev = _ref3[0];
 				var curr = _ref3[1];
 	
+				// TODO: prev or curr being placeholders may be a complex situation; model it properly
 				if (desc.cardinality.max === 1) {
-					if (prev) {
+					if (prev && !prev.isPlaceholder) {
 						prev.fields[desc.keyInResource].set(null, { createEditCommand: false });
 					}
-					if (curr) {
+					if (curr && !curr.isPlaceholder) {
 						curr.fields[desc.keyInResource].set(owner, { createEditCommand: false });
 					}
 				} else {
-					if (prev) {
+					if (prev && !prev.isPlaceholder) {
 						prev.fields[desc.keyInResource].get().delete(owner);
 					}
-					if (curr) {
+					if (curr && !curr.isPlaceholder) {
 						curr.fields[desc.keyInResource].get().add(owner);
 					}
 					// TODO: , { createEditCommand: false } ?
@@ -19700,7 +19708,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				this.set(null, {
 					ignoreReadonly: true,
 					ignoreValidation: true,
-					// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
 					createEditCommand: false
 				});
 				_get(Object.getPrototypeOf(SideField.prototype), _symbols.$$destruct, this).call(this);

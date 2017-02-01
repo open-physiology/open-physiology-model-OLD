@@ -135,5 +135,39 @@ describe("regression tests", () => {
 		await expect(measurable2.commit()).to.be.fulfilled;
 		await expect(causality1 .commit()).to.be.fulfilled;
     });
-
+	
+	
+	regression("\"This graph does not have a vertex ''\" error when retrieving existing lyph with borders", async () => {
+		
+		let environment = moduleFactory({
+			async loadAll(cls, options = {}) {
+				let results = [{
+					"thickness":                { "min": 0 },
+					"length":                   { "min": 0 },
+					"name":                     "Heart chamber",
+					"href":                     "192.168.99.100://Lyph/47",
+					"id":                       47,
+					"cardinalityBase":          1,
+					"class":                    "Lyph",
+					"-->HasLongitudinalBorder": [
+						{
+							"href":  "192.168.99.100://HasLongitudinalBorder/94",
+							"class": "HasLongitudinalBorder"
+						},
+						{
+							"href":  "192.168.99.100://HasLongitudinalBorder/93",
+							"class": "HasLongitudinalBorder"
+						}
+					]
+				}];
+				return results;
+			}
+		});
+		const model = environment.classes;
+		
+		let lyphs = [...await model.Lyph.getAll()];
+		
+		expect(lyphs).to.have.length(1);
+	});
+	
 });

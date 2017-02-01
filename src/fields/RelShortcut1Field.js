@@ -126,9 +126,7 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		this.set(null, {
 			ignoreReadonly:    true,
 			ignoreValidation:  true,
-			createEditCommand: false,
-			// updatePristine: true
-			// TODO: remove all 'pristine' related stuff from the field classes
+			createEditCommand: false
 		});
 		super[$$destruct]();
 	}

@@ -32,9 +32,10 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 					if (!cls.isResource) { return [] }
 					let r = [];
 					for (let [key, value] of values::entries()) {
-						if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
-							// TODO: loop for rel$ class fields
-							r.push(value.originCommand);
+						const relDesc = (cls.relationships[key] || cls.relationshipShortcuts[key]);
+						if (relDesc && value) {
+							if (relDesc.cardinality.max <= 1) { value = [value] }
+							r.push(...value.map(addr=>cls.Entity.getLocalOrNewPlaceholder(addr).originCommand));
 						}
 					}
 					return r;
@@ -42,9 +43,11 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 				...(()=>{
 					if (!cls.isRelationship) { return [] }
 					let r = [];
+					const Entity = cls.environment.Entity;
 					for (let side of [1, 2]) {
 						if (values[side]) {
-							r.push(values[side].originCommand);
+							const localEntity = Entity.getLocalOrNewPlaceholder(values[side]);
+							r.push(localEntity.originCommand);
 						}
 					}
 					return r;

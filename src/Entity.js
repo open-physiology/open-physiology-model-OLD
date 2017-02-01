@@ -440,10 +440,12 @@ export default (environment) => {
 			let { minimal, entityToTemporaryHref } = options;
 			let result = {};
 			for (let [key, field] of this.fields::entries()) {
-				if (!minimal || (field.constructor !== RelShortcut$Field
-				              && field.constructor !== RelShortcut1Field)) {
-					result[key] = field.value;
-				}
+				const fieldIsShortcut = (
+					field.constructor === RelShortcut$Field ||
+					field.constructor === RelShortcut1Field
+				);
+				if (minimal && fieldIsShortcut) { continue }
+				result[key] = field.value;
 			}
 			if (!result.href && entityToTemporaryHref.has(this)) {
 				result.href = entityToTemporaryHref.get(this);

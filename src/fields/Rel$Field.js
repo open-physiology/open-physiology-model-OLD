@@ -116,6 +116,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		/* handle initial values */
 		if (initialValue && initialValue[Symbol.iterator]) {
 			for (let rel of this.jsonToValue(initialValue)) {
+				if (rel.isPlaceholder) { continue } // TODO: this may be a complex situation; model it properly
 				if (!rel.fields[desc.keyInRelationship].get()) {
 					rel.fields[desc.keyInRelationship].set(this, { createEditCommand: false });
 				}
@@ -129,6 +130,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		}
 		
 		/* fill up missing required values with 'auto'matic ones */
+		// TODO: only when creating a new entity, right? And this can also be called for a load-command now.
 		if (desc.options.auto) {
 			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
 			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {

@@ -49,7 +49,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		cls.prototype::defineProperty(key, {
 			get() { return this.fields[key].get() },
 			...(readonly ? {} : {
-				set(val) { this.fields[key].set(val)}
+				set(val) { this.fields[key].set(val) }
 			}),
 			enumerable:   true,
 			configurable: false
@@ -157,10 +157,9 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		
 	[$$destruct]() {
 		this.set(new Set(), {
-			ignoreReadonly:   true,
-			ignoreValidation: true,
-			// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
-			createEditCommand:  false
+			ignoreReadonly:    true,
+			ignoreValidation:  true,
+			createEditCommand: false
 		});
 		super[$$destruct]();
 	}

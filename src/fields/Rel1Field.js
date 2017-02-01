@@ -126,8 +126,9 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			::startWith(null)
 			::pairwise()
 			.subscribe(([prev, curr]) => {
-				if (prev) { prev.fields[desc.keyInRelationship].set(null,  { createEditCommand: false }) }
-				if (curr) { curr.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) }
+				// TODO: prev or curr being placeholders may be a complex situation; model it properly
+				if (prev && !prev.isPlaceholder) { prev.fields[desc.keyInRelationship].set(null,  { createEditCommand: false }) }
+				if (curr && !curr.isPlaceholder) { curr.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) }
 			});
 		
 		/* set the value of this field to null when the relationship replaces this resource */
