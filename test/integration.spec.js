@@ -343,10 +343,12 @@ describe("integrated workflow", () => {
 				"class": "Lyph",
 				"-->HasLongitudinalBorder": [
 					{
-						"href": "192.168.99.100://HasLongitudinalBorder/94"
+						"href": "192.168.99.100://HasLongitudinalBorder/94",
+						"class": "HasLongitudinalBorder"
 					},
 					{
-						"href": "192.168.99.100://HasLongitudinalBorder/93"
+						"href": "192.168.99.100://HasLongitudinalBorder/93",
+						"class": "HasLongitudinalBorder"
 					}
 				]
 			}
