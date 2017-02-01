@@ -326,5 +326,42 @@ describe("integrated workflow", () => {
 			.is.an.instanceof(Material)
 			.with.property('name', "Material 3");
 	});
+
+    it("can retrieve an existing lyph with borders", async () => {
+
+		let environment, frontend;
+		({frontend} = simpleMockHandlers());
+
+		frontend.loadAll = async function(cls, options = {}) {
+			let results = [ {
+				"thickness": { "min": 0, "max": null },
+				"length": { "min": 0, "max": null },
+				"name": "Heart chamber",
+				"href": "192.168.99.100://Lyph/47",
+				"id": 47,
+				"cardinalityBase": 1,
+				"class": "Lyph",
+				"-->HasLongitudinalBorder": [
+					{
+						"href": "192.168.99.100://HasLongitudinalBorder/94"
+					},
+					{
+						"href": "192.168.99.100://HasLongitudinalBorder/93"
+					}
+				]
+			}
+			];
+			return results;
+		};
+
+		environment = moduleFactory(frontend);
+		const model = environment.classes;
+
+        let lyphs = [...await model.Lyph.getAll()];
+
+        console.log("Lyphs", lyphs);
+
+        expect(lyphs).to.have.length(1);
+    });
 	
 });
