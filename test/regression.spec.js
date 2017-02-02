@@ -142,20 +142,48 @@ describe("regression tests", () => {
 		let environment = moduleFactory({
 			async loadAll(cls, options = {}) {
 				let results = [{
-					"thickness":                { "min": 0 },
-					"length":                   { "min": 0 },
-					"name":                     "Heart chamber",
-					"href":                     "192.168.99.100://Lyph/47",
-					"id":                       47,
-					"cardinalityBase":          1,
-					"class":                    "Lyph",
+					"thickness": {
+						"min": 0,
+						"max": null
+					},
+					"length": {
+						"min": 0,
+						"max": null
+					},
+					"name": "Renal hilum",
+					"href": "192.168.99.100://Lyph/18",
+					"id": 18,
+					"cardinalityBase": 1,
+					"class": "Lyph",
+					"<--Coalesces": [
+						{
+							"href": "192.168.99.100://Coalesces/83",
+							"class": "Coalesces"
+						}
+					],
+					"<--IncludesElement": [
+						{
+							"href": "192.168.99.100://IncludesElement/65",
+							"class": "IncludesElement"
+						}
+					],
+					"-->DefinesType": {
+						"href": "192.168.99.100://DefinesType/55",
+						"class": "DefinesType"
+					},
+					"<--HasLayer": [
+						{
+							"href": "192.168.99.100://HasLayer/42",
+							"class": "HasLayer"
+						}
+					],
 					"-->HasLongitudinalBorder": [
 						{
-							"href":  "192.168.99.100://HasLongitudinalBorder/94",
+							"href": "192.168.99.100://HasLongitudinalBorder/26",
 							"class": "HasLongitudinalBorder"
 						},
 						{
-							"href":  "192.168.99.100://HasLongitudinalBorder/93",
+							"href": "192.168.99.100://HasLongitudinalBorder/25",
 							"class": "HasLongitudinalBorder"
 						}
 					]
