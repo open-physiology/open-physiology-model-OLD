@@ -228,5 +228,35 @@ describe("regression tests", () => {
 
 		expect(lyphs).to.have.length(1);
 	});
+
+	regression("Delete resource", async () => {
+
+		let environment = moduleFactory({
+			async loadAll(cls, options = {}) {
+				let results = [{
+					"thickness": {
+						"min": 0,
+						"max": null
+					},
+					"length": {
+						"min": 0,
+						"max": null
+					},
+					"name": "Renal hilum",
+					"href": "192.168.99.100://Lyph/18",
+					"id": 18,
+					"cardinalityBase": 1,
+					"class": "Lyph"
+				}];
+				return results;
+			}
+		});
+		const model = environment.classes;
+
+		let lyphs = [...await model.Lyph.getAll()];
+		expect(lyphs).to.have.length(1);
+
+		await lyphs[0].delete();
+	});
 	
 });
