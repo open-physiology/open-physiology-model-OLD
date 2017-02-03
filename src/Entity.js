@@ -441,8 +441,8 @@ export default (environment) => {
 			let result = {};
 			for (let [key, field] of this.fields::entries()) {
 				const fieldIsShortcut = (
-					field.constructor === RelShortcut$Field ||
-					field.constructor === RelShortcut1Field
+					field.constructor.name === 'RelShortcut$Field' ||
+					field.constructor.name === 'RelShortcut1Field'
 				);
 				if (minimal && fieldIsShortcut) { continue }
 				result[key] = field.value;
