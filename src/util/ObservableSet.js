@@ -6,7 +6,7 @@ import {humanMsg, constraint} from "./misc";
 const $$set               = Symbol('$$set');
 const $$addSubject        = Symbol('$$addSubject');
 const $$deleteSubject     = Symbol('$$deleteSubject');
-const $$valueObservable      = Symbol('$$valueObservable');
+const $$valueObservable   = Symbol('$$valueObservable');
 const $$disableNextReplay = Symbol('$$disableNextReplay');
 
 class AddReplaySubject extends Subject {

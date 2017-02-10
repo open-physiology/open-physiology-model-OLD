@@ -2,7 +2,9 @@ import isUndefined from 'lodash-bound/isUndefined';
 import entries     from 'lodash-bound/entries';
 import cloneDeep   from 'lodash-bound/cloneDeep';
 
+import {filter, map}    from '../util/bound-hybrid-functions';
 import {defineProperty} from 'bound-native-methods';
+import {take}           from 'rxjs/operator/take';
 
 import {humanMsg, assign, callOrReturn} from "../util/misc";
 
@@ -15,6 +17,7 @@ import {
 	$$desc,
 	$$initSet,
 	$$entriesIn,
+	$$href
 } from './symbols';
 import {constraint} from "../util/misc";
 
@@ -67,12 +70,34 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		`);
 		
 		/* set the initial value */
-		this[$$initSet](
-			[!initialValue::isUndefined(), initialValue::callOrReturn(owner)::cloneDeep()],
-			['default' in desc,            desc.default::callOrReturn(owner)::cloneDeep()],
-			['value'   in desc,            desc.value  ::callOrReturn(owner)::cloneDeep()],
-			[!desc.required]
-		);
+		owner.p('isPlaceholder')::filter(v=>!v)::take(1).subscribe(() => {
+			// this[$$initSet](
+			// 	[!initialValue::isUndefined(), initialValue::callOrReturn(owner)::cloneDeep()],
+			// 	['default' in desc,            desc.default::callOrReturn(owner)::cloneDeep()],
+			// 	['value'   in desc,            desc.value  ::callOrReturn(owner)::cloneDeep()],
+			// 	[!desc.required]
+			// );
+			this[$$initSet](
+				[!initialValue::isUndefined(), initialValue::callOrReturn(owner)::cloneDeep()],
+				['default' in desc],
+				['value'   in desc],
+				[!desc.required   ]
+			);
+		});
+	}
+	
+	get() {
+		/* lazy loading of default or constant value */
+		// TODO: also lazy-load when subscription is taken
+		let value = super.get();
+		if (value::isUndefined()) {
+			if ('default' in this[$$desc]) {
+				this.set(this[$$desc].default::callOrReturn(this[$$owner])::cloneDeep(), {createEditCommand: false});
+			} else if ('value' in desc) {
+				this.set(this[$$desc].value::callOrReturn(this[$$owner])::cloneDeep(), {createEditCommand: false});
+			}
+		}
+		return super.get();
 	}
 	
 	static valueToJSON(value, {flattenFieldValues = false} = {}) {

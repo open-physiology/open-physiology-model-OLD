@@ -103,11 +103,13 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		/* update relationships that are added or deleted here */
 		this[$$value].e('add')
 			::waitUntilConstructed()
+			::switchMap(rel => rel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>rel))
 			.subscribe((rel) => { rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) });
 		
 		/* decouple a relationship when it decouples from this resource */
 		this[$$value].e('add')
 			::waitUntilConstructed()
+			::switchMap(newRel => newRel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>newRel))
 			::switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value')
 				::filter(res => res !== owner)
 				::map(() => newRel)
@@ -134,6 +136,15 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		if (desc.options.auto) {
 			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
 			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
+				
+				
+				// // TODO: remove
+				// if (owner.constructor.name === 'Lyph' && desc.keyInResource === '-->HasLongitudinalBorder') {
+				// 	console.log('Rel$Field.(auto)', owner.constructor.name, desc.keyInResource);
+				// 	debugger;
+				// }
+				
+				
 				let otherEntity = desc.codomain.resourceClass.new({}, {
 					forcedDependencies: [owner.originCommand]
 				});
@@ -143,8 +154,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 				}, {
 					forcedDependencies: [owner.originCommand]
 				});
-				// this[$$pristine].add(rel); // TODO: remove 'pristine' related stuff everywhere except commands
-				this[$$value]   .add(rel);
+				this[$$value].add(rel);
 			}
 		}
 		

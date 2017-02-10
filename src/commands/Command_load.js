@@ -7,9 +7,11 @@ import {
 	$$entities,
 	$$entitiesByHref,
 	$$committedEntities,
-	$$isPlaceholder
+	// $$isPlaceholder
 } from '../symbols';
+import {$$href} from '../fields/symbols';
 import {constraint, humanMsg} from '../util/misc';
+import {Field} from '../fields/Field';
 
 export default (cls) => class Command_load extends cls.TrackedCommand {
 	
@@ -18,7 +20,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 	static get entityClass() { return cls }
 	
 	static create(values, options = {}) {
-		return super.create([values], options);
+		return super.create([values], {...options, values});
 	}
 	
 	constructor(values = {}, options = {}) {
@@ -105,18 +107,26 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 			`);
 			
 			/* construct entity */
+			const values = { ...this.values };
 			this.result = new realCls(
-				{ ...this.values },
+				values,
 				{ ...this.options, allowInvokingConstructor: true }
 			);
-			this.result[$$isPlaceholder] = this.placeholder;
+			this.result.pSubject('isPlaceholder').next(this.placeholder);
+			
+			/* initialize fields if this is not a placeholder */
+			if (!this.placeholder) {
+				Field.initializeEntity(this.result, values);
+			} else {
+				this.result[$$href] = values.href;
+			}
 			
 			/* track this command in the entity */
 			this.result.originCommand = this; // TODO: maintain array of originCommands instead
 			
 			/* register this entity */
 			cls[$$entities].add(this.result);
-			cls[$$entitiesByHref][this.result.href] = this.result;
+			cls[$$entitiesByHref][this.values.href] = this.result;
 			cls[$$committedEntities].add(this.result);
 			
 			/* after it's first committed, it's no longer new */
@@ -151,15 +161,20 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 			/* if we're loading a placeholder, we're done now */
 			if (this.placeholder) { return }
 			
-			/* otherwise, set the values */
-			for (let [key, value] of this.values::entries()) {
-				this.result.fields[key].set(value, {
-					createEditCommand: false,
-					ignoreReadonly:    true,
-					ignoreValidation:  true
-				});
+			if (!this.result.fields) {
+				/* initialize fields if this is not a placeholder */
+				Field.initializeEntity(this.result, this.values);
+			} else  {
+				/* otherwise, set the values of the existing fields */
+				for (let [key, value] of this.values::entries()) {
+					this.result.fields[key].set(value, {
+						createEditCommand: false,
+						ignoreReadonly:    true,
+						ignoreValidation:  true
+					});
+				}
 			}
-			this.result[$$isPlaceholder] = false;
+			this.result.pSubject('isPlaceholder').next(false);
 		}
 	}
 	

@@ -8,3 +8,4 @@ export const $$initSet      = Symbol('$$initSet');
 export const $$entriesIn    = Symbol('$$entriesIn');
 export const $$initialized  = Symbol('$$initialized');
 export const $$destruct     = Symbol('$$destruct');
+export const $$href         = Symbol('$$href');

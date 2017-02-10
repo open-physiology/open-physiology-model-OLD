@@ -9,6 +9,7 @@ import values      from 'lodash-bound/values';
 import parseInt    from 'lodash-bound/parseInt';
 import every       from 'lodash-bound/every';
 import size        from 'lodash-bound/size';
+import entries     from 'lodash-bound/entries';
 
 import ValueTracker from '../util/ValueTracker';
 
@@ -55,6 +56,31 @@ export default ({backend}) => {
 		}
 		
 		static create(initialArgs, options) {
+			// TODO: how to streamline the possible duplication of both initialArgs and options containing `values`?
+			let {values = {}} = options;
+			
+			/* fetch references for given values */
+			const cls = this.entityClass;
+			if (cls && cls.isResource) {
+				for (let [key, value] of values::entries()) {
+					const relDesc = (cls.relationships[key] || cls.relationshipShortcuts[key]);
+					if (relDesc && value) {
+						if (relDesc.cardinality.max <= 1) {
+							values[key] = cls.Entity.getLocalOrNewPlaceholder(value);
+						} else {
+							values[key] = value.map(addr=>cls.Entity.getLocalOrNewPlaceholder(addr));
+						}
+					}
+				}
+			} else if (cls && cls.isRelationship) {
+				for (let side of [1, 2]) {
+					if (values[side]) {
+						values[side] = cls.Entity.getLocalOrNewPlaceholder(values[side]);
+					}
+				}
+			}
+			
+			/* construct the command and handle options */
 			let cmd = new this(...initialArgs, { ...options, allowInvokingConstructor: true });
 			cmd.options.command = cmd;
 			this.processOptions(cmd);
@@ -344,17 +370,13 @@ export default ({backend}) => {
 			commandsFoundSoFar.add(this);
 			/* add dependency commits */
 			for (let [dep,,{commitDependency}] of commandGraph.verticesTo(this)) {
-				console.log();
 				if (!commitDependency)                     { continue }
-				console.log();
 				if (dep[$$committing] || dep[$$committed]) { continue }
 				dep.commitDependencies(commandsFoundSoFar);
 			}
 			/* add forced commits */
 			for (let [rdep,,{forcedDependency}] of commandGraph.verticesFrom(this)) {
-				console.log();
 				if (!forcedDependency)                       { continue }
-				console.log();
 				if (rdep[$$committing] || rdep[$$committed]) { continue }
 				rdep.commitDependencies(commandsFoundSoFar);
 			}

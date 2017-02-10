@@ -36,27 +36,27 @@ export const afterEach  = mocha.afterEach  || gw.afterEach;
 export const expect     = chai.expect;
 
 /* special function for regression tests */
-function regression_(itFn, metaOrDesc, descOrFn, optFn) {
+function regression_(metaOrDesc, desc) {
 	let issue, date, description, fn;
 	if (metaOrDesc::isPlainObject()) {
-		[{issue, date}, description, fn   ] =
-		[metaOrDesc   , descOrFn   , optFn];
+		[{issue, date}, description] =
+		[metaOrDesc   , desc];
 	} else {
 		[description, fn      ] =
-		[metaOrDesc , descOrFn];
+		[metaOrDesc , desc];
 	}
-	return itFn(`(regression${
+	return `(regression${
 		issue ? `: issue #${issue}` : date ? `: ${date}` : ''
 	})${
 		description ? ` ${description}` : ''
-	}`, fn);
+	}`;
 }
-export function regression(metaOrDesc, descOrFn, optFn) {
-	return regression_(it, metaOrDesc, descOrFn, optFn);
+export function regression(metaOrDesc, desc) {
+	return regression_(metaOrDesc, desc);
 }
-regression.skip = function skip(metaOrDesc, descOrFn, optFn) {
-	return regression_(::it.skip, metaOrDesc, descOrFn, optFn);
-};
-regression.only = function only(metaOrDesc, descOrFn, optFn) {
-	return regression_(::it.only, metaOrDesc, descOrFn, optFn);
-};
+// regression.skip = function skip(metaOrDesc, descOrFn, optFn) {
+// 	return regression_(::it.skip, metaOrDesc, descOrFn, optFn);
+// };
+// regression.only = function only(metaOrDesc, descOrFn, optFn) {
+// 	return regression_(::it.only, metaOrDesc, descOrFn, optFn);
+// };

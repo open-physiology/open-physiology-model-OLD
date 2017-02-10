@@ -1,8 +1,8 @@
 import {constraint, humanMsg} from '../util/misc';
 
-import {
-	$$isPlaceholder
-} from '../symbols';
+// import {
+// 	$$isPlaceholder
+// } from '../symbols';
 
 export default (cls) => class Command_delete extends cls.TrackedCommand {
 	
@@ -39,7 +39,7 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 			that was not specified in
 			the Command_delete constructor.
 		`);
-		constraint(!this.entity[$$isPlaceholder], humanMsg`
+		constraint(!this.entity.isPlaceholder, humanMsg`
 			Cannot delete a placeholder.
 			Load the entity fully before editing.
 		`);

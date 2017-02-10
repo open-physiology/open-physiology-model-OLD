@@ -18,7 +18,7 @@ describe("regression tests", () => {
 		registerEnvironment(environment);
 	});
     
-	regression("HasType[2] set to null?", async () => {
+	it("HasType[2] set to null?", async () => {
    		const {Group, Lyph, HasMaterial} = environment.classes;
    		
    		let lyph1 = Lyph.new();
@@ -36,14 +36,14 @@ describe("regression tests", () => {
    		
    	});
    
-   	regression("setting type in initializer fails at commit", async () => {
+	it("setting type in initializer fails at commit", async () => {
    		const {Lyph} = environment.classes;
    		let t1 = Lyph.new({ name: "Renal hilum" });
    		await t1.commit();
    		// await expect(t1.commit()).to.not.be.rejected;
    	});
    	
-   	regression("trying to instantiate abstract class Has", async () => {
+	it("trying to instantiate abstract class Has", async () => {
    		const {Lyph, HasPart} = environment.classes;
    		
    		let subLyph = Lyph.new(
@@ -77,7 +77,7 @@ describe("regression tests", () => {
    		
    	});
    	
-   	regression("relationship mismatch", async () => {
+	it("relationship mismatch", async () => {
    		const {Lyph, Type} = environment.classes;
    		
    		let blood = Lyph.new({ name: "Blood" });
@@ -88,7 +88,7 @@ describe("regression tests", () => {
    	});
    
    
-   	regression("export manually defined plural", async () => {
+	it("export manually defined plural", async () => {
    		const {Process, Causality} = environment.classes;
    
    		let process   = Process.new({ name: "Blood advection" });
@@ -98,11 +98,13 @@ describe("regression tests", () => {
    		expect(causality.constructor).to.have.a.property('plural', "causalities");
    	});
 	
-	regression("auto-synchronized border-natures?", async () => {
+	it("auto-synchronized border-natures?", async () => {
 		
 		const {Lyph, Border} = environment.classes;
 		
 		let lyph = Lyph.new();
+		
+		await new Promise((resolve) => { setTimeout(resolve, 1000) });
 		
 		expect(new Set([
 			[...lyph.longitudinalBorders][0].nature,
@@ -119,7 +121,7 @@ describe("regression tests", () => {
 		
 	});
     
-    regression("commit causality resource", async () => {
+    it("commit causality resource", async () => {
         const {Measurable, Causality} = environment.classes;
 
         let measurable1 = Measurable.new({ name: "Concentration of water" });
@@ -137,7 +139,7 @@ describe("regression tests", () => {
     });
 	
 	
-	regression("\"This graph does not have a vertex ''\" error when retrieving existing lyph with borders", async () => {
+	it("\"This graph does not have a vertex ''\" error when retrieving existing lyph with borders", async () => {
 		
 		let environment = moduleFactory({
 			async loadAll(cls, options = {}) {

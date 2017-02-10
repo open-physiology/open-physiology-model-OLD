@@ -9,7 +9,7 @@ import {
 	$$entities,
 	$$entitiesByHref,
 	$$committedEntities,
-	$$isPlaceholder
+	// $$isPlaceholder
 } from '../symbols';
 import {Field} from '../fields/Field';
 // import {$$commands} from './symbols';
@@ -21,7 +21,7 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 	static get entityClass() { return cls }
 	
 	static create(initialValues = {}, options = {}) {
-		return super.create([initialValues], options);
+		return super.create([initialValues], {...options, values: initialValues});
 	}
 	
 	constructor(initialValues = {}, options = {}) {
@@ -69,21 +69,24 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 			class ${cls.name}.
 		`);
 		/* construct entity */
+		const values = { ...this.initialValues };
 		if (cls.behavior['new']::isFunction()) {
 			this.result = cls.behavior['new'](this) || null;
 		} else {
 			this.result = new cls(
-				{ ...this.initialValues },
+				values,
 				{ ...this.options, allowInvokingConstructor: true }
 			);
 		}
-		this.result[$$isPlaceholder] = false;
+		this.result.pSubject('isPlaceholder').next(false);
+		/* initialize fields */
+		Field.initializeEntity(this.result, values);
 		/* track this command in the entity */
 		this.result.originCommand = this;
-		/* register as new */
-		this.result.pSubject('isNew').next(true);
 		/* register this entity */
 		cls.Entity[$$entities].add(this.result);
+		/* register as new */
+		this.result.pSubject('isNew').next(true);
 	}
 	
 	toJSON(options = {}) {

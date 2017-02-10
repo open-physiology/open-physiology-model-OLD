@@ -14,11 +14,14 @@ import {wrapInArray} from "../util/misc";
 import _union from 'lodash/union';
 
 import defaults from 'lodash-bound/defaults';
+import isUndefined from 'lodash-bound/isUndefined';
 import assign from 'lodash-bound/assign';
 import max from 'lodash-bound/max';
 import map from 'lodash-bound/map';
 import {typedDistributionSchema} from "../util/schemas";
+import {Field} from '../fields/Field';
 
+import {$$value} from '../fields/symbols';
 
 export default TypedModule.create('lyphs', [
 	resources, typed
@@ -152,7 +155,16 @@ export default TypedModule.create('lyphs', [
 			'relativePosition': {
 				type: 'number',
 				required: true,
-				default() { return [...this[1]['-->HasLayer']]::map('relativePosition').concat([0])::max() + 1 }
+				default() { return [...this[1]['-->HasLayer']]::map((hasLayerRel) => {
+					let pos = hasLayerRel.fields.relativePosition[$$value];
+					if (pos::isUndefined()) { pos = -Infinity }
+					return pos;
+					// TODO: Having to reference $$value here to avoid getting
+					//     : a stack-overflow by using .get() (which would call this default function again)
+					//     : Not a very nice solution.
+					// TODO: go back to explicitly setting the default value at initialization,
+					//     : but time it right, so that this[1] above is already defined
+				}).concat([0])::max() + 1 }
 			}
 			// TODO: CONSTRAINT - two layers of the same lyph cannot have the same relativePosition
 		},
@@ -195,7 +207,12 @@ export default TypedModule.create('lyphs', [
 			'relativePosition': {
 				type: 'number',
 				required: true,
-				default() { return [...this[1]['-->HasSegment']]::map('relativePosition').concat([0])::max() + 1 }
+				default() { return [...this[1]['-->HasSegment']]::map((hasLayerRel) => {
+					let pos = hasLayerRel.fields.relativePosition[$$value];
+					if (pos::isUndefined()) { pos = -Infinity }
+					return pos;
+					// TODO: See layer relativePosition above
+				}).concat([0])::max() + 1 }
 			}
 			// TODO: CONSTRAINT - two segments of the same lyph cannot have the same relativePosition
 		},

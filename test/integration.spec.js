@@ -272,7 +272,7 @@ describe("integrated workflow", () => {
 		let [ph1, ph2] = childLyphs::keyBy('href')::at([href1, href2]);
 		
 		expect(ph1.isPlaceholder).to.be.true;
-		expect(ph1.name).to.be.undefined;
+		expect(() => ph1.name).to.throw;
 		let entity1 = await Lyph.get(href1);
 		expect(entity1).to.equal(ph1);
 		expect(entity1.name).to.equal("Lyph 1");

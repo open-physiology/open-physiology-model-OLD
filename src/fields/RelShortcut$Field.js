@@ -31,6 +31,7 @@ import {
 	$$destruct
 } from './symbols';
 import {constraint} from "../util/misc";
+import {switchMap} from 'rxjs/operator/switchMap';
 
 
 Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
@@ -83,8 +84,10 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 
 		/* syncing with relationship field */
 		const correspondingRelField = owner.fields[desc.keyInResource][$$value];
+		
 		correspondingRelField.e('add')
 			::waitUntilConstructed()
+			::switchMap(newRel => newRel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>newRel))
 			.subscribe((newRel) => {
 				let newRelDisconnected = newRel.fields[desc.keyInRelationship].p('value')
 					::filter(v => v !== owner)

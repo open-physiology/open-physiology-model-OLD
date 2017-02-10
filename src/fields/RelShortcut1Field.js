@@ -1,5 +1,8 @@
 import {filter}                   from 'rxjs/operator/filter';
 import {switchMap}                from 'rxjs/operator/switchMap';
+import {mapTo}                    from 'rxjs/operator/mapTo';
+import {take}                     from 'rxjs/operator/take';
+import {takeUntil}                from 'rxjs/operator/takeUntil';
 import {defer as deferObservable} from 'rxjs/observable/defer';
 import 'rxjs/add/operator/do';
 
@@ -86,6 +89,7 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		/* keep this value up to date with new sides of new relationships */
 		correspondingRelValue
 			::filter(v=>v)
+			::switchMap(rel => rel.p('fieldsInitialized')::filter(v=>!!v)::mapTo(rel))
 			::switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
 			.subscribe( this.p('value') );
 	
@@ -94,7 +98,14 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 			.subscribe((scValue) => {
 				const relValue = owner.fields[desc.keyInResource].get();
 				if (relValue) {
-					relValue.fields[desc.codomain.keyInRelationship].set(scValue || null, { createEditCommand: false });
+					// TODO: should we wait until relValue.p('fieldsInitialized')?
+					
+					relValue.p('fieldsInitialized')
+						::filter(v=>!!v)
+						::take(1)
+						::takeUntil(this.p('value')::filter(v=>v!==scValue)).subscribe(() => {
+							relValue.fields[desc.codomain.keyInRelationship].set(scValue || null, { createEditCommand: false });
+						});
 				} else if (scValue && !desc.relationshipClass.abstract) {
 					// TODO: Is the abstractness test above really the best way?
 					const rel = desc.relationshipClass.new({

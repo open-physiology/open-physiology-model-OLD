@@ -4,7 +4,7 @@
   "description": "a full description of the open physiology model in ES6/ES7",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register",
+    "test": "mocha-webpack --opts mocha-webpack.opts",
     "produce-grouped-descriptions": "babel-node src/scripts/produce-grouped-descriptions.js",
     "build": "cross-env BABEL_ENV=production webpack"
   },

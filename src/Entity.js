@@ -9,6 +9,8 @@ import pick        from 'lodash-bound/pick';
 import entries     from 'lodash-bound/entries';
 import reject      from 'lodash-bound/reject';
 
+import _uniqueId from 'lodash/uniqueId';
+
 import {humanMsg, definePropertiesByValue, definePropertyByValue} from './util/misc';
 import ObservableSet                   from './util/ObservableSet';
 import {Field}                         from './fields/fields';
@@ -33,7 +35,7 @@ import {
 	$$entitiesByHref,
 	$$committedEntities,
 	$$entities,
-	$$isPlaceholder
+	// $$isPlaceholder
 } from './symbols';
 const $$newEntitySubject         = Symbol('$$newEntitySubject'   );
 const $$deleted                  = Symbol('$$deleted'            );
@@ -235,7 +237,7 @@ export default (environment) => {
 			this.commandDelete({ ...options, run: true });
 		}
 		
-		get isPlaceholder() { return this[$$isPlaceholder] }
+		// get isPlaceholder() { return this[$$isPlaceholder] }
 		
 		////////////////////////////////////////////
 		////////// Caching Model Entities //////////
@@ -245,14 +247,14 @@ export default (environment) => {
 			entityOrAddress: Entity | { href: string } | string | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
-			return entity && !entity[$$isPlaceholder];
+			return entity && !entity.isPlaceholder;//[$$isPlaceholder];
 		}
 		
 		static hasPlaceholder(
 			entityOrAddress: Entity | { href: string } | string | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
-			return entity && entity[$$isPlaceholder];
+			return entity && entity.isPlaceholder;//[$$isPlaceholder];
 		}
 		
 		static hasLocal(
@@ -368,6 +370,8 @@ export default (environment) => {
 		@property({ initial: false, readonly: true }) isDeleted;
 		@property({ initial: true,  readonly: true }) isPristine;
 		@property({ initial: false, readonly: true }) isNew;
+		@property({ initial: false, readonly: true }) fieldsInitialized;
+		@property({ readonly: true })                 isPlaceholder;
 		
 		
 		///////////////////////////////
@@ -410,12 +414,17 @@ export default (environment) => {
 			});
 			
 			/* initialize all fields in this entity */
+			this.foobar = _uniqueId(this.constructor.name + '-');
+			if (this.constructor.name === 'HasLongitudinalBorder') {
+				console.log('(Entity constructor)', this.foobar);
+			}
+			
 			Field.initializeEntity(this, initialValues);
 			
 		}
 		
 		get [Symbol.toStringTag]() {
-			return `${this.constructor.name}: ${this.href || this.name}`;
+			return `${this.constructor.name}: ${this.href}`;
 		}
 		
 		

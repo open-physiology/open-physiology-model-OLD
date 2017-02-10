@@ -28,9 +28,12 @@ import {
 	$$initSet,
 	$$entriesIn,
 	$$initialized,
-	$$destruct
+	$$destruct,
+	$$href
 } from './symbols';
 import {constraint} from "../util/misc";
+
+const $$fieldsInitialized = Symbol('$$fieldsInitialized');
 
 export class Field extends ValueTracker {
 	
@@ -61,14 +64,19 @@ export class Field extends ValueTracker {
 		
 	}
 	
+	/** only use for Entity instances when they are not placeholders (anymore) */
 	static initializeEntity(owner, initialValues) {
 		if (owner.fields) { return }
 		owner::defineProperty('fields', { value: {} });
 		
 		/* allow specific field-init code to wait until all fields are initialized */
-		const constructingOwner = new Subject();
-		const waitUntilConstructed = function() {
-			return concat(constructingOwner, this);
+		const constructingOwner = new Subject(); // TODO: remove; obsolete
+		const waitUntilConstructed = function (entity = owner) {
+			if (entity === owner) { // TODO: remove; obsolete
+				return concat(constructingOwner, this);
+			} else {
+				return concat(entity.p('fieldsInitialized'), this);
+			}
 		};
 		
 		/* initialize all fields */
@@ -102,7 +110,8 @@ export class Field extends ValueTracker {
 		}
 		
 		/* notify completion of field initialization */
-		constructingOwner.complete();
+		constructingOwner.complete(); // TODO: remove; obsolete
+		owner.pSubject('fieldsInitialized').next(true);
 	}
 	
 	static destructEntity(owner) {
@@ -118,10 +127,8 @@ export class Field extends ValueTracker {
 	// events & properties //
 	/////////////////////////
 	
-	@event() commitEvent;
-	@event() rollbackEvent;
-	
-	// @property({ initial: true, readonly: true }) isPristine;// TODO: remove all 'pristine' related stuff from the field classes
+	@event()    commitEvent;
+	@event()    rollbackEvent;
 	@property() value;
 	
 	

@@ -15,7 +15,7 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.js$/,
-				exclude: /node\_modules/,
+				exclude: /node_modules/,
 				loader: 'babel'
 			},
 			{

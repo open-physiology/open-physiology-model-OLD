@@ -135,6 +135,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		this.p('value')
 			::waitUntilConstructed()
 			::filter(_isObject)
+			::switchMap(newRel => newRel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>newRel))
 			::switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value'))
 			::filter(res => res !== owner)
 			::map(()=>null)

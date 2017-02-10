@@ -5,9 +5,9 @@ import keys    from 'lodash-bound/keys';
 import entries from 'lodash-bound/entries';
 import isArray from 'lodash-bound/isArray';
 
-import {
-	$$isPlaceholder
-} from '../symbols';
+// import {
+// 	$$isPlaceholder
+// } from '../symbols';
 
 
 // TODO: Make all field-setter code use this command
@@ -19,7 +19,7 @@ export default (cls) => class Command_edit extends cls.TrackedCommand {
 	static get entityClass() { return cls }
 	
 	static create(entity, newValues = {}, options = {}) {
-		return super.create([entity, newValues], options);
+		return super.create([entity, newValues], {...options, values: newValues});
 	}
 	
 	constructor(entity, newValues = {}, options = {}) {
@@ -74,7 +74,7 @@ export default (cls) => class Command_edit extends cls.TrackedCommand {
 			that was not specified in
 			the Command_edit constructor.
 		`);
-		constraint(!this.entity[$$isPlaceholder], humanMsg`
+		constraint(!this.entity.isPlaceholder, humanMsg`
 			Cannot edit a placeholder.
 			Load the entity fully before editing.
 		`);
