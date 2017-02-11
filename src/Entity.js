@@ -9,8 +9,6 @@ import pick        from 'lodash-bound/pick';
 import entries     from 'lodash-bound/entries';
 import reject      from 'lodash-bound/reject';
 
-import _uniqueId from 'lodash/uniqueId';
-
 import {humanMsg, definePropertiesByValue, definePropertyByValue} from './util/misc';
 import ObservableSet                   from './util/ObservableSet';
 import {Field}                         from './fields/fields';
@@ -66,7 +64,7 @@ export default (environment) => {
 		static get Entity() { return Entity }
 		
 		static normalizeAddress(address, options = {}) {
-			const {entityToTemporaryHref} = options;
+			const {entityToTemporaryHref = new Map} = options;
 			if (address::isString()) { return { class: this.name, href: address } }
 			if (address::isObject()) {
 				let href = address.href || entityToTemporaryHref.get(address);
@@ -414,13 +412,7 @@ export default (environment) => {
 			});
 			
 			/* initialize all fields in this entity */
-			this.foobar = _uniqueId(this.constructor.name + '-');
-			if (this.constructor.name === 'HasLongitudinalBorder') {
-				console.log('(Entity constructor)', this.foobar);
-			}
-			
 			Field.initializeEntity(this, initialValues);
-			
 		}
 		
 		get [Symbol.toStringTag]() {
@@ -446,7 +438,7 @@ export default (environment) => {
 		}
 		
 		toJSON(options = {}) {
-			let { minimal, entityToTemporaryHref } = options;
+			let { minimal, entityToTemporaryHref = new Map } = options;
 			let result = {};
 			for (let [key, field] of this.fields::entries()) {
 				const fieldIsShortcut = (

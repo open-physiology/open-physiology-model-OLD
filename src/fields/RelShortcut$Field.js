@@ -134,8 +134,12 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		const {entityToTemporaryHref = new Map} = options;
-		return value::map(e => ({ href: e.href || entityToTemporaryHref.get(e) }));
+		// const Entity = this[$$owner].constructor.Entity;
+		// const {entityToTemporaryHref = new Map} = options;
+		return value::map(e => {
+			const Entity = e.constructor.Entity;
+			Entity.normalizeAddress(e, options)
+		});
 	}
 	
 	jsonToValue(json, options = {}) {

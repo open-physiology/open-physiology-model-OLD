@@ -77,7 +77,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		super({ ...options, setValueThroughSignal: false });
 		const { owner, desc, initialValue, waitUntilConstructed, constructingOwner, related } = options;
 		
-		this::defineProperty($$value,    { value: new ObservableSet });
+		this::defineProperty($$value, { value: new ObservableSet });
 		
 		/* mirror stuff that happens in sub-fields */
 		constructingOwner.subscribe({complete: () => {
@@ -132,19 +132,9 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		}
 		
 		/* fill up missing required values with 'auto'matic ones */
-		// TODO: only when creating a new entity, right? And this can also be called for a load-command now.
-		if (desc.options.auto) {
+		if (desc.options.auto && !owner.isPlaceholder) {
 			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
 			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
-				
-				
-				// // TODO: remove
-				// if (owner.constructor.name === 'Lyph' && desc.keyInResource === '-->HasLongitudinalBorder') {
-				// 	console.log('Rel$Field.(auto)', owner.constructor.name, desc.keyInResource);
-				// 	debugger;
-				// }
-				
-				
 				let otherEntity = desc.codomain.resourceClass.new({}, {
 					forcedDependencies: [owner.originCommand]
 				});
@@ -170,8 +160,11 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		const {entityToTemporaryHref = new Map} = options;
-		return value::map(e => ({ href: e.href || entityToTemporaryHref.get(e) }));
+		// const {entityToTemporaryHref = new Map} = options;
+		return value::map(e => {
+			const Entity = e.constructor.Entity;
+			Entity.normalizeAddress(e, options)
+		});
 	}
 	
 	jsonToValue(json, options = {}) {

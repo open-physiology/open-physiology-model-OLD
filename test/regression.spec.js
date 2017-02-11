@@ -201,7 +201,7 @@ describe("regression tests", () => {
 	});
 
 
-	regression("ReferenceError: RelShortcut$Field is not defined", async () => {
+	it("ReferenceError: RelShortcut$Field is not defined", async () => {
 
 		let environment = moduleFactory({
 			async loadAll(cls, options = {}) {
@@ -231,90 +231,47 @@ describe("regression tests", () => {
 		expect(lyphs).to.have.length(1);
 	});
 
-
-	regression("Delete resource", async () => {
-
+	it("Relationship resources in commit_new have property class", async () => {
 		let environment = moduleFactory({
 			async loadAll(cls, options = {}) {
-				let results = [{
-					"thickness": {
-						"min": 0,
-						"max": null
-					},
-					"length": {
-						"min": 0,
-						"max": null
-					},
+				return [{
+					"name": "Kidney",
+					"href": "192.168.99.100://Lyph/17",
+					"id": 17,
+					"cardinalityBase": 1,
+					"class": "Lyph"
+				}, {
 					"name": "Renal hilum",
 					"href": "192.168.99.100://Lyph/18",
 					"id": 18,
 					"cardinalityBase": 1,
 					"class": "Lyph"
 				}];
-				return results;
-			}
-		});
-		const model = environment.classes;
-
-		let lyphs = [...await model.Lyph.getAll()];
-		expect(lyphs).to.have.length(1);
-
-		await lyphs[0].delete();
-	});
-
-	regression("Relationship resources in commit_new have property class", async () => {
-
-		let environment = moduleFactory({
-			async loadAll(cls, options = {}) {
-				let results = [{
-						"name": "Kidney",
-						"href": "192.168.99.100://Lyph/17",
-						"id": 17,
-						"cardinalityBase": 1,
-						"class": "Lyph"
-					},
-					{
-						"name": "Renal hilum",
-						"href": "192.168.99.100://Lyph/18",
-						"id": 18,
-						"cardinalityBase": 1,
-						"class": "Lyph"
-				}];
-				return results;
 			},
-
 			async commit_new({commandType, values}) {
-				values.href = "open-physiology.org/" + values.class +"/" + 1;
-				expect(values[1]).has.property("class");
-				expect(values[2]).has.property("class");
+				values.href = `open-physiology.org/${values.class}/${1}`;
+				expect(values[1]).to.have.property('class');
+				expect(values[2]).to.have.property('class');
 				return values;
 			},
-
 		});
-		const model = environment.classes;
+		const {Lyph, HasLayer} = environment.classes;
 
-		let lyphs = [...await model.Lyph.getAll()];
+		let lyphs = [...await Lyph.getAll()];
 		expect(lyphs).to.have.length(2);
-
-		let layer = model.HasLayer.new({ 1: lyphs[0], 2: lyphs[1]});
-		//console.log("Layer", layer.toJSON());
-		await layer.commit();
-
-		expect(layer[1]).to.have.property("href");
-		expect(layer[1]).to.have.property("class");
-		expect(layer[2]).to.have.property("href");
-		expect(layer[2]).to.have.property("class");
+		let hasLayer = HasLayer.new({ 1: lyphs[0], 2: lyphs[1]});
+		await hasLayer.commit();
 	});
 
-	regression("toJSON() does not fail on relationships", async () => {
+	it("toJSON() does not fail on relationships", async () => {
 
 		const model = environment.classes;
 
 		let lyph1 = model.Lyph.new({name: "Kidney"});
 		let lyph2 = model.Lyph.new({name: "Kidney lobus"});
-		let layer = model.HasLayer.new({ 1: lyph1, 2: lyph2});
+		let hasLayer = model.HasLayer.new({ 1: lyph1, 2: lyph2});
 
-		console.log("Layer", layer.toJSON());
+		console.log("Layer", hasLayer.toJSON());
 	});
 	
 });

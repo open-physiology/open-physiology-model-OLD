@@ -70,8 +70,8 @@ Field[$$registerFieldClass](class SideField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[initialValue::isObject() || initialValue::isNull(),   initialValue                   ],
-			[desc.options.auto,                                  ::desc.resourceClass.new         ] // TODO: command dependencies?
+			[initialValue::isObject() || initialValue::isNull(), initialValue            ],
+			[desc.options.auto && !owner.isPlaceholder,          ::desc.resourceClass.new] // TODO: command dependencies?
 		);
 		
 		/* if one side becomes null, then so does the other, */
@@ -100,9 +100,10 @@ Field[$$registerFieldClass](class SideField extends Field {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		const {entityToTemporaryHref = new Map} = options;
+		// const {entityToTemporaryHref = new Map} = options;
 		if (!value) { return value }
-		return { href: value.href || entityToTemporaryHref.get(value) };
+		const Entity = value.constructor.Entity;
+		return Entity.normalizeAddress(value, options);
 	}
 	
 	jsonToValue(json, options = {}) {

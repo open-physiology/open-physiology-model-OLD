@@ -118,10 +118,10 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		const {entityToTemporaryHref = new Map} = options;
-		//debugger;
+		// const {entityToTemporaryHref = new Map} = options;
 		if (!value) { return value }
-		return { href: value.href || entityToTemporaryHref.get(value) };
+		const Entity = value.constructor.Entity;
+		return Entity.normalizeAddress(value, options);
 	}
 	
 	jsonToValue(json, options = {}) {

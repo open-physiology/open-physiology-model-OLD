@@ -85,7 +85,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		this[$$initSet](
 			[initialValue, initialValue],
 			[givenShortcutInitialValue ],
-			[desc.options.auto, () => {
+			[desc.options.auto && !owner.isPlaceholder, () => {
 				let otherEntity = desc.codomain.resourceClass.new({}, {
 					forcedDependencies: [owner.originCommand]
 				});
@@ -143,9 +143,10 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		const {entityToTemporaryHref = new Map} = options;
+		// const {entityToTemporaryHref = new Map} = options;
 		if (value === null) { return null }
-		return { href: value.href || entityToTemporaryHref.get(value) };
+		const Entity = value.constructor.Entity;
+		return Entity.normalizeAddress(value, options);
 	}
 	
 	jsonToValue(json, options = {}) {
