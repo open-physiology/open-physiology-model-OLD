@@ -327,6 +327,8 @@ describe("integrated workflow", () => {
 			.with.property('name', "Material 3");
 	});
 	
+	it("can accept an href when first creating an entity, but expects this href to remain consistent at commit");
+	
 	it("can delete a resource", async () => {
 		const {Lyph} = environment.classes;
 
@@ -344,9 +346,6 @@ describe("integrated workflow", () => {
 		lyph.delete();
 		
 		expect(Lyph.hasLocal(href)).to.be.false;
-		
-		
-		
 	});
 	
 });

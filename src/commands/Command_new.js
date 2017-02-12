@@ -1,4 +1,5 @@
 import isFunction from 'lodash-bound/isFunction';
+import isString   from 'lodash-bound/isString';
 import entries    from 'lodash-bound/entries';
 import isArray    from 'lodash-bound/isArray';
 import assert     from 'power-assert';
@@ -71,8 +72,10 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 		/* construct entity */
 		const values = { ...this.initialValues };
 		if (cls.behavior['new']::isFunction()) {
+			/* this class has custom 'new' behavior */
 			this.result = cls.behavior['new'](this) || null;
 		} else {
+			/* using default 'new' behavior */
 			this.result = new cls(
 				values,
 				{ ...this.options, allowInvokingConstructor: true }
@@ -87,6 +90,10 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 		cls.Entity[$$entities].add(this.result);
 		/* register as new */
 		this.result.pSubject('isNew').next(true);
+		/* pre-store by href */
+		if (this.options.acceptHref && values.href::isString()) {
+			cls.Entity[$$entitiesByHref][values.href] = this.result;
+		}
 	}
 	
 	toJSON(options = {}) {
@@ -119,6 +126,14 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 			The backend function commit_new needs to
 			return an object with an href property.
 		`);
+		
+		if (this.options.acceptHref && this.initialValues.href::isString()) {
+			assert(response.href === this.initialValues.href, humanMsg`
+				The backend function commit_new needs to
+				return an object with the same href property
+				as already provided when the entity was first created.
+			`);
+		}
 		
 		/* set the new values */
 		for (let [key, newValue] of response::entries()) {
