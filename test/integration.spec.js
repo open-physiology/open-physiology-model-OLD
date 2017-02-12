@@ -328,33 +328,25 @@ describe("integrated workflow", () => {
 	});
 	
 	it("can delete a resource", async () => {
+		const {Lyph} = environment.classes;
 
-		let environment = moduleFactory({
-			async loadAll(cls, options = {}) {
-				let results = [{
-					"thickness": {
-						"min": 0,
-						"max": null
-					},
-					"length": {
-						"min": 0,
-						"max": null
-					},
-					"name": "Renal hilum",
-					"href": "192.168.99.100://Lyph/18",
-					"id": 18,
-					"cardinalityBase": 1,
-					"class": "Lyph"
-				}];
-				return results;
-			}
+		let { href } = backend.create({
+			class: 'Lyph',
+			name:  "Lyph 1"
 		});
-		const model = environment.classes;
 
-		let lyphs = [...await model.Lyph.getAll()];
-		expect(lyphs).to.have.length(1);
+		let lyph = await Lyph.get(href);
+		
+		expect(lyph.href).to.equal(href);
 
-		await lyphs[0].delete();
+		expect(Lyph.hasLocal(href)).to.be.true;
+		
+		lyph.delete();
+		
+		expect(Lyph.hasLocal(href)).to.be.false;
+		
+		
+		
 	});
 	
 });

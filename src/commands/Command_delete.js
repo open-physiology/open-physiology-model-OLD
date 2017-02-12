@@ -19,8 +19,8 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 			...options,
 			commandDependencies: [
 				entity.originCommand,
-				...entity.editCommands,
-				...options.commandDependencies
+				...(entity.editCommands || []),
+				...(options.commandDependencies || [])
 			]
 		});
 		this.entity = entity;
@@ -51,7 +51,7 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 		
 		/* track this command in the entity */
 		this.entity.deleteCommand = this;
-		this.pSubject('isDeleted') .next(true);
+		this.entity.pSubject('isDeleted') .next(true);
 	}
 	
 	toJSON(options = {}) {

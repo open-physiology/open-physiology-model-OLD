@@ -14918,13 +14918,13 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'hasCache',
 				value: function hasCache(entityOrAddress) {
 					var entity = this.getLocal(entityOrAddress);
-					return entity && !entity.isPlaceholder; //[$$isPlaceholder];
+					return entity && !entity.isPlaceholder;
 				}
 			}, {
 				key: 'hasPlaceholder',
 				value: function hasPlaceholder(entityOrAddress) {
 					var entity = this.getLocal(entityOrAddress);
-					return entity && entity.isPlaceholder; //[$$isPlaceholder];
+					return entity && entity.isPlaceholder;
 				}
 			}, {
 				key: 'hasLocal',
@@ -14933,8 +14933,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 			}, {
 				key: 'getLocal',
-				value: function getLocal( // TODO: make private?
-				entityOrAddress) {
+				value: function getLocal(entityOrAddress) {
 					/* is it already a local entity? */
 					if (_instanceof(entityOrAddress, Entity)) {
 						return entityOrAddress;
@@ -14954,6 +14953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					/* make sure the retrieved entity is of the expected class */
 					(0, _misc.constraint)(this.hasInstance(entity), (0, _misc.humanMsg)(_templateObject2, JSON.stringify(address.href), this.name, entity.constructor.name));
 	
+					/***/
 					return entity;
 				}
 			}, {
@@ -17236,7 +17236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				_classCallCheck(this, Command_delete);
 	
 				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Command_delete).call(this, _extends({}, options, {
-					commandDependencies: [entity.originCommand].concat(_toConsumableArray(entity.editCommands), _toConsumableArray(options.commandDependencies))
+					commandDependencies: [entity.originCommand].concat(_toConsumableArray(entity.editCommands || []), _toConsumableArray(options.commandDependencies || []))
 				})));
 	
 				_this.entity = null;
@@ -17258,7 +17258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					/* track this command in the entity */
 					this.entity.deleteCommand = this;
-					this.pSubject('isDeleted').next(true);
+					this.entity.pSubject('isDeleted').next(true);
 				}
 			}, {
 				key: 'toJSON',

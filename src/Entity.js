@@ -245,14 +245,14 @@ export default (environment) => {
 			entityOrAddress: Entity | { href: string } | string | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
-			return entity && !entity.isPlaceholder;//[$$isPlaceholder];
+			return entity && !entity.isPlaceholder;
 		}
 		
 		static hasPlaceholder(
 			entityOrAddress: Entity | { href: string } | string | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
-			return entity && entity.isPlaceholder;//[$$isPlaceholder];
+			return entity && entity.isPlaceholder;
 		}
 		
 		static hasLocal(
@@ -261,7 +261,7 @@ export default (environment) => {
 			return !!this.getLocal(entityOrAddress);
 		}
 		
-		static getLocal( // TODO: make private?
+		static getLocal(
 			entityOrAddress: Entity | { href: string } | string
 		) : this {
 			/* is it already a local entity? */
@@ -283,6 +283,7 @@ export default (environment) => {
 				but of class '${entity.constructor.name}'.
 			`);
 			
+			/***/
 			return entity;
 		}
 		
