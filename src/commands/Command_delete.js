@@ -46,12 +46,12 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 		
 		
 		// TODO: Command_delete on all relevant linked entities (test if they're already scheduled for deletion)
-		// TODO: Keep the entity in memory (this.entity) so the deletion can be rolled back.
+		// TODO: Keep a reference to the entity (this.entity) so the deletion can be rolled back.
 		
 		
 		/* track this command in the entity */
 		this.entity.deleteCommand = this;
-		this.entity.pSubject('isDeleted') .next(true);
+		this.entity.pSubject('isDeleted').next(true);
 	}
 	
 	toJSON(options = {}) {

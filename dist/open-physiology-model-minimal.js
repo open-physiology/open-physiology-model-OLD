@@ -15656,7 +15656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					(0, _misc.constraint)(!this.entity.isPlaceholder, (0, _misc.humanMsg)(_templateObject2));
 	
 					// TODO: Command_delete on all relevant linked entities (test if they're already scheduled for deletion)
-					// TODO: Keep the entity in memory (this.entity) so the deletion can be rolled back.
+					// TODO: Keep a reference to the entity (this.entity) so the deletion can be rolled back.
 	
 	
 					/* track this command in the entity */
@@ -16821,7 +16821,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						var _context5;
 	
 						this.set((_context5 = (_context5 = this[_symbols.$$desc].default, _misc.callOrReturn).call(_context5, this[_symbols.$$owner]), _cloneDeep2.default).call(_context5), { createEditCommand: false });
-					} else if ('value' in desc) {
+					} else if ('value' in this[_symbols.$$desc]) {
 						var _context6;
 	
 						this.set((_context6 = (_context6 = this[_symbols.$$desc].value, _misc.callOrReturn).call(_context6, this[_symbols.$$owner]), _cloneDeep2.default).call(_context6), { createEditCommand: false });

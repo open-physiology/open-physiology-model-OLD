@@ -93,7 +93,7 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		if (value::isUndefined()) {
 			if ('default' in this[$$desc]) {
 				this.set(this[$$desc].default::callOrReturn(this[$$owner])::cloneDeep(), {createEditCommand: false});
-			} else if ('value' in desc) {
+			} else if ('value' in this[$$desc]) {
 				this.set(this[$$desc].value::callOrReturn(this[$$owner])::cloneDeep(), {createEditCommand: false});
 			}
 		}
