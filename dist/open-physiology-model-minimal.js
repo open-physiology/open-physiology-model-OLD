@@ -16221,8 +16221,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 							for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
 								var side = _arr2[_i2];
-								if (initialValues[side]) {
-									r.push(initialValues[side].originCommand);
+								if (values[side]) {
+									r.push(values[side].originCommand);
 								}
 							}
 						}

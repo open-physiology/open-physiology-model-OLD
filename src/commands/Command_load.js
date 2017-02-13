@@ -67,8 +67,8 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 					let r = [];
 					if (cls.isRelationship) {
 						for (let side of [1, 2]) {
-							if (initialValues[side]) {
-								r.push(initialValues[side].originCommand);
+							if (values[side]) {
+								r.push(values[side].originCommand);
 							}
 						}
 					}
