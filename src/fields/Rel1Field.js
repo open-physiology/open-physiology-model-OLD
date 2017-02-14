@@ -144,7 +144,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 	
 	static valueToJSON(value, options = {}) {
 		// const {entityToTemporaryHref = new Map} = options;
-		if (value === null) { return null }
+		if (!value) { return value }
 		const Entity = value.constructor.Entity;
 		return Entity.normalizeAddress(value, options);
 	}

@@ -19216,8 +19216,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
 				// const {entityToTemporaryHref = new Map} = options;
-				if (value === null) {
-					return null;
+				if (!value) {
+					return value;
 				}
 				var Entity = value.constructor.Entity;
 				return Entity.normalizeAddress(value, options);
