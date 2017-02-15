@@ -273,5 +273,47 @@ describe("regression tests", () => {
 
 		console.log("Layer", hasLayer.toJSON());
 	});
-	
+
+	it("Resource type has a relationship with defining template", async () => {
+
+		let committedClasses = [];
+
+		let environment = moduleFactory({
+			async load(addresses, options = {}) {
+				let res = [];
+				for (let address of Object.values(addresses)) {
+					if (address.class === "Material")
+						res.push({
+							"name": "Urine",
+							"id": 1,
+							"href": "192.168.99.100://Material/1",
+							"class": "Material"
+						});
+				}
+				return res;
+			},
+			async commit_new({commandType, values}) {
+				committedClasses.push(values.class);
+				return values;
+			},
+		});
+
+		const model = environment.classes;
+
+		let material = model.Material.new({name: "Kidney",
+			"id": 1,
+			"href": "192.168.99.100://Material/1"},
+			{acceptHref: true});
+		await material.commit();
+
+		let materialType = model.Type.new({name: "Kidney type", definition: material.href,
+			"id": 2,
+			"href": "192.168.99.100://Type/2"},
+			{acceptHref: true});
+		await materialType.commit();
+
+		console.log("Committed classes", committedClasses);
+		expect(committedClasses).to.include("DefinesType");
+	});
+
 });
