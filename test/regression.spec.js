@@ -274,7 +274,7 @@ describe("regression tests", () => {
 		console.log("Layer", hasLayer.toJSON());
 	});
 
-	it("Resource type has a relationship with defining template", async () => {
+	it("Resource is committed together with its relationships", async () => {
 
 		let committedClasses = [];
 
@@ -285,8 +285,7 @@ describe("regression tests", () => {
 					if (address.class === "Material")
 						res.push({
 							"name": "Urine",
-							"id": 1,
-							"href": "192.168.99.100://Material/1",
+							"href": "open-physiology.org://Material/1",
 							"class": "Material"
 						});
 				}
@@ -294,25 +293,27 @@ describe("regression tests", () => {
 			},
 			async commit_new({commandType, values}) {
 				committedClasses.push(values.class);
+				if (values.class === "Material"){
+					values.href = "open-physiology.org://Material/1";
+				} else
+					if (values.class === "Type"){
+						values.href = "open-physiology.org://Type/2";
+					}
+					else {
+						values.href = "open-physiology.org://Resource/10";
+					}
 				return values;
 			},
 		});
 
 		const model = environment.classes;
 
-		let material = model.Material.new({name: "Kidney",
-			"id": 1,
-			"href": "192.168.99.100://Material/1"},
-			{acceptHref: true});
+		let material = model.Material.new({name: "Kidney"});
 		await material.commit();
 
-		let materialType = model.Type.new({name: "Kidney type", definition: material.href,
-			"id": 2,
-			"href": "192.168.99.100://Type/2"},
-			{acceptHref: true});
+		let materialType = model.Type.new({name: "Kidney type", definition: material});
 		await materialType.commit();
 
-		console.log("Committed classes", committedClasses);
 		expect(committedClasses).to.include("DefinesType");
 	});
 
