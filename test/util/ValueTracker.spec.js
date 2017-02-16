@@ -147,6 +147,34 @@ describe("ValueTracker class", () => {
 		
 	});
 	
+	it("can invalidate a property's cache to re-emit the same value again", () => {
+		
+		let obj = new Vector();
+		
+		record( obj.p('x') );
+
+		expect(log).to.eql([0]);
+		
+		obj.p('x').next(1);
+		
+		expect(log).to.eql([0, 1]);
+		
+		obj.p('x').next(1);
+		
+		expect(log).to.eql([0, 1]);
+		
+		obj.p('x').invalidateCache();
+		
+		obj.p('x').next(1);
+		
+		expect(log).to.eql([0, 1, 1]);
+		
+		obj.p('x').next(1);
+		
+		expect(log).to.eql([0, 1, 1]);
+		
+	});
+	
 	
 	
 });

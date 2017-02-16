@@ -133,8 +133,14 @@ export default class ValueTracker {
 			::filter              (this::isValid    )
 			::map                 (this::transform  )
 			// ::takeUntil           (this[$$takeUntil])
-			::distinctUntilChanged(this::isEqual    );
+			::distinctUntilChanged(this::isEqual    )
+			::filter              (v => v !== invalidCache);
 		this[$$properties][name] = readonly ? subject.asObservable() : subject;
+		
+		const invalidCache = Symbol();
+		subject.invalidateCache = () => {
+			subject.next(invalidCache);
+		};
 		
 		/* keep track of current value */
 		this[$$properties][name].subscribe((v) => {
