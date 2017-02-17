@@ -390,26 +390,32 @@ export default ({backend}) => {
 			
 			/* scheduling commits that need to happen before this one */
 			const commandsToCommitBeforeMe = new Set;
-			
 			// dependency commits
 			for (let [dep,,{commitDependency}] of commandGraph.verticesTo(this)) {
 				if (!commitDependency || dep[$$committing] || dep[$$committed]) { continue }
 				commandsToCommitBeforeMe.add(dep);
 			}
 			
+			/* scheduling commits that need to be forced after this one */
+			const commandsToCommitAfterMe = new Set;
 			// forced commits
 			for (let [rdep,,{forcedDependency}] of commandGraph.verticesFrom(this)) {
 				if (!forcedDependency)                       { continue }
 				if (rdep[$$committing] || rdep[$$committed]) { continue }
-				commandsToCommitBeforeMe.add(rdep);
+				commandsToCommitAfterMe.add(rdep);
 			}
 			
-			/* await those commits first */
+			/* await dependency commits first */
 			await Promise.all([...commandsToCommitBeforeMe].map(c=>c.commit()));
 			
 			/* then commit this command */
 			//debugger;
 			await this.localCommit();
+			
+			/* then await forced dependent commits */
+			await Promise.all([...commandsToCommitAfterMe].map(c=>c.commit()));
+			
+			/* toggle flags */
 			this[$$committing] = false;
 			this[$$committed]  = true;
 			

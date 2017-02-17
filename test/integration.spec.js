@@ -75,6 +75,7 @@ describe("integrated workflow", () => {
 
 	});
 
+	
 	it("can create new Materials and link them", async () => {
 		const {Material, ContainsMaterial, Type} = environment.classes;
 
@@ -121,6 +122,8 @@ describe("integrated workflow", () => {
 		
 		waterType.definition = newWater;
 
+		// debugger;
+		
 		await newWater.commit();
 		await waterType.commit();
 
@@ -132,11 +135,7 @@ describe("integrated workflow", () => {
 			name: waterName2
 		} = newWater;
 
-		// debugger;
-
 		newWater.rollback();
-
-		// debugger;
 
 		expect(newWater).to.have.a.property('href', waterHref2);
 		expect(newWater).to.have.a.property('name', waterName2);
@@ -145,8 +144,6 @@ describe("integrated workflow", () => {
 			1: blood,
 			2: waterType
 		});
-
-		// debugger;
 
 		expect(bloodHasWater).to.have.property(1, blood);
 		expect(bloodHasWater).to.have.property(2, waterType);
@@ -159,10 +156,37 @@ describe("integrated workflow", () => {
 
 		await bloodHasWater.commit();
 	
-		// debugger;
-	
 		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
 
+	});
+
+	// TODO: fix bug that occurs on rollback
+	
+	it.skip("can create new Materials and link them (simpler)", async () => {
+		const {Material, ContainsMaterial, Type} = environment.classes;
+
+		let water1 = Material.new({ name: "Water 1" });
+		
+		let waterType = Type.new({ definition: water1 });
+		
+		water1.rollback();
+		
+		let water2 = Material.new({ name: "Water 2" });
+
+		console.log('(((((1)))))');
+		
+		await water2.commit();
+		
+		console.log('(((((2)))))');
+
+		waterType.definition = water2;
+		
+		console.log('(((((3)))))');
+		
+		await waterType.commit();
+		
+		console.log('(((((4)))))');
+		
 	});
 	
 	it("can retrieve an existing entity from the backend (1)", async () => {

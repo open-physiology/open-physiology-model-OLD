@@ -110,10 +110,17 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 				let rel = [...correspondingRelField]
 					.find(rel => rel.fields[desc.keyInRelationship]         .get() === owner &&
 					             rel.fields[desc.codomain.keyInRelationship].get() === newRes);
+				// TODO: Should we just remove corresponding relationship if it exists,
+				//     : and create a new one in any case?
 				if (!rel) {
 					rel = desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: newRes
+					}, {
+						forcedDependencies: [owner.originCommand]
+						// TODO: this forced dependency is a stopgap measure;
+						//     : It should be the command that performed the edit,
+						//     : which is not necessarily the origin command
 					});
 					correspondingRelField.add(rel);
 				}

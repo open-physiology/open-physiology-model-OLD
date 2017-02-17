@@ -381,7 +381,6 @@ export default (environment) => {
 			initialValues: {} = {},
 			options      : {} = {}
 		) {
-			
 			/* initialize value tracking */
 			super();
 			super.setValueTrackerOptions({
@@ -425,7 +424,7 @@ export default (environment) => {
 		
 		static objectToJSON(obj, options = {}) {
 			let { minimal, sourceEntity } = options;
-			// TODO: rather than sourceEntity, accept an entity class,
+			// TODO: rather than sourceEntity, accept an entity CLASS,
 			//       which should have a good description of the fields
 			let result = {};
 			for (let [key, value] of obj::entries()) {

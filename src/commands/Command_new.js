@@ -115,9 +115,7 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 	
 	async localCommit() {
 		const backend = cls.environment.backend;
-		//debugger;
 		const response = await backend.commit_new(this.toJSON());
-		//debugger;
 		this.handleCommitResponse(response);
 	}
 	

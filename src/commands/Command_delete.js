@@ -30,7 +30,8 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 		return new Set(this.entity ? [this.entity] : []);
 	}
 
-	entity = null;
+	entity    = null;
+	oldValues = null;
 	
 	localRun() {
 		/* sanity checks */
@@ -49,8 +50,16 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 		// TODO: Keep a reference to the entity (this.entity) so the deletion can be rolled back.
 		
 		
+		
 		/* track this command in the entity */
 		this.entity.deleteCommand = this;
+		
+		/* invalidate field subject caches */
+		for (let key of this.entity.fields::keys()) {
+			this.entity.p(key).invalidateCache();
+		}
+		
+		
 		this.entity.pSubject('isDeleted').next(true);
 	}
 	

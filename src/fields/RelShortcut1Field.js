@@ -9,6 +9,7 @@ import 'rxjs/add/operator/do';
 import entries     from 'lodash-bound/entries';
 import isObject    from 'lodash-bound/isObject';
 import isUndefined from 'lodash-bound/isUndefined';
+import last        from 'lodash-bound/last';
 
 import {defineProperty} from 'bound-native-methods';
 
@@ -93,13 +94,39 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 			::switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
 			.subscribe( this.p('value') );
 	
+		// /* keep the relationship up to date */
+		// this.p('value')
+		// 	// .do((v) => {
+		// 	// 	console.log('relshortcutfield value:', v);
+		// 	// })
+		// 	::waitUntilConstructed()
+		// 	.subscribe((scValue) => {
+		// 		// const relValue = owner.fields[desc.keyInResource].get();
+		// 		if (scValue && !desc.relationshipClass.abstract) {
+		// 			// TODO: Is the abstractness test above really the best way?
+		// 			const rel = desc.relationshipClass.new({
+		// 				[desc.keyInRelationship]         : owner,
+		// 				[desc.codomain.keyInRelationship]: scValue
+		// 			}, {
+		// 				forcedDependencies: [owner.originCommand]
+		// 				// TODO: this forced dependency is a stopgap measure;
+		// 				//     : It should be the command that performed the edit,
+		// 				//     : which is not necessarily the origin command
+		// 			});
+		// 			owner.fields[desc.keyInResource].set(rel, { createEditCommand: false });
+		// 		}
+		// 	});
+		
 		/* keep the relationship up to date */
-		this.p('value')::waitUntilConstructed()
+		this.p('value')
+			// .do((v) => {
+			// 	console.log('relshortcutfield value:', v);
+			// })
+			::waitUntilConstructed()
 			.subscribe((scValue) => {
 				const relValue = owner.fields[desc.keyInResource].get();
-				if (relValue) {
+				if (relValue && relValue[desc.codomain.keyInRelationship]) {
 					// TODO: should we wait until relValue.p('fieldsInitialized')?
-					
 					relValue.p('fieldsInitialized')
 						::filter(v=>!!v)
 						::take(1)
@@ -108,9 +135,17 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 						});
 				} else if (scValue && !desc.relationshipClass.abstract) {
 					// TODO: Is the abstractness test above really the best way?
+
+					/* find relevant command */
+					let forcedDep = owner.editCommands::last() || owner.originCommand;
 					const rel = desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: scValue
+					}, {
+						forcedDependencies: [forcedDep]
+						// TODO: this forced dependency is a stopgap measure;
+						//     : It should be the command that performed the edit,
+						//     : which is not necessarily the origin command
 					});
 					owner.fields[desc.keyInResource].set(rel, { createEditCommand: false });
 				}

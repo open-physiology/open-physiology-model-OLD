@@ -89,13 +89,13 @@ export default (cls) => class Command_edit extends cls.TrackedCommand {
 			}
 		}
 		
+		/* track this command in the entity */
+		this.entity.editCommands.push(this);
+		
 		/* set the new values */
 		for (let [key, newValue] of this.newValues::entries()) {
 			this.entity.fields[key].set(newValue, { createEditCommand: false });
 		}
-		
-		/* track this command in the entity */
-		this.entity.editCommands.push(this);
 		
 		/* if changes were made, the entity is no longer pristine */
 		if (thereAreChanges) {

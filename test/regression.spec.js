@@ -231,7 +231,7 @@ describe("regression tests", () => {
 		expect(lyphs).to.have.length(1);
 	});
 
-	it("Relationship resources in commit_new have property class", async () => {
+	it("Relationship resources in commit_new should have property 'class'", async () => {
 		let environment = moduleFactory({
 			async loadAll(cls, options = {}) {
 				return [{
@@ -263,58 +263,24 @@ describe("regression tests", () => {
 		await hasLayer.commit();
 	});
 
-	it("toJSON() does not fail on relationships", async () => {
-
-		const model = environment.classes;
-
-		let lyph1 = model.Lyph.new({name: "Kidney"});
-		let lyph2 = model.Lyph.new({name: "Kidney lobus"});
-		let hasLayer = model.HasLayer.new({ 1: lyph1, 2: lyph2});
-
-		console.log("Layer", hasLayer.toJSON());
+	it("toJSON() should not fail on relationships", async () => {
+		const {Lyph, HasLayer} = environment.classes;
+		let lyph1 = Lyph.new({name: "Kidney"});
+		let lyph2 = Lyph.new({name: "Kidney lobus"});
+		let hasLayer = HasLayer.new({ 1: lyph1, 2: lyph2});
+		expect(::hasLayer.toJSON).not.to.throw;
 	});
 
-	it("Resource is committed together with its relationships", async () => {
-
-		let committedClasses = [];
-
-		let environment = moduleFactory({
-			async load(addresses, options = {}) {
-				let res = [];
-				for (let address of Object.values(addresses)) {
-					if (address.class === "Material")
-						res.push({
-							"name": "Urine",
-							"href": "open-physiology.org://Material/1",
-							"class": "Material"
-						});
-				}
-				return res;
-			},
-			async commit_new({commandType, values}) {
-				committedClasses.push(values.class);
-				if (values.class === "Material"){
-					values.href = "open-physiology.org://Material/1";
-				} else
-					if (values.class === "Type"){
-						values.href = "open-physiology.org://Type/2";
-					}
-					else {
-						values.href = "open-physiology.org://Resource/10";
-					}
-				return values;
-			},
-		});
-
-		const model = environment.classes;
-
-		let material = model.Material.new({name: "Kidney"});
-		await material.commit();
-
-		let materialType = model.Type.new({name: "Kidney type", definition: material});
-		await materialType.commit();
-
-		expect(committedClasses).to.include("DefinesType");
+	it("Resource should be committed together with its relationships", async () => {
+		const {Lyph, HasLayer} = environment.classes;
+		
+		let heart = Lyph.new({name: "Heart"});
+		await heart.commit();
+		
+		let body = Lyph.new({ name: "Body", layers: [heart] });
+		await body.commit();
+		
+		expect(backend.readAll()).to.include.something.with.property('class', 'HasLayer');
 	});
 
 });
