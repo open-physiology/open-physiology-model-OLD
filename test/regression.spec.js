@@ -6,7 +6,7 @@ import {map} from 'rxjs/operator/map';
 import {take} from 'rxjs/operator/take';
 import {toPromise} from 'rxjs/operator/toPromise';
 import {filter} from '../src/util/bound-hybrid-functions';
-
+import cloneDeep   from 'lodash-bound/cloneDeep';
 
 describe("regression tests", () => {
 
@@ -282,5 +282,47 @@ describe("regression tests", () => {
 		
 		expect(backend.readAll()).to.include.something.with.property('class', 'HasLayer');
 	});
+
+	it("Problem with href while committing resources with relationships", async () => {
+		let UID = 0;
+
+		let environment = moduleFactory({
+			async commit_new({values}) {
+				expect(values).not.to.be.null;
+				values.id = ++UID;
+				values.href = "open-physiology.org://" + UID;
+				return backend.create(values)::cloneDeep();
+			},
+			async load(addresses, options = {}) {
+				return addresses.map(addr => backend.read(addr)::cloneDeep());
+			},
+			async loadAll(cls, options = {}) {
+				return backend.readAll().filter(e => cls.hasSubclass(cls.environment.classes[e.class]))::cloneDeep();
+			}
+		});
+
+		const {Measurable, Causality, IsCauseOf} = environment.classes;
+
+		let measurable = Measurable.new({ name:  "Concentration of water"});
+		let causality = Causality.new({ name:   "Functional dependency", cause:  measurable});
+
+		await measurable.commit();
+		await causality.commit();
+
+		let isCauseOf = [...await IsCauseOf.getAll()][0];
+		console.log(isCauseOf.toJSON());
+		expect(isCauseOf).to.have.property(1).which.is.not.null;
+		expect(isCauseOf).to.have.property(2).which.is.not.null;
+		expect(isCauseOf[1].href).to.equal(measurable.href);
+		expect(isCauseOf[2].href).to.equal(causality.href);
+
+		//NK: without overriding environment sometimes relationship refers to temporary href of causality
+		//This is not persistent bug, looks like the sequence of commit operations may vary and
+		//occasionally the relationship is eother attempted to be committed before one of its ends
+		//or reference to it is not updated yet
+
+
+	});
+
 
 });
