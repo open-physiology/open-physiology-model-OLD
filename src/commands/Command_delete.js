@@ -1,5 +1,7 @@
 import {constraint, humanMsg} from '../util/misc';
 
+import deepFreeze from 'deep-freeze-strict';
+
 // import {
 // 	$$isPlaceholder
 // } from '../symbols';
@@ -72,7 +74,7 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 	
 	async localCommit() {
 		const backend = cls.environment.backend;
-		const response = await backend.commit_delete(this.toJSON());
+		const response = await backend.commit_delete(deepFreeze(this.toJSON()));
 		this.handleCommitResponse(response);
 	}
 	

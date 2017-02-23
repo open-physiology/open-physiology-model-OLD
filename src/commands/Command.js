@@ -11,6 +11,8 @@ import every       from 'lodash-bound/every';
 import size        from 'lodash-bound/size';
 import entries     from 'lodash-bound/entries';
 
+import deepFreeze  from 'deep-freeze-strict';
+
 import ValueTracker from '../util/ValueTracker';
 
 import {map, filter} from '../util/bound-hybrid-functions';
@@ -541,11 +543,11 @@ export default ({backend}) => {
 			
 			// debugger;
 			
-			const response = await backend.commit_batch({
+			const response = await backend.commit_batch(deepFreeze({
 				commandType:    'batch',
 				temporaryHrefs: [...temporaryHrefs],
 				commands:       [...commandListJSON]
-			});
+			}));
 			
 			// debugger;
 			

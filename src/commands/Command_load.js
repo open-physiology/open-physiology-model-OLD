@@ -1,6 +1,7 @@
 import isFunction from 'lodash-bound/isFunction';
 import isString   from 'lodash-bound/isString';
 import entries    from 'lodash-bound/entries';
+import deepFreeze from 'deep-freeze-strict';
 import assert     from 'power-assert';
 import {setPrototype} from 'bound-native-methods';
 import {

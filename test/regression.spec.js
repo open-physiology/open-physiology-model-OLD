@@ -289,9 +289,11 @@ describe("regression tests", () => {
 		let environment = moduleFactory({
 			async commit_new({values}) {
 				expect(values).not.to.be.null;
+				values = values::cloneDeep();
 				values.id = ++UID;
 				values.href = "open-physiology.org://" + UID;
-				return backend.create(values)::cloneDeep();
+				let result = backend.create(values, values.href);
+				return result;
 			},
 			async load(addresses, options = {}) {
 				return addresses.map(addr => backend.read(addr)::cloneDeep());
@@ -310,18 +312,10 @@ describe("regression tests", () => {
 		await causality.commit();
 
 		let isCauseOf = [...await IsCauseOf.getAll()][0];
-		console.log(isCauseOf.toJSON());
 		expect(isCauseOf).to.have.property(1).which.is.not.null;
 		expect(isCauseOf).to.have.property(2).which.is.not.null;
 		expect(isCauseOf[1].href).to.equal(measurable.href);
 		expect(isCauseOf[2].href).to.equal(causality.href);
-
-		//NK: without overriding environment sometimes relationship refers to temporary href of causality
-		//This is not persistent bug, looks like the sequence of commit operations may vary and
-		//occasionally the relationship is eother attempted to be committed before one of its ends
-		//or reference to it is not updated yet
-
-
 	});
 
 

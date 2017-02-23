@@ -59,48 +59,55 @@ class Environment {
 		/* issue an error if/when commit or load were called but not provided */
 		const noOpMsg = (op) => async () => { console.error(humanMsg`No '${op}' behavior was specified to the module.`) };
 		const thisEnvironment = this;
-		async function defaultBatchCommitter({temporaryHrefs, commands}) {
-			/* a function to replace temporary href with new href */
-			function replaceTemporaryHrefs({futureCommand, temporaryHref, newHref}) {
-				let hrefObjects = [];
-				switch (futureCommand.commandType) {
-					case 'new': {
-						const cls = thisEnvironment.classes[futureCommand.values.class];
-						const fieldKeys = cls.isResource
-							? [...cls.relationships::keys(), ...cls.relationshipShortcuts::keys()]
-							: [1, 2];
-						for (let key of fieldKeys) {
-							if (futureCommand.values[key]::isArray()) {
-								hrefObjects.push(...futureCommand.values[key]);
-							} else {
-								hrefObjects.push(futureCommand.values[key]);
-							}
+		
+		
+		
+		/* a function to replace temporary href with new href */
+		function replaceTemporaryHrefs({futureCommand, temporaryHref, newHref}) {
+			let hrefObjects = [];
+			switch (futureCommand.commandType) {
+				case 'new': {
+					const cls = thisEnvironment.classes[futureCommand.values.class];
+					const fieldKeys = cls.isResource
+						? [...cls.relationships::keys(), ...cls.relationshipShortcuts::keys()]
+						: [1, 2];
+					for (let key of fieldKeys) {
+						if (futureCommand.values[key]::isArray()) {
+							hrefObjects.push(...futureCommand.values[key]);
+						} else {
+							hrefObjects.push(futureCommand.values[key]);
 						}
-					} break;
-					case 'edit': {
-						hrefObjects.push(futureCommand.entity);
-						const cls = thisEnvironment.classes[futureCommand.entity.class];
-						const fieldKeys = cls.isResource
-							? [...cls.relationships::keys(), ...cls.relationshipShortcuts::keys()]
-							: [1, 2];
-						for (let key of fieldKeys) {
-							if (futureCommand.newValues[key]::isArray()) {
-								hrefObjects.push(...futureCommand.newValues[key]);
-							} else {
-								hrefObjects.push(futureCommand.newValues[key]);
-							}
-						}
-					} break;
-					case 'delete': {
-						hrefObjects.push(futureCommand.entity);
-					} break;
-				}
-				for (let hrefObject of hrefObjects) {
-					if (hrefObject && hrefObject.href === temporaryHref) {
-						hrefObject.href = newHref;
 					}
+				} break;
+				case 'edit': {
+					hrefObjects.push(futureCommand.entity);
+					const cls = thisEnvironment.classes[futureCommand.entity.class];
+					const fieldKeys = cls.isResource
+						? [...cls.relationships::keys(), ...cls.relationshipShortcuts::keys()]
+						: [1, 2];
+					for (let key of fieldKeys) {
+						if (futureCommand.newValues[key]::isArray()) {
+							hrefObjects.push(...futureCommand.newValues[key]);
+						} else {
+							hrefObjects.push(futureCommand.newValues[key]);
+						}
+					}
+				} break;
+				case 'delete': {
+					hrefObjects.push(futureCommand.entity);
+				} break;
+			}
+			for (let hrefObject of hrefObjects) {
+				if (hrefObject && hrefObject.href === temporaryHref) {
+					hrefObject.href = newHref;
 				}
 			}
+		}
+		
+		async function defaultBatchCommitter({temporaryHrefs, commands}) {
+			
+			/* get unfrozen version */
+			commands = commands::cloneDeep();
 			
 			/* prepare response object */
 			let response = {

@@ -47,9 +47,9 @@ export const simpleMockHandlers = () => {
 	/* and the frontend interface (implementing commit & load) */
 	const backend = {
 		
-		create(values) {
+		create(values, customHref) {
 			const id   = _uniqueId()::parseInt();
-			const href = `mock-backend://${id}`;
+			const href = customHref || `mock-backend://${id}`;
 			return storageByHref[href] = { ...values, href };
 		},
 		

@@ -34,6 +34,7 @@
     "babel-plugin-transform-flow-strip-types": "^6.8.0",
     "babel-plugin-transform-function-bind": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "6",
+    "babel-plugin-transform-strict-mode": "^6.22.0",
     "babel-plugin-typecheck": "^3.9.0",
     "babel-plugin-unassert": "^2.1.1",
     "babel-polyfill": "6",
@@ -57,6 +58,7 @@
   "dependencies": {
     "babel-helpers": "^6.8.0",
     "bound-native-methods": "^0.1.6",
+    "deep-freeze-strict": "^1.1.1",
     "fraction.js": "^3.3.1",
     "graph.js": "^1.20.10",
     "lodash": "^4.13.1",

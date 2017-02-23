@@ -3,6 +3,7 @@ import isString   from 'lodash-bound/isString';
 import entries    from 'lodash-bound/entries';
 import isArray    from 'lodash-bound/isArray';
 import assert     from 'power-assert';
+import deepFreeze from 'deep-freeze-strict';
 
 import {constraint, humanMsg} from '../util/misc';
 
@@ -115,7 +116,7 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 	
 	async localCommit() {
 		const backend = cls.environment.backend;
-		const response = await backend.commit_new(this.toJSON());
+		const response = await backend.commit_new(deepFreeze(this.toJSON()));
 		this.handleCommitResponse(response);
 	}
 	

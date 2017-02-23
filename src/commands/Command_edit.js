@@ -5,6 +5,8 @@ import keys    from 'lodash-bound/keys';
 import entries from 'lodash-bound/entries';
 import isArray from 'lodash-bound/isArray';
 
+import deepFreeze from 'deep-freeze-strict';
+
 // import {
 // 	$$isPlaceholder
 // } from '../symbols';
@@ -114,7 +116,7 @@ export default (cls) => class Command_edit extends cls.TrackedCommand {
 	async localCommit() {
 		const backend = cls.environment.backend;
 		// debugger;
-		let response = await backend.commit_edit(this.toJSON());
+		let response = await backend.commit_edit(deepFreeze(this.toJSON()));
 		// debugger;
 		this.handleCommitResponse(response);
 	}
