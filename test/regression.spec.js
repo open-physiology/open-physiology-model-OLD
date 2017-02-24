@@ -318,5 +318,65 @@ describe("regression tests", () => {
 		expect(isCauseOf[2].href).to.equal(causality.href);
 	});
 
+	it("Canonical tree nodes should not duplicate", async() => {
+		let UID = 0;
+		let entitiesInDB = [];
+		let environment = moduleFactory({
+			async commit_new({values}) {
+				let result = backend.create(values, values.href);
+				entitiesInDB.push(result);  //Collect entities that would be put to DB by server
+				return result;
+			},
+			async load(addresses, options = {}) {
+				return addresses.map(addr => backend.read(addr)::cloneDeep());
+			},
+			async loadAll(cls, options = {}) {
+				return backend.readAll().filter(e => cls.hasSubclass(cls.environment.classes[e.class]))::cloneDeep();
+			}
+		});
+
+		const model = environment.classes;
+
+		/* canonical trees */
+		let initial = {};
+
+		initial.canonicalTree1 = model.CanonicalTree.new({
+			name:  "SLN"});
+
+		initial.canonicalTree1_2 = model.CanonicalTree.new({
+			name:  "SLN tail 1"});
+
+		initial.canonicalTree1_3 = model.CanonicalTree.new({
+			name:  "SLN tail 2"});
+
+		initial.canonicalTreeBranch1_2 = model.CanonicalTreeBranch.new({
+			name:  "SLN 1st level branch",
+			parentTree: initial.canonicalTree1,
+			childTree: initial.canonicalTree1_2
+		});
+
+		initial.canonicalTreeBranch2_3 = model.CanonicalTreeBranch.new({
+			name:  "SLN 2st level branch",
+			parentTree: initial.canonicalTree1_2,
+			childTree: initial.canonicalTree1_3
+		});
+
+		for (let key of Object.keys(initial)){ await initial[key].commit(); }
+
+		let nodes = [...await model.CanonicalTree.getAll()];
+		let branches = [...await model.CanonicalTreeBranch.getAll()];
+		expect(nodes.length).to.be.equal(3);
+		expect(branches.length).to.be.equal(2);
+
+		let nodesInDB = entitiesInDB.filter(x => x.class === "CanonicalTree");
+		let branchesInDB = entitiesInDB.filter(x => x.class === "CanonicalTreeBranch");
+		//console.log("Nodes in DB", nodesInDB);
+		//console.log("Branches in DB", JSON.stringify(branchesInDB, null, 4));
+
+		expect(nodesInDB.length).to.be.equal(3);
+		expect(branchesInDB.length).to.be.equal(2);
+
+	})
+
 
 });
