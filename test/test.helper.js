@@ -34,29 +34,3 @@ export const it         = mocha.it         || gw.it;
 export const beforeEach = mocha.beforeEach || gw.beforeEach;
 export const afterEach  = mocha.afterEach  || gw.afterEach;
 export const expect     = chai.expect;
-
-/* special function for regression tests */
-function regression_(metaOrDesc, desc) {
-	let issue, date, description, fn;
-	if (metaOrDesc::isPlainObject()) {
-		[{issue, date}, description] =
-		[metaOrDesc   , desc];
-	} else {
-		[description, fn      ] =
-		[metaOrDesc , desc];
-	}
-	return `(regression${
-		issue ? `: issue #${issue}` : date ? `: ${date}` : ''
-	})${
-		description ? ` ${description}` : ''
-	}`;
-}
-export function regression(metaOrDesc, desc) {
-	return regression_(metaOrDesc, desc);
-}
-// regression.skip = function skip(metaOrDesc, descOrFn, optFn) {
-// 	return regression_(::it.skip, metaOrDesc, descOrFn, optFn);
-// };
-// regression.only = function only(metaOrDesc, descOrFn, optFn) {
-// 	return regression_(::it.only, metaOrDesc, descOrFn, optFn);
-// };
