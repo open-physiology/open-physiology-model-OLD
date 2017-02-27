@@ -14311,6 +14311,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'commit',
 				value: function () {
 					var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+						var response;
 						return regeneratorRuntime.wrap(function _callee2$(_context2) {
 							while (1) {
 								switch (_context2.prev = _context2.next) {
@@ -14328,8 +14329,9 @@ return /******/ (function(modules) { // webpackBootstrap
 										return this.localCommit();
 	
 									case 5:
-										this[$$committing] = false;
-										this[$$committed] = true;
+										response = _context2.sent;
+	
+										this.handleCommitResponse(response);
 	
 									case 7:
 									case 'end':
@@ -14345,6 +14347,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					return commit;
 				}()
+			}, {
+				key: 'handleCommitResponse',
+				value: function handleCommitResponse(response) {
+					this.localHandleCommitResponse(response);
+					this[$$committing] = false;
+					this[$$committed] = true;
+				}
 			}, {
 				key: 'rollback',
 				value: function rollback() {
@@ -14697,7 +14706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'commit',
 				value: function () {
 					var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-						var commandsToCommitBeforeMe, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _step8$value, dep, commitDependency, commandsToCommitAfterMe, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, _step9$value, rdep, forcedDependency;
+						var commandsToCommitBeforeMe, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _step8$value, dep, commitDependency, commandsToCommitAfterMe, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, _step9$value, rdep, forcedDependency, response;
 	
 						return regeneratorRuntime.wrap(function _callee3$(_context3) {
 							while (1) {
@@ -14872,16 +14881,16 @@ return /******/ (function(modules) { // webpackBootstrap
 										return this.localCommit();
 	
 									case 69:
-										_context3.next = 71;
+										response = _context3.sent;
+										_context3.next = 72;
 										return Promise.all([].concat(_toConsumableArray(commandsToCommitAfterMe)).map(function (c) {
 											return c.commit();
 										}));
 	
-									case 71:
+									case 72:
 	
-										/* toggle flags */
-										this[$$committing] = false;
-										this[$$committed] = true;
+										/* handle local commit response */
+										this.handleCommitResponse(response);
 	
 										/* post process entities (e.g., to set 'pristine' flag) */
 										this.postProcessAssociatedEntities();
@@ -15398,7 +15407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						var _context9,
 						    _this3 = this;
 	
-						var associatedEntities, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, command, _iteratorNormalCompletion22, _didIteratorError22, _iteratorError22, _iterator22, _step22, entity, temporaryHrefs, entityToTemporaryHref, _iteratorNormalCompletion21, _didIteratorError21, _iteratorError21, _iterator21, _step21, _entity, href, commandList, commandListJSON, response, i, localCommand, localResponse;
+						var associatedEntities, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, command, _iteratorNormalCompletion22, _didIteratorError22, _iteratorError22, _iterator22, _step22, entity, temporaryHrefs, entityToTemporaryHref, _iteratorNormalCompletion21, _didIteratorError21, _iteratorError21, _iterator21, _step21, _entity, href, commandListJSON;
 	
 						return regeneratorRuntime.wrap(function _callee4$(_context10) {
 							while (1) {
@@ -15559,7 +15568,7 @@ return /******/ (function(modules) { // webpackBootstrap
 										return _context10.finish(57);
 	
 									case 65:
-										commandList = [].concat(_toConsumableArray((_context9 = (_context9 = commandGraph.vertices_topologically(), _boundHybridFunctions.map).call(_context9, function (_ref24) {
+										this.commandList = [].concat(_toConsumableArray((_context9 = (_context9 = commandGraph.vertices_topologically(), _boundHybridFunctions.map).call(_context9, function (_ref24) {
 											var _ref25 = _slicedToArray(_ref24, 1);
 	
 											var cmd = _ref25[0];
@@ -15567,7 +15576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 										}), _boundHybridFunctions.filter).call(_context9, function (cmd) {
 											return _this3.commands.has(cmd);
 										})));
-										commandListJSON = _boundHybridFunctions.map.call(commandList, function (cmd) {
+										commandListJSON = (_context9 = this.commandList, _boundHybridFunctions.map).call(_context9, function (cmd) {
 											return cmd.toJSON({
 												entityToTemporaryHref: entityToTemporaryHref,
 												minimal: true
@@ -15578,8 +15587,6 @@ return /******/ (function(modules) { // webpackBootstrap
 										////////////////////////////////////////////////////////////
 										// report to backend
 	
-										// debugger;
-	
 										_context10.next = 69;
 										return backend.commit_batch((0, _deepFreezeStrict2.default)({
 											commandType: 'batch',
@@ -15588,25 +15595,9 @@ return /******/ (function(modules) { // webpackBootstrap
 										}));
 	
 									case 69:
-										response = _context10.sent;
+										return _context10.abrupt('return', _context10.sent);
 	
-	
-										// debugger;
-	
-	
-										////////////////////////////////////////////////////////////
-										// process response
-	
-										for (i = 0; i < commandList.length; ++i) {
-											localCommand = commandList[i];
-											localResponse = response.commands[i];
-	
-											localCommand.handleCommitResponse(localResponse);
-										}
-	
-										// debugger;
-	
-									case 71:
+									case 70:
 									case 'end':
 										return _context10.stop();
 								}
@@ -15620,6 +15611,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					return localCommit;
 				}()
+			}, {
+				key: 'localHandleCommitResponse',
+				value: function localHandleCommitResponse(response) {
+					for (var i = 0; i < this.commandList.length; ++i) {
+						var localCommand = this.commandList[i];
+						var localResponse = response.commands[i];
+						localCommand.handleCommitResponse(localResponse);
+					}
+				}
 			}, {
 				key: 'localRollback',
 				value: function localRollback() {}
@@ -15775,7 +15775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'localCommit',
 				value: function () {
 					var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-						var backend, response;
+						var backend;
 						return regeneratorRuntime.wrap(function _callee$(_context2) {
 							while (1) {
 								switch (_context2.prev = _context2.next) {
@@ -15785,11 +15785,9 @@ return /******/ (function(modules) { // webpackBootstrap
 										return backend.commit_delete((0, _deepFreezeStrict2.default)(this.toJSON()));
 	
 									case 3:
-										response = _context2.sent;
+										return _context2.abrupt('return', _context2.sent);
 	
-										this.handleCommitResponse(response);
-	
-									case 5:
+									case 4:
 									case 'end':
 										return _context2.stop();
 								}
@@ -15804,8 +15802,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					return localCommit;
 				}()
 			}, {
-				key: 'handleCommitResponse',
-				value: function handleCommitResponse(response) {
+				key: 'localHandleCommitResponse',
+				value: function localHandleCommitResponse(response) {
 					// TODO: stuff?
 				}
 			}, {
@@ -16081,24 +16079,19 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'localCommit',
 				value: function () {
 					var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-						var backend, response;
+						var backend;
 						return regeneratorRuntime.wrap(function _callee$(_context4) {
 							while (1) {
 								switch (_context4.prev = _context4.next) {
 									case 0:
 										backend = cls.environment.backend;
-										// debugger;
-	
 										_context4.next = 3;
 										return backend.commit_edit((0, _deepFreezeStrict2.default)(this.toJSON()));
 	
 									case 3:
-										response = _context4.sent;
+										return _context4.abrupt('return', _context4.sent);
 	
-										// debugger;
-										this.handleCommitResponse(response);
-	
-									case 5:
+									case 4:
 									case 'end':
 										return _context4.stop();
 								}
@@ -16113,8 +16106,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					return localCommit;
 				}()
 			}, {
-				key: 'handleCommitResponse',
-				value: function handleCommitResponse(response) {
+				key: 'localHandleCommitResponse',
+				value: function localHandleCommitResponse(response) {
 					// TODO: (update fields that changed since commit?)
 				}
 			}, {
@@ -16454,8 +16447,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'localCommit',
 				value: function localCommit() {}
 			}, {
-				key: 'handleCommitResponse',
-				value: function handleCommitResponse(response) {} // intentionally empty
+				key: 'localHandleCommitResponse',
+				value: function localHandleCommitResponse(response) {} // intentionally empty
 	
 			}, {
 				key: 'localRollback',
@@ -16677,7 +16670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'localCommit',
 				value: function () {
 					var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-						var backend, response;
+						var backend;
 						return regeneratorRuntime.wrap(function _callee$(_context2) {
 							while (1) {
 								switch (_context2.prev = _context2.next) {
@@ -16687,11 +16680,9 @@ return /******/ (function(modules) { // webpackBootstrap
 										return backend.commit_new((0, _deepFreezeStrict2.default)(this.toJSON()));
 	
 									case 3:
-										response = _context2.sent;
+										return _context2.abrupt('return', _context2.sent);
 	
-										this.handleCommitResponse(response);
-	
-									case 5:
+									case 4:
 									case 'end':
 										return _context2.stop();
 								}
@@ -16706,8 +16697,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					return localCommit;
 				}()
 			}, {
-				key: 'handleCommitResponse',
-				value: function handleCommitResponse(response) {
+				key: 'localHandleCommitResponse',
+				value: function localHandleCommitResponse(response) {
 					var _context3;
 	
 					if (this.options.acceptHref && (_context3 = this.initialValues.href, _isString2.default).call(_context3)) {}

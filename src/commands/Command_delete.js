@@ -74,11 +74,11 @@ export default (cls) => class Command_delete extends cls.TrackedCommand {
 	
 	async localCommit() {
 		const backend = cls.environment.backend;
-		const response = await backend.commit_delete(deepFreeze(this.toJSON()));
-		this.handleCommitResponse(response);
+		return await backend.commit_delete(deepFreeze(this.toJSON()));
+		// this.handleCommitResponse(response);
 	}
 	
-	handleCommitResponse(response) {
+	localHandleCommitResponse(response) {
 		// TODO: stuff?
 	}
 

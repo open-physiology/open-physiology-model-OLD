@@ -323,34 +323,23 @@ describe("regression tests", () => {
 
 		/* canonical trees */
 		let initial = {};
-
 		initial.canonicalTree1 = model.CanonicalTree.new({
 			name:  "SLN"});
-
 		initial.canonicalTree1_2 = model.CanonicalTree.new({
 			name:  "SLN tail 1"});
-
-		initial.canonicalTree1_3 = model.CanonicalTree.new({
-			name:  "SLN tail 2"});
-
 		initial.canonicalTreeBranch1_2 = model.CanonicalTreeBranch.new({
 			name:  "SLN 1st level branch",
 			parentTree: initial.canonicalTree1,
 			childTree: initial.canonicalTree1_2
 		});
 
-		initial.canonicalTreeBranch2_3 = model.CanonicalTreeBranch.new({
-			name:  "SLN 2st level branch",
-			parentTree: initial.canonicalTree1_2,
-			childTree: initial.canonicalTree1_3
-		});
-
-		for (let key of Object.keys(initial)){ await initial[key].commit(); }
-
+		await initial.canonicalTree1.commit();
+		await initial.canonicalTreeBranch1_2.commit();
+		
 		let nodes    = backend.readAll()::filter(v => v.class === 'CanonicalTree');
 		let branches = backend.readAll()::filter(v => v.class === 'CanonicalTreeBranch');
-		expect(nodes.length).to.be.equal(3);
-		expect(branches.length).to.be.equal(2);
+		expect(nodes.length).to.be.equal(2);
+		expect(branches.length).to.be.equal(1);
 
 	})
 

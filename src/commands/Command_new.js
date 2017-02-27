@@ -116,11 +116,10 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 	
 	async localCommit() {
 		const backend = cls.environment.backend;
-		const response = await backend.commit_new(deepFreeze(this.toJSON()));
-		this.handleCommitResponse(response);
+		return await backend.commit_new(deepFreeze(this.toJSON()));
 	}
 	
-	handleCommitResponse(response) {
+	localHandleCommitResponse(response) {
 		assert(!!response.href, humanMsg`
 			The backend function commit_new needs to
 			return an object with an href property.

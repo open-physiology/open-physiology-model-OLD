@@ -129,7 +129,12 @@ export default ({backend}) => {
 			assert(!this[$$rollingBack], "Cannot commit a command that's in the process of being rolled back.");
 			if (this[$$committing] || this[$$committed]) { return }
 			this[$$committing] = true;
-			await this.localCommit();
+			let response = await this.localCommit();
+			this.handleCommitResponse(response);
+		}
+		
+		handleCommitResponse(response) {
+			this.localHandleCommitResponse(response);
 			this[$$committing] = false;
 			this[$$committed]  = true;
 		}
@@ -411,15 +416,13 @@ export default ({backend}) => {
 			await Promise.all([...commandsToCommitBeforeMe].map(c=>c.commit()));
 			
 			/* then commit this command */
-			//debugger;
-			await this.localCommit();
+			let response = await this.localCommit();
 			
 			/* then await forced dependent commits */
 			await Promise.all([...commandsToCommitAfterMe].map(c=>c.commit()));
 			
-			/* toggle flags */
-			this[$$committing] = false;
-			this[$$committed]  = true;
+			/* handle local commit response */
+			this.handleCommitResponse(response);
 			
 			/* post process entities (e.g., to set 'pristine' flag) */
 			this.postProcessAssociatedEntities();
@@ -526,12 +529,12 @@ export default ({backend}) => {
 				}
 			}
 			
-			const commandList = [
+			this.commandList = [
 				...commandGraph.vertices_topologically()
 					::map(([cmd]) => cmd)
 					::filter(cmd => this.commands.has(cmd))
 			];
-			const commandListJSON = commandList
+			const commandListJSON = this.commandList
 				::map(cmd => cmd.toJSON({
 					entityToTemporaryHref,
 					minimal: true
@@ -541,28 +544,19 @@ export default ({backend}) => {
 			////////////////////////////////////////////////////////////
 			// report to backend
 			
-			// debugger;
-			
-			const response = await backend.commit_batch(deepFreeze({
+			return await backend.commit_batch(deepFreeze({
 				commandType:    'batch',
 				temporaryHrefs: [...temporaryHrefs],
 				commands:       [...commandListJSON]
 			}));
-			
-			// debugger;
-			
-			
-			////////////////////////////////////////////////////////////
-			// process response
-			
-			for (let i = 0; i < commandList.length; ++i) {
-				const localCommand  = commandList[i];
+		}
+		
+		localHandleCommitResponse(response) {
+			for (let i = 0; i < this.commandList.length; ++i) {
+				const localCommand  = this.commandList[i];
 				const localResponse = response.commands[i];
 				localCommand.handleCommitResponse(localResponse);
 			}
-			
-			// debugger;
-			
 		}
 	
 		localRollback() {

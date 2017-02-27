@@ -115,13 +115,10 @@ export default (cls) => class Command_edit extends cls.TrackedCommand {
 	
 	async localCommit() {
 		const backend = cls.environment.backend;
-		// debugger;
-		let response = await backend.commit_edit(deepFreeze(this.toJSON()));
-		// debugger;
-		this.handleCommitResponse(response);
+		return await backend.commit_edit(deepFreeze(this.toJSON()));
 	}
 	
-	handleCommitResponse(response) {
+	localHandleCommitResponse(response) {
 		// TODO: (update fields that changed since commit?)
 	}
 

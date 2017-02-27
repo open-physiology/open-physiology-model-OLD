@@ -194,7 +194,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 		`);
 	}
 	
-	handleCommitResponse(response) {
+	localHandleCommitResponse(response) {
 	} // intentionally empty
 
 	localRollback() {
