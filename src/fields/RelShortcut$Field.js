@@ -145,7 +145,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		// const {entityToTemporaryHref = new Map} = options;
 		return value::map(e => {
 			const Entity = e.constructor.Entity;
-			Entity.normalizeAddress(e, options)
+			return Entity.normalizeAddress(e, options)
 		});
 	}
 	

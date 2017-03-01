@@ -13769,7 +13769,8 @@ return /******/ (function(modules) { // webpackBootstrap
 					if (!result.href && entityToTemporaryHref.has(this)) {
 						result.href = entityToTemporaryHref.get(this);
 					}
-					return this.constructor.objectToJSON(result, _extends({}, options, { sourceEntity: this }));
+					var res = this.constructor.objectToJSON(result, _extends({}, options, { sourceEntity: this }));
+					return res;
 				}
 	
 				//// Setting / getting of fields
@@ -17405,7 +17406,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				// const {entityToTemporaryHref = new Map} = options;
 				return _boundHybridFunctions.map.call(value, function (e) {
 					var Entity = e.constructor.Entity;
-					Entity.normalizeAddress(e, options);
+					return Entity.normalizeAddress(e, options);
 				});
 			}
 		}]);
@@ -18092,7 +18093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				// const {entityToTemporaryHref = new Map} = options;
 				return _boundHybridFunctions.map.call(value, function (e) {
 					var Entity = e.constructor.Entity;
-					Entity.normalizeAddress(e, options);
+					return Entity.normalizeAddress(e, options);
 				});
 			}
 		}]);

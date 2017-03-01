@@ -451,7 +451,8 @@ export default (environment) => {
 			if (!result.href && entityToTemporaryHref.has(this)) {
 				result.href = entityToTemporaryHref.get(this);
 			}
-			return this.constructor.objectToJSON(result, { ...options, sourceEntity: this });
+			let res = this.constructor.objectToJSON(result, { ...options, sourceEntity: this });
+			return res;
 		}
 		
 		
