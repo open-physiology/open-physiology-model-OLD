@@ -341,7 +341,19 @@ describe("regression tests", () => {
 		expect(nodes.length).to.be.equal(2);
 		expect(branches.length).to.be.equal(1);
 
+	});
+
+	it("Lyphs with axis extracted as resources", async() => {
+		const {Lyph, Border, Resource} = environment.classes;
+
+		let border1 = Border.new({name: "Border 1", nature: "open"});
+		let border2 = Border.new({name: "Border 2", nature: "closed"});
+		let heart = Lyph.new({name: "Heart", borders: [border1, border2], axis: border1});
+		await border1.commit();
+		await border2.commit();
+		await heart.commit();
+
+		let resources = await Resource.getAll();
+		expect(resources).to.include.something.with.property('class', 'Lyph');
 	})
-
-
 });
