@@ -348,12 +348,17 @@ describe("regression tests", () => {
 
 		let border1 = Border.new({name: "Border 1", nature: "open"});
 		let border2 = Border.new({name: "Border 2", nature: "closed"});
-		let heart = Lyph.new({name: "Heart", borders: [border1, border2], axis: border1});
+		let heart = Lyph.new({name: "Heart", longitudinalBorders: [border1, border2], axis: border1});
 		await border1.commit();
 		await border2.commit();
 		await heart.commit();
 
-		let resources = await Resource.getAll();
-		expect(resources).to.include.something.with.property('class', 'Lyph');
+		//Note: the error most likely is in toJSON() because without map(x => x.toJSON()) the test passes
+		let resources = [...await Resource.getAll()].map(x => x.toJSON());
+		let lyphs = resources.filter(x => x.class === "Lyph");
+		expect(lyphs).to.have.length(1);
+		expect(lyphs[0]).to.have.property('-->HasLongitudinalBorder');
+		let borderRels = [...lyphs[0]['-->HasLongitudinalBorder']];
+		expect(borderRels).to.have.length(2);
 	})
 });
