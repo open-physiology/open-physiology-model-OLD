@@ -3,7 +3,9 @@ module.exports = {
 	devtool: 'source-map',
 	entry: {
 		'open-physiology-model': [ 'babel-polyfill', './src/index.js' ],
-		'open-physiology-model-minimal': [ './src/index.js' ]
+		'open-physiology-model-minimal':           [ './src/index.js' ],
+		'ajaxBackend':           [ 'babel-polyfill', './src/ajaxBackend.js' ],
+		'ajaxBackend-minimal':                     [ './src/ajaxBackend.js' ]
 	},
 	output: {
 		path: './dist',
