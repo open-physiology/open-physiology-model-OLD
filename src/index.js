@@ -9,9 +9,8 @@ import research       from './modules/research';
 import visualisations from './modules/visualisations';
 
 import Module from './Module';
-import ajaxBackend from './ajaxBackend';
 
-const exp = Module.create('all', [
+export default Module.create('all', [
 	resources,
 	typed,
 	lyphs,
@@ -22,7 +21,3 @@ const exp = Module.create('all', [
 	visualisations,
 	canonicalTrees,
 ]);
-
-exp.ajaxBackend = ajaxBackend;
-
-export default exp;
