@@ -10,7 +10,7 @@ module.exports = {
 	output: {
 		path: './dist',
 		filename: '[name].js',
-		library: 'OpenPhysiologyModel',
+		library: 'OpenPhysiologyModel_[name]',
 		libraryTarget: 'umd',
 		sourceMapFilename: '[file].map'
 	},
