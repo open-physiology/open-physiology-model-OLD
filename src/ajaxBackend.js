@@ -11,7 +11,7 @@
 */
 
 /* super-simple storage implementation */
-export const ajaxBackend = () => {
+export default () => {
 	/* a way for test suites to register the environment to these mock-handlers */
 	let environment, ajax, baseURL;
 	function register({environment: e, ajax: ajx, baseURL: burl}) {

@@ -3412,8 +3412,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
+	
 	/**
-		import ajaxBackend from './node_modules/open-physiology-model/src/ajaxBackend.js';
+		import ajaxBackend from './node_modules/open-physiology-model/dist/ajaxBackend.js';
 		let environment = moduleFactory(frontend);
 		let {backend, register} = ajaxBackend();
 		register({
@@ -3425,7 +3426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 	
 	/* super-simple storage implementation */
-	var ajaxBackend = exports.ajaxBackend = function ajaxBackend() {
+	exports.default = function () {
 		/* a way for test suites to register the environment to these mock-handlers */
 		var environment = void 0,
 		    ajax = void 0,
