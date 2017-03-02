@@ -20318,16 +20318,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.ajaxBackend = undefined;
-	
-	var _ajaxBackend = __webpack_require__(206);
-	
-	Object.defineProperty(exports, 'ajaxBackend', {
-		enumerable: true,
-		get: function get() {
-			return _ajaxBackend.ajaxBackend;
-		}
-	});
 	
 	var _resources = __webpack_require__(21);
 	
@@ -20369,9 +20359,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
+	var _ajaxBackend = __webpack_require__(206);
+	
+	var _ajaxBackend2 = _interopRequireDefault(_ajaxBackend);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	exports.default = _Module2.default.create('all', [_resources2.default, _typed2.default, _lyphs2.default, _groups2.default, _measurables2.default, _processes2.default, _research2.default, _visualisations2.default, _canonicalTrees2.default]);
+	var exp = _Module2.default.create('all', [_resources2.default, _typed2.default, _lyphs2.default, _groups2.default, _measurables2.default, _processes2.default, _research2.default, _visualisations2.default, _canonicalTrees2.default]);
+	
+	exp.ajaxBackend = _ajaxBackend2.default;
+	
+	exports.default = exp;
 
 /***/ },
 /* 219 */
