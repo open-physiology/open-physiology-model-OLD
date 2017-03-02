@@ -360,5 +360,19 @@ describe("regression tests", () => {
 		expect(lyphs[0]).to.have.property('-->HasLongitudinalBorder');
 		let borderRels = [...lyphs[0]['-->HasLongitudinalBorder']];
 		expect(borderRels).to.have.length(2);
-	})
+	});
+	
+	it("Some related relationship expectations", async () => {
+		const {Lyph, Border, Resource} = environment.classes;
+
+		let border1 = Border.new({name: "Border 1", nature: "open"});
+		let border2 = Border.new({name: "Border 2", nature: "closed"});
+		let heart = Lyph.new({name: "Heart", longitudinalBorders: [border2], axis: border1});
+		await heart.commit();
+		
+		expect(backend.readAll().filter(x => x.class === 'Lyph')).to.have.length(1);
+		expect(backend.readAll().filter(x => x.class === 'HasAxis')).to.have.length(1);
+		expect(backend.readAll().filter(x => x.class === 'HasLongitudinalBorder')).to.have.length(1);
+		expect(backend.readAll().filter(x => x.class === 'Border')).to.have.length(2);
+	});
 });
