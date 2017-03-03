@@ -196,7 +196,6 @@ export class Field extends ValueTracker {
 	}
 	
 	[$$initSet](...alternatives) {
-		
 		for (let [guard, value] of alternatives) {
 			if (guard::isFunction() ? guard() : guard) {
 				if (value::isUndefined()) { return }
@@ -211,7 +210,6 @@ export class Field extends ValueTracker {
 				return;
 			}
 		}
-		
 	}
 	
 	isInvalid(val) {

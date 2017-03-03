@@ -377,29 +377,37 @@ describe("regression tests", () => {
     });
 
     it("Constraint violation while reconstructing resources", async () => {
-        let environment = moduleFactory({
-            async loadAll(cls, options = {}) {
-                console.log("Extracting", cls.name);
-                //There is no request for relationships, so this return accurately represents the situation at server
-                return [{
-                   name: 'Blood',
-                   href: 'open-physiology.org/Type/2',
-                   id: 2,
-                   class: 'Type',
-                   '<--DefinesType': { href: 'open-physiology.org/DefinesType/3', class: 'DefinesType' }
-                }, {
-                    name: 'Blood',
-                    href: 'open-physiology.org/Material/1',
-                    id: 1,
-                    class: 'Material',
-                    '-->DefinesType': {href: 'open-physiology.org/DefinesType/3', class: 'DefinesType'}
-                }];
-            }
+    	
+	    backend.create({
+           name: 'Blood',
+           href: 'open-physiology.org/Type/2',
+           id: 2,
+           class: 'Type',
+           '<--DefinesType': { href: 'open-physiology.org/DefinesType/3', class: 'DefinesType' }
         });
+	    backend.create({
+            name: 'Blood',
+            href: 'open-physiology.org/Material/1',
+            id: 1,
+            class: 'Material',
+            '-->DefinesType': {href: 'open-physiology.org/DefinesType/3', class: 'DefinesType'}
+        });
+	    backend.create({
+		    href: 'open-physiology.org/DefinesType/3',
+		    class: 'DefinesType',
+            [1]: {
+               href:  'open-physiology.org/Material/1',
+               class: 'Material',
+            },
+            [2]: {
+               href:  'open-physiology.org/Type/2',
+               class: 'Type',
+            }
+	    });
 
         const model = environment.classes;
 
-        let resources = [...await model.Resource.getAll()].map(x => x.toJSON());
+        let resources = [...await model.Resource.getAll()];
         expect(resources).to.have.length(2);
 
         //The following check fails in Rel1Field.js, val is a JSON object, not a model relationship

@@ -79,7 +79,7 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		// so that the two don't compete. Therefore, this constructor is very
 		// forgiving. The constraint checks are done on the other constructor.
 		this[$$initSet](
-			[initialValue, initialValue],
+			[initialValue, () => this.jsonToValue(initialValue)],
 			[true]
 		);
 		

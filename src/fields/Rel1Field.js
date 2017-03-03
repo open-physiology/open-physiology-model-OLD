@@ -83,8 +83,8 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[initialValue, initialValue],
-			[givenShortcutInitialValue ],
+			[initialValue, () => this.jsonToValue(initialValue)],
+			[givenShortcutInitialValue],
 			[desc.options.auto && !owner.isPlaceholder, () => {
 				let otherEntity = desc.codomain.resourceClass.new({}, {
 					forcedDependencies: [owner.originCommand]
@@ -99,7 +99,7 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			[desc.options.default, () => {
 				let otherEntity = desc.options.default::callOrReturn({
 					forcedDependencies: [owner.originCommand]
-				});
+				}); // TODO: do defaults need to go through jsonToValue?
 				return desc.relationshipClass.new({
 					[desc.keyInRelationship]         : owner,
 					[desc.codomain.keyInRelationship]: otherEntity

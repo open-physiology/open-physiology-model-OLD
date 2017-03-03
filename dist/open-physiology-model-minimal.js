@@ -1370,7 +1370,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _iteratorError8 = undefined;
 	
 				try {
-	
 					for (var _iterator8 = alternatives[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
 						var _step8$value = _slicedToArray(_step8.value, 2);
 	
@@ -17577,7 +17576,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			(0, _misc.constraint)(!initialValue || !givenShortcutInitialValue, (0, _misc.humanMsg)(_templateObject, key, desc.shortcutKey, _this.constructor.singular));
 	
 			/* set the initial value */
-			_this[_symbols.$$initSet]([initialValue, initialValue], [givenShortcutInitialValue], [desc.options.auto && !owner.isPlaceholder, function () {
+			_this[_symbols.$$initSet]([initialValue, function () {
+				return _this.jsonToValue(initialValue);
+			}], [givenShortcutInitialValue], [desc.options.auto && !owner.isPlaceholder, function () {
 				var _desc$relationshipCla;
 	
 				var otherEntity = desc.codomain.resourceClass.new({}, {
@@ -17591,7 +17592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				var otherEntity = (_context3 = desc.options.default, _misc.callOrReturn).call(_context3, {
 					forcedDependencies: [owner.originCommand]
-				});
+				}); // TODO: do defaults need to go through jsonToValue?
 				return desc.relationshipClass.new((_desc$relationshipCla2 = {}, _defineProperty(_desc$relationshipCla2, desc.keyInRelationship, owner), _defineProperty(_desc$relationshipCla2, desc.codomain.keyInRelationship, otherEntity), _desc$relationshipCla2), {
 					forcedDependencies: [owner.originCommand]
 				});
@@ -18260,7 +18261,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			// so that the two don't compete. Therefore, this constructor is very
 			// forgiving. The constraint checks are done on the other constructor.
 	
-			_this[_symbols.$$initSet]([initialValue, initialValue], [true]);
+			_this[_symbols.$$initSet]([initialValue, function () {
+				return _this.jsonToValue(initialValue);
+			}], [true]);
 	
 			var correspondingRelValue = (_context3 = (0, _defer.defer)(function () {
 				return owner.fields[desc.keyInResource].p('value');
