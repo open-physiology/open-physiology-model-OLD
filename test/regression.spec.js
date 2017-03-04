@@ -33,14 +33,12 @@ describe("regression tests", () => {
         await group.commit();
 
         expect([...group.elements]).to.eql([lyph1, lyph2]);
-
     });
 
     it("setting type in initializer fails at commit", async () => {
         const {Lyph} = environment.classes;
         let t1 = Lyph.new({ name: "Renal hilum" });
         await t1.commit();
-        // await expect(t1.commit()).to.not.be.rejected;
     });
 
     it("trying to instantiate abstract class Has", async () => {
@@ -319,18 +317,16 @@ describe("regression tests", () => {
     });
 
     it("Canonical tree nodes should not duplicate", async() => {
-        const model = environment.classes;
+        const {CanonicalTree, CanonicalTreeBranch} = environment.classes;
 
         /* canonical trees */
         let initial = {};
-        initial.canonicalTree1 = model.CanonicalTree.new({
-            name:  "SLN"});
-        initial.canonicalTree1_2 = model.CanonicalTree.new({
-            name:  "SLN tail 1"});
-        initial.canonicalTreeBranch1_2 = model.CanonicalTreeBranch.new({
-            name:  "SLN 1st level branch",
+        initial.canonicalTree1         = CanonicalTree.new({ name: "SLN"        });
+        initial.canonicalTree1_2       = CanonicalTree.new({ name: "SLN tail 1" });
+        initial.canonicalTreeBranch1_2 = CanonicalTreeBranch.new({
+            name:       "SLN 1st level branch",
             parentTree: initial.canonicalTree1,
-            childTree: initial.canonicalTree1_2
+            childTree:  initial.canonicalTree1_2
         });
 
         await initial.canonicalTree1.commit();
@@ -354,12 +350,13 @@ describe("regression tests", () => {
         await heart.commit();
 
         //Note: the error most likely is in toJSON() because without map(x => x.toJSON()) the test passes
-        let resources = [...await Resource.getAll()].map(x => x.toJSON());
-        let lyphs = resources.filter(x => x.class === "Lyph");
+        let resources = [...await Resource.getAll()];
+        let lyphs = resources.filter(x => x.class === "Lyph").map(x => x.toJSON());
         expect(lyphs).to.have.length(1);
         expect(lyphs[0]).to.have.property('-->HasLongitudinalBorder');
         let borderRels = [...lyphs[0]['-->HasLongitudinalBorder']];
-        expect(borderRels).to.have.length(2);
+        expect([...lyphs[0]['-->HasLongitudinalBorder']]).to.have.length(1);
+        expect(lyphs[0]['-->HasAxis']).to.not.be.null;
     });
 
     it("Some related relationship expectations", async () => {

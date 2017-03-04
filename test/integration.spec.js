@@ -172,20 +172,12 @@ describe("integrated workflow", () => {
 		water1.rollback();
 		
 		let water2 = Material.new({ name: "Water 2" });
-
-		console.log('(((((1)))))');
 		
 		await water2.commit();
 		
-		console.log('(((((2)))))');
-
 		waterType.definition = water2;
 		
-		console.log('(((((3)))))');
-		
 		await waterType.commit();
-		
-		console.log('(((((4)))))');
 		
 	});
 	
@@ -353,7 +345,8 @@ describe("integrated workflow", () => {
 	
 	it("can accept an href when first creating an entity, but expects this href to remain consistent at commit");
 	
-	it("can delete a resource", async () => {
+	// TODO: delete operation
+	it.skip("can delete a resource", async () => {
 		const {Lyph} = environment.classes;
 
 		let { href } = backend.create({

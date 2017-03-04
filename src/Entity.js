@@ -423,29 +423,39 @@ export default (environment) => {
 		//// Transforming to/from JSON
 		
 		static objectToJSON(obj, options = {}) {
-			let { minimal, sourceEntity } = options;
+			let { sourceEntity } = options;
 			// TODO: rather than sourceEntity, accept an entity CLASS,
 			//       which should have a good description of the fields
 			let result = {};
 			for (let [key, value] of obj::entries()) {
 				const field = sourceEntity.fields[key];
-				if (!minimal || (field.constructor.name !== 'RelShortcut$Field'
-				              && field.constructor.name !== 'RelShortcut1Field')) {
-					result[key] = field.constructor.valueToJSON(value, options);
+				let opts;
+				switch (field.constructor.name) {
+					case 'Rel$Field': case 'Rel1Field': {
+						opts = { ...options, requireClass: key.substring(3) };
+					} break;
+					case 'SideField': case 'PropertyField': {
+						opts = options;
+					} break;
+					default: continue; // Don't put shortcut fields in JSON
 				}
+				let valueJSON = field.constructor.valueToJSON(value, opts);
+				if (field.constructor.name === 'Rel$Field' && valueJSON.length === 0) { continue }
+				if (field.constructor.name === 'Rel1Field' && valueJSON === null)     { continue }
+				result[key] = valueJSON;
 			}
 			return result;
 		}
 		
 		toJSON(options = {}) {
-			let { minimal, entityToTemporaryHref = new Map } = options;
+			let { entityToTemporaryHref = new Map } = options;
 			let result = {};
 			for (let [key, field] of this.fields::entries()) {
 				const fieldIsShortcut = (
 					field.constructor.name === 'RelShortcut$Field' ||
 					field.constructor.name === 'RelShortcut1Field'
 				);
-				if (minimal && fieldIsShortcut) { continue }
+				if (fieldIsShortcut) { continue }
 				result[key] = field.value;
 			}
 			if (!result.href && entityToTemporaryHref.has(this)) {

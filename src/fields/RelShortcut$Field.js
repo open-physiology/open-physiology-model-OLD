@@ -8,6 +8,7 @@ import inRange     from 'lodash-bound/inRange';
 import size        from 'lodash-bound/size';
 import entries     from 'lodash-bound/entries';
 import isUndefined from 'lodash-bound/isUndefined';
+import isArray from 'lodash-bound/isArray';
 
 
 import {defineProperties, defineProperty} from 'bound-native-methods';
@@ -112,7 +113,11 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 					             rel.fields[desc.codomain.keyInRelationship].get() === newRes);
 				// TODO: Should we just remove corresponding relationship if it exists,
 				//     : and create a new one in any case?
-				if (!rel) {
+				// TODO: NOTE - We don't have enough information here, really.
+				//     : We're checking for .abstract, but it could still be concrete,
+				//     : yet not the most specific class. This all depends on how the original
+				//     : value was set, and we don't know that here.
+				if (!rel && !desc.relationshipClass.abstract) {
 					rel = desc.relationshipClass.new({
 						[desc.keyInRelationship]         : owner,
 						[desc.codomain.keyInRelationship]: newRes
@@ -143,6 +148,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 	static valueToJSON(value, options = {}) {
 		// const Entity = this[$$owner].constructor.Entity;
 		// const {entityToTemporaryHref = new Map} = options;
+		// TODO: adjust as per Rel$Field.valueToJSON (
 		return value::map(e => {
 			const Entity = e.constructor.Entity;
 			return Entity.normalizeAddress(e, options)
@@ -165,6 +171,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 			You're trying to set a readonly field
 			${this[$$owner].constructor.name}#${this[$$key]}.
 		`);
+		if (newValue::isArray()) { newValue = this.jsonToValue(newValue) }
 		if (!ignoreValidation) { this.validate(newValue, ['set']) }
 		copySetContent(this[$$value], newValue);
 	}

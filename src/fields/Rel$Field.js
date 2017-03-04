@@ -1,4 +1,3 @@
-import {filter}    from 'rxjs/operator/filter';
 import {switchMap} from 'rxjs/operator/switchMap';
 import {startWith} from 'rxjs/operator/startWith';
 import {pairwise}  from 'rxjs/operator/pairwise';
@@ -9,6 +8,7 @@ import get         from 'lodash-bound/get';
 import size        from 'lodash-bound/size';
 import entries     from 'lodash-bound/entries';
 import isUndefined from 'lodash-bound/isUndefined';
+import isArray     from 'lodash-bound/isArray';
 
 import {defineProperty} from 'bound-native-methods';
 
@@ -16,7 +16,7 @@ import assert from 'power-assert';
 
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
 import {humanMsg, constraint} from '../util/misc';
-import {map} from '../util/bound-hybrid-functions';
+import {map, filter} from '../util/bound-hybrid-functions';
 
 import {Field, RelField} from './Field';
 
@@ -154,17 +154,17 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 	
 	set(newValue, { ignoreReadonly = false, ignoreValidation = false, updatePristine = false } = {}) {
 		constraint(ignoreReadonly || !this[$$desc].readonly);
-		if (!ignoreValidation) { this.validate(newValue, ['set'])           }
-		// if (updatePristine)    { copySetContent(this[$$pristine], newValue) }// TODO: remove all 'pristine' related stuff from the field classes
+		if (newValue::isArray()) { newValue = this.jsonToValue(newValue) }
+		if (!ignoreValidation) { this.validate(newValue, ['set']) }
 		copySetContent(this[$$value], newValue);
 	}
 	
-	static valueToJSON(value, options = {}) {
-		// const {entityToTemporaryHref = new Map} = options;
-		return value::map(e => {
+	static valueToJSON(value, {requireClass, ...options} = {}) {
+		return [...value::map(e => {
 			const Entity = e.constructor.Entity;
-			return Entity.normalizeAddress(e, options)
-		});
+			if (requireClass && requireClass !== e.class) { return undefined }
+			return Entity.normalizeAddress(e, options);
+		})::filter(v=>!!v)];
 	}
 	
 	jsonToValue(json, options = {}) {

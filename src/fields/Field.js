@@ -158,7 +158,7 @@ export class Field extends ValueTracker {
 	
 	static valueToJSON() { assert(false, humanMsg`Field.valueToJSON must be implemented in subclasses.`) }
 	
-	valueToJSON(options = {}) { return this.constructor.toJSON(this.value, options) }
+	valueToJSON(options = {}) { return this.constructor.valueToJSON(this.value, options) }
 	
 	//noinspection JSDuplicatedDeclaration // (to suppress warning due to Webstorm bug)
 	get() { return this[$$value] }
@@ -182,6 +182,7 @@ export class Field extends ValueTracker {
 				'${this[$$owner].constructor.name}#${this[$$key]}'.
 			`);
 			if (this.jsonToValue::isFunction()) {
+				// TODO: should we check whether newValue is plain before converting?
 				newValue = this.jsonToValue(newValue, options);
 			}
 			if (!ignoreValidation) { this.validate(newValue, ['set']) }

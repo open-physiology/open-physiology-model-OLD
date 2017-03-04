@@ -142,9 +142,10 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 			.subscribe( this.p('value') );
 	}
 	
-	static valueToJSON(value, options = {}) {
+	static valueToJSON(value, {requireClass, ...options} = {}) {
 		// const {entityToTemporaryHref = new Map} = options;
 		if (!value) { return value }
+		if (requireClass && requireClass !== value.class) { return undefined }
 		const Entity = value.constructor.Entity;
 		return Entity.normalizeAddress(value, options);
 	}

@@ -529,6 +529,7 @@ export default ({backend}) => {
 				}
 			}
 			
+			/* create JSON object */
 			this.commandList = [
 				...commandGraph.vertices_topologically()
 					::map(([cmd]) => cmd)
@@ -537,13 +538,43 @@ export default ({backend}) => {
 			const commandListJSON = this.commandList
 				::map(cmd => cmd.toJSON({
 					entityToTemporaryHref,
-					minimal: true
+					minimal: true // TODO: does minimal still do anything? (probably not)
 				}));
 			
-			/* create JSON object */
+			
+			/* remove forward references */
+			let tmpHrefsSeen = new Set;
+			for (let i = 0; i < this.commandList.length; ++i) {
+				const localCommand     = this.commandList[i];
+				const localCommandJSON = commandListJSON[i];
+				let entity     = localCommand    .result || localCommand    .entity;
+				let valuesJSON = localCommandJSON.values || localCommandJSON.newValues;
+				if (temporaryHrefs.has(valuesJSON.href)) {
+					tmpHrefsSeen.add(valuesJSON.href);
+				}
+				for (let [key, valueJSON] of valuesJSON::entries()) {
+					switch (entity.fields[key].constructor.name) {
+						case 'Rel$Field': {
+							for (let [i, valJSON] of valueJSON::entries()) {
+								if (temporaryHrefs.has(valJSON.href) && !tmpHrefsSeen.has(valJSON.href)) {
+									valueJSON.splice(i, 1);
+								}
+							}
+							if (valueJSON.length === 0) {
+								delete valuesJSON[key];
+							}
+						} break;
+						case 'Rel1Field': {
+							if (valueJSON && temporaryHrefs.has(valueJSON.href) && !tmpHrefsSeen.has(valueJSON.href)) {
+								delete valuesJSON[key];
+							}
+						} break;
+					}
+				}
+			}
+			
 			////////////////////////////////////////////////////////////
 			// report to backend
-			
 			return await backend.commit_batch(deepFreeze({
 				commandType:    'batch',
 				temporaryHrefs: [...temporaryHrefs],

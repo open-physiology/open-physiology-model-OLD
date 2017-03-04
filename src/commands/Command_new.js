@@ -82,6 +82,16 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 				{ ...this.options, allowInvokingConstructor: true }
 			);
 		}
+		/* record resulting values */
+		this.resultingValues = {};
+		for (let [key, field] of this.result.fields::entries()) {
+			let value = field.get();
+			if (['Rel$Field', 'RelShortcut$Field'].includes(field.constructor.name)) {
+				value = new Set(value);
+			}
+			this.resultingValues[key] = value;
+		}
+		/* it's not a placeholder */
 		this.result.pSubject('isPlaceholder').next(false);
 		/* initialize fields */
 		Field.initializeEntity(this.result, values);
@@ -101,8 +111,8 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 		const {entityToTemporaryHref = new Set} = options;
 		return {
 			commandType: 'new',
-			values: this.result.constructor.objectToJSON({
-				...this.initialValues,
+			values: cls.objectToJSON({
+				...this.resultingValues,
 				class: cls.name,
 				...(entityToTemporaryHref.has(this.result)
 					? { href: entityToTemporaryHref.get(this.result) }
