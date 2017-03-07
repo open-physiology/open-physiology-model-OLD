@@ -406,10 +406,44 @@ describe("regression tests", () => {
 
         let resources = [...await model.Resource.getAll()];
         expect(resources).to.have.length(2);
+    });
 
-        //The following check fails in Rel1Field.js, val is a JSON object, not a model relationship
-        //const hasCompatibleType = expectedRelationshipClass.hasInstance(val);
-        //constraint(notGiven || hasCompatibleType
+    it("Layers are lost", async () => {
+
+        backend.create({
+            name: 'Blood',
+            href: 'open-physiology.org/Lyph/1',
+            id: 1,
+            class: 'Lyph',
+            '-->HasLayer': { href: 'open-physiology.org/Lyph/3', class: 'HasLayer' }
+        });
+        backend.create({
+            name: 'Cytosol',
+            href: 'open-physiology.org/Lyph/2',
+            id: 2,
+            class: 'Lyph',
+            '<--HasLayer': {href: 'open-physiology.org/HasLayer/3', class: 'HasLayer'}
+        });
+        backend.create({
+            href: 'open-physiology.org/HasLayer/3',
+            class: 'HasLayer',
+            [1]: {
+                href:  'open-physiology.org/Lyph/1',
+                class: 'Lyph',
+            },
+            [2]: {
+                href:  'open-physiology.org/Lyph/2',
+                class: 'Lyph',
+            }
+        });
+
+        const model = environment.classes;
+
+        let mainLyph = await model.Lyph.get('open-physiology.org/Lyph/1');
+        console.log("Response", mainLyph);
+        expect(mainLyph).to.have.property('-->HasLayer');
+        //expect(mainLyph).to.have.property('layers');
 
     });
+
 });
