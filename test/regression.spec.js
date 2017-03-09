@@ -410,40 +410,18 @@ describe("regression tests", () => {
 
     it("Layers are lost", async () => {
 
-        backend.create({
-            name: 'Blood',
-            href: 'open-physiology.org/Lyph/1',
-            id: 1,
-            class: 'Lyph',
-            '-->HasLayer': { href: 'open-physiology.org/Lyph/3', class: 'HasLayer' }
-        });
-        backend.create({
-            name: 'Cytosol',
-            href: 'open-physiology.org/Lyph/2',
-            id: 2,
-            class: 'Lyph',
-            '<--HasLayer': {href: 'open-physiology.org/HasLayer/3', class: 'HasLayer'}
-        });
-        backend.create({
-            href: 'open-physiology.org/HasLayer/3',
+        let {href: href1} = backend.create({ name: 'Blood', class: 'Lyph' });
+        let {href: href2} = backend.create({ name: 'Cytosol', class: 'Lyph' });
+        let {href: href3} = backend.create({
             class: 'HasLayer',
-            [1]: {
-                href:  'open-physiology.org/Lyph/1',
-                class: 'Lyph',
-            },
-            [2]: {
-                href:  'open-physiology.org/Lyph/2',
-                class: 'Lyph',
-            }
+            [1]: { href:  href1, class: 'Lyph' },
+            [2]: { href:  href2, class: 'Lyph' }
         });
 
         const model = environment.classes;
-
-        let mainLyph = await model.Lyph.get('open-physiology.org/Lyph/1');
-        console.log("Response", mainLyph);
-        expect(mainLyph).to.have.property('-->HasLayer');
-        //expect(mainLyph).to.have.property('layers');
-
+        let mainLyph = await model.Lyph.get(href1);
+        let response = mainLyph.toJSON();
+        expect(response).to.have.property('-->HasLayer');
     });
 
 });
