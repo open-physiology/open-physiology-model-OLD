@@ -118,11 +118,11 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		/* handle initial values */
 		if (initialValue && initialValue[Symbol.iterator]) {
 			for (let rel of this.jsonToValue(initialValue)) {
-				if (rel.isPlaceholder) { continue } // TODO: this may be a complex situation; model it properly
+				// if (rel.isPlaceholder) { continue } // TODO: this may be a complex situation; model it properly
 				if (!rel.fields[desc.keyInRelationship].get()) {
-					rel.fields[desc.keyInRelationship].set(this, { createEditCommand: false });
+					rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false });
 				}
-				assert(rel[desc.keyInRelationship] === this);
+				assert(rel.fields[desc.keyInRelationship].get() === owner);
 				this[$$value].add(rel);
 			}
 		} else if (related::get([desc.shortcutKey, 'initialValue'])) {

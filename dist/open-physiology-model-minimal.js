@@ -17431,11 +17431,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					for (var _iterator2 = _this.jsonToValue(initialValue)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var rel = _step2.value;
 	
-						if (rel.isPlaceholder) {
-							continue;
-						} // TODO: this may be a complex situation; model it properly
+						// if (rel.isPlaceholder) { continue } // TODO: this may be a complex situation; model it properly
 						if (!rel.fields[desc.keyInRelationship].get()) {
-							rel.fields[desc.keyInRelationship].set(_this, { createEditCommand: false });
+							rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false });
 						}
 	
 						_this[_symbols.$$value].add(rel);
