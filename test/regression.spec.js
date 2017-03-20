@@ -409,19 +409,76 @@ describe("regression tests", () => {
     });
 
     it("Layers are lost", async () => {
+        let lyph1 = {
+            "name": "Blood",
+            "href": "http://localhost:8888/Lyph/1",
+            "id": 1,
+            "class": "Lyph",
+            "-->HasLayer": [
+                {
+                    "href": "http://localhost:8888/HasLayer/3",
+                    "class": "HasLayer"
+                }
+            ]
+        };
+        let lyph2 = {
+            "name": "Cytosol",
+            "href": "http://localhost:8888/Lyph/2",
+            "id": 2,
+            "class": "Lyph",
+            "<--HasLayer": [
+                {
+                    "href": "http://localhost:8888/HasLayer/3",
+                    "class": "HasLayer"
+                }
+            ],
+        };
+        let rel = {
+            "href": "http://localhost:8888/HasLayer/3",
+            "id": 3,
+            "class": "HasLayer",
+            "1": {
+                "href": "http://localhost:8888/Lyph/1",
+                "class": "Lyph"
+            },
+            "2": {
+                "href": "http://localhost:8888/Lyph/2",
+                "class": "Lyph"
+            }
+        };
 
-        let {href: href1} = backend.create({ name: 'Blood', class: 'Lyph' });
-        let {href: href2} = backend.create({ name: 'Cytosol', class: 'Lyph' });
-        let {href: href3} = backend.create({
-            class: 'HasLayer',
-            [1]: { href:  href1, class: 'Lyph' },
-            [2]: { href:  href2, class: 'Lyph' }
+        let environment = moduleFactory({
+            async loadAll(cls, options = {}) {
+                if (cls.name === "Lyph"){
+                    return [lyph1, lyph2]
+                }
+                if (cls.name === "HasLayer"){
+                    return [rel];
+                }
+            },
+            async load(addresses, options = {}) {
+                let response = [];
+                for (let address of Object.values(addresses)){
+                    if (address.href === "http://localhost:8888/Lyph/1"){ response.push(lyph1); }
+                    if (address.href === "http://localhost:8888/Lyph/2"){ response.push(lyph2); }
+                    if (address.href === "http://localhost:8888/HasLayer/3"){ response.push(rel); }
+                }
+                return response;
+            },
         });
 
         const model = environment.classes;
-        let mainLyph = await model.Lyph.get(href1);
-        let response = mainLyph.toJSON();
-        expect(response).to.have.property('-->HasLayer');
+        //Check via loadAll
+        let lyphs = [...await model.Lyph.getAll()];
+       // let responses = lyphs.map(x => x.toJSON());
+        let mainLyph = lyphs.find(x => x.href === "http://localhost:8888/Lyph/1");
+
+        //check via load
+        // let mainLyph = await model.Lyph.get({class: model.Lyph, href: "http://localhost:8888/Lyph/1"});
+        // mainLyph = mainLyph.toJSON();
+        // console.log(mainLyph);
+        expect(mainLyph).to.have.property('-->HasLayer');
+        expect([...mainLyph['-->HasLayer']]).to.have.length(1);
     });
 
 });
