@@ -210,7 +210,7 @@ export default class ValueTracker {
 				if (key.length === 0) { return { val: obj } }
 				
 				let loose, head, sep, tail;
-				const match = key.match(/^\s*(\??)\s*(~>|\.)\s*(\w+)\s*(.*?)$/);
+				const match = key.match(/^\s*(\??)\s*(~>|\.)\s*([\w<>-]+)\s*(.*?)$/);
 				assert(match);
 				[,loose,sep,head,tail] = match;
 				

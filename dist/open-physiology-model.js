@@ -1032,7 +1032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _misc = __webpack_require__(2);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1647,133 +1647,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 20 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var $$registerFieldClass = exports.$$registerFieldClass = Symbol('$$registerFieldClass');
-	var $$fieldClasses = exports.$$fieldClasses = Symbol('$$fieldClasses');
-	var $$owner = exports.$$owner = Symbol('$$owner');
-	var $$key = exports.$$key = Symbol('$$key');
-	var $$desc = exports.$$desc = Symbol('$$desc');
-	var $$value = exports.$$value = Symbol('$$value');
-	var $$initSet = exports.$$initSet = Symbol('$$initSet');
-	var $$entriesIn = exports.$$entriesIn = Symbol('$$entriesIn');
-	var $$initialized = exports.$$initialized = Symbol('$$initialized');
-	var $$destruct = exports.$$destruct = Symbol('$$destruct');
-	var $$href = exports.$$href = Symbol('$$href');
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _schemas = __webpack_require__(33);
-	
-	var _Module = __webpack_require__(46);
-	
-	var _Module2 = _interopRequireDefault(_Module);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = _Module2.default.create('resources', [], function (M) {
-	
-		var Resource = M.RESOURCE({ /////////////////////////////////////////////////////////////////
-	
-			name: 'Resource',
-	
-			abstract: true,
-	
-			singular: "resource",
-	
-			properties: {
-				'href': _extends({}, _schemas.uriSchema, { readonly: true }),
-				'class': _extends({}, _schemas.identifierSchema, { readonly: true }),
-				'name': { type: 'string' },
-				'id': _extends({}, _schemas.idSchema) // TODO: when server has been updated, remove 'id' entirely
-			}
-	
-		}); //////////////////////////////////////////////////////////////////////////
-	
-	
-		var IsRelatedTo = M.RELATIONSHIP({
-	
-			name: 'IsRelatedTo',
-	
-			abstract: true,
-	
-			singular: "is related to",
-	
-			1: [Resource, '0..*'],
-			2: [Resource, '0..*'],
-	
-			properties: {
-				'href': _extends({}, _schemas.uriSchema, { readonly: true }),
-				'class': _extends({}, _schemas.identifierSchema, { readonly: true }),
-				'id': _extends({}, _schemas.idSchema) // TODO: when server has been updated, remove 'id' entirely
-			}
-	
-		});
-	
-		var ExternalResource = M.RESOURCE({ ///////////////////////////////////////
-	
-			name: 'ExternalResource',
-	
-			extends: Resource,
-	
-			singular: "external resource",
-	
-			properties: {
-				'uri': _extends({}, _schemas.uriSchema, { required: true }),
-				'type': { type: 'string' } // "fma" or "cocomac", etc.
-			}
-	
-		}); /////////////////////////////////////////////////////////////////////////
-	
-	
-		var IsExternallyRelatedTo = M.RELATIONSHIP({
-	
-			name: 'IsExternallyRelatedTo',
-	
-			extends: IsRelatedTo,
-	
-			singular: "is externally related to",
-	
-			1: [ExternalResource, '0..*'],
-			2: [ExternalResource, '0..*'],
-	
-			properties: {
-				'type': { type: 'string', required: true }
-			}
-	
-		});
-	
-		var CorrespondsTo = M.RELATIONSHIP({
-	
-			name: 'CorrespondsTo',
-	
-			extends: IsRelatedTo,
-	
-			singular: "corresponds to",
-	
-			1: [Resource, '0..*', { anchors: true, key: 'externals' }],
-			2: [ExternalResource, '0..*', { key: 'locals' }]
-	
-		});
-	});
-
-/***/ },
-/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1918,6 +1791,133 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Observable.js.map
 
 /***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var $$registerFieldClass = exports.$$registerFieldClass = Symbol('$$registerFieldClass');
+	var $$fieldClasses = exports.$$fieldClasses = Symbol('$$fieldClasses');
+	var $$owner = exports.$$owner = Symbol('$$owner');
+	var $$key = exports.$$key = Symbol('$$key');
+	var $$desc = exports.$$desc = Symbol('$$desc');
+	var $$value = exports.$$value = Symbol('$$value');
+	var $$initSet = exports.$$initSet = Symbol('$$initSet');
+	var $$entriesIn = exports.$$entriesIn = Symbol('$$entriesIn');
+	var $$initialized = exports.$$initialized = Symbol('$$initialized');
+	var $$destruct = exports.$$destruct = Symbol('$$destruct');
+	var $$href = exports.$$href = Symbol('$$href');
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _schemas = __webpack_require__(33);
+	
+	var _Module = __webpack_require__(46);
+	
+	var _Module2 = _interopRequireDefault(_Module);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = _Module2.default.create('resources', [], function (M) {
+	
+		var Resource = M.RESOURCE({ /////////////////////////////////////////////////////////////////
+	
+			name: 'Resource',
+	
+			abstract: true,
+	
+			singular: "resource",
+	
+			properties: {
+				'href': _extends({}, _schemas.uriSchema, { readonly: true }),
+				'class': _extends({}, _schemas.identifierSchema, { readonly: true }),
+				'name': { type: 'string' },
+				'id': _extends({}, _schemas.idSchema) // TODO: when server has been updated, remove 'id' entirely
+			}
+	
+		}); //////////////////////////////////////////////////////////////////////////
+	
+	
+		var IsRelatedTo = M.RELATIONSHIP({
+	
+			name: 'IsRelatedTo',
+	
+			abstract: true,
+	
+			singular: "is related to",
+	
+			1: [Resource, '0..*'],
+			2: [Resource, '0..*'],
+	
+			properties: {
+				'href': _extends({}, _schemas.uriSchema, { readonly: true }),
+				'class': _extends({}, _schemas.identifierSchema, { readonly: true }),
+				'id': _extends({}, _schemas.idSchema) // TODO: when server has been updated, remove 'id' entirely
+			}
+	
+		});
+	
+		var ExternalResource = M.RESOURCE({ ///////////////////////////////////////
+	
+			name: 'ExternalResource',
+	
+			extends: Resource,
+	
+			singular: "external resource",
+	
+			properties: {
+				'uri': _extends({}, _schemas.uriSchema, { required: true }),
+				'type': { type: 'string' } // "fma" or "cocomac", etc.
+			}
+	
+		}); /////////////////////////////////////////////////////////////////////////
+	
+	
+		var IsExternallyRelatedTo = M.RELATIONSHIP({
+	
+			name: 'IsExternallyRelatedTo',
+	
+			extends: IsRelatedTo,
+	
+			singular: "is externally related to",
+	
+			1: [ExternalResource, '0..*'],
+			2: [ExternalResource, '0..*'],
+	
+			properties: {
+				'type': { type: 'string', required: true }
+			}
+	
+		});
+	
+		var CorrespondsTo = M.RELATIONSHIP({
+	
+			name: 'CorrespondsTo',
+	
+			extends: IsRelatedTo,
+	
+			singular: "corresponds to",
+	
+			1: [Resource, '0..*', { anchors: true, key: 'externals' }],
+			2: [ExternalResource, '0..*', { key: 'locals' }]
+	
+		});
+	});
+
+/***/ },
 /* 23 */
 /***/ function(module, exports) {
 
@@ -2011,7 +2011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	var do_1 = __webpack_require__(428);
 	Observable_1.Observable.prototype.do = do_1._do;
 	//# sourceMappingURL=do.js.map
@@ -2042,7 +2042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -2767,7 +2767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var root_1 = __webpack_require__(93);
 	var isArray_1 = __webpack_require__(91);
 	var isPromise_1 = __webpack_require__(437);
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	var iterator_1 = __webpack_require__(433);
 	var InnerSubscriber_1 = __webpack_require__(417);
 	var symbol_observable_1 = __webpack_require__(192);
@@ -4147,7 +4147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _schemas = __webpack_require__(33);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -4181,7 +4181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Field = __webpack_require__(16);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -4580,7 +4580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _wu3 = _interopRequireDefault(_wu2);
 	
-	var _Observable = __webpack_require__(22);
+	var _Observable = __webpack_require__(20);
 	
 	var _filter = __webpack_require__(259);
 	
@@ -5076,7 +5076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	var ScalarObservable_1 = __webpack_require__(186);
 	var EmptyObservable_1 = __webpack_require__(131);
 	var isScheduler_1 = __webpack_require__(92);
@@ -6417,7 +6417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	var Subscriber_1 = __webpack_require__(13);
 	var Subscription_1 = __webpack_require__(130);
 	var ObjectUnsubscribedError_1 = __webpack_require__(189);
@@ -6944,7 +6944,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -7101,7 +7101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _schemas = __webpack_require__(33);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -7568,9 +7568,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.flag = exports.event = exports.property = exports.default = undefined;
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -7603,6 +7603,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _isBoolean3 = _interopRequireDefault(_isBoolean2);
 	
 	var _misc = __webpack_require__(2);
+	
+	var _Observable = __webpack_require__(20);
 	
 	var _Subject = __webpack_require__(87);
 	
@@ -7808,9 +7810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				/* is the event name already taken? */
 	
 	
-				this[$$events][name] = (_context3 = (_context3 = new _Subject.Subject(), _takeUntil.takeUntil).call(_context3, this[$$takeUntil]),
-				// ::filter              (this[$$filterBy] )
-				_filter.filter).call(_context3, this[$$filterBy]);
+				this[$$events][name] = (_context3 = (_context3 = new _Subject.Subject(), _takeUntil.takeUntil).call(_context3, this[$$takeUntil]), _filter.filter).call(_context3, this[$$filterBy]);
 	
 				return this[$$events][name];
 			}
@@ -7821,6 +7821,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @public
 	   * @method
 	   * @param  {String}                   name            - the name of the new property
+	   * @param  {Boolean}            [decoratorUsed=false] - whether this property was created with a decorator (don't use this manually)
 	   * @param  {Boolean}                 [readonly=false] - whether the value can be manually set
 	   * @param  {function(*,*):Boolean}   [isEqual]        - a predicate function by which to test for duplicate values
 	   * @param  {function(*):Boolean}     [isValid]        - a predicate function to validate a given value
@@ -7838,6 +7839,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				var _ref3 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
+				var _ref3$decoratorUsed = _ref3.decoratorUsed;
+				var decoratorUsed = _ref3$decoratorUsed === undefined ? false : _ref3$decoratorUsed;
 				var _ref3$readonly = _ref3.readonly;
 				var readonly = _ref3$readonly === undefined ? false : _ref3$readonly;
 				var _ref3$isEqual = _ref3.isEqual;
@@ -7872,9 +7875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 	
 				/* define the bus which manages the property */
-				var subject = this[$$settableProperties][name] = (_context4 = (_context4 = (_context4 = (_context4 = new _BehaviorSubject.BehaviorSubject(initial), _filter.filter).call(_context4, isValid.bind(this)), _map.map).call(_context4, transform.bind(this))
-				// ::takeUntil           (this[$$takeUntil])
-				, _distinctUntilChanged.distinctUntilChanged).call(_context4, isEqual.bind(this)), _filter.filter).call(_context4, function (v) {
+				var subject = this[$$settableProperties][name] = (_context4 = (_context4 = (_context4 = (_context4 = new _BehaviorSubject.BehaviorSubject(initial), _filter.filter).call(_context4, isValid.bind(this)), _map.map).call(_context4, transform.bind(this)), _distinctUntilChanged.distinctUntilChanged).call(_context4, isEqual.bind(this)), _filter.filter).call(_context4, function (v) {
 					return v !== invalidCache;
 				});
 				this[$$properties][name] = readonly ? subject.asObservable() : subject;
@@ -7891,6 +7892,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				/* create event version of the property */
 				this[$$events][name] = (_context4 = subject.asObservable(), _skip.skip).call(_context4, 1); // skip 'current value' on subscribe
+	
+				/* if not yet done, create object property */
+				if (!decoratorUsed) {
+					defineProperty.call(this, name, _extends({
+						get: function get() {
+							return this[$$currentValues][name];
+						}
+					}, !readonly && {
+						set: function set(value) {
+							subject.next(value);
+						}
+					}));
+				}
 	
 				/* return property */
 				return this[$$settableProperties][name];
@@ -7952,60 +7966,54 @@ return /******/ (function(modules) { // webpackBootstrap
 					}]));
 				} else if (name) {
 					var _ret = function () {
-						var head = name,
-						    sep = void 0,
-						    tail = void 0;
-						var match = name.match(/^(.+?)(\??\.)(.+)$/);
-						if (match) {
-							var _ret2 = function () {
-								var _context7;
 	
-								var _match = _slicedToArray(match, 4);
+						/* If not, treat it as a path. */
+						var resolve = function resolve(obj, key) {
+							var _context7;
 	
-								head = _match[1];
-								sep = _match[2];
-								tail = _match[3];
+							if (key.length === 0) {
+								return { val: obj };
+							}
 	
-								var loose = sep === '?.';
-								return {
-									v: {
-										v: (_context7 = _this2.p(head), _switchMap.switchMap).call(_context7, function (obj) {
-											if (!obj) {
-												if (loose) {
-													return (0, _of.of)(null);
-												} else {
-													return (0, _never.never)();
-												}
-											}
-											// TODO: allow simple property chaining (even if not observables)
-											return obj.p(tail);
-										})
-									}
-								};
-							}();
+							var loose = void 0,
+							    head = void 0,
+							    sep = void 0,
+							    tail = void 0;
+							var match = key.match(/^\s*(\??)\s*(~>|\.)\s*([\w<>-]+)\s*(.*?)$/);
 	
-							if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
-						} else {
+							var _match = _slicedToArray(match, 5);
+	
+							loose = _match[1];
+							sep = _match[2];
+							head = _match[3];
+							tail = _match[4];
+	
+	
+							if (!obj) {
+								return { obs: !!loose ? (0, _of.of)(obj) : (0, _never.never)() };
+							}
+	
+							switch (sep) {
+								case '~>':
+									return { obs: (_context7 = obj.p(head), _switchMap.switchMap).call(_context7, function (innerObj) {
+											var result = resolve(innerObj, tail);
+											return result.obs || (0, _of.of)(result.val);
+										}) };
+								case '.':
+									return resolve(obj[head], tail);
+							}
+						};
+	
+						/* Is it a simple name? Do a simple lookup. */
+						if (name.match(/^\w+$/)) {
 							return {
 								v: _this2[$$properties][name]
 							};
 						}
 	
-						// const [head, ...tail] = name.split('.');
-						// if (tail.length > 0) {
-						// 	return this.p(head)::switchMap((obj) => {
-						// 		if (!obj) { return never() }
-						// 		assert(obj.p::isFunction(), humanMsg`
-						// 			The '${head}' property did not return
-						// 			a ValueTracker-based object,
-						// 			so it cannot be chained.
-						// 		`);
-						// 		return obj.p(tail.join('.'));
-						// 	});
-						// } else {
-						// 	assert(this[$$properties][head], humanMsg`No property '${name}' exists.`);
-						// 	return this[$$properties][head];
-						// }
+						return {
+							v: resolve(_this2, '~>' + name).obs
+						};
 					}();
 	
 					if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
@@ -8071,7 +8079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var property = exports.property = function property() {
 		var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 		return function (target, key) {
-			_set2.default.call(target, ['constructor', $$properties, key], options);
+			_set2.default.call(target, ['constructor', $$properties, key], _extends({}, options, { decoratorUsed: true }));
 			return _extends({
 				get: function get() {
 					return this[$$currentValues][key];
@@ -8918,7 +8926,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -9360,7 +9368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -13879,7 +13887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -17957,7 +17965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _symbols = __webpack_require__(100);
 	
-	var _symbols2 = __webpack_require__(20);
+	var _symbols2 = __webpack_require__(21);
 	
 	var _misc = __webpack_require__(2);
 	
@@ -18603,7 +18611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Field2 = __webpack_require__(16);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -18825,7 +18833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Field = __webpack_require__(16);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -19278,7 +19286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Field = __webpack_require__(16);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -19609,7 +19617,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Field = __webpack_require__(16);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	var _switchMap = __webpack_require__(64);
 	
@@ -19987,7 +19995,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Field = __webpack_require__(16);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -20277,7 +20285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Field2 = __webpack_require__(16);
 	
-	var _symbols = __webpack_require__(20);
+	var _symbols = __webpack_require__(21);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -20469,7 +20477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -20527,7 +20535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TypedModule2 = _interopRequireDefault(_TypedModule);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -20633,7 +20641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Module2 = _interopRequireDefault(_Module);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -20762,7 +20770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _schemas = __webpack_require__(33);
 	
-	var _resources = __webpack_require__(21);
+	var _resources = __webpack_require__(22);
 	
 	var _resources2 = _interopRequireDefault(_resources);
 	
@@ -27694,7 +27702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	var subscribeToResult_1 = __webpack_require__(43);
 	var OuterSubscriber_1 = __webpack_require__(41);
 	/**
@@ -27792,7 +27800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Observable_1 = __webpack_require__(22);
+	var Observable_1 = __webpack_require__(20);
 	var noop_1 = __webpack_require__(438);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
