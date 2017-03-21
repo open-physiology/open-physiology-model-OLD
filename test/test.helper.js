@@ -1,5 +1,5 @@
-import { install } from 'source-map-support';
-install();
+import sourceMapSupport from 'source-map-support';
+sourceMapSupport.install();
 
 import 'babel-polyfill';
 import 'polyfill-function-prototype-bind';

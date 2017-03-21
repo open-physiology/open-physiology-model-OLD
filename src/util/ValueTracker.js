@@ -10,6 +10,7 @@ import assert from 'power-assert';
 
 import {args, humanMsg} from './misc';
 
+import {Observable}           from 'rxjs/Observable';
 import {Subject}              from 'rxjs/Subject';
 import {BehaviorSubject}      from 'rxjs/BehaviorSubject';
 import {of}                   from 'rxjs/observable/of';
@@ -98,6 +99,7 @@ export default class ValueTracker {
 	 * @public
 	 * @method
 	 * @param  {String}                   name            - the name of the new property
+	 * @param  {Boolean}            [decoratorUsed=false] - whether this property was created with a decorator (don't use this manually)
 	 * @param  {Boolean}                 [readonly=false] - whether the value can be manually set
 	 * @param  {function(*,*):Boolean}   [isEqual]        - a predicate function by which to test for duplicate values
 	 * @param  {function(*):Boolean}     [isValid]        - a predicate function to validate a given value
@@ -107,6 +109,7 @@ export default class ValueTracker {
 	 * @return {BehaviorSubject} - the property associated with the given name
 	 */
 	newProperty(name, {
+		decoratorUsed = false,
 		readonly  = false,
 		isEqual   = (a,b) => (a===b),
 		isValid   = ()=>true,
@@ -129,10 +132,8 @@ export default class ValueTracker {
 		
 		/* define the bus which manages the property */
 		let subject = this[$$settableProperties][name] = new BehaviorSubject(initial)
-			// ::filter              (this[$$filterBy] )
 			::filter              (this::isValid    )
 			::map                 (this::transform  )
-			// ::takeUntil           (this[$$takeUntil])
 			::distinctUntilChanged(this::isEqual    )
 			::filter              (v => v !== invalidCache);
 		this[$$properties][name] = readonly ? subject.asObservable() : subject;
@@ -150,6 +151,16 @@ export default class ValueTracker {
 		/* create event version of the property */
 		this[$$events][name] = subject.asObservable()
 			::skip(1); // skip 'current value' on subscribe
+		
+		/* if not yet done, create object property */
+		if (!decoratorUsed) {
+			this::defineProperty(name, {
+				get() { return this[$$currentValues][name] },
+				...(!readonly && {
+					set(value) { subject.next(value) }
+				})
+			});
+		}
 		
 		/* return property */
 		return this[$$settableProperties][name];
@@ -187,43 +198,34 @@ export default class ValueTracker {
 				::withLatestFrom(...optionalPassiveDeps.map(::this.p),
 				(active, ...passive) => optionalTransformer(...active, ...passive));
 		} else if (name) {
-			let head = name, sep, tail;
-			const match = name.match(/^(.+?)(\??\.)(.+)$/);
-			if (match) {
-				[,head,sep,tail] = match;
-				let loose = (sep === '?.');
-				return this.p(head)::switchMap((obj) => {
-					if (!obj) {
-						if (loose) { return of(null) }
-						else       { return never()  }
-					}
-					assert(obj.p::isFunction(), humanMsg`
-						The '${head}' property did not return
-						a ValueTracker-based object,
-						so it cannot be chained.
-					`); // TODO: allow simple property chaining (even if not observables)
-					return obj.p(tail);
-				});
-			} else {
+			
+			/* Is it a simple name? Do a simple lookup. */
+			if (name.match(/^\w+$/)) {
 				assert(this[$$properties][name], humanMsg`No property '${name}' exists.`);
 				return this[$$properties][name];
 			}
 			
-			// const [head, ...tail] = name.split('.');
-			// if (tail.length > 0) {
-			// 	return this.p(head)::switchMap((obj) => {
-			// 		if (!obj) { return never() }
-			// 		assert(obj.p::isFunction(), humanMsg`
-			// 			The '${head}' property did not return
-			// 			a ValueTracker-based object,
-			// 			so it cannot be chained.
-			// 		`);
-			// 		return obj.p(tail.join('.'));
-			// 	});
-			// } else {
-			// 	assert(this[$$properties][head], humanMsg`No property '${name}' exists.`);
-			// 	return this[$$properties][head];
-			// }
+			/* If not, treat it as a path. */
+			function resolve(obj, key) {
+				if (key.length === 0) { return { val: obj } }
+				
+				let loose, head, sep, tail;
+				const match = key.match(/^\s*(\??)\s*(~>|\.)\s*(\w+)\s*(.*?)$/);
+				assert(match);
+				[,loose,sep,head,tail] = match;
+				
+				if (!obj) { return { obs: !!loose ? of(obj) : never() } }
+				
+				switch (sep) {
+					case '~>': return { obs: obj.p(head)::switchMap((innerObj) => {
+						let result = resolve(innerObj, tail);
+						return result.obs || of(result.val);
+					})};
+					case '.': return resolve(obj[head], tail);
+				}
+			}
+
+			return resolve(this, `~>${name}`).obs;
 		}
 	}
 	
@@ -261,7 +263,7 @@ export default class ValueTracker {
 };
 
 export const property = (options = {}) => (target, key) => {
-	target::set(['constructor', $$properties, key], options);
+	target::set(['constructor', $$properties, key], { ...options, decoratorUsed: true });
 	return {
 		get() { return this[$$currentValues][key] },
 		...(!options.readonly && {
