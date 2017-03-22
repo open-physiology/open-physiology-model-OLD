@@ -481,24 +481,20 @@ describe("regression tests", () => {
             "href": "http://localhost:8888/Material/1",
             "id": 1,
             "class": "Material",
-            "-->DefinesType": [
-                {
-                    "href": "http://localhost:8888/DefinesType/3",
-                    "class": "DefinesType"
-                }
-            ],
+            "-->DefinesType": {
+                "href": "http://localhost:8888/DefinesType/3",
+                "class": "DefinesType"
+            },
         };
         let r2 = {
             "name": "Blood",
             "href": "http://localhost:8888/Type/2",
             "id": 2,
             "class": "Type",
-            "<--DefinesType": [
-                {
-                    "href": "http://localhost:8888/DefinesType/3",
-                    "class": "DefinesType"
-                }
-            ]
+            "<--DefinesType": {
+                "href": "http://localhost:8888/DefinesType/3",
+                "class": "DefinesType"
+            }
         };
         let rel = {
             "href": "http://localhost:8888/DefinesType/3",
@@ -516,24 +512,23 @@ describe("regression tests", () => {
 
         let environment = moduleFactory({
             async loadAll(cls, options = {}) {
-                if (cls.name === "Material"){ return [r1] }
-                if (cls.name === "Type"){ return [r2] }
-                if (cls.name === "DefinesType"){ return [rel]; }
+                if (cls.name === 'Material')    { return [r1]  }
+                if (cls.name === 'Type')        { return [r2]  }
+                if (cls.name === 'DefinesType') { return [rel] }
             },
             async load(addresses, options = {}) {
                 let response = [];
                 for (let address of Object.values(addresses)){
-                    if (address.href === "http://localhost:8888/Material/1"){ response.push(r1); }
-                    if (address.href === "http://localhost:8888/Type/2"){ response.push(r2); }
-                    if (address.href === "http://localhost:8888/DefinesType/3"){ response.push(rel); }
+                    if (address.href === 'http://localhost:8888/Material/1')    { response.push(r1)  }
+                    if (address.href === 'http://localhost:8888/Type/2')        { response.push(r2)  }
+                    if (address.href === 'http://localhost:8888/DefinesType/3') { response.push(rel) }
                 }
-                return response;
+                return addresses::isArray() ? response : response[0];
             },
         });
 
         const {Material} = environment.classes;
         let materials = [...await Material.getAll()];
-        console.log(materials);
     });
 
 
