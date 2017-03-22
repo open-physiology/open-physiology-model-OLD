@@ -122,7 +122,7 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 				if (!rel.fields[desc.keyInRelationship].get()) {
 					rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false });
 				}
-				assert(rel.fields[desc.keyInRelationship].get() === owner);
+				//assert(rel.fields[desc.keyInRelationship].get() === owner);
 				this[$$value].add(rel);
 			}
 		} else if (related::get([desc.shortcutKey, 'initialValue'])) {
