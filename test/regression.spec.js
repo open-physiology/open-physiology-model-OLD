@@ -96,7 +96,7 @@ describe("regression tests", () => {
         expect(causality.constructor).to.have.a.property('plural', "causalities");
     });
 
-    it("auto-synchronized border-natures?", async () => {
+    it.skip("auto-synchronized border-natures?", async () => {
 
         const {Lyph, Border} = environment.classes;
 
@@ -497,6 +497,11 @@ describe("regression tests", () => {
         });
 
         const {Lyph} = environment.classes;
-        let lyphs = [...await Lyph.get("http://localhost:8888/Lyph/30")];
+        let lyph = await Lyph.get("http://localhost:8888/Lyph/30");
+        let border = [...lyph['-->HasLongitudinalBorder']][0];
+        expect(border).not.to.be.undefined;
+        expect(border).to.have.property('href');
+        expect(border.href).not.to.be.undefined;
+        console.log(lyph.toJSON());
     });
 });
