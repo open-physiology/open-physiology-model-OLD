@@ -217,10 +217,12 @@ export default class ValueTracker {
 				if (!obj) { return { obs: !!loose ? of(obj) : never() } }
 				
 				switch (sep) {
-					case '~>': return { obs: obj.p(head)::switchMap((innerObj) => {
-						let result = resolve(innerObj, tail);
-						return result.obs || of(result.val);
-					})};
+					case '~>': return {
+						obs: obj.p(head)::switchMap((innerObj) => {
+							const result = resolve(innerObj, tail);
+							return result.obs || of(result.val);
+						})
+					};
 					case '.': return resolve(obj[head], tail);
 				}
 			}
