@@ -1,6 +1,6 @@
-import {switchMap} from 'rxjs/operator/switchMap';
-import {startWith} from 'rxjs/operator/startWith';
-import {pairwise}  from 'rxjs/operator/pairwise';
+// TODO: make sure we don't need to import this anymore: switchMap;
+// TODO: make sure we don't need to import this anymore: startWith;
+// TODO: make sure we don't need to import this anymore: pairwise;
 import 'rxjs/add/operator/do';
 
 import inRange     from 'lodash-bound/inRange';
@@ -90,8 +90,8 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 					subField.get().e('delete').subscribe( this.get().e('delete') );
 				} else { // Rel1Field
 					subField.p('value')
-						::startWith(null)
-						::pairwise()
+						.startWith(null)
+						.pairwise()
 						.subscribe(([prev, curr]) => {
 							if (prev) { this.get().delete(prev) }
 							if (curr) { this.get().add   (curr) }
@@ -103,16 +103,16 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 		/* update relationships that are added or deleted here */
 		this[$$value].e('add')
 			::waitUntilConstructed()
-			::switchMap(rel => rel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>rel))
+			.switchMap(rel => rel.p('fieldsInitialized').filter(v=>!!v).map(()=>rel))
 			.subscribe((rel) => { rel.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) });
 		
 		/* decouple a relationship when it decouples from this resource */
 		this[$$value].e('add')
 			::waitUntilConstructed()
-			::switchMap(newRel => newRel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>newRel))
-			::switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value')
-				::filter(res => res !== owner)
-				::map(() => newRel)
+			.switchMap(newRel => newRel.p('fieldsInitialized').filter(v=>!!v).map(()=>newRel))
+			.switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value')
+				.filter(res => res !== owner)
+				.map(() => newRel)
 			).subscribe( this.get().e('delete') );
 		
 		/* handle initial values */

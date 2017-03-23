@@ -1,6 +1,6 @@
-import {Subject}                  from 'rxjs/Subject';
-import {map}                      from 'rxjs/operator/map';
-import {concat}                   from 'rxjs/observable/concat';
+import {Observable, Subject} from '../libs/rxjs.js';
+// TODO: make sure we don't need to import this anymore: map;
+// TODO: make sure we don't need to import anymore: concat
 import 'rxjs/add/operator/do';
 
 import pick        from 'lodash-bound/pick';
@@ -73,9 +73,9 @@ export class Field extends ValueTracker {
 		const constructingOwner = new Subject(); // TODO: remove; obsolete
 		const waitUntilConstructed = function (entity = owner) {
 			if (entity === owner) { // TODO: remove; obsolete
-				return concat(constructingOwner, this);
+				return Observable.concat(constructingOwner, this);
 			} else {
-				return concat(entity.p('fieldsInitialized'), this);
+				return Observable.concat(entity.p('fieldsInitialized'), this);
 			}
 		};
 		
@@ -152,7 +152,7 @@ export class Field extends ValueTracker {
 			this.p('value').subscribe((v) => { this.set(v, { createEditCommand: false }) });
 		}
 		// this.p('value') // TODO: remove all 'pristine' related stuff from the field classes
-		// 	::map(v => this.constructor.isEqual(v, this[$$pristine]))
+		// 	.map(v => this.constructor.isEqual(v, this[$$pristine]))
 		// 	.subscribe( this.pSubject('isPristine') );
 	}
 	

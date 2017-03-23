@@ -4,7 +4,7 @@ import cloneDeep   from 'lodash-bound/cloneDeep';
 
 import {filter, map}    from '../util/bound-hybrid-functions';
 import {defineProperty} from 'bound-native-methods';
-import {take}           from 'rxjs/operator/take';
+// TODO: make sure we don't need to import this anymore: take;
 
 import {humanMsg, assign, callOrReturn} from "../util/misc";
 
@@ -70,7 +70,7 @@ Field[$$registerFieldClass](class PropertyField extends Field {
 		`);
 		
 		/* set the initial value */
-		owner.p('isPlaceholder')::filter(v=>!v)::take(1).subscribe(() => {
+		owner.p('isPlaceholder').filter(v=>!v).take(1).subscribe(() => {
 			// this[$$initSet](
 			// 	[!initialValue::isUndefined(), initialValue::callOrReturn(owner)::cloneDeep()],
 			// 	['default' in desc,            desc.default::callOrReturn(owner)::cloneDeep()],

@@ -1,7 +1,7 @@
-import {pairwise}                 from 'rxjs/operator/pairwise';
-import {takeUntil}                from 'rxjs/operator/takeUntil';
-import {take}                     from 'rxjs/operator/take';
-import {startWith}                from 'rxjs/operator/startWith';
+// TODO: make sure we don't need to import this anymore: pairwise;
+// TODO: make sure we don't need to import this anymore: takeUntil;
+// TODO: make sure we don't need to import this anymore: take;
+// TODO: make sure we don't need to import this anymore: startWith;
 import 'rxjs/add/operator/do';
 
 import inRange     from 'lodash-bound/inRange';
@@ -32,7 +32,7 @@ import {
 	$$destruct
 } from './symbols';
 import {constraint} from "../util/misc";
-import {switchMap} from 'rxjs/operator/switchMap';
+// TODO: make sure we don't need to import this anymore: switchMap;
 
 
 Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
@@ -88,14 +88,14 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 		
 		correspondingRelField.e('add')
 			::waitUntilConstructed()
-			::switchMap(newRel => newRel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>newRel))
+			.switchMap(newRel => newRel.p('fieldsInitialized').filter(v=>!!v).map(()=>newRel))
 			.subscribe((newRel) => {
 				let newRelDisconnected = newRel.fields[desc.keyInRelationship].p('value')
-					::filter(v => v !== owner)
-					::take(1);
+					.filter(v => v !== owner)
+					.take(1);
 				newRel.fields[desc.codomain.keyInRelationship].p('value')
-					::takeUntil(newRelDisconnected)
-					::startWith(null)::pairwise().subscribe(([prev, curr]) => {
+					.takeUntil(newRelDisconnected)
+					.startWith(null).pairwise().subscribe(([prev, curr]) => {
 						if (prev) { this[$$value].delete(prev) }
 						if (curr) { this[$$value].add   (curr) }
 					});

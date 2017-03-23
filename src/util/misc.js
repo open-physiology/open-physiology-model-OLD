@@ -17,7 +17,7 @@ import rearg from 'rearg';
 
 import {defineProperty} from 'bound-native-methods';
 
-import {filter} from 'rxjs/operator/filter';
+// TODO: make sure we don't need to import this anymore: filter;
 
 import _zip from 'lodash/zip';
 
@@ -138,7 +138,7 @@ export const stopPropagation = (event) => {
 };
 
 export function which(keyCode) {
-	return this::filter(event => event.which === keyCode);
+	return this.filter(event => event.which === keyCode);
 }
 
 export const xy_add = (a, b) => ({

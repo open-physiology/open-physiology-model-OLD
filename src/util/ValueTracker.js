@@ -10,18 +10,17 @@ import assert from 'power-assert';
 
 import {args, humanMsg} from './misc';
 
-import {Subject}              from 'rxjs/Subject';
-import {BehaviorSubject}      from 'rxjs/BehaviorSubject';
-import {of}                   from 'rxjs/observable/of';
-import {never}                from 'rxjs/observable/never';
-import {combineLatest}        from 'rxjs/observable/combineLatest';
-import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged';
-import {filter}               from 'rxjs/operator/filter';
-import {takeUntil}            from 'rxjs/operator/takeUntil';
-import {skip}                 from 'rxjs/operator/skip';
-import {map}                  from 'rxjs/operator/map';
-import {withLatestFrom}       from 'rxjs/operator/withLatestFrom';
-import {switchMap}            from 'rxjs/operator/switchMap';
+import {Observable, Subject, BehaviorSubject} from '../libs/rxjs.js';
+// TODO: make sure we don't need to import anymore: of
+// TODO: make sure we don't need to import anymore: never
+// TODO: make sure we don't need to import anymore: combineLatest
+// TODO: make sure we don't need to import this anymore: distinctUntilChanged;
+// TODO: make sure we don't need to import this anymore: filter;
+// TODO: make sure we don't need to import this anymore: takeUntil;
+// TODO: make sure we don't need to import this anymore: skip;
+// TODO: make sure we don't need to import this anymore: map;
+// TODO: make sure we don't need to import this anymore: withLatestFrom;
+// TODO: make sure we don't need to import this anymore: switchMap;
 import 'rxjs/add/operator/do';
 
 const $$events             = Symbol('$$events');
@@ -58,11 +57,11 @@ export default class ValueTracker {
 	}
 	
 	constructor() {
-		this[$$takeUntil] = never();
+		this[$$takeUntil] = Observable.never();
 		this[$$filterBy]  = (()=>true);
 	}
 	
-	setValueTrackerOptions({ takeUntil = never(), filterBy = (()=>true) }) {
+	setValueTrackerOptions({ takeUntil = Observable.never(), filterBy = (()=>true) }) {
 		this[$$takeUntil] = takeUntil;
 		this[$$filterBy]  = filterBy;
 		this[$$initialize]();
@@ -86,8 +85,8 @@ export default class ValueTracker {
 			`There is already a property '${name}' on this object.`);
 		
 		this[$$events][name] = new Subject()
-			::takeUntil(this[$$takeUntil])
-			::filter   (this[$$filterBy] );
+			.takeUntil(this[$$takeUntil])
+			.filter(this[$$filterBy] );
 		
 		return this[$$events][name];
 	}
@@ -129,12 +128,12 @@ export default class ValueTracker {
 		
 		/* define the bus which manages the property */
 		let subject = this[$$settableProperties][name] = new BehaviorSubject(initial)
-			// ::filter              (this[$$filterBy] )
-			::filter              (this::isValid    )
-			::map                 (this::transform  )
-			// ::takeUntil           (this[$$takeUntil])
-			::distinctUntilChanged(this::isEqual    )
-			::filter              (v => v !== invalidCache);
+			// .filter(this[$$filterBy] )
+			.filter(this::isValid    )
+			.map(this::transform  )
+			// .takeUntil(this[$$takeUntil])
+			.distinctUntilChanged(this::isEqual    )
+			.filter(v => v !== invalidCache);
 		this[$$properties][name] = readonly ? subject.asObservable() : subject;
 		
 		const invalidCache = Symbol();
@@ -149,7 +148,7 @@ export default class ValueTracker {
 		
 		/* create event version of the property */
 		this[$$events][name] = subject.asObservable()
-			::skip(1); // skip 'current value' on subscribe
+			.skip(1); // skip 'current value' on subscribe
 		
 		/* return property */
 		return this[$$settableProperties][name];
@@ -166,7 +165,7 @@ export default class ValueTracker {
 	 */
 	e(name) {
 		this[$$initialize]();
-		return this[$$events][name] || never();
+		return this[$$events][name] || Observable.never();
 	}
 	
 	hasProperty(name) {
@@ -187,8 +186,8 @@ export default class ValueTracker {
 	@args('s?a?a?f?') p(name, deps, optionalPassiveDeps = [], optionalTransformer = (...a)=>a) {
 		this[$$initialize]();
 		if (deps) {
-			return combineLatest(...deps               .map(::this.p))
-				::withLatestFrom(...optionalPassiveDeps.map(::this.p),
+			return Observable.combineLatest(...deps               .map(::this.p))
+				.withLatestFrom(...optionalPassiveDeps.map(::this.p),
 				(active, ...passive) => optionalTransformer(...active, ...passive));
 		} else if (name) {
 			let head = name, sep, tail;
@@ -196,10 +195,10 @@ export default class ValueTracker {
 			if (match) {
 				[,head,sep,tail] = match;
 				let loose = (sep === '?.');
-				return this.p(head)::switchMap((obj) => {
+				return this.p(head).switchMap((obj) => {
 					if (!obj) {
-						if (loose) { return of(null) }
-						else       { return never()  }
+						if (loose) { return Observable.of(null) }
+						else       { return Observable.never()  }
 					}
 					assert(obj.p::isFunction(), humanMsg`
 						The '${head}' property did not return
@@ -215,8 +214,8 @@ export default class ValueTracker {
 			
 			// const [head, ...tail] = name.split('.');
 			// if (tail.length > 0) {
-			// 	return this.p(head)::switchMap((obj) => {
-			// 		if (!obj) { return never() }
+			// 	return this.p(head).switchMap((obj) => {
+			// 		if (!obj) { return Observable.never() }
 			// 		assert(obj.p::isFunction(), humanMsg`
 			// 			The '${head}' property did not return
 			// 			a ValueTracker-based object,

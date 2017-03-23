@@ -1,8 +1,8 @@
-import {filter}                   from 'rxjs/operator/filter';
-import {switchMap}                from 'rxjs/operator/switchMap';
-import {mapTo}                    from 'rxjs/operator/mapTo';
-import {take}                     from 'rxjs/operator/take';
-import {takeUntil}                from 'rxjs/operator/takeUntil';
+// TODO: make sure we don't need to import this anymore: filter;
+// TODO: make sure we don't need to import this anymore: switchMap;
+// TODO: make sure we don't need to import this anymore: mapTo;
+// TODO: make sure we don't need to import this anymore: take;
+// TODO: make sure we don't need to import this anymore: takeUntil;
 import {defer as deferObservable} from 'rxjs/observable/defer';
 import 'rxjs/add/operator/do';
 
@@ -89,9 +89,9 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		
 		/* keep this value up to date with new sides of new relationships */
 		correspondingRelValue
-			::filter(v=>v)
-			::switchMap(rel => rel.p('fieldsInitialized')::filter(v=>!!v)::mapTo(rel))
-			::switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
+			.filter(v=>v)
+			.switchMap(rel => rel.p('fieldsInitialized').filter(v=>!!v).mapTo(rel))
+			.switchMap(rel => rel.fields[desc.codomain.keyInRelationship].p('value'))
 			.subscribe( this.p('value') );
 	
 		// /* keep the relationship up to date */
@@ -128,9 +128,9 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 				if (relValue && relValue[desc.codomain.keyInRelationship]) {
 					// TODO: should we wait until relValue.p('fieldsInitialized')?
 					relValue.p('fieldsInitialized')
-						::filter(v=>!!v)
-						::take(1)
-						::takeUntil(this.p('value')::filter(v=>v!==scValue)).subscribe(() => {
+						.filter(v=>!!v)
+						.take(1)
+						.takeUntil(this.p('value').filter(v=>v!==scValue)).subscribe(() => {
 							relValue.fields[desc.codomain.keyInRelationship].set(scValue || null, { createEditCommand: false });
 						});
 				} else if (scValue && !desc.relationshipClass.abstract) {

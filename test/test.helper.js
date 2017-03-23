@@ -28,9 +28,15 @@ chai.use(sinonChai);
 /* direct exports from respective packages */
 import mocha from 'mocha';
 
-const gw = global || window;
-export const describe   = mocha.describe   || gw.describe;
-export const it         = mocha.it         || gw.it;
-export const beforeEach = mocha.beforeEach || gw.beforeEach;
-export const afterEach  = mocha.afterEach  || gw.afterEach;
+import global from '../src/util/global.js';
+
+export const describe   = mocha.describe   || global.describe;
+export const it         = mocha.it         || global.it;
+export const beforeEach = mocha.beforeEach || global.beforeEach;
+export const afterEach  = mocha.afterEach  || global.afterEach;
 export const expect     = chai.expect;
+
+
+/* importing rxjs */
+import Rx from 'rxjs';
+global.Rx = Rx;

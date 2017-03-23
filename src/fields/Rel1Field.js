@@ -1,8 +1,8 @@
-import {map}       from 'rxjs/operator/map';
-import {filter}    from 'rxjs/operator/filter';
-import {pairwise}  from 'rxjs/operator/pairwise';
-import {switchMap} from 'rxjs/operator/switchMap';
-import {startWith} from 'rxjs/operator/startWith';
+// TODO: make sure we don't need to import this anymore: map;
+// TODO: make sure we don't need to import this anymore: filter;
+// TODO: make sure we don't need to import this anymore: pairwise;
+// TODO: make sure we don't need to import this anymore: switchMap;
+// TODO: make sure we don't need to import this anymore: startWith;
 import 'rxjs/add/operator/do';
 
 import get         from 'lodash-bound/get';
@@ -123,8 +123,8 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		/* keep the relationship up to date with changes here */
 		this.p('value')
 			::waitUntilConstructed()
-			::startWith(null)
-			::pairwise()
+			.startWith(null)
+			.pairwise()
 			.subscribe(([prev, curr]) => {
 				// TODO: prev or curr being placeholders may be a complex situation; model it properly
 				if (prev && !prev.isPlaceholder) { prev.fields[desc.keyInRelationship].set(null,  { createEditCommand: false }) }
@@ -134,11 +134,11 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		/* set the value of this field to null when the relationship replaces this resource */
 		this.p('value')
 			::waitUntilConstructed()
-			::filter(_isObject)
-			::switchMap(newRel => newRel.p('fieldsInitialized')::filter(v=>!!v)::map(()=>newRel))
-			::switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value'))
-			::filter(res => res !== owner)
-			::map(()=>null)
+			.filter(_isObject)
+			.switchMap(newRel => newRel.p('fieldsInitialized').filter(v=>!!v).map(()=>newRel))
+			.switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value'))
+			.filter(res => res !== owner)
+			.map(()=>null)
 			.subscribe( this.p('value') );
 	}
 	

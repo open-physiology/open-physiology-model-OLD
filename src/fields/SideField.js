@@ -1,6 +1,6 @@
-import {filter}                   from 'rxjs/operator/filter';
-import {pairwise}                 from 'rxjs/operator/pairwise'
-import {startWith}                from 'rxjs/operator/startWith';
+// TODO: make sure we don't need to import this anymore: filter;
+// TODO: make sure we don't need to import this anymore: pairwise
+// TODO: make sure we don't need to import this anymore: startWith;
 import 'rxjs/add/operator/do';
 
 import isUndefined from 'lodash-bound/isUndefined';
@@ -78,14 +78,14 @@ Field[$$registerFieldClass](class SideField extends Field {
 		/* releasing the relationship                        */
 		this.p('value')
 			::waitUntilConstructed()
-			::filter(v=>v===null)
+			.filter(v=>v===null)
 			.subscribe(owner.fields[desc.codomain.keyInRelationship]);
 		
 		/* when a side changes, let the relevant resources know */
 		this.p('value')
-			::startWith(null)
+			.startWith(null)
 			::waitUntilConstructed()
-			::pairwise()
+			.pairwise()
 			.subscribe(([prev, curr]) => {
 				// TODO: prev or curr being placeholders may be a complex situation; model it properly
 				if (desc.cardinality.max === 1) {

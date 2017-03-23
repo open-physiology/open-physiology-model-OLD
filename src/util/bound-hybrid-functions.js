@@ -1,6 +1,6 @@
 import wu from 'wu';
 
-import {Observable} from 'rxjs/Observable';
+import {Observable} from '../libs/rxjs.js';
 
 function hybrid(ld, rx, wuFn) {
 	return function (...args) {

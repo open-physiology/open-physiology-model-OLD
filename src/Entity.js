@@ -13,9 +13,9 @@ import {humanMsg, definePropertiesByValue, definePropertyByValue} from './util/m
 import ObservableSet                   from './util/ObservableSet';
 import {Field}                         from './fields/fields';
 import ValueTracker, {event, property} from './util/ValueTracker';
-import {BehaviorSubject}               from 'rxjs/BehaviorSubject';
-import {combineLatest}                 from 'rxjs/observable/combineLatest';
-import                                      'rxjs/add/operator/do';
+import {Observable, BehaviorSubject} from './libs/rxjs.js';
+// TODO: make sure we don't need to import anymore: combineLatest
+// TODO: make sure we don't need to import anymore: do
 
 import {filter, map} from './util/bound-hybrid-functions';
 
@@ -111,8 +111,8 @@ export default (environment) => {
 				     [$$committedEntities, $$committedEntitiesSubject]
 			]) {
 				const localSet = new ObservableSet();
-				Entity[$$set].e('add'   )::filter(::EntitySubclass.hasInstance).subscribe(localSet.e('add'   ));
-				Entity[$$set].e('delete')::filter(::EntitySubclass.hasInstance).subscribe(localSet.e('delete'));
+				Entity[$$set].e('add'   ).filter(::EntitySubclass.hasInstance).subscribe(localSet.e('add'   ));
+				Entity[$$set].e('delete').filter(::EntitySubclass.hasInstance).subscribe(localSet.e('delete'));
 				EntitySubclass::definePropertyByValue($$subject, localSet.p('value'));
 			}
 			
@@ -384,12 +384,12 @@ export default (environment) => {
 			/* initialize value tracking */
 			super();
 			super.setValueTrackerOptions({
-				takeUntil: combineLatest(
+				takeUntil: Observable.combineLatest(
 					this.p('isDeleted'),
 					this.p('isPristine'),
 					this.p('isNew'),
 					(d, p, n) => d && (p || n)
-				)::filter(v=>!!v)
+				).filter(v=>!!v)
 			});
 			
 			/* make sure this constructor was invoked under proper conditions */
@@ -558,7 +558,7 @@ export default (environment) => {
 ///// FROM Entity CONSTRUCTOR
 // // TODO: remove this? Fields are no longer 'in charge' of committing
 // /* entity is pristine if all its fields are pristine */
-// combineLatest(
+// Observable.combineLatest(
 // 	...this.fields::values()::map(f=>f.p('isPristine')),
 // 	(...fieldPristines) => fieldPristines.every(v=>!!v)
 // ).subscribe( this.pSubject('isPristine') );
