@@ -419,6 +419,14 @@ export default (environment) => {
 			return `${this.constructor.name}: ${this.href}`;
 		}
 		
+		p(...args) {
+			if (!!this.fields && !!this.fields[args[0]]) {
+				return this.fields[args[0]].p('value');
+			} else if (this.hasProperty(...args)) {
+				return super.p(...args);
+			}
+		}
+		
 		
 		//// Transforming to/from JSON
 		

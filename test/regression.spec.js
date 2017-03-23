@@ -96,6 +96,7 @@ describe("regression tests", () => {
         expect(causality.constructor).to.have.a.property('plural', "causalities");
     });
 
+    // TODO: temporarily skipping this test, because it assumes border auto-creation.
     it.skip("auto-synchronized border-natures?", async () => {
 
         const {Lyph, Border} = environment.classes;

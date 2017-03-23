@@ -72,17 +72,19 @@ describe("'lyphs' Module", () => {
 			createRadialBorders: 1
 		});
 		
-		expect([...lyph1.longitudinalBorders]).to.have.a.lengthOf(2);
-		expect([...lyph1.longitudinalBorders][0]).to.be.an.instanceOf(Border);
-		expect([...lyph1.longitudinalBorders][1]).to.be.an.instanceOf(Border);
+		// TODO: No longer auto-creating longitudinal borders
+		// expect([...lyph1.longitudinalBorders]).to.have.a.lengthOf(2);
+		// expect([...lyph1.longitudinalBorders][0]).to.be.an.instanceOf(Border);
+		// expect([...lyph1.longitudinalBorders][1]).to.be.an.instanceOf(Border);
 		
-		expect([...lyph1['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
-		expect([...lyph1['-->HasBorder']])            .to.have.a.lengthOf(3);
+		// expect([...lyph1['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
+		// expect([...lyph1['-->HasBorder']])            .to.have.a.lengthOf(3);
+		expect([...lyph1['-->HasBorder']])            .to.have.a.lengthOf(1);
 		
-		let oneLongitudinalBorderOfLyph1 = [...lyph1.longitudinalBorders][0];
-		expect(oneLongitudinalBorderOfLyph1['<--HasLongitudinalBorder']).to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
-		expect(oneLongitudinalBorderOfLyph1['<--HasBorder'])            .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
-		expect([...oneLongitudinalBorderOfLyph1['<--Has']][0])          .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
+		// let oneLongitudinalBorderOfLyph1 = [...lyph1.longitudinalBorders][0];
+		// expect(oneLongitudinalBorderOfLyph1['<--HasLongitudinalBorder']).to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
+		// expect(oneLongitudinalBorderOfLyph1['<--HasBorder'])            .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
+		// expect([...oneLongitudinalBorderOfLyph1['<--Has']][0])          .to.be.instanceOf(HasLongitudinalBorder, HasBorder, Has);
 		 
 		expect([...lyph1.radialBorders]).to.have.a.lengthOf(1);
 		expect([...lyph1.radialBorders][0]).to.be.an.instanceOf(Border);
@@ -92,12 +94,13 @@ describe("'lyphs' Module", () => {
 			createAxis: true
 		});
 		
-		expect([...lyph2.longitudinalBorders]).to.have.a.lengthOf(2);
-		expect([...lyph2.longitudinalBorders][0]).to.be.an.instanceOf(Border);
-		expect([...lyph2.longitudinalBorders][1]).to.be.an.instanceOf(Border);
+		// expect([...lyph2.longitudinalBorders]).to.have.a.lengthOf(2);
+		// expect([...lyph2.longitudinalBorders][0]).to.be.an.instanceOf(Border);
+		// expect([...lyph2.longitudinalBorders][1]).to.be.an.instanceOf(Border);
 		
-		expect([...lyph2['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
-		expect([...lyph2['-->HasBorder']])            .to.have.a.lengthOf(4);
+		// expect([...lyph2['-->HasLongitudinalBorder']]).to.have.a.lengthOf(2);
+		// expect([...lyph2['-->HasBorder']])            .to.have.a.lengthOf(4);
+		expect([...lyph2['-->HasBorder']])            .to.have.a.lengthOf(3);
 		
 		expect([...lyph2.radialBorders]).to.have.a.lengthOf(2);
 		expect([...lyph2.radialBorders][0]).to.be.an.instanceOf(Border);

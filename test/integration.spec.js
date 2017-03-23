@@ -309,8 +309,8 @@ describe("integrated workflow", () => {
 		
 		await lyph.commit();
 
-		expect(backend.readAll()).to.have.length(5);
-		// ⬑ 1 lyph, 2 borders, 2 relationships
+		expect(backend.readAll()).to.have.length(1);
+		// ⬑ 1 lyph // TODO: note, no longer auto-creating longitudinal borders
 	});
 	
 	it("can load either one or multiple entities per request", async () => {
