@@ -1,5 +1,4 @@
-import {Subject} from '../libs/rxjs.js';
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {BehaviorSubject, Subject} from '../libs/rxjs.js';
 import assert from "power-assert";
 import {humanMsg, constraint} from "./misc";
 

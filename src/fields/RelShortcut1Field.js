@@ -3,8 +3,10 @@
 // TODO: make sure we don't need to import this anymore: mapTo;
 // TODO: make sure we don't need to import this anymore: take;
 // TODO: make sure we don't need to import this anymore: takeUntil;
-import {defer as deferObservable} from 'rxjs/observable/defer';
-import 'rxjs/add/operator/do';
+// import {defer as deferObservable} from 'rxjs/observable/defer';
+// import 'rxjs/add/operator/do';
+
+import {Observable} from '../libs/rxjs.js'
 
 import entries     from 'lodash-bound/entries';
 import isObject    from 'lodash-bound/isObject';
@@ -84,7 +86,7 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 		);
 		
 		const correspondingRelValue =
-			deferObservable(() => owner.fields[desc.keyInResource].p('value'))
+			Observable.defer(() => owner.fields[desc.keyInResource].p('value'))
 				::waitUntilConstructed();
 		
 		/* keep this value up to date with new sides of new relationships */

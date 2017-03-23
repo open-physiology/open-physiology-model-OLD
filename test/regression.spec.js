@@ -2,9 +2,6 @@ import {describe, expect} from './test.helper';
 import moduleFactory from '../src/index';
 import {simpleMockHandlers} from "./mock-handlers.helper";
 
-import {map} from 'rxjs/operator/map';
-import {take} from 'rxjs/operator/take';
-import {toPromise} from 'rxjs/operator/toPromise';
 import {filter} from '../src/util/bound-hybrid-functions';
 import cloneDeep   from 'lodash-bound/cloneDeep';
 
@@ -488,11 +485,9 @@ describe("regression tests", () => {
 
         let environment = moduleFactory({
             async loadAll(cls, options = {}) {
-                console.log("loadAll", cls.name);
                 return [r1];
             },
             async load(addresses, options = {}) {
-                console.log("load", JSON.stringify(addresses, null, 4));
                 return [r1];
             }
         });
@@ -503,6 +498,5 @@ describe("regression tests", () => {
         expect(border).not.to.be.undefined;
         expect(border).to.have.property('href');
         expect(border.href).not.to.be.undefined;
-        console.log(lyph.toJSON());
     });
 });
