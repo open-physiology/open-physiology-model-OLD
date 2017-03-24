@@ -499,4 +499,34 @@ describe("regression tests", () => {
         expect(border).to.have.property('href');
         expect(border.href).not.to.be.undefined;
     });
+
+    it("Types are missing <--DefinesType relationship", async () => {
+        let r1 = {
+            "name"  : "Renal parenchyma type",
+            "href"  :"http://localhost:8888/Type/46",
+            "id"    :46,
+            "class" :"Type",
+            "<--DefinesType" : {"href":"http://localhost:8888/DefinesType/47", "class":"DefinesType"}
+        };
+
+        let environment = moduleFactory({
+            async loadAll(cls, options = {}) {
+                //console.log("loadAll", cls);
+                return [r1];
+            },
+            async load(addresses, options = {}) {
+                //console.log("load", addresses);
+                return [r1];
+            }
+        });
+
+        const {Type} = environment.classes;
+        let type = await Type.get("http://localhost:8888/Type/46");
+        let definition = type['<--DefinesType'];
+        expect(definition).not.to.be.undefined;
+        expect(definition).not.to.be.null;
+        expect(definition).to.have.property('href');
+        expect(definition.href).not.to.be.undefined;
+    });
+
 });
