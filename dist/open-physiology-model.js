@@ -1169,6 +1169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
 				_defaults2.default.call(options, { createEditCommand: true });
+	
 				if (options.createEditCommand) {
 	
 					this[_symbols.$$owner].edit(_defineProperty({}, this[_symbols.$$key], newValue), options);
@@ -17324,20 +17325,16 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 			});
 	
-			/* set the value of this field to null when the relationship replaces this resource */
-			(_context4 = _this.p('value'), waitUntilConstructed).call(_context4).filter(_isObject3.default).switchMap(function (newRel) {
-				return newRel.p('fieldsInitialized').filter(function (v) {
-					return !!v;
-				}).map(function () {
-					return newRel;
-				});
-			}).switchMap(function (newRel) {
-				return newRel.fields[desc.keyInRelationship].p('value');
-			}).filter(function (res) {
-				return res !== owner;
-			}).map(function () {
-				return null;
-			}).subscribe(_this.p('value'));
+			// TODO: This was causing a bug; it's no longer relevant after the refactoring
+			// /* set the value of this field to null when the relationship replaces this resource */
+			// this.p('value')
+			// 	::waitUntilConstructed()
+			// 	.filter(_isObject)
+			// 	.switchMap(newRel => newRel.p('fieldsInitialized').filter(v=>!!v).map(()=>newRel))
+			// 	.switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value'))
+			// 	.filter(res => res !== owner)
+			// 	.map(()=>null)
+			// 	.subscribe( this.p('value') );
 			return _this;
 		}
 	

@@ -131,15 +131,17 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 				if (curr && !curr.isPlaceholder) { curr.fields[desc.keyInRelationship].set(owner, { createEditCommand: false }) }
 			});
 		
-		/* set the value of this field to null when the relationship replaces this resource */
-		this.p('value')
-			::waitUntilConstructed()
-			.filter(_isObject)
-			.switchMap(newRel => newRel.p('fieldsInitialized').filter(v=>!!v).map(()=>newRel))
-			.switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value'))
-			.filter(res => res !== owner)
-			.map(()=>null)
-			.subscribe( this.p('value') );
+		
+		// TODO: This was causing a bug; it's no longer relevant after the refactoring
+		// /* set the value of this field to null when the relationship replaces this resource */
+		// this.p('value')
+		// 	::waitUntilConstructed()
+		// 	.filter(_isObject)
+		// 	.switchMap(newRel => newRel.p('fieldsInitialized').filter(v=>!!v).map(()=>newRel))
+		// 	.switchMap(newRel => newRel.fields[desc.keyInRelationship].p('value'))
+		// 	.filter(res => res !== owner)
+		// 	.map(()=>null)
+		// 	.subscribe( this.p('value') );
 	}
 	
 	static valueToJSON(value, {requireClass, ...options} = {}) {

@@ -506,16 +506,17 @@ describe("regression tests", () => {
             "href"  :"http://localhost:8888/Type/46",
             "id"    :46,
             "class" :"Type",
-            "<--DefinesType" : {"href":"http://localhost:8888/DefinesType/47", "class":"DefinesType"}
+            "<--DefinesType" : {
+                "href":"http://localhost:8888/DefinesType/47",
+                "class":"DefinesType"
+            }
         };
 
         let environment = moduleFactory({
             async loadAll(cls, options = {}) {
-                //console.log("loadAll", cls);
                 return [r1];
             },
             async load(addresses, options = {}) {
-                //console.log("load", addresses);
                 return [r1];
             }
         });

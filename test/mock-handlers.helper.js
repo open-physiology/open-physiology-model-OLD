@@ -49,7 +49,7 @@ export const simpleMockHandlers = () => {
 		
 		create(values, customHref) {
 			const id   = _uniqueId()::parseInt();
-			const href = customHref || `mock-backend://${id}`;
+			const href = (customHref === true ? values.href : customHref) || `mock-backend://${id}`;
 			return storageByHref[href] = { ...values, href };
 		},
 		

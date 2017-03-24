@@ -149,7 +149,9 @@ export class Field extends ValueTracker {
 		this[$$desc]  = desc;
 		if (setValueThroughSignal) {
 			// allow signal-push to change value
-			this.p('value').subscribe((v) => { this.set(v, { createEditCommand: false }) });
+			this.p('value').subscribe((v) => {
+				this.set(v, { createEditCommand: false });
+			});
 		}
 		// this.p('value') // TODO: remove all 'pristine' related stuff from the field classes
 		// 	.map(v => this.constructor.isEqual(v, this[$$pristine]))
@@ -165,6 +167,7 @@ export class Field extends ValueTracker {
 	
 	set(newValue, options = {}) {
 		options::defaults({ createEditCommand: true });
+		
 		if (options.createEditCommand) {
 			
 			this[$$owner].edit({ [this[$$key]]: newValue }, options);
