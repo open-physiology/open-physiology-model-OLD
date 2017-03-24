@@ -1,7 +1,7 @@
 import {Observable, Subject} from '../libs/rxjs.js';
 // TODO: make sure we don't need to import this anymore: map;
 // TODO: make sure we don't need to import anymore: concat
-import 'rxjs/add/operator/do';
+// import 'rxjs/add/operator/do';
 
 import pick        from 'lodash-bound/pick';
 import isFunction  from 'lodash-bound/isFunction';

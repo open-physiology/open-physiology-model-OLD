@@ -2,7 +2,7 @@
 // TODO: make sure we don't need to import this anymore: takeUntil;
 // TODO: make sure we don't need to import this anymore: take;
 // TODO: make sure we don't need to import this anymore: startWith;
-import 'rxjs/add/operator/do';
+// import 'rxjs/add/operator/do';
 
 import inRange     from 'lodash-bound/inRange';
 import size        from 'lodash-bound/size';

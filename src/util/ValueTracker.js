@@ -21,7 +21,7 @@ import {Observable, Subject, BehaviorSubject} from '../libs/rxjs.js';
 // TODO: make sure we don't need to import this anymore: map;
 // TODO: make sure we don't need to import this anymore: withLatestFrom;
 // TODO: make sure we don't need to import this anymore: switchMap;
-import 'rxjs/add/operator/do';
+// import 'rxjs/add/operator/do';
 
 const $$events             = Symbol('$$events');
 const $$properties         = Symbol('$$properties');
