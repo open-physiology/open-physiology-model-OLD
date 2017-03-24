@@ -529,4 +529,40 @@ describe("regression tests", () => {
         expect(definition.href).not.to.be.undefined;
     });
 
+    it("CanonicalBranches are missing links to parent and child tree", async () => {
+
+        let r1 = {
+            "name":"SLN 1st level branch",
+            "href":"http://localhost:8888/CanonicalTreeBranch/62",
+            "id":62,
+            "cardinalityBase":1,
+            "class":"CanonicalTreeBranch",
+            "-->IsConveyedBy":{"href":"http://localhost:8888/IsConveyedBy/65","class":"IsConveyedBy"},
+            "-->BranchesTo":{"href":"http://localhost:8888/BranchesTo/64","class":"BranchesTo"},
+            "<--HasBranch":{"href":"http://localhost:8888/HasBranch/63","class":"HasBranch"}
+        };
+
+        let environment = moduleFactory({
+            async loadAll(cls, options = {}) {
+                //console.log("loadAll", cls);
+                return [r1];
+            },
+            async load(addresses, options = {}) {
+                //console.log("load", addresses);
+                return [r1];
+            }
+        });
+
+        const {CanonicalTreeBranch} = environment.classes;
+        let ctb = await CanonicalTreeBranch.get("http://localhost:8888/CanonicalTreeBranch/62");
+        let rels = [ctb["-->IsConveyedBy"], ctb["-->BranchesTo"], ctb["<--HasBranch"]];
+        for (let rel of rels){
+            expect(rel).not.to.be.undefined;
+            expect(rel).not.to.be.null;
+            expect(rel).to.have.property('href');
+            expect(rel.href).not.to.be.undefined;
+        }
+
+    });
+
 });
