@@ -147,7 +147,7 @@ Field[$$registerFieldClass](class RelShortcut$Field extends RelField {
 	
 	static valueToJSON(value, options = {}) {
 		// const Entity = this[$$owner].constructor.Entity;
-		// const {entityToTemporaryHref = new Map} = options;
+		// const {entityToTemporaryId = new Map} = options;
 		// TODO: adjust as per Rel$Field.valueToJSON (
 		return value::map(e => {
 			const Entity = e.constructor.Entity;

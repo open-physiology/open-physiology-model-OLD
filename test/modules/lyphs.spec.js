@@ -113,7 +113,7 @@ describe("'lyphs' Module", () => {
 		
 		const {Lyph} = environment.classes;
 		
-		expect(Lyph.properties           ).to.have.property('href');
+		expect(Lyph.properties           ).to.have.property('id');
 		expect(Lyph.relationships        ).to.have.property('-->ContainsMaterial');
 		expect(Lyph.relationshipShortcuts).to.have.property('materials');
 		

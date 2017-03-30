@@ -14,10 +14,9 @@ export default Module.create('resources', [], (M) => {
 		singular: "resource",
 		
 		properties: {
-			'href':  { ...uriSchema,        readonly: true },
+			'id':    { ...idSchema,         readonly: true },
 			'class': { ...identifierSchema, readonly: true },
-			'name':  { type: 'string' },
-			'id':    { ...idSchema } // TODO: when server has been updated, remove 'id' entirely
+			'name':  { type: 'string' }
 		}
 		
 	});//////////////////////////////////////////////////////////////////////////
@@ -35,9 +34,8 @@ export default Module.create('resources', [], (M) => {
 		2: [Resource, '0..*'],
 		
 		properties: {
-			'href':  { ...uriSchema,        readonly: true },
-			'class': { ...identifierSchema, readonly: true },
-			'id':    { ...idSchema } // TODO: when server has been updated, remove 'id' entirely
+			'id':    { ...idSchema,         readonly: true }, // TODO: id will disappear from relationships in future refactoring
+			'class': { ...identifierSchema, readonly: true }
 		}
 		
 	});

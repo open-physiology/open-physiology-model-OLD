@@ -31,14 +31,14 @@ export default () => {
 		},
 		commit_edit({entity, newValues}) {
 			return ajax({
-				url:    entity.href || `${baseURL}/${entity.constructor.name}/${entity.id}`,
+				url:    `${baseURL}/${entity.constructor.name}/${entity.id}`,
 				method: 'POST',
 				data:   newValues
 			});
 		},
 		commit_delete({entity}) {
 			return ajax({
-				url:    entity.href || `${baseURL}/${entity.constructor.name}/${entity.id}`,
+				url:    `${baseURL}/${entity.constructor.name}/${entity.id}`,
 				method: 'DELETE'
 			});
 		},

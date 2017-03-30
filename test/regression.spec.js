@@ -143,47 +143,44 @@ describe("regression tests", () => {
             async loadAll(cls, options = {}) {
                 let results = [{
                     "thickness": {
-                        "min": 0,
-                        "max": null
+                        "min": 0
                     },
                     "length": {
-                        "min": 0,
-                        "max": null
+                        "min": 0
                     },
                     "name": "Renal hilum",
-                    "href": "192.168.99.100://Lyph/18",
                     "id": 18,
                     "cardinalityBase": 1,
                     "class": "Lyph",
                     "<--Coalesces": [
                         {
-                            "href": "192.168.99.100://Coalesces/83",
+                            "id":     83,
                             "class": "Coalesces"
                         }
                     ],
                     "<--IncludesElement": [
                         {
-                            "href": "192.168.99.100://IncludesElement/65",
+                            "id":     65,
                             "class": "IncludesElement"
                         }
                     ],
                     "-->DefinesType": {
-                        "href": "192.168.99.100://DefinesType/55",
+                        "id":     55,
                         "class": "DefinesType"
                     },
                     "<--HasLayer": [
                         {
-                            "href": "192.168.99.100://HasLayer/42",
+                            "id":     42,
                             "class": "HasLayer"
                         }
                     ],
                     "-->HasLongitudinalBorder": [
                         {
-                            "href": "192.168.99.100://HasLongitudinalBorder/26",
+                            "id":     26,
                             "class": "HasLongitudinalBorder"
                         },
                         {
-                            "href": "192.168.99.100://HasLongitudinalBorder/25",
+                            "id":     25,
                             "class": "HasLongitudinalBorder"
                         }
                     ]
@@ -213,7 +210,6 @@ describe("regression tests", () => {
                         "max": null
                     },
                     "name": "Renal hilum",
-                    "href": "192.168.99.100://Lyph/18",
                     "id": 18,
                     "cardinalityBase": 1,
                     "class": "Lyph"
@@ -234,20 +230,18 @@ describe("regression tests", () => {
             async loadAll(cls, options = {}) {
                 return [{
                     "name": "Kidney",
-                    "href": "192.168.99.100://Lyph/17",
                     "id": 17,
                     "cardinalityBase": 1,
                     "class": "Lyph"
                 }, {
                     "name": "Renal hilum",
-                    "href": "192.168.99.100://Lyph/18",
                     "id": 18,
                     "cardinalityBase": 1,
                     "class": "Lyph"
                 }];
             },
             async commit_new({commandType, values}) {
-                values.href = `open-physiology.org/${values.class}/${1}`;
+                values.id = 1;
                 expect(values[1]).to.have.property('class');
                 expect(values[2]).to.have.property('class');
                 return values;
@@ -281,7 +275,7 @@ describe("regression tests", () => {
         expect(backend.readAll()).to.include.something.with.property('class', 'HasLayer');
     });
 
-    it("Problem with href while committing resources with relationships", async () => {
+    it("Problem with id (was href) while committing resources with relationships", async () => {
         let UID = 0;
 
         let environment = moduleFactory({
@@ -289,8 +283,7 @@ describe("regression tests", () => {
                 expect(values).not.to.be.null;
                 values = values::cloneDeep();
                 values.id = ++UID;
-                values.href = "open-physiology.org/" + UID;
-                let result = backend.create(values, values.href);
+                let result = backend.create(values, values.id);
                 return result;
             },
             async load(addresses, options = {}) {
@@ -312,8 +305,8 @@ describe("regression tests", () => {
         let isCauseOf = [...await IsCauseOf.getAll()][0];
         expect(isCauseOf).to.have.property(1).which.is.not.null;
         expect(isCauseOf).to.have.property(2).which.is.not.null;
-        expect(isCauseOf[1].href).to.equal(measurable.href);
-        expect(isCauseOf[2].href).to.equal(causality.href);
+        expect(isCauseOf[1].id).to.equal(measurable.id);
+        expect(isCauseOf[2].id).to.equal(causality .id);
     });
 
     it("Canonical tree nodes should not duplicate", async() => {
@@ -377,27 +370,25 @@ describe("regression tests", () => {
     	
 	    backend.create({
            name: 'Blood',
-           href: 'open-physiology.org/Type/2',
            id: 2,
            class: 'Type',
-           '<--DefinesType': { href: 'open-physiology.org/DefinesType/3', class: 'DefinesType' }
+           '<--DefinesType': { id: 3, class: 'DefinesType' }
         });
 	    backend.create({
             name: 'Blood',
-            href: 'open-physiology.org/Material/1',
             id: 1,
             class: 'Material',
-            '-->DefinesType': {href: 'open-physiology.org/DefinesType/3', class: 'DefinesType'}
+            '-->DefinesType': {id: 3, class: 'DefinesType'}
         });
 	    backend.create({
-		    href: 'open-physiology.org/DefinesType/3',
+		    id: 3,
 		    class: 'DefinesType',
             [1]: {
-               href:  'open-physiology.org/Material/1',
+               id:  1,
                class: 'Material',
             },
             [2]: {
-               href:  'open-physiology.org/Type/2',
+               id:  2,
                class: 'Type',
             }
 	    });
@@ -411,38 +402,35 @@ describe("regression tests", () => {
     it("Layers are lost", async () => {
         let lyph1 = {
             "name": "Blood",
-            "href": "http://localhost:8888/Lyph/1",
             "id": 1,
             "class": "Lyph",
             "-->HasLayer": [
                 {
-                    "href": "http://localhost:8888/HasLayer/3",
+                    "id": 3,
                     "class": "HasLayer"
                 }
             ]
         };
         let lyph2 = {
             "name": "Cytosol",
-            "href": "http://localhost:8888/Lyph/2",
             "id": 2,
             "class": "Lyph",
             "<--HasLayer": [
                 {
-                    "href": "http://localhost:8888/HasLayer/3",
+                    "id": 3,
                     "class": "HasLayer"
                 }
             ],
         };
         let rel = {
-            "href": "http://localhost:8888/HasLayer/3",
             "id": 3,
             "class": "HasLayer",
             "1": {
-                "href": "http://localhost:8888/Lyph/1",
+                "id": 1,
                 "class": "Lyph"
             },
             "2": {
-                "href": "http://localhost:8888/Lyph/2",
+                "id": 2,
                 "class": "Lyph"
             }
         };
@@ -459,16 +447,16 @@ describe("regression tests", () => {
             async load(addresses, options = {}) {
                 let response = [];
                 for (let address of Object.values(addresses)){
-                    if (address.href === "http://localhost:8888/Lyph/1"){ response.push(lyph1); }
-                    if (address.href === "http://localhost:8888/Lyph/2"){ response.push(lyph2); }
-                    if (address.href === "http://localhost:8888/HasLayer/3"){ response.push(rel); }
+                    if (address.id === 1){ response.push(lyph1); }
+                    if (address.id === 2){ response.push(lyph2); }
+                    if (address.id === 3){ response.push(rel);   }
                 }
                 return response;
             },
         });
 
         const {Lyph} = environment.classes;
-        let mainLyph = await Lyph.get('http://localhost:8888/Lyph/1');
+        let mainLyph = await Lyph.get(1);
         expect(mainLyph).to.have.property('-->HasLayer');
         expect([...mainLyph['-->HasLayer']]).to.have.length(1);
     });
@@ -476,11 +464,10 @@ describe("regression tests", () => {
     it("Investigation performance issue - something fails", async () => {
         let r1 = {
             "name": "Kidney",
-            "href": "http://localhost:8888/Lyph/30",
             "id": 30,
             "class": "Lyph",
             "-->HasLongitudinalBorder": [
-                {"href": "http://localhost:8888/HasLongitudinalBorder/36", "class": "HasLongitudinalBorder"}]
+                {"id": 36, "class": "HasLongitudinalBorder"}]
         };
 
         let environment = moduleFactory({
@@ -493,21 +480,20 @@ describe("regression tests", () => {
         });
 
         const {Lyph} = environment.classes;
-        let lyph = await Lyph.get("http://localhost:8888/Lyph/30");
+        let lyph = await Lyph.get(30);
         let border = [...lyph['-->HasLongitudinalBorder']][0];
         expect(border).not.to.be.undefined;
-        expect(border).to.have.property('href');
-        expect(border.href).not.to.be.undefined;
+        expect(border).to.have.property('id');
+        expect(border.id).not.to.be.undefined;
     });
 
     it("Types are missing <--DefinesType relationship", async () => {
         let r1 = {
             "name"  : "Renal parenchyma type",
-            "href"  :"http://localhost:8888/Type/46",
             "id"    :46,
             "class" :"Type",
             "<--DefinesType" : {
-                "href":"http://localhost:8888/DefinesType/47",
+                "id": 47,
                 "class":"DefinesType"
             }
         };
@@ -522,46 +508,43 @@ describe("regression tests", () => {
         });
 
         const {Type} = environment.classes;
-        let type = await Type.get("http://localhost:8888/Type/46");
+        let type = await Type.get(46);
         let definition = type['<--DefinesType'];
         expect(definition).not.to.be.undefined;
         expect(definition).not.to.be.null;
-        expect(definition).to.have.property('href');
-        expect(definition.href).not.to.be.undefined;
+        expect(definition).to.have.property('id');
+        expect(definition.id).not.to.be.undefined;
     });
 
     it("CanonicalBranches are missing links to parent and child tree", async () => {
 
         let r1 = {
             "name":"SLN 1st level branch",
-            "href":"http://localhost:8888/CanonicalTreeBranch/62",
             "id":62,
             "cardinalityBase":1,
             "class":"CanonicalTreeBranch",
-            "-->IsConveyedBy":{"href":"http://localhost:8888/IsConveyedBy/65","class":"IsConveyedBy"},
-            "-->BranchesTo":{"href":"http://localhost:8888/BranchesTo/64","class":"BranchesTo"},
-            "<--HasBranch":{"href":"http://localhost:8888/HasBranch/63","class":"HasBranch"}
+            "-->IsConveyedBy": { "id": 65, "class":"IsConveyedBy"},
+            "-->BranchesTo":   { "id": 64, "class":"BranchesTo"},
+            "<--HasBranch":    { "id": 63, "class":"HasBranch"}
         };
 
         let environment = moduleFactory({
             async loadAll(cls, options = {}) {
-                //console.log("loadAll", cls);
                 return [r1];
             },
             async load(addresses, options = {}) {
-                //console.log("load", addresses);
                 return [r1];
             }
         });
 
         const {CanonicalTreeBranch} = environment.classes;
-        let ctb = await CanonicalTreeBranch.get("http://localhost:8888/CanonicalTreeBranch/62");
+        let ctb = await CanonicalTreeBranch.get(62);
         let rels = [ctb["-->IsConveyedBy"], ctb["-->BranchesTo"], ctb["<--HasBranch"]];
         for (let rel of rels){
             expect(rel).not.to.be.undefined;
             expect(rel).not.to.be.null;
-            expect(rel).to.have.property('href');
-            expect(rel.href).not.to.be.undefined;
+            expect(rel).to.have.property('id');
+            expect(rel.id).not.to.be.undefined;
         }
 
     });

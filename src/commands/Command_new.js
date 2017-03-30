@@ -1,5 +1,6 @@
 import isFunction from 'lodash-bound/isFunction';
 import isString   from 'lodash-bound/isString';
+import isInteger  from 'lodash-bound/isInteger';
 import entries    from 'lodash-bound/entries';
 import isArray    from 'lodash-bound/isArray';
 import assert     from 'power-assert';
@@ -9,7 +10,7 @@ import {constraint, humanMsg} from '../util/misc';
 
 import {
 	$$entities,
-	$$entitiesByHref,
+	$$entitiesById,
 	$$committedEntities,
 	// $$isPlaceholder
 } from '../symbols';
@@ -101,21 +102,21 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 		cls.Entity[$$entities].add(this.result);
 		/* register as new */
 		this.result.pSubject('isNew').next(true);
-		/* pre-store by href */
-		if (this.options.acceptHref && values.href::isString()) {
-			cls.Entity[$$entitiesByHref][values.href] = this.result;
+		/* pre-store by id */
+		if (this.options.acceptId && values.id::isInteger()) {
+			cls.Entity[$$entitiesById][values.id] = this.result;
 		}
 	}
 	
 	toJSON(options = {}) {
-		const {entityToTemporaryHref = new Set} = options;
+		const {entityToTemporaryId = new Set} = options;
 		return {
 			commandType: 'new',
 			values: cls.objectToJSON({
 				...this.resultingValues,
 				class: cls.name,
-				...(entityToTemporaryHref.has(this.result)
-					? { href: entityToTemporaryHref.get(this.result) }
+				...(entityToTemporaryId.has(this.result)
+					? { id: entityToTemporaryId.get(this.result) }
 					: {})
 			}, {
 				...options,
@@ -130,15 +131,15 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 	}
 	
 	localHandleCommitResponse(response) {
-		assert(!!response.href, humanMsg`
+		assert(!!response.id, humanMsg`
 			The backend function commit_new needs to
-			return an object with an href property.
+			return an object with an id property.
 		`);
 		
-		if (this.options.acceptHref && this.initialValues.href::isString()) {
-			assert(response.href === this.initialValues.href, humanMsg`
+		if (this.options.acceptId && this.initialValues.id::isInteger()) {
+			assert(response.id === this.initialValues.id, humanMsg`
 				The backend function commit_new needs to
-				return an object with the same href property
+				return an object with the same id property
 				as already provided when the entity was first created.
 			`);
 		}
@@ -157,7 +158,7 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 		this.result.pSubject('isNew').next(false);
 		
 		/* maintain caches */
-		cls.Entity[$$entitiesByHref][response.href] = this.result;
+		cls.Entity[$$entitiesById][response.id] = this.result;
 		cls.Entity[$$committedEntities].add(this.result);
 	}
 
@@ -166,7 +167,7 @@ export default (cls) => class Command_new extends cls.TrackedCommand {
 		Field.destructEntity(this.result);
 		
 		/* un-register the entity */
-		delete cls.Entity[$$entitiesByHref][this.result.href];
+		delete cls.Entity[$$entitiesById][this.result.id];
 		cls.Entity[$$entities].delete(this.result);
 		cls.Entity[$$committedEntities].delete(this.result);
 		

@@ -100,7 +100,7 @@ Field[$$registerFieldClass](class SideField extends Field {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		// const {entityToTemporaryHref = new Map} = options;
+		// const {entityToTemporaryId = new Map} = options;
 		if (!value) { return value }
 		const Entity = value.constructor.Entity;
 		return Entity.normalizeAddress(value, options);

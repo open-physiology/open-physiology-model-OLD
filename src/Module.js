@@ -62,9 +62,9 @@ class Environment {
 		
 		
 		
-		/* a function to replace temporary href with new href */
-		function replaceTemporaryHrefs({futureCommand, temporaryHref, newHref}) {
-			let hrefObjects = [];
+		/* a function to replace temporary id with new id */
+		function replaceTemporaryIds({futureCommand, temporaryId, newId}) {
+			let idObjects = [];
 			switch (futureCommand.commandType) {
 				case 'new': {
 					const cls = thisEnvironment.classes[futureCommand.values.class];
@@ -73,45 +73,45 @@ class Environment {
 						: [1, 2];
 					for (let key of fieldKeys) {
 						if (futureCommand.values[key]::isArray()) {
-							hrefObjects.push(...futureCommand.values[key]);
+							idObjects.push(...futureCommand.values[key]);
 						} else {
-							hrefObjects.push(futureCommand.values[key]);
+							idObjects.push(futureCommand.values[key]);
 						}
 					}
 				} break;
 				case 'edit': {
-					hrefObjects.push(futureCommand.entity);
+					idObjects.push(futureCommand.entity);
 					const cls = thisEnvironment.classes[futureCommand.entity.class];
 					const fieldKeys = cls.isResource
 						? [...cls.relationships::keys(), ...cls.relationshipShortcuts::keys()]
 						: [1, 2];
 					for (let key of fieldKeys) {
 						if (futureCommand.newValues[key]::isArray()) {
-							hrefObjects.push(...futureCommand.newValues[key]);
+							idObjects.push(...futureCommand.newValues[key]);
 						} else {
-							hrefObjects.push(futureCommand.newValues[key]);
+							idObjects.push(futureCommand.newValues[key]);
 						}
 					}
 				} break;
 				case 'delete': {
-					hrefObjects.push(futureCommand.entity);
+					idObjects.push(futureCommand.entity);
 				} break;
 			}
-			for (let hrefObject of hrefObjects) {
-				if (hrefObject && hrefObject.href === temporaryHref) {
-					hrefObject.href = newHref;
+			for (let idObject of idObjects) {
+				if (idObject && idObject.id === temporaryId) {
+					idObject.id = newId;
 				}
 			}
 		}
 		
-		async function defaultBatchCommitter({temporaryHrefs, commands}) {
+		async function defaultBatchCommitter({temporaryIds, commands}) {
 			
 			/* get unfrozen version */
 			commands = commands::cloneDeep();
 			
 			/* prepare response object */
 			let response = {
-				temporaryHrefs: {},
+				temporaryIds: {},
 				commands: []
 			};
 			
@@ -122,13 +122,13 @@ class Environment {
 				switch(localCommand.commandType) {
 					case 'new': {
 						localResponse = await this.commit_new(localCommand);
-						if (temporaryHrefs.includes(localCommand.values.href)) {
-							const temporaryHref = localCommand.values.href;
-							const newHref       = localResponse.href;
-							response.temporaryHrefs[temporaryHref] = newHref;
+						if (temporaryIds.includes(localCommand.values.id)) {
+							const temporaryId = localCommand.values.id;
+							const newId       = localResponse.id;
+							response.temporaryIds[temporaryId] = newId;
 							for (let j = i+1; j < commands.length; ++j) {
 								const futureCommand = commands[j];
-								replaceTemporaryHrefs({futureCommand, temporaryHref, newHref});
+								replaceTemporaryIds({futureCommand, temporaryId, newId});
 							}
 						}
 					} break;

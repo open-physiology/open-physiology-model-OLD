@@ -29,7 +29,7 @@ import {
 	$$entriesIn,
 	$$initialized,
 	$$destruct,
-	$$href
+	$$id
 } from './symbols';
 import {constraint} from "../util/misc";
 

@@ -17,7 +17,7 @@ import {
 	$$desc,
 	$$initSet,
 	$$entriesIn,
-	$$href
+	$$id
 } from './symbols';
 import {constraint} from "../util/misc";
 
@@ -25,7 +25,7 @@ import {constraint} from "../util/misc";
 Field[$$registerFieldClass](class PropertyField extends Field {
 	
 	// this[$$owner] instanceof RelatedTo | Resource
-	// this[$$key]   instanceof "name" | "class" | "href" | ...
+	// this[$$key]   instanceof "name" | "class" | "id" | ...
 	// this[$$value] instanceof any
 	
 	////////////

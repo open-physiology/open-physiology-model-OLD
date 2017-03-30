@@ -84,18 +84,17 @@ describe("integrated workflow", () => {
 		});
 
 		expect(blood).to.be.an.instanceOf(Material);
-		expect(blood).to.have.a.property('href').which.is.null;
+		expect(blood).to.have.a.property('id').which.is.null;
 		expect(blood).to.have.a.property('class', 'Material');
 		expect(blood).to.have.a.property('name', "blood");
 
 		await blood.commit();
 
-		expect(blood).to.have.a.property('href').which.is.a('string');
+		expect(blood).to.have.a.property('id').which.is.a('number');
 
 		let water = Material.new({
 			name: "waiter"
 		});
-		// let waterHref = water.href;
 		
 		let waterType = Type.new({
 			definition: water
@@ -127,17 +126,17 @@ describe("integrated workflow", () => {
 		await newWater.commit();
 		await waterType.commit();
 
-		expect(newWater).to.have.a.property('href').which.is.a('string');
+		expect(newWater).to.have.a.property('id').which.is.a('number');
 		expect(newWater).to.have.a.property('name', "water");
 
 		const {
-			href: waterHref2,
+			id:   waterId2,
 			name: waterName2
 		} = newWater;
 
 		newWater.rollback();
 
-		expect(newWater).to.have.a.property('href', waterHref2);
+		expect(newWater).to.have.a.property('id',   waterId2  );
 		expect(newWater).to.have.a.property('name', waterName2);
 
 		let bloodHasWater = ContainsMaterial.new({
@@ -151,12 +150,12 @@ describe("integrated workflow", () => {
 		expect([...blood    .materials            ] ).to.include(waterType    );
 		expect([...waterType['<--ContainsMaterial']]).to.include(bloodHasWater);
 
-		expect(bloodHasWater).to.have.a.property('href').which.is.null;
+		expect(bloodHasWater).to.have.a.property('id').which.is.null;
 		expect(bloodHasWater).to.have.a.property('class', 'ContainsMaterial');
 
 		await bloodHasWater.commit();
 	
-		expect(bloodHasWater).to.have.a.property('href').which.is.a('string');
+		expect(bloodHasWater).to.have.a.property('id').which.is.a('string');
 
 	});
 
@@ -184,39 +183,39 @@ describe("integrated workflow", () => {
 	it("can retrieve an existing entity from the backend (1)", async () => {
 		const {Material} = environment.classes;
 		
-		let {href} = backend.create({
+		let {id} = backend.create({
 			class: 'Material',
 			name: "Created Material"
 		});
 		expect(backend.readAll()).to.have.length(1);
 		
-		let material = await Material.get(href);
+		let material = await Material.get(id);
 		
 		expect(material).to.be.instanceof(Material);
-		expect(material.href).to.equal(href);
+		expect(material.id  ).to.equal(id);
 		expect(material.name).to.equal("Created Material");
 	});
 	
 	it("can retrieve an existing entity from the backend (2)", async () => {
 		const {Template, Material} = environment.classes;
 		
-		let {href} = backend.create({
+		let {id} = backend.create({
 			class: 'Material',
 			name: "Created Material"
 		});
 		expect(backend.readAll()).to.have.length(1);
 		
-		let material = await Template.get(href);
+		let material = await Template.get(id);
 		
 		expect(material).to.be.instanceof(Material);
-		expect(material.href).to.equal(href);
+		expect(material.id).to.equal(id);
 		expect(material.name).to.equal("Created Material");
 	});
 	
 	it("can retrieve all existing entities from the backend (1)", async () => {
 		const {Material} = environment.classes;
 
-		let {href} = backend.create({
+		let {id} = backend.create({
 			class: 'Material',
 			name: "Created Material"
 		});
@@ -228,7 +227,7 @@ describe("integrated workflow", () => {
 		
 		let lyph = allMaterials[0];
 		expect(lyph).to.be.instanceof(Material);
-		expect(lyph.href).to.equal(href);
+		expect(lyph.id).to.equal(id);
 		expect(lyph.name).to.equal("Created Material");
 
 	});
@@ -236,38 +235,38 @@ describe("integrated workflow", () => {
 	it("can retrieve all existing entities from the backend (2)", async () => {
 		const {Template, CanonicalTree, Material} = environment.classes;
 
-		let { href: href1 } = backend.create({
+		let { id: id1 } = backend.create({
 			class: 'Material',
 			name: "Created Material"
 		});
-		let { href: href2 } = backend.create({
+		let { id: id2 } = backend.create({
 			class: 'CanonicalTree',
 			name: "Created Canonical Tree"
 		});
-		expect(href1).to.not.equal(href2);
+		expect(id1).to.not.equal(id2);
 		expect(backend.readAll()).to.have.length(2);
 		
 		let allTemplates = [...await Template.getAll()];
 
 		expect(allTemplates).to.have.length(2);
 		
-		let template1 = allTemplates.filter(t=>t.href===href1)[0];
+		let template1 = allTemplates.filter(t=>t.id===id1)[0];
 		expect(template1).to.be.instanceof(Material);
 		expect(template1.name).to.equal("Created Material");
 		
-		let template2 = allTemplates.filter(t=>t.href===href2)[0];
+		let template2 = allTemplates.filter(t=>t.id===id2)[0];
 		expect(template2).to.be.instanceof(CanonicalTree);
 		expect(template2.name).to.equal("Created Canonical Tree");
 	});
 	
-	it("accepts href in a reference", async () => {
+	it("accepts id in a reference", async () => {
 		const {Lyph} = environment.classes;
 
-		let { href: href1 } = backend.create({
+		let { id: id1 } = backend.create({
 			class: 'Lyph',
 			name:  "Lyph 1"
 		});
-		let { href: href2 } = backend.create({
+		let { id: id2 } = backend.create({
 			class: 'Lyph',
 			name:  "Lyph 2"
 		});
@@ -275,21 +274,21 @@ describe("integrated workflow", () => {
 		let parentLyph = Lyph.new({
 			name: "Parent Lyph",
 			parts: [
-				{ href: href1, class: 'Lyph' },
-				{ href: href2, class: 'Lyph' }
+				{ id: id1, class: 'Lyph' },
+				{ id: id2, class: 'Lyph' }
 			]
 		});
 		
 		let childLyphs = [...parentLyph.parts];
-		expect(childLyphs::map('href'))
+		expect(childLyphs::map('id'))
 			.to.have.length(2).and
-			.to.have.members([href1, href2]);
+			.to.have.members([id1, id2]);
 		
-		let [ph1, ph2] = childLyphs::keyBy('href')::at([href1, href2]);
+		let [ph1, ph2] = childLyphs::keyBy('id')::at([id1, id2]);
 		
 		expect(ph1.isPlaceholder).to.be.true;
 		expect(() => ph1.name).to.throw;
-		let entity1 = await Lyph.get(href1);
+		let entity1 = await Lyph.get(id1);
 		expect(entity1).to.equal(ph1);
 		expect(entity1.name).to.equal("Lyph 1");
 		expect(entity1.isPlaceholder).to.be.false;
@@ -316,25 +315,25 @@ describe("integrated workflow", () => {
 	it("can load either one or multiple entities per request", async () => {
 		const {Material} = environment.classes;
 		
-		let { href: href1 } = backend.create({
+		let { id: id1 } = backend.create({
 			class: 'Material',
 			name:  "Material 1"
 		});
-		let { href: href2 } = backend.create({
+		let { id: id2 } = backend.create({
 			class: 'Material',
 			name:  "Material 2"
 		});
-		let { href: href3 } = backend.create({
+		let { id: id3 } = backend.create({
 			class: 'Material',
 			name:  "Material 3"
 		});
 		
-		let material1 = await Material.get(href1);
+		let material1 = await Material.get(id1);
 		expect(material1)
 			.is.an.instanceof(Material)
 			.with.property('name', "Material 1");
 		
-		let [material2, material3] = await Material.get([href2, href3]);
+		let [material2, material3] = await Material.get([id2, id3]);
 		expect(material2)
 			.is.an.instanceof(Material)
 			.with.property('name', "Material 2");
@@ -343,26 +342,26 @@ describe("integrated workflow", () => {
 			.with.property('name', "Material 3");
 	});
 	
-	it("can accept an href when first creating an entity, but expects this href to remain consistent at commit");
+	it("can accept an id when first creating an entity, but expects this id to remain consistent at commit");
 	
 	// TODO: delete operation
 	it.skip("can delete a resource", async () => {
 		const {Lyph} = environment.classes;
 
-		let { href } = backend.create({
+		let { id } = backend.create({
 			class: 'Lyph',
 			name:  "Lyph 1"
 		});
 
-		let lyph = await Lyph.get(href);
+		let lyph = await Lyph.get(id);
 		
-		expect(lyph.href).to.equal(href);
+		expect(lyph.id).to.equal(id);
 
-		expect(Lyph.hasLocal(href)).to.be.true;
+		expect(Lyph.hasLocal(id)).to.be.true;
 		
 		lyph.delete();
 		
-		expect(Lyph.hasLocal(href)).to.be.false;
+		expect(Lyph.hasLocal(id)).to.be.false;
 	});
 	
 });

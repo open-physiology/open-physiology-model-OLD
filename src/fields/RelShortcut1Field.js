@@ -155,14 +155,14 @@ Field[$$registerFieldClass](class RelShortcut1Field extends RelField {
 	}
 	
 	static valueToJSON(value, options = {}) {
-		// const {entityToTemporaryHref = new Map} = options;
+		// const {entityToTemporaryId = new Map} = options;
 		if (!value) { return value }
 		const Entity = value.constructor.Entity;
 		return Entity.normalizeAddress(value, options);
 	}
 	
 	jsonToValue(json, options = {}) {
-		// TODO: expect and use option temporaryToPermanentHref
+		// TODO: expect and use option temporaryToPermanentId
 		if (json === null) { return null }
 		const Entity  = this[$$owner].constructor.Entity;
 		let result = Entity.getLocal(json, options);

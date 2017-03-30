@@ -6,11 +6,11 @@ import assert     from 'power-assert';
 import {setPrototype} from 'bound-native-methods';
 import {
 	$$entities,
-	$$entitiesByHref,
+	$$entitiesById,
 	$$committedEntities,
 	// $$isPlaceholder
 } from '../symbols';
-import {$$href} from '../fields/symbols';
+import {$$id} from '../fields/symbols';
 import {constraint, humanMsg} from '../util/misc';
 import {Field} from '../fields/Field';
 
@@ -109,7 +109,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 			
 			/* construct entity */
 			const values = { ...this.values };
-			this.result = new realCls(
+			this.result                           = new realCls(
 				values,
 				{ ...this.options, allowInvokingConstructor: true }
 			);
@@ -119,7 +119,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 			if (!this.placeholder) {
 				Field.initializeEntity(this.result, values);
 			} else {
-				this.result[$$href] = values.href;
+				this.result[$$id] = values.id;
 			}
 			
 			/* track this command in the entity */
@@ -127,7 +127,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 			
 			/* register this entity */
 			cls[$$entities].add(this.result);
-			cls[$$entitiesByHref][this.values.href] = this.result;
+			cls[$$entitiesById][this.values.id] = this.result;
 			cls[$$committedEntities].add(this.result);
 			
 			/* after it's first committed, it's no longer new */
@@ -136,7 +136,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 			/* sanity checks */
 			constraint(this.result.isPristine, humanMsg`
 				Cannot load data into the ${this.result.class}
-				with href="${this.result.href}", because it has local changes.
+				with id="${this.result.id}", because it has local changes.
 			`);
 			
 			/* check class compatibility */
@@ -190,7 +190,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 		assert(false, humanMsg`
 			Command_load#localCommit should never be called,
 			because a load command starts out as being committed.
-			(${href})
+			(${id})
 		`);
 	}
 	
@@ -201,7 +201,7 @@ export default (cls) => class Command_load extends cls.TrackedCommand {
 		assert(false, humanMsg`
 			Command_load#localRollback should never be called,
 			because a load command starts out as being committed.
-			(${this.result.href})
+			(${this.result.id})
 		`);
 	}
 };

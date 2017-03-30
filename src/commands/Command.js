@@ -478,9 +478,9 @@ export default ({backend}) => {
 	////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////
 	
-	/* tracking temporary hrefs/ids */
-	function newTemporaryHref() {
-		return `temporary-href://${_uniqueId()::parseInt()}`;
+	/* tracking temporary ids */
+	function newTemporaryId() {
+		return _uniqueId()::parseInt();
 	}
 	
 	/***/
@@ -518,14 +518,14 @@ export default ({backend}) => {
 				}
 			}
 			
-			/* generate temporary hrefs for newly created entities */
-			const temporaryHrefs = new Set;
-			const entityToTemporaryHref = new Map;
+			/* generate temporary ids for newly created entities */
+			const temporaryIds = new Set;
+			const entityToTemporaryId = new Map;
 			for (let entity of associatedEntities) {
-				if (!entity.href && !entityToTemporaryHref.has(entity)) {
-					const href = newTemporaryHref();
-					entityToTemporaryHref.set(entity, href);
-					temporaryHrefs.add(href);
+				if (!entity.id && !entityToTemporaryId.has(entity)) {
+					const id = newTemporaryId();
+					entityToTemporaryId.set(entity, id);
+					temporaryIds.add(id);
 				}
 			}
 			
@@ -537,26 +537,26 @@ export default ({backend}) => {
 			];
 			const commandListJSON = this.commandList
 				::map(cmd => cmd.toJSON({
-					entityToTemporaryHref,
+					entityToTemporaryId,
 					minimal: true // TODO: does minimal still do anything? (probably not)
 				}));
 			
 			
 			/* remove forward references */
-			let tmpHrefsSeen = new Set;
+			let tmpIdsSeen = new Set;
 			for (let i = 0; i < this.commandList.length; ++i) {
 				const localCommand     = this.commandList[i];
 				const localCommandJSON = commandListJSON[i];
 				let entity     = localCommand    .result || localCommand    .entity;
 				let valuesJSON = localCommandJSON.values || localCommandJSON.newValues;
-				if (temporaryHrefs.has(valuesJSON.href)) {
-					tmpHrefsSeen.add(valuesJSON.href);
+				if (temporaryIds.has(valuesJSON.id)) {
+					tmpIdsSeen.add(valuesJSON.id);
 				}
 				for (let [key, valueJSON] of valuesJSON::entries()) {
 					switch (entity.fields[key].constructor.name) {
 						case 'Rel$Field': {
 							for (let [i, valJSON] of valueJSON::entries()) {
-								if (temporaryHrefs.has(valJSON.href) && !tmpHrefsSeen.has(valJSON.href)) {
+								if (temporaryIds.has(valJSON.id) && !tmpIdsSeen.has(valJSON.id)) {
 									valueJSON.splice(i, 1);
 								}
 							}
@@ -565,7 +565,7 @@ export default ({backend}) => {
 							}
 						} break;
 						case 'Rel1Field': {
-							if (valueJSON && temporaryHrefs.has(valueJSON.href) && !tmpHrefsSeen.has(valueJSON.href)) {
+							if (valueJSON && temporaryIds.has(valueJSON.id) && !tmpIdsSeen.has(valueJSON.id)) {
 								delete valuesJSON[key];
 							}
 						} break;
@@ -576,9 +576,9 @@ export default ({backend}) => {
 			////////////////////////////////////////////////////////////
 			// report to backend
 			return await backend.commit_batch(deepFreeze({
-				commandType:    'batch',
-				temporaryHrefs: [...temporaryHrefs],
-				commands:       [...commandListJSON]
+				commandType:  'batch',
+				temporaryIds: [...temporaryIds],
+				commands:     [...commandListJSON]
 			}));
 		}
 		

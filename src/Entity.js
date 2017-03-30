@@ -23,6 +23,7 @@ import {defineProperties, defineProperty, assign, setPrototype} from 'bound-nati
 
 import babelHelpers from './util/babel-helpers';
 import {constraint} from './util/misc';
+import assert from 'power-assert';
 
 import command_newClassFactory    from './commands/Command_new';
 import command_deleteClassFactory from './commands/Command_delete';
@@ -30,7 +31,7 @@ import command_editClassFactory   from './commands/Command_edit';
 import command_loadClassFactory   from './commands/Command_load';
 
 import {
-	$$entitiesByHref,
+	$$entitiesById,
 	$$committedEntities,
 	$$entities,
 	// $$isPlaceholder
@@ -64,11 +65,11 @@ export default (environment) => {
 		static get Entity() { return Entity }
 		
 		static normalizeAddress(address, options = {}) {
-			const {entityToTemporaryHref = new Map} = options;
-			if (address::isString()) { return { class: this.name, href: address } }
+			const {entityToTemporaryId = new Map} = options;
+			if (address::isInteger()) { return { class: this.name, id: address } }
 			if (address::isObject()) {
-				let href = address.href || entityToTemporaryHref.get(address);
-				return { class: address.class || this.name, href };
+				let id = address.id || entityToTemporaryId.get(address);
+				return { class: address.class || this.name, id };
 			}
 			assert(false, humanMsg`${JSON.stringify(address)} is not a valid entity identifier.`);
 		}
@@ -242,27 +243,27 @@ export default (environment) => {
 		////////////////////////////////////////////
 		
 		static hasCache(
-			entityOrAddress: Entity | { href: string } | string | number
+			entityOrAddress: Entity | { id: number } | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
 			return entity && !entity.isPlaceholder;
 		}
 		
 		static hasPlaceholder(
-			entityOrAddress: Entity | { href: string } | string | number
+			entityOrAddress: Entity | { id: number } | number
 		) {
 			let entity = this.getLocal(entityOrAddress);
 			return entity && entity.isPlaceholder;
 		}
 		
 		static hasLocal(
-			entityOrAddress: Entity | { href: string } | string | number
+			entityOrAddress: Entity | { id: number } | number
 		) {
 			return !!this.getLocal(entityOrAddress);
 		}
 		
 		static getLocal(
-			entityOrAddress: Entity | { href: string } | string
+			entityOrAddress: Entity | { id: number } | number
 		) : this {
 			/* is it already a local entity? */
 			if (entityOrAddress instanceof Entity) { return entityOrAddress }
@@ -271,14 +272,14 @@ export default (environment) => {
 			const address = this.normalizeAddress(entityOrAddress);
 			
 			/* if it's not yet cached, return undefined */
-			if (!Entity[$$entitiesByHref][address.href]) { return }
+			if (!Entity[$$entitiesById][address.id]) { return }
 			
 			/* fetch the entity (or placeholder) from the cache */
-			let entity = Entity[$$entitiesByHref][address.href];
+			let entity = Entity[$$entitiesById][address.id];
 			
 			/* make sure the retrieved entity is of the expected class */
 			constraint(this.hasInstance(entity), humanMsg`
-				The entity at '${JSON.stringify(address.href)}'
+				The entity at '${JSON.stringify(address.id)}'
 				is not of class '${this.name}'
 				but of class '${entity.constructor.name}'.
 			`);
@@ -288,7 +289,7 @@ export default (environment) => {
 		}
 		
 		static getLocalOrNewPlaceholder( // TODO: make private?
-			entityOrAddress: Entity | { href: string } | string,
+			entityOrAddress: Entity | { id: number } | number,
 			options: {} = {}
 		) : this {
 			let result = this.getLocal(entityOrAddress);
@@ -297,7 +298,7 @@ export default (environment) => {
 		}
 		
 		static setPlaceholder(
-			address: string | { href: string },
+			address: { id: number } | number,
 			options: {} = {}
 		) {
 			const addressObj = this.normalizeAddress(address);
@@ -306,7 +307,7 @@ export default (environment) => {
 		}
 		
 		static setCache( // TODO: make private
-			values:  Entity | { href: string },
+			values:  Entity | { id: number } | number,
 			options: {} = {}
 		) {
 			if (values instanceof Entity) { return values }
@@ -319,7 +320,7 @@ export default (environment) => {
 		////////////////////////////////////////////////////////////////
 		
 		static async get(
-			addresses: Array | { href: string } | string | number,
+			addresses: Array | { id: number } | number,
 			options:   {} = {} // TODO: filtering, expanding, paging, ...
 		) : this {
 			const useArray = addresses::isArray();
@@ -407,7 +408,7 @@ export default (environment) => {
 			
 			/* set defaults for the core initial field values */
 			initialValues::defaults({
-				href:  null,
+				id:  null,
 				class: this.constructor.name
 			});
 			
@@ -416,7 +417,7 @@ export default (environment) => {
 		}
 		
 		get [Symbol.toStringTag]() {
-			return `${this.constructor.name}: ${this.href}`;
+			return `${this.constructor.name}: ${this.id}`;
 		}
 		
 		p(...args) {
@@ -456,7 +457,7 @@ export default (environment) => {
 		}
 		
 		toJSON(options = {}) {
-			let { entityToTemporaryHref = new Map } = options;
+			let { entityToTemporaryId = new Map } = options;
 			let result = {};
 			for (let [key, field] of this.fields::entries()) {
 				const fieldIsShortcut = (
@@ -466,8 +467,8 @@ export default (environment) => {
 				if (fieldIsShortcut) { continue }
 				result[key] = field.value;
 			}
-			if (!result.href && entityToTemporaryHref.has(this)) {
-				result.href = entityToTemporaryHref.get(this);
+			if (!result.id && entityToTemporaryId.has(this)) {
+				result.id = entityToTemporaryId.get(this);
 			}
 			let res = this.constructor.objectToJSON(result, { ...options, sourceEntity: this });
 			return res;
@@ -538,7 +539,7 @@ export default (environment) => {
 		[$$committedEntities]       : new ObservableSet(),
 		[$$committedEntitiesSubject]: new BehaviorSubject(new Set()),
 		
-		[$$entitiesByHref] :          {}
+		[$$entitiesById] :            {}
 	});
 	
 	return Entity;

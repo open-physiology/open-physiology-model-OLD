@@ -19,16 +19,16 @@ import {humanMsg} from "../src/util/misc";
 function valueOrReference(val) {
 	if (val && val.constructor && (val.constructor.isResource || val.constructor.isRelationship)) {
 		return {
-			href:  val.href,
+			id:    val.id,
 			class: val.class
 		};
 	} else {
 		return val;
 	}
 }
-function hrefFromAddress(address = {}) {
-	if (address::isString()) { return address      }
-	if (address::isObject()) { return address.href }
+function idFromAddress(address = {}) {
+	if (address::isString()) { return address    }
+	if (address::isObject()) { return address.id }
 	throw new Error(humanMsg`The given value ${address} is not a recognized identifier.`);
 }
 
@@ -40,29 +40,28 @@ export const simpleMockHandlers = () => {
 		environment = e;
 	}
 	
-	/* storage of all entities by a simple object, mapped by href */
-	const storageByHref = {};
+	/* storage of all entities by a simple object, mapped by id */
+	const storageById = {};
 	
 	/* the backend object exposes CRUD operations to the simple storage */
 	/* and the frontend interface (implementing commit & load) */
 	const backend = {
 		
-		create(values, customHref) {
-			const id   = _uniqueId()::parseInt();
-			const href = (customHref === true ? values.href : customHref) || `mock-backend://${id}`;
-			return storageByHref[href] = { ...values, href };
+		create(values, customId) {
+			const id = _uniqueId()::parseInt();
+			return storageById[id] = { ...values, id };
 		},
 		
 		read(address) {
-			return storageByHref[hrefFromAddress(address)];
+			return storageById[idFromAddress(address)];
 		},
 		
 		readAll() {
-			return storageByHref::values();
+			return storageById::values();
 		},
 		
 		update(address, newValues) {
-			const object = storageByHref[hrefFromAddress(address)];
+			const object = storageById[idFromAddress(address)];
 			for (let [key, val] of newValues::entries()) {
 				// TODO: actually look at manifest to see what to set
 				object[key] = valueOrReference(val);
@@ -70,8 +69,8 @@ export const simpleMockHandlers = () => {
 			return object;
 		},
 		
-		delete(idOrHref) {
-			delete storageByHref[hrefFromAddress(idOrHref)];
+		delete(address) {
+			delete storageById[idFromAddress(address)];
 		}
 		
 	};
