@@ -1,30 +1,56 @@
 'use strict';
+
+// var wallabyWebpack = require('wallaby-webpack');
+//
+// var webpackConfig = require('./webpack.config-test.js');
+// webpackConfig.module.loaders = webpackConfig.module.loaders.filter(function (l) { return l.use !== 'babel' });
+// delete webpackConfig.devtool;
+// var wallabyPostprocessor = wallabyWebpack(webpackConfig);
+
 module.exports = function (tests) {
+	tests = tests.map(function (pattern) {
+		return { pattern: pattern };
+	});
+	
+	console.log(tests);
+	
 	return function (wallaby) {
 		return {
 			
 			files: [
-				{ pattern: 'src/**/*.js' },
-				{ pattern: 'test/**/*.plugin.js' },
-				{ pattern: 'test/**/*.helper.js' },
+				{ pattern: 'src/**/*.js',         },
+				{ pattern: 'src/**/*.png',        },
+				{ pattern: 'test/**/*.plugin.js', },
+				{ pattern: 'test/**/*.helper.js', },
 			],
 			
 			tests: tests,
 			
-			compilers: {
-				'**/*.js': wallaby.compilers.babel()
-			},
-			
 			env: { type: 'node' },
+			// env: { type: 'browser' },
 			
 			testFramework: 'mocha',
 			
 			maxConsoleMessagesPerTest: 1000,
 			
+			preprocessors: {
+		      'src/**/*.png': function (file) { return '' }
+		    },
+			
+			compilers: {
+				'**/*.js': wallaby.compilers.babel()
+			},
+			
+			// postprocessor: wallabyPostprocessor,
+
 			bootstrap: function (wallaby) {
 				
-				wallaby.testFramework.timeout(10000);
-				
+				// wallaby.testFramework.timeout(10000);
+
+				// required to trigger test loading
+				// window.__moduleBundler.loadTests();
+                
+                
 				// var modulePrototype = require('module').Module.prototype;
 				// if (!modulePrototype._originalRequire) {
 				// 	modulePrototype._originalRequire = modulePrototype.require;

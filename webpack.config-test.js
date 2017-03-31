@@ -1,16 +1,7 @@
 var webpack = require('webpack');
+
 module.exports = {
 	devtool: 'source-map',
-	// entry: {
-	// 	'open-physiology-model': [ 'babel-polyfill', './src/index.js' ]
-	// },
-	// output: {
-	// 	path: './dist',
-	// 	filename: '[name].js',
-	// 	library: 'OpenPhysiologyModel',
-	// 	libraryTarget: 'umd',
-	// 	sourceMapFilename: '[file].map'
-	// },
 	module: {
 		loaders: [
 			{
@@ -21,6 +12,10 @@ module.exports = {
 			{
 				test: /\.json$/,
 				loader: 'json'
+			},
+			{
+				test: /icons\/\w+\.png$/,
+				loader: 'url?limit=20000'
 			}
 		]
 	},
@@ -30,5 +25,8 @@ module.exports = {
 		devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
 	},
 	target: 'node',
-	externals: [require('webpack-node-externals')()]
+	externals: [require('webpack-node-externals')()],
+	plugins: [
+		new webpack.NormalModuleReplacementPlugin(/\.(gif|png|scss|css)$/, 'node-noop')
+	]
 };
