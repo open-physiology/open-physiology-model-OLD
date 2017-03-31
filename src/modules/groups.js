@@ -17,7 +17,9 @@ export default TypedModule.create('groups', [
 		
 		extends: Template,
 		
-		singular: "group"
+		singular: "group",
+				
+		icon: require('./icons/group.png')
 		
 	});/////////////////////////////////////////////////////////////////////////////
 	

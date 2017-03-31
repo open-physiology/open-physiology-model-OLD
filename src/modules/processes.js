@@ -23,6 +23,8 @@ export default TypedModule.create('processes', [
 		
 		singular: "process",
 		plural:   "processes",
+				
+		icon: require('./icons/process.png'),
 		
 		properties: {
 			'transportPhenomenon': {

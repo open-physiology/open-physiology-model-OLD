@@ -18,7 +18,9 @@ export default Module.create('typed', [
 		
 		extends: Resource,
 		
-		singular: "type"
+		singular: "type",
+		
+		icon: require('./icons/type.png')
 		
 	});/////////////////////////////////////////////////////////////////////////
 	

@@ -19,6 +19,8 @@ export default TypedModule.create('canonicalTrees', [
 		extends: Template,
 		
 		singular: "canonical tree",
+				
+		icon: require('./icons/canonicalTree.png'),
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
@@ -31,6 +33,8 @@ export default TypedModule.create('canonicalTrees', [
 		singular: "canonical tree branch",
 		
 		plural: "canonical tree branches",
+				
+		icon: require('./icons/canonicalTreeBranch.png'),
 		
 	});/////////////////////////////////////////////////////////////////////////
 	

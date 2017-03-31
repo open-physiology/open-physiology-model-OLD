@@ -16,12 +16,16 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.js$/,
-				exclude: /node\_modules/,
+				exclude: /node_modules/,
 				loader: 'babel'
 			},
 			{
 				test: /\.json$/,
 				loader: 'json'
+			},
+			{
+				test: /icons\/\w+\.png$/,
+				loader: 'url?limit=20000'
 			}
 		]
 	},

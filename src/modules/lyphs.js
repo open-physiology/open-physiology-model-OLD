@@ -35,7 +35,9 @@ export default TypedModule.create('lyphs', [
 		
 		extends: Template,
 		
-		singular: "material"
+		singular: "material",
+		
+		icon: require('./icons/material.png')
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
@@ -63,6 +65,8 @@ export default TypedModule.create('lyphs', [
 		extends: Material,
 		
 		singular: "lyph",
+				
+		icon: require('./icons/lyph.png'),
 		
 		properties: {
 			'thickness': { // size in radial dimension
@@ -232,6 +236,8 @@ export default TypedModule.create('lyphs', [
 		extends: Template,
 		
 		singular: "border",
+				
+		icon: require('./icons/border.png'),
 		
 		properties: {
 			nature: {
@@ -309,7 +315,9 @@ export default TypedModule.create('lyphs', [
 		
 		extends: Template,
 		
-		singular: "coalescence scenario"
+		singular: "coalescence scenario",
+				
+		icon: require('./icons/coalescenceScenario.png')
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
@@ -339,7 +347,9 @@ export default TypedModule.create('lyphs', [
 		
 		extends: Resource,
 		
-		singular: "coalescence"
+		singular: "coalescence",
+				
+		icon: require('./icons/coalescence.png')
 		
 		// coalescence between two or more lyph templates means
 		// that at least one lyph from each participating lyph template
@@ -388,6 +398,8 @@ export default TypedModule.create('lyphs', [
 		extends: Template,
 		
 		singular: "node",
+				
+		icon: require('./icons/node.png'),
 		
 	});/////////////////////////////////////////////////////////////////////////
 	

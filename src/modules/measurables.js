@@ -23,6 +23,8 @@ export default TypedModule.create('measurables', [
 		extends: Template,
 		
 		singular: "measurable",
+				
+		icon: require('./icons/measurable.png'),
 		
 		properties: {
 			'quality': {
@@ -94,6 +96,8 @@ export default TypedModule.create('measurables', [
 		
 		singular: "causality",
 		plural:   "causalities",
+				
+		icon: require('./icons/causality.png'),
 		
 	});/////////////////////////////////////////////////////////////////////////
 	

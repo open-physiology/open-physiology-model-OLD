@@ -18,6 +18,8 @@ export default Module.create('research', [
 		extends: Resource,
 		
 		singular: "correlation",
+				
+		icon: require('./icons/correlation.png'),
 		
 		properties: {
 			'comment': { type: 'string' }
@@ -47,7 +49,9 @@ export default Module.create('research', [
 		extends: Resource,
 		
 		singular: "clinical index",
-		plural:   "clinical indices"
+		plural:   "clinical indices",
+				
+		icon: require('./icons/clinicalIndex.png')
 		
 	});/////////////////////////////////////////////////////////////////////////
 	
@@ -88,7 +92,9 @@ export default Module.create('research', [
 		
 		extends: Resource,
 		
-		singular: "publication"
+		singular: "publication",
+				
+		icon: require('./icons/publication.png')
 		
 	});/////////////////////////////////////////////////////////////////////////
 	

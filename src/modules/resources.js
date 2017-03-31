@@ -13,6 +13,8 @@ export default Module.create('resources', [], (M) => {
 		
 		singular: "resource",
 		
+		icon: require('./icons/resource.png'),
+		
 		properties: {
 			'id':    { ...idSchema,         readonly: true },
 			'class': { ...identifierSchema, readonly: true },
@@ -20,7 +22,7 @@ export default Module.create('resources', [], (M) => {
 		}
 		
 	});//////////////////////////////////////////////////////////////////////////
-	 
+	
 	
 	const IsRelatedTo = M.RELATIONSHIP({
 		
@@ -48,6 +50,8 @@ export default Module.create('resources', [], (M) => {
 		extends: Resource,
 		
 		singular: "external resource",
+		
+		icon: require('./icons/externalResource.png'),
 		
 		properties: {
 			'uri':  { ...uriSchema, required: true },
