@@ -44,27 +44,7 @@ module.exports = function (tests) {
 			// postprocessor: wallabyPostprocessor,
 
 			bootstrap: function (wallaby) {
-				
-				// wallaby.testFramework.timeout(10000);
-
-				// required to trigger test loading
-				// window.__moduleBundler.loadTests();
-                
-                
-				// var modulePrototype = require('module').Module.prototype;
-				// if (!modulePrototype._originalRequire) {
-				// 	modulePrototype._originalRequire = modulePrototype.require;
-				// 	modulePrototype.require = function (filePath) {
-				// 		var exports = modulePrototype._originalRequire.call(this, filePath);
-				// 		if (filePath === 'mocha') {
-				// 			exports.describe = global.describe;
-				// 			exports.it = global.it;
-				// 			exports.xdescribe = global.xdescribe;
-				// 			exports.xit = global.xit;
-				// 		}
-				// 		return exports;
-				// 	};
-				// }
+				wallaby.testFramework.timeout(10000);
 			},
 			
 			debug: true
