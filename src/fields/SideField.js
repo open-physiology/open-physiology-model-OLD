@@ -70,8 +70,9 @@ Field[$$registerFieldClass](class SideField extends Field {
 		
 		/* set the initial value */
 		this[$$initSet](
-			[initialValue::isObject() || initialValue::isNull(), initialValue            ],
-			[desc.options.auto && !owner.isPlaceholder,          ::desc.resourceClass.new] // TODO: command dependencies?
+			[initialValue::isObject() || initialValue::isNull(), initialValue]
+			// TODO: remove following commented code; no longer doing auto-create
+			// [desc.options.auto && !owner.isPlaceholder,          ::desc.resourceClass.new] // TODO: command dependencies?
 		);
 		
 		/* if one side becomes null, then so does the other, */

@@ -85,17 +85,18 @@ Field[$$registerFieldClass](class Rel1Field extends RelField {
 		this[$$initSet](
 			[initialValue, () => this.jsonToValue(initialValue)],
 			[givenShortcutInitialValue],
-			[desc.options.auto && !owner.isPlaceholder, () => {
-				let otherEntity = desc.codomain.resourceClass.new({}, {
-					forcedDependencies: [owner.originCommand]
-				});
-				return desc.relationshipClass.new({
-					[desc.keyInRelationship]         : owner,
-					[desc.codomain.keyInRelationship]: otherEntity
-				}, {
-					forcedDependencies: [owner.originCommand]
-				});
-			}],
+			// TODO: remove following commented code; no longer doing auto-create
+			// [desc.options.auto && !owner.isPlaceholder, () => {
+			// 	let otherEntity = desc.codomain.resourceClass.new({}, {
+			// 		forcedDependencies: [owner.originCommand]
+			// 	});
+			// 	return desc.relationshipClass.new({
+			// 		[desc.keyInRelationship]         : owner,
+			// 		[desc.codomain.keyInRelationship]: otherEntity
+			// 	}, {
+			// 		forcedDependencies: [owner.originCommand]
+			// 	});
+			// }],
 			[desc.options.default, () => {
 				let otherEntity = desc.options.default::callOrReturn({
 					forcedDependencies: [owner.originCommand]

@@ -131,22 +131,23 @@ Field[$$registerFieldClass](class Rel$Field extends RelField {
 			// OK, this field is optional
 		}
 		
-		/* fill up missing required values with 'auto'matic ones */
-		if (desc.options.auto && !owner.isPlaceholder) {
-			let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
-			for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
-				let otherEntity = desc.codomain.resourceClass.new({}, {
-					forcedDependencies: [owner.originCommand]
-				});
-				const rel = desc.relationshipClass.new({
-					[desc.keyInRelationship]         : owner,
-					[desc.codomain.keyInRelationship]: otherEntity
-				}, {
-					forcedDependencies: [owner.originCommand]
-				});
-				this[$$value].add(rel);
-			}
-		}
+		// TODO: remove following commented code; no longer doing auto-create
+		// /* fill up missing required values with 'auto'matic ones */
+		// if (desc.options.auto && !owner.isPlaceholder) {
+		// 	let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
+		// 	for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
+		// 		let otherEntity = desc.codomain.resourceClass.new({}, {
+		// 			forcedDependencies: [owner.originCommand]
+		// 		});
+		// 		const rel = desc.relationshipClass.new({
+		// 			[desc.keyInRelationship]         : owner,
+		// 			[desc.codomain.keyInRelationship]: otherEntity
+		// 		}, {
+		// 			forcedDependencies: [owner.originCommand]
+		// 		});
+		// 		this[$$value].add(rel);
+		// 	}
+		// }
 		
 		/* emit 'value' signals (but note that setValueThroughSignal = false) */
 		this[$$value].p('value')::waitUntilConstructed().subscribe( this.p('value') );

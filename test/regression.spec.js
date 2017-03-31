@@ -94,11 +94,16 @@ describe("regression tests", () => {
     });
 
     // TODO: temporarily skipping this test, because it assumes border auto-creation.
-    it.skip("auto-synchronized border-natures?", async () => {
+    it("auto-synchronized border-natures?", async () => {
 
         const {Lyph, Border} = environment.classes;
 
-        let lyph = Lyph.new();
+        let lyph = Lyph.new({
+            longitudinalBorders: [
+                Border.new(),
+                Border.new()
+            ]
+        });
 
         await new Promise((resolve) => { setTimeout(resolve, 1000) });
 

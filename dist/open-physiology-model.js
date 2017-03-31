@@ -3868,7 +3868,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		/* 4 borders maximum; at least two longitudinal borders; optionally one or two radial borders */
 		var HasBorder = borderRel('HasBorder', Has, '0..4', '1..1', 'borders', 'has border', { abstract: true });
-		var HasLongitudinalBorder = borderRel('HasLongitudinalBorder', HasBorder, '2..2', '0..1', 'longitudinalBorders', 'has longitudinal border', {}, {/*auto: true, readonly: true*/});
+		var HasLongitudinalBorder = borderRel('HasLongitudinalBorder', HasBorder, '2..2', '0..1', 'longitudinalBorders', 'has longitudinal border', {}, {});
 		var HasRadialBorder = borderRel('HasRadialBorder', HasBorder, '0..2', '0..1', 'radialBorders', 'has radial border');
 	
 		/* one of the longitudinal borders can be an axis */
@@ -16744,8 +16744,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
 	function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16957,21 +16955,23 @@ return /******/ (function(modules) { // webpackBootstrap
 			// OK, this field is optional
 	
 	
-			/* fill up missing required values with 'auto'matic ones */
-			if (desc.options.auto && !owner.isPlaceholder) {
-				var shortcutInitial = _get3.default.call(related, [desc.shortcutKey, 'initialValue']);
-				for (var i = (_context4 = _this[_symbols.$$value], _size2.default).call(_context4) + _size2.default.call(shortcutInitial); i < desc.cardinality.min; ++i) {
-					var _context4, _desc$relationshipCla;
-	
-					var otherEntity = desc.codomain.resourceClass.new({}, {
-						forcedDependencies: [owner.originCommand]
-					});
-					var _rel = desc.relationshipClass.new((_desc$relationshipCla = {}, _defineProperty(_desc$relationshipCla, desc.keyInRelationship, owner), _defineProperty(_desc$relationshipCla, desc.codomain.keyInRelationship, otherEntity), _desc$relationshipCla), {
-						forcedDependencies: [owner.originCommand]
-					});
-					_this[_symbols.$$value].add(_rel);
-				}
-			}
+			// TODO: remove following commented code; no longer doing auto-create
+			// /* fill up missing required values with 'auto'matic ones */
+			// if (desc.options.auto && !owner.isPlaceholder) {
+			// 	let shortcutInitial = related::get([desc.shortcutKey, 'initialValue']);
+			// 	for (let i = this[$$value]::size() + shortcutInitial::size(); i < desc.cardinality.min; ++i) {
+			// 		let otherEntity = desc.codomain.resourceClass.new({}, {
+			// 			forcedDependencies: [owner.originCommand]
+			// 		});
+			// 		const rel = desc.relationshipClass.new({
+			// 			[desc.keyInRelationship]         : owner,
+			// 			[desc.codomain.keyInRelationship]: otherEntity
+			// 		}, {
+			// 			forcedDependencies: [owner.originCommand]
+			// 		});
+			// 		this[$$value].add(rel);
+			// 	}
+			// }
 	
 			/* emit 'value' signals (but note that setValueThroughSignal = false) */
 			(_context3 = _this[_symbols.$$value].p('value'), waitUntilConstructed).call(_context3).subscribe(_this.p('value'));
@@ -16981,7 +16981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(Rel$Field, [{
 			key: 'set',
 			value: function set(newValue) {
-				var _context5;
+				var _context4;
 	
 				var _ref8 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
@@ -16993,7 +16993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var updatePristine = _ref8$updatePristine === undefined ? false : _ref8$updatePristine;
 	
 				(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly);
-				if ((_context5 = newValue, _isArray2.default).call(_context5)) {
+				if ((_context4 = newValue, _isArray2.default).call(_context4)) {
 					newValue = this.jsonToValue(newValue);
 				}
 				if (!ignoreValidation) {
@@ -17056,13 +17056,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				(0, _misc.constraint)(val[Symbol.iterator], (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (stages.includes('commit')) {
-					var _context6;
+					var _context5;
 	
 					var _$$desc$cardinality = this[_symbols.$$desc].cardinality;
 					var min = _$$desc$cardinality.min;
 					var max = _$$desc$cardinality.max;
 	
-					(0, _misc.constraint)((_context6 = _size2.default.call(val), _inRange2.default).call(_context6, min, max + 1), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key], min, max));
+					(0, _misc.constraint)((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, min, max + 1), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key], min, max));
 				}
 				val.forEach(this.validateElement.bind(this));
 			}
@@ -17078,12 +17078,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: 'commit',
 			value: function () {
 				var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-					return regeneratorRuntime.wrap(function _callee$(_context7) {
+					return regeneratorRuntime.wrap(function _callee$(_context6) {
 						while (1) {
-							switch (_context7.prev = _context7.next) {
+							switch (_context6.prev = _context6.next) {
 								case 0:
 								case 'end':
-									return _context7.stop();
+									return _context6.stop();
 							}
 						}
 					}, _callee, this);
@@ -17101,7 +17101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}], [{
 			key: 'valueToJSON',
 			value: function valueToJSON(value) {
-				var _context8;
+				var _context7;
 	
 				var _ref10 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
@@ -17109,13 +17109,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				var options = _objectWithoutProperties(_ref10, ['requireClass']);
 	
-				return [].concat(_toConsumableArray((_context8 = _boundHybridFunctions.map.call(value, function (e) {
+				return [].concat(_toConsumableArray((_context7 = _boundHybridFunctions.map.call(value, function (e) {
 					var Entity = e.constructor.Entity;
 					if (requireClass && requireClass !== e.class) {
 						return undefined;
 					}
 					return Entity.normalizeAddress(e, options);
-				}), _boundHybridFunctions.filter).call(_context8, function (v) {
+				}), _boundHybridFunctions.filter).call(_context7, function (v) {
 					return !!v;
 				})));
 			}
@@ -17284,22 +17284,26 @@ return /******/ (function(modules) { // webpackBootstrap
 			/* set the initial value */
 			_this[_symbols.$$initSet]([initialValue, function () {
 				return _this.jsonToValue(initialValue);
-			}], [givenShortcutInitialValue], [desc.options.auto && !owner.isPlaceholder, function () {
-				var _desc$relationshipCla;
-	
-				var otherEntity = desc.codomain.resourceClass.new({}, {
-					forcedDependencies: [owner.originCommand]
-				});
-				return desc.relationshipClass.new((_desc$relationshipCla = {}, _defineProperty(_desc$relationshipCla, desc.keyInRelationship, owner), _defineProperty(_desc$relationshipCla, desc.codomain.keyInRelationship, otherEntity), _desc$relationshipCla), {
-					forcedDependencies: [owner.originCommand]
-				});
-			}], [desc.options.default, function () {
-				var _context3, _desc$relationshipCla2;
+			}], [givenShortcutInitialValue],
+			// TODO: remove following commented code; no longer doing auto-create
+			// [desc.options.auto && !owner.isPlaceholder, () => {
+			// 	let otherEntity = desc.codomain.resourceClass.new({}, {
+			// 		forcedDependencies: [owner.originCommand]
+			// 	});
+			// 	return desc.relationshipClass.new({
+			// 		[desc.keyInRelationship]         : owner,
+			// 		[desc.codomain.keyInRelationship]: otherEntity
+			// 	}, {
+			// 		forcedDependencies: [owner.originCommand]
+			// 	});
+			// }],
+			[desc.options.default, function () {
+				var _context3, _desc$relationshipCla;
 	
 				var otherEntity = (_context3 = desc.options.default, _misc.callOrReturn).call(_context3, {
 					forcedDependencies: [owner.originCommand]
 				}); // TODO: do defaults need to go through jsonToValue?
-				return desc.relationshipClass.new((_desc$relationshipCla2 = {}, _defineProperty(_desc$relationshipCla2, desc.keyInRelationship, owner), _defineProperty(_desc$relationshipCla2, desc.codomain.keyInRelationship, otherEntity), _desc$relationshipCla2), {
+				return desc.relationshipClass.new((_desc$relationshipCla = {}, _defineProperty(_desc$relationshipCla, desc.keyInRelationship, owner), _defineProperty(_desc$relationshipCla, desc.codomain.keyInRelationship, otherEntity), _desc$relationshipCla), {
 					forcedDependencies: [owner.originCommand]
 				});
 			}], [desc.cardinality.min === 0, null]);
@@ -18225,7 +18229,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* set the initial value */
 	
-			_this[_symbols.$$initSet]([_isObject2.default.call(initialValue) || _isNull2.default.call(initialValue), initialValue], [desc.options.auto && !owner.isPlaceholder, (_context2 = desc.resourceClass).new.bind(_context2)] // TODO: command dependencies?
+			_this[_symbols.$$initSet]([_isObject2.default.call(initialValue) || _isNull2.default.call(initialValue), initialValue]
+			// TODO: remove following commented code; no longer doing auto-create
+			// [desc.options.auto && !owner.isPlaceholder,          ::desc.resourceClass.new] // TODO: command dependencies?
 			);
 	
 			/* if one side becomes null, then so does the other, */
