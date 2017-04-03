@@ -25,7 +25,7 @@ module.exports = {
 			},
 			{
 				test: /icons\/\w+\.png$/,
-				loader: 'url?limit=20000'
+				loader: 'url'
 			}
 		]
 	},
