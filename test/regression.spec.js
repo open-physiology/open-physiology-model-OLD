@@ -562,7 +562,7 @@ describe("regression tests", () => {
 
         //materials expects parameter of class 'Type'
         let lyph1 = Lyph.new({name: "Heart", materials: [material1]});
-        await expect(lyph1.commit()).to.be.isFulfilled();
+        await expect(lyph1.commit()).to.be.fulfilled;
     });
 
 });
