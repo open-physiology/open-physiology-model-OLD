@@ -554,4 +554,15 @@ describe("regression tests", () => {
 
     });
 
+    it("Parameter with incorrect type does not cause exception", async () => {
+        const {Lyph, Material} = environment.classes;
+
+        let material1 = Material.new({name: "Blood"});
+        await material1.commit();
+
+        //materials expects parameter of class 'Type'
+        let lyph1 = Lyph.new({name: "Heart", materials: [material1]});
+        await expect(lyph1.commit()).to.be.isFulfilled();
+    });
+
 });
