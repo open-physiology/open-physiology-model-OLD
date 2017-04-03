@@ -27,7 +27,6 @@ module.exports = function (tests) {
 			tests: tests,
 			
 			env: { type: 'node' },
-			// env: { type: 'browser' },
 			
 			testFramework: 'mocha',
 			

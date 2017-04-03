@@ -1,1 +1,1 @@
-module.exports = require('./wallaby.tmpl.js')(['test/modules/lyphs.spec.js']);
+module.exports = require('./wallaby.tmpl.js')(['./test/modules/lyphs.spec.js']);
