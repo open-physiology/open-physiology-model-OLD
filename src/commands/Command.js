@@ -479,8 +479,9 @@ export default ({backend}) => {
 	////////////////////////////////////////////////////////////////////////////
 	
 	/* tracking temporary ids */
+	// temporary ids are negative // TODO: create regression test to confirm this
 	function newTemporaryId() {
-		return _uniqueId()::parseInt();
+		return -_uniqueId()::parseInt();
 	}
 	
 	/***/

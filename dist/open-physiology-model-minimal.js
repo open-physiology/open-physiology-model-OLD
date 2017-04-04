@@ -13291,12 +13291,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		////////////////////////////////////////////////////////////////////////////
 	
 		/* tracking temporary ids */
+		// temporary ids are negative
 	
 	
 		function newTemporaryId() {
 			var _context8;
 	
-			return (_context8 = (0, _uniqueId3.default)(), _parseInt2.default).call(_context8);
+			return -(_context8 = (0, _uniqueId3.default)(), _parseInt2.default).call(_context8);
 		}
 	
 		/***/
