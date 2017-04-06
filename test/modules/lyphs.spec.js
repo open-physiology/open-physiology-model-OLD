@@ -143,4 +143,9 @@ describe("'lyphs' Module", () => {
 		
 	});
 	
+	it("exports lyph classes that have icons", () => {
+		const {Lyph} = environment.classes;
+		expect(Lyph.icon).to.be.a('string');
+	});
+	
 });

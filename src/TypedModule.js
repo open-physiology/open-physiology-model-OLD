@@ -43,6 +43,8 @@ export default class TypedModule extends Module {
 				
 				singular: conf.singular,
 				plural: conf.plural,
+				
+				icon: conf.icon,
 
 				properties:        conf.properties,
 				patternProperties: conf.patternProperties,

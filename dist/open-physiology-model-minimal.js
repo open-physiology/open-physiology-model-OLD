@@ -168,10 +168,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		try {
 			for (var _iterator = (0, _zip3.default)(vals, strings.slice(1))[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-				var _step$value = _slicedToArray(_step.value, 2);
-	
-				var val = _step$value[0];
-				var str = _step$value[1];
+				var _step$value = _slicedToArray(_step.value, 2),
+				    val = _step$value[0],
+				    str = _step$value[1];
 	
 				result += val + simpleSpaced(str);
 			}
@@ -217,10 +216,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function parseCardinality(val) {
 		var match = val.match(/^(\d+)\.\.(\d+|\*)$/);
 	
-		var _match = _slicedToArray(match, 3);
-	
-		var min = _match[1];
-		var max = _match[2];
+		var _match = _slicedToArray(match, 3),
+		    min = _match[1],
+		    max = _match[2];
 	
 		if (max === '*') {
 			max = Infinity;
@@ -232,9 +230,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function stringifyCardinality(cardinality) {
-		var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-		var abbreviate = _ref.abbreviate;
+		var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+		    abbreviate = _ref.abbreviate;
 	
 		return cardinality.min === cardinality.max && abbreviate ? '   ' + cardinality.min : cardinality.min + '..' + (cardinality.max === Infinity ? '*' : cardinality.max);
 	}
@@ -265,10 +262,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	var sw = exports.sw = function sw(val) {
-		var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+		var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+		    _ref2$autoInvoke = _ref2.autoInvoke,
+		    autoInvoke = _ref2$autoInvoke === undefined ? true : _ref2$autoInvoke;
 	
-		var _ref2$autoInvoke = _ref2.autoInvoke;
-		var autoInvoke = _ref2$autoInvoke === undefined ? true : _ref2$autoInvoke;
 		return function (map) {
 			var _context5;
 	
@@ -281,23 +278,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	function definePropertyByValue(key, value) {
-		var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+		var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
 		_boundNativeMethods.defineProperty.call(this, key, _extends({}, options, { value: value }));
 	}
 	
 	function definePropertiesByValue(obj) {
-		var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+		var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 		var _iteratorNormalCompletion2 = true;
 		var _didIteratorError2 = false;
 		var _iteratorError2 = undefined;
 	
 		try {
 			for (var _iterator2 = _entries2.default.call(obj)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-				var _step2$value = _slicedToArray(_step2.value, 2);
-	
-				var key = _step2$value[0];
-				var value = _step2$value[1];
+				var _step2$value = _slicedToArray(_step2.value, 2),
+				    key = _step2$value[0],
+				    value = _step2$value[1];
 	
 				definePropertyByValue.call(this, key, value, options);
 			}
@@ -788,9 +784,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						try {
 							for (var _iterator2 = FieldClass[_symbols.$$entriesIn](cls)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-								var _step2$value = _step2.value;
-								var key = _step2$value.key;
-								var desc = _step2$value.desc;
+								var _ref2 = _step2.value;
+								var key = _ref2.key,
+								    desc = _ref2.desc;
 	
 								if (!onlyForKey || onlyForKey === key) {
 									FieldClass.initClass({ cls: cls, key: key, desc: desc });
@@ -847,7 +843,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				/* allow specific field-init code to wait until all fields are initialized */
 				var constructingOwner = new _rxjs.Subject(); // TODO: remove; obsolete
 				var waitUntilConstructed = function waitUntilConstructed() {
-					var entity = arguments.length <= 0 || arguments[0] === undefined ? owner : arguments[0];
+					var entity = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : owner;
 	
 					if (entity === owner) {
 						// TODO: remove; obsolete
@@ -1018,16 +1014,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		}]);
 	
-		function Field(_ref) {
-			var owner = _ref.owner;
-			var key = _ref.key;
-			var desc = _ref.desc;
-			var _ref$setValueThroughS = _ref.setValueThroughSignal;
-			var setValueThroughSignal = _ref$setValueThroughS === undefined ? true : _ref$setValueThroughS;
+		function Field(_ref3) {
+			var owner = _ref3.owner,
+			    key = _ref3.key,
+			    desc = _ref3.desc,
+			    _ref3$setValueThrough = _ref3.setValueThroughSignal,
+			    setValueThroughSignal = _ref3$setValueThrough === undefined ? true : _ref3$setValueThrough;
 	
 			_classCallCheck(this, Field);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this));
+			var _this = _possibleConstructorReturn(this, (Field.__proto__ || Object.getPrototypeOf(Field)).call(this));
 	
 			_initDefineProp(_this, 'commitEvent', _descriptor, _this);
 	
@@ -1054,7 +1050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(Field, [{
 			key: 'valueToJSON',
 			value: function valueToJSON() {
-				var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+				var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 				return this.constructor.valueToJSON(this.value, options);
 			}
 	
@@ -1068,7 +1064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'set',
 			value: function set(newValue) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				_defaults2.default.call(options, { createEditCommand: true });
 	
@@ -1078,12 +1074,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				} else if (!this.constructor.isEqual(this[_symbols.$$value], newValue)) {
 					var _context2;
 	
-					var _options$ignoreReadon = options.ignoreReadonly;
-					var ignoreReadonly = _options$ignoreReadon === undefined ? false : _options$ignoreReadon;
-					var _options$ignoreValida = options.ignoreValidation;
-					var ignoreValidation = _options$ignoreValida === undefined ? false : _options$ignoreValida;
-					var _options$createEditCo = options.createEditCommand;
-					var createEditCommand = _options$createEditCo === undefined ? true : _options$createEditCo;
+					var _options$ignoreReadon = options.ignoreReadonly,
+					    ignoreReadonly = _options$ignoreReadon === undefined ? false : _options$ignoreReadon,
+					    _options$ignoreValida = options.ignoreValidation,
+					    ignoreValidation = _options$ignoreValida === undefined ? false : _options$ignoreValida,
+					    _options$createEditCo = options.createEditCommand,
+					    createEditCommand = _options$createEditCo === undefined ? true : _options$createEditCo;
 	
 	
 					(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly, (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
@@ -1116,10 +1112,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				try {
 					for (var _iterator8 = alternatives[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-						var _step8$value = _slicedToArray(_step8.value, 2);
-	
-						var guard = _step8$value[0];
-						var value = _step8$value[1];
+						var _step8$value = _slicedToArray(_step8.value, 2),
+						    guard = _step8$value[0],
+						    value = _step8$value[1];
 	
 						if (_isFunction2.default.call(guard) ? guard() : guard) {
 							if (_isUndefined2.default.call(value)) {
@@ -1167,7 +1162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+				var stages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 			}
 	
 			// async commit() {
@@ -1207,7 +1202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function RelField(options) {
 			_classCallCheck(this, RelField);
 	
-			var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(RelField).call(this, options));
+			var _this2 = _possibleConstructorReturn(this, (RelField.__proto__ || Object.getPrototypeOf(RelField)).call(this, options));
 	
 			_initDefineProp(_this2, 'possibleValues', _descriptor4, _this2);
 	
@@ -1499,8 +1494,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = _Module2.default.create('typed', [_resources2.default], function (M, _ref) {
-		var Resource = _ref.Resource;
-		var IsRelatedTo = _ref.IsRelatedTo;
+		var Resource = _ref.Resource,
+		    IsRelatedTo = _ref.IsRelatedTo;
 	
 	
 		var Type = M.RESOURCE({ ///////////////////////////////////////////////////
@@ -1683,7 +1678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function TypedModule() {
 			_classCallCheck(this, TypedModule);
 	
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(TypedModule).apply(this, arguments));
+			return _possibleConstructorReturn(this, (TypedModule.__proto__ || Object.getPrototypeOf(TypedModule)).apply(this, arguments));
 		}
 	
 		_createClass(TypedModule, [{
@@ -1714,6 +1709,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						singular: conf.singular,
 						plural: conf.plural,
+	
+						icon: conf.icon,
 	
 						properties: conf.properties,
 						patternProperties: conf.patternProperties,
@@ -2015,7 +2012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -2096,7 +2093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
@@ -2119,8 +2116,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref4) {
 					var _context6;
 	
-					var temporaryIds = _ref4.temporaryIds;
-					var commands = _ref4.commands;
+					var temporaryIds = _ref4.temporaryIds,
+					    commands = _ref4.commands;
 					var response, i, localCommand, localResponse, temporaryId, newId, j, futureCommand;
 					return regeneratorRuntime.wrap(function _callee2$(_context7) {
 						while (1) {
@@ -2243,9 +2240,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* a function to replace temporary id with new id */
 			function replaceTemporaryIds(_ref2) {
-				var futureCommand = _ref2.futureCommand;
-				var temporaryId = _ref2.temporaryId;
-				var newId = _ref2.newId;
+				var futureCommand = _ref2.futureCommand,
+				    temporaryId = _ref2.temporaryId,
+				    newId = _ref2.newId;
 	
 				var idObjects = [];
 				switch (futureCommand.commandType) {
@@ -2360,10 +2357,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			this.backend = {};
 			var _arr = [['commit_new', noOpMsg('commit_new')], ['commit_edit', noOpMsg('commit_edit')], ['commit_delete', noOpMsg('commit_delete')], ['commit_batch', defaultBatchCommitter], ['load', noOpMsg('load')], ['loadAll', noOpMsg('loadAll')]];
 			for (var _i = 0; _i < _arr.length; _i++) {
-				var _arr$_i = _slicedToArray(_arr[_i], 2);
-	
-				var op = _arr$_i[0];
-				var defaultOp = _arr$_i[1];
+				var _arr$_i = _slicedToArray(_arr[_i], 2),
+				    op = _arr$_i[0],
+				    defaultOp = _arr$_i[1];
 	
 				this.backend[op] = this[op] = envOrBackend[op] ? envOrBackend[op].bind(envOrBackend) : defaultOp;
 			}
@@ -2376,11 +2372,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* create a version of the Command and Entity classes */
 	
-			var _commandClassFactory = (0, _Command2.default)(this);
-	
-			var Command = _commandClassFactory.Command;
-			var TrackedCommand = _commandClassFactory.TrackedCommand;
-			var Command_batch = _commandClassFactory.Command_batch;
+			var _commandClassFactory = (0, _Command2.default)(this),
+			    Command = _commandClassFactory.Command,
+			    TrackedCommand = _commandClassFactory.TrackedCommand,
+			    Command_batch = _commandClassFactory.Command_batch;
 	
 			_misc.definePropertyByValue.call(this, 'Command', Command);
 			_misc.definePropertyByValue.call(this, 'TrackedCommand', TrackedCommand);
@@ -2462,7 +2457,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _this2 = this;
 	
 				return function () {
-					var environment = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+					var environment = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
 					environment = new Environment(environment);
 					var module = new _this2(name);
@@ -2546,10 +2541,9 @@ return /******/ (function(modules) { // webpackBootstrap
 				/* normalize properties */
 				var _arr3 = [['properties', 'key'], ['patternProperties', 'pattern']];
 				for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
-					var _arr3$_i = _slicedToArray(_arr3[_i3], 2);
-	
-					var pKey = _arr3$_i[0];
-					var kKey = _arr3$_i[1];
+					var _arr3$_i = _slicedToArray(_arr3[_i3], 2),
+					    pKey = _arr3$_i[0],
+					    kKey = _arr3$_i[1];
 	
 					_defaults2.default.call(config, _defineProperty({}, pKey, {}));
 					var _iteratorNormalCompletion5 = true;
@@ -2560,10 +2554,9 @@ return /******/ (function(modules) { // webpackBootstrap
 						for (var _iterator5 = (_context9 = config[pKey], _entries2.default).call(_context9)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
 							var _context9;
 	
-							var _step5$value = _slicedToArray(_step5.value, 2);
-	
-							var k = _step5$value[0];
-							var desc = _step5$value[1];
+							var _step5$value = _slicedToArray(_step5.value, 2),
+							    k = _step5$value[0],
+							    desc = _step5$value[1];
 	
 							desc[kKey] = k;
 						}
@@ -2646,24 +2639,19 @@ return /******/ (function(modules) { // webpackBootstrap
 					var pair = (_pair = {}, _defineProperty(_pair, 1, {}), _defineProperty(_pair, 2, {}), _pair);
 					var _arr5 = [[[1, pair[1]], [2, pair[2]]], [[2, pair[2]], [1, pair[1]]]];
 					for (var _i5 = 0; _i5 < _arr5.length; _i5++) {
-						var _arr5$_i = _slicedToArray(_arr5[_i5], 2);
+						var _arr5$_i = _slicedToArray(_arr5[_i5], 2),
+						    _arr5$_i$ = _slicedToArray(_arr5$_i[0], 2),
+						    domainKey = _arr5$_i$[0],
+						    domain = _arr5$_i$[1],
+						    _arr5$_i$2 = _slicedToArray(_arr5$_i[1], 2),
+						    codomainKey = _arr5$_i$2[0],
+						    codomain = _arr5$_i$2[1];
 	
-						var _arr5$_i$ = _slicedToArray(_arr5$_i[0], 2);
-	
-						var domainKey = _arr5$_i$[0];
-						var domain = _arr5$_i$[1];
-	
-						var _arr5$_i$2 = _slicedToArray(_arr5$_i[1], 2);
-	
-						var codomainKey = _arr5$_i$2[0];
-						var codomain = _arr5$_i$2[1];
-	
-						var _givenDomainPair$doma = _slicedToArray(givenDomainPair[domainKey], 3);
-	
-						var resourceClass = _givenDomainPair$doma[0];
-						var cardinality = _givenDomainPair$doma[1];
-						var _givenDomainPair$doma2 = _givenDomainPair$doma[2];
-						var options = _givenDomainPair$doma2 === undefined ? {} : _givenDomainPair$doma2;
+						var _givenDomainPair$doma = _slicedToArray(givenDomainPair[domainKey], 3),
+						    resourceClass = _givenDomainPair$doma[0],
+						    cardinality = _givenDomainPair$doma[1],
+						    _givenDomainPair$doma2 = _givenDomainPair$doma[2],
+						    options = _givenDomainPair$doma2 === undefined ? {} : _givenDomainPair$doma2;
 	
 						_misc.definePropertiesByValue.call(domain, {
 							codomain: codomain,
@@ -2743,11 +2731,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: $$processRelationshipDomain,
 			value: function value(referenceDomain) {
-				var resourceClass = referenceDomain.resourceClass;
-				var relationshipClass = referenceDomain.relationshipClass;
-				var keyInRelationship = referenceDomain.keyInRelationship;
-				var keyInResource = referenceDomain.keyInResource;
-				var shortcutKey = referenceDomain.shortcutKey;
+				var resourceClass = referenceDomain.resourceClass,
+				    relationshipClass = referenceDomain.relationshipClass,
+				    keyInRelationship = referenceDomain.keyInRelationship,
+				    keyInResource = referenceDomain.keyInResource,
+				    shortcutKey = referenceDomain.shortcutKey;
 	
 				// const relSinks = relationshipClass::(function findSinks() {
 				// 	if (this.extendedBy::size() === 0) { return [this] }
@@ -3316,11 +3304,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	exports.default = _TypedModule2.default.create('lyphs', [_resources2.default, _typed2.default], function (M, _ref) {
-		var Resource = _ref.Resource;
-		var IsRelatedTo = _ref.IsRelatedTo;
-		var Template = _ref.Template;
-		var PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
-		var Has = _ref.Has;
+		var Resource = _ref.Resource,
+		    IsRelatedTo = _ref.IsRelatedTo,
+		    Template = _ref.Template,
+		    PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition,
+		    Has = _ref.Has;
 	
 	
 		var Material = M.TYPED_RESOURCE({ /////////////////////////////////////////
@@ -3384,10 +3372,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				new: function _new(command) {
 					var _context;
 	
-					var _command$initialValue = command.initialValues;
-					var initialValues = _command$initialValue === undefined ? {} : _command$initialValue;
-					var _command$options = command.options;
-					var options = _command$options === undefined ? {} : _command$options;
+					var _command$initialValue = command.initialValues,
+					    initialValues = _command$initialValue === undefined ? {} : _command$initialValue,
+					    _command$options = command.options,
+					    options = _command$options === undefined ? {} : _command$options;
 	
 					initialValues = _extends({}, initialValues);
 					(_context = initialValues, _defaults2.default).call(_context, {
@@ -3560,8 +3548,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		}); /////////////////////////////////////////////////////////////////////////
 	
 		var borderRel = function borderRel(name, Superclass, c1, c2, key, singular) {
-			var flags = arguments.length <= 6 || arguments[6] === undefined ? {} : arguments[6];
-			var options = arguments.length <= 7 || arguments[7] === undefined ? {} : arguments[7];
+			var flags = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
+			var options = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : {};
 			return M.RELATIONSHIP(_extends({
 	
 				name: name,
@@ -4638,16 +4626,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = _TypedModule2.default.create('measurables', [_resources2.default, _typed2.default, _lyphs2.default, _processes2.default], function (M, _ref) {
-		var Resource = _ref.Resource;
-		var IsRelatedTo = _ref.IsRelatedTo;
-		var Template = _ref.Template;
-		var Lyph = _ref.Lyph;
-		var Material = _ref.Material;
-		var Border = _ref.Border;
-		var Node = _ref.Node;
-		var Process = _ref.Process;
-		var Has = _ref.Has;
-		var PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
+		var Resource = _ref.Resource,
+		    IsRelatedTo = _ref.IsRelatedTo,
+		    Template = _ref.Template,
+		    Lyph = _ref.Lyph,
+		    Material = _ref.Material,
+		    Border = _ref.Border,
+		    Node = _ref.Node,
+		    Process = _ref.Process,
+		    Has = _ref.Has,
+		    PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
 	
 	
 		var Measurable = M.TYPED_RESOURCE({ ///////////////////////////////////////
@@ -4793,13 +4781,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = _TypedModule2.default.create('processes', [_resources2.default, _typed2.default, _lyphs2.default], function (M, _ref) {
-		var IsRelatedTo = _ref.IsRelatedTo;
-		var Template = _ref.Template;
-		var Material = _ref.Material;
-		var Lyph = _ref.Lyph;
-		var Node = _ref.Node;
-		var Has = _ref.Has;
-		var PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
+		var IsRelatedTo = _ref.IsRelatedTo,
+		    Template = _ref.Template,
+		    Material = _ref.Material,
+		    Lyph = _ref.Lyph,
+		    Node = _ref.Node,
+		    Has = _ref.Has,
+		    PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
 	
 	
 		var Process = M.TYPED_RESOURCE({ //////////////////////////////////////////
@@ -5006,7 +4994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function AddReplaySubject(initialSet) {
 			_classCallCheck(this, AddReplaySubject);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AddReplaySubject).call(this));
+			var _this = _possibleConstructorReturn(this, (AddReplaySubject.__proto__ || Object.getPrototypeOf(AddReplaySubject)).call(this));
 	
 			_this._setReference = initialSet;
 			return _this;
@@ -5023,7 +5011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: "_subscribe",
 			value: function _subscribe(subscriber) {
-				var subscription = _get(Object.getPrototypeOf(AddReplaySubject.prototype), "_subscribe", this).call(this, subscriber);
+				var subscription = _get(AddReplaySubject.prototype.__proto__ || Object.getPrototypeOf(AddReplaySubject.prototype), "_subscribe", this).call(this, subscriber);
 				if (subscription && !subscription.isUnsubscribed && !this[$$disableNextReplay]) {
 					this._setReference.forEach(subscriber.next.bind(subscriber));
 				}
@@ -5039,11 +5027,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		_inherits(ObservableSet, _extendableBuiltin2);
 	
 		function ObservableSet() {
-			var initialContent = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+			var initialContent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 	
 			_classCallCheck(this, ObservableSet);
 	
-			var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(ObservableSet).call(this));
+			var _this2 = _possibleConstructorReturn(this, (ObservableSet.__proto__ || Object.getPrototypeOf(ObservableSet)).call(this));
 	
 			_this2[$$addSubject] = new AddReplaySubject(_this2);
 			_this2[$$addSubject].normalSubscribe(_this2.add.bind(_this2));
@@ -5096,7 +5084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: "add",
 			value: function add(obj) {
 				if (!this.has(obj)) {
-					_get(Object.getPrototypeOf(ObservableSet.prototype), "add", this).call(this, obj);
+					_get(ObservableSet.prototype.__proto__ || Object.getPrototypeOf(ObservableSet.prototype), "add", this).call(this, obj);
 					this.e('add').next(obj);
 				}
 				return this;
@@ -5105,7 +5093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			key: "delete",
 			value: function _delete(obj) {
 				if (this.has(obj)) {
-					_get(Object.getPrototypeOf(ObservableSet.prototype), "delete", this).call(this, obj);
+					_get(ObservableSet.prototype.__proto__ || Object.getPrototypeOf(ObservableSet.prototype), "delete", this).call(this, obj);
 					this.e('delete').next(obj);
 					return true;
 				}
@@ -5247,8 +5235,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5372,10 +5358,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					for (var _iterator = (_context = this.constructor[$$events] || {}, _entries2.default).call(_context)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var _context;
 	
-						var _step$value = _slicedToArray(_step.value, 2);
-	
-						var key = _step$value[0];
-						var options = _step$value[1];
+						var _step$value = _slicedToArray(_step.value, 2),
+						    key = _step$value[0],
+						    options = _step$value[1];
 	
 						this.newEvent(key, options);
 					}
@@ -5402,10 +5387,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					for (var _iterator2 = (_context2 = this.constructor[$$properties] || {}, _entries2.default).call(_context2)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var _context2;
 	
-						var _step2$value = _slicedToArray(_step2.value, 2);
-	
-						var key = _step2$value[0];
-						var options = _step2$value[1];
+						var _step2$value = _slicedToArray(_step2.value, 2),
+						    key = _step2$value[0],
+						    options = _step2$value[1];
 	
 						this.newProperty(key, options);
 					}
@@ -5438,10 +5422,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(ValueTracker, [{
 			key: 'setValueTrackerOptions',
 			value: function setValueTrackerOptions(_ref) {
-				var _ref$takeUntil = _ref.takeUntil;
-				var takeUntil = _ref$takeUntil === undefined ? _rxjs.Observable.never() : _ref$takeUntil;
-				var _ref$filterBy = _ref.filterBy;
-				var filterBy = _ref$filterBy === undefined ? function () {
+				var _ref$takeUntil = _ref.takeUntil,
+				    takeUntil = _ref$takeUntil === undefined ? _rxjs.Observable.never() : _ref$takeUntil,
+				    _ref$filterBy = _ref.filterBy,
+				    filterBy = _ref$filterBy === undefined ? function () {
 					return true;
 				} : _ref$filterBy;
 	
@@ -5462,7 +5446,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'newEvent',
 			value: function newEvent(name) {
-				var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				_objectDestructuringEmpty(_ref2);
 	
@@ -5497,23 +5481,22 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _context3,
 				    _this = this;
 	
-				var _ref3 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-				var _ref3$readonly = _ref3.readonly;
-				var readonly = _ref3$readonly === undefined ? false : _ref3$readonly;
-				var _ref3$isEqual = _ref3.isEqual;
-				var isEqual = _ref3$isEqual === undefined ? function (a, b) {
+				var _ref3 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+				    _ref3$readonly = _ref3.readonly,
+				    readonly = _ref3$readonly === undefined ? false : _ref3$readonly,
+				    _ref3$isEqual = _ref3.isEqual,
+				    isEqual = _ref3$isEqual === undefined ? function (a, b) {
 					return a === b;
-				} : _ref3$isEqual;
-				var _ref3$isValid = _ref3.isValid;
-				var isValid = _ref3$isValid === undefined ? function () {
+				} : _ref3$isEqual,
+				    _ref3$isValid = _ref3.isValid,
+				    isValid = _ref3$isValid === undefined ? function () {
 					return true;
-				} : _ref3$isValid;
-				var _ref3$transform = _ref3.transform;
-				var transform = _ref3$transform === undefined ? function (v) {
+				} : _ref3$isValid,
+				    _ref3$transform = _ref3.transform,
+				    transform = _ref3$transform === undefined ? function (v) {
 					return v;
-				} : _ref3$transform;
-				var initial = _ref3.initial;
+				} : _ref3$transform,
+				    initial = _ref3.initial;
 	
 				this[$$initialize]();
 	
@@ -5596,16 +5579,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'p',
 			value: function p(name, deps) {
-				var _this2 = this;
-	
-				var optionalPassiveDeps = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
-				var optionalTransformer = arguments.length <= 3 || arguments[3] === undefined ? function () {
+				var optionalPassiveDeps = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+				var optionalTransformer = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function () {
 					for (var _len = arguments.length, a = Array(_len), _key = 0; _key < _len; _key++) {
 						a[_key] = arguments[_key];
 					}
 	
 					return a;
-				} : arguments[3];
+				};
 	
 				this[$$initialize]();
 				if (deps) {
@@ -5619,62 +5600,48 @@ return /******/ (function(modules) { // webpackBootstrap
 						return optionalTransformer.apply(undefined, _toConsumableArray(active).concat(passive));
 					}]));
 				} else if (name) {
-					var _ret = function () {
-						var head = name,
-						    sep = void 0,
-						    tail = void 0;
-						var match = name.match(/^(.+?)(\??\.)(.+)$/);
-						if (match) {
-							var _ret2 = function () {
-								var _match = _slicedToArray(match, 4);
+					var head = name,
+					    sep = void 0,
+					    tail = void 0;
+					var match = name.match(/^(.+?)(\??\.)(.+)$/);
+					if (match) {
+						var _match = _slicedToArray(match, 4);
 	
-								head = _match[1];
-								sep = _match[2];
-								tail = _match[3];
+						head = _match[1];
+						sep = _match[2];
+						tail = _match[3];
 	
-								var loose = sep === '?.';
-								return {
-									v: {
-										v: _this2.p(head).switchMap(function (obj) {
-											if (!obj) {
-												if (loose) {
-													return _rxjs.Observable.of(null);
-												} else {
-													return _rxjs.Observable.never();
-												}
-											}
-											// TODO: allow simple property chaining (even if not observables)
-											return obj.p(tail);
-										})
-									}
-								};
-							}();
+						var loose = sep === '?.';
+						return this.p(head).switchMap(function (obj) {
+							if (!obj) {
+								if (loose) {
+									return _rxjs.Observable.of(null);
+								} else {
+									return _rxjs.Observable.never();
+								}
+							}
+							// TODO: allow simple property chaining (even if not observables)
+							return obj.p(tail);
+						});
+					} else {
+						return this[$$properties][name];
+					}
 	
-							if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
-						} else {
-							return {
-								v: _this2[$$properties][name]
-							};
-						}
-	
-						// const [head, ...tail] = name.split('.');
-						// if (tail.length > 0) {
-						// 	return this.p(head).switchMap((obj) => {
-						// 		if (!obj) { return Observable.never() }
-						// 		assert(obj.p::isFunction(), humanMsg`
-						// 			The '${head}' property did not return
-						// 			a ValueTracker-based object,
-						// 			so it cannot be chained.
-						// 		`);
-						// 		return obj.p(tail.join('.'));
-						// 	});
-						// } else {
-						// 	assert(this[$$properties][head], humanMsg`No property '${name}' exists.`);
-						// 	return this[$$properties][head];
-						// }
-					}();
-	
-					if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+					// const [head, ...tail] = name.split('.');
+					// if (tail.length > 0) {
+					// 	return this.p(head).switchMap((obj) => {
+					// 		if (!obj) { return Observable.never() }
+					// 		assert(obj.p::isFunction(), humanMsg`
+					// 			The '${head}' property did not return
+					// 			a ValueTracker-based object,
+					// 			so it cannot be chained.
+					// 		`);
+					// 		return obj.p(tail.join('.'));
+					// 	});
+					// } else {
+					// 	assert(this[$$properties][head], humanMsg`No property '${name}' exists.`);
+					// 	return this[$$properties][head];
+					// }
 				}
 			}
 	
@@ -5692,10 +5659,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'pObj',
 			value: function pObj(activeDeps) {
-				var optionalPassiveDeps = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-				var optionalTransformer = arguments.length <= 2 || arguments[2] === undefined ? function (obj) {
+				var optionalPassiveDeps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+				var optionalTransformer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (obj) {
 					return obj;
-				} : arguments[2];
+				};
 	
 				this[$$initialize]();
 				var bothList = activeDeps.concat(optionalPassiveDeps);
@@ -5735,7 +5702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	;
 	
 	var property = exports.property = function property() {
-		var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+		var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 		return function (target, key) {
 			_set2.default.call(target, ['constructor', $$properties, key], options);
 			return _extends({
@@ -5751,7 +5718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var event = exports.event = function event() {
-		var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+		var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 		return function (target, key) {
 			var match = key.match(/^(\w+)Event$/);
 	
@@ -6317,9 +6284,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = _TypedModule2.default.create('groups', [_resources2.default, _typed2.default], function (M, _ref) {
-		var IsRelatedTo = _ref.IsRelatedTo;
-		var Template = _ref.Template;
-		var PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
+		var IsRelatedTo = _ref.IsRelatedTo,
+		    Template = _ref.Template,
+		    PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
 	
 	
 		var Group = M.TYPED_RESOURCE({ /////////////////////////////////////////
@@ -10934,7 +10901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		});
 	}
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
@@ -10996,10 +10963,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = function (environment) {
 		var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _assign$call;
 	
-		var Command = environment.Command;
-		var TrackedCommand = environment.TrackedCommand;
-		var Command_batch = environment.Command_batch;
-		var backend = environment.backend;
+		var Command = environment.Command,
+		    TrackedCommand = environment.TrackedCommand,
+		    Command_batch = environment.Command_batch,
+		    backend = environment.backend;
 	
 	
 		function createCommandClasses(cls) {
@@ -11018,8 +10985,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(Entity, [{
 				key: 'commandEdit',
 				value: function commandEdit() {
-					var newValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var newValues = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					return this.constructor.commandEdit(this, newValues, options);
 				}
@@ -11029,7 +10996,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'commandDelete',
 				value: function commandDelete() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
 					return this.constructor.commandDelete(this, options);
 				}
@@ -11041,14 +11008,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'edit',
 				value: function edit(newValues) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					this.commandEdit(newValues, _extends({}, options, { run: true }));
 				}
 			}, {
 				key: 'delete',
 				value: function _delete() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
 					this.commandDelete(_extends({}, options, { run: true }));
 				}
@@ -11062,9 +11029,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			}], [{
 				key: 'normalizeAddress',
 				value: function normalizeAddress(address) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-					var _options$entityToTemp = options.entityToTemporaryId;
-					var entityToTemporaryId = _options$entityToTemp === undefined ? new Map() : _options$entityToTemp;
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+					var _options$entityToTemp = options.entityToTemporaryId,
+					    entityToTemporaryId = _options$entityToTemp === undefined ? new Map() : _options$entityToTemp;
 	
 					if (_isInteger2.default.call(address)) {
 						return { class: this.name, id: address };
@@ -11083,9 +11050,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'createClass',
 				value: function createClass(config) {
 					/* create the class with the right name, constructor and static content */
-					var name = config.name;
-	
-					var rest = _objectWithoutProperties(config, ['name']);
+					var name = config.name,
+					    rest = _objectWithoutProperties(config, ['name']);
 	
 					/* create the new class */
 					// using Function constructor to give the class a dynamic name
@@ -11105,10 +11071,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					/* maintaining <Class>.p('all') and <Class>.p('allCommitted') */
 					var _arr = [[_symbols.$$entities, $$entitiesSubject], [_symbols.$$committedEntities, $$committedEntitiesSubject]];
 					for (var _i = 0; _i < _arr.length; _i++) {
-						var _arr$_i = _slicedToArray(_arr[_i], 2);
-	
-						var $$set = _arr$_i[0];
-						var $$subject = _arr$_i[1];
+						var _arr$_i = _slicedToArray(_arr[_i], 2),
+						    $$set = _arr$_i[0],
+						    $$subject = _arr$_i[1];
 	
 						var localSet = new _ObservableSet2.default();
 						Entity[$$set].e('add').filter(EntitySubclass.hasInstance.bind(EntitySubclass)).subscribe(localSet.e('add'));
@@ -11234,8 +11199,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'commandNew',
 				value: function commandNew() {
-					var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var initialValues = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					return this.Command_new.create(initialValues, options);
 				}
@@ -11245,23 +11210,23 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'commandEdit',
 				value: function commandEdit(entity) {
-					var newValues = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-					var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+					var newValues = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+					var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
 					return this.Command_edit.create(entity, newValues, options);
 				}
 			}, {
 				key: 'commandDelete',
 				value: function commandDelete(entity) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					return this.Command_delete.create(entity, options);
 				}
 			}, {
 				key: 'new',
 				value: function _new() {
-					var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var initialValues = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					return this.commandNew(initialValues, _extends({}, options, { run: true })).result;
 				}
@@ -11311,7 +11276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'getLocalOrNewPlaceholder',
 				value: function getLocalOrNewPlaceholder( // TODO: make private?
 				entityOrAddress) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					var result = this.getLocal(entityOrAddress);
 					if (!result) {
@@ -11322,7 +11287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'setPlaceholder',
 				value: function setPlaceholder(address) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					var addressObj = this.normalizeAddress(address);
 					var placeholder = this[$$Command_load].create(addressObj, _extends({}, options, { placeholder: true })).result;
@@ -11332,7 +11297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'setCache',
 				value: function setCache( // TODO: make private
 				values) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					if (_instanceof(values, Entity)) {
 						return values;
@@ -11352,7 +11317,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						var _context,
 						    _this2 = this;
 	
-						var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+						var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 						var useArray, absentAddresses, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, response, result;
 	
@@ -11454,7 +11419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						}, _callee, this, [[7, 20, 24, 32], [25,, 27, 31]]);
 					}));
 	
-					function get(_x17, _x18) {
+					function get(_x17) {
 						return _ref.apply(this, arguments);
 					}
 	
@@ -11464,7 +11429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'getAll',
 				value: function () {
 					var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-						var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+						var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
 						var response, result, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, values, entity;
 	
@@ -11539,7 +11504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						}, _callee2, this, [[7, 11, 15, 23], [16,, 18, 22]]);
 					}));
 	
-					function getAll(_x20) {
+					function getAll() {
 						return _ref2.apply(this, arguments);
 					}
 	
@@ -11567,12 +11532,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			///////////////////////////////
 	
 			function Entity() {
-				var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var initialValues = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				_classCallCheck(this, Entity);
 	
-				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Entity).call(this));
+				var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this));
 				/* initialize value tracking */
 	
 	
@@ -11592,7 +11557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				_initDefineProp(_this, 'isPlaceholder', _descriptor8, _this);
 	
-				_get(Object.getPrototypeOf(Entity.prototype), 'setValueTrackerOptions', _this).call(_this, {
+				_get(Entity.prototype.__proto__ || Object.getPrototypeOf(Entity.prototype), 'setValueTrackerOptions', _this).call(_this, {
 					takeUntil: _rxjs.Observable.combineLatest(_this.p('isDeleted'), _this.p('isPristine'), _this.p('isNew'), function (d, p, n) {
 						return d && (p || n);
 					}).filter(function (v) {
@@ -11632,7 +11597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					} else if (this.hasProperty.apply(this, args)) {
 						var _get2;
 	
-						return (_get2 = _get(Object.getPrototypeOf(Entity.prototype), 'p', this)).call.apply(_get2, [this].concat(args));
+						return (_get2 = _get(Entity.prototype.__proto__ || Object.getPrototypeOf(Entity.prototype), 'p', this)).call.apply(_get2, [this].concat(args));
 					}
 				}
 	
@@ -11641,9 +11606,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'toJSON',
 				value: function toJSON() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-					var _options$entityToTemp2 = options.entityToTemporaryId;
-					var entityToTemporaryId = _options$entityToTemp2 === undefined ? new Map() : _options$entityToTemp2;
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+					var _options$entityToTemp2 = options.entityToTemporaryId,
+					    entityToTemporaryId = _options$entityToTemp2 === undefined ? new Map() : _options$entityToTemp2;
 	
 					var result = {};
 					var _iteratorNormalCompletion5 = true;
@@ -11654,10 +11619,9 @@ return /******/ (function(modules) { // webpackBootstrap
 						for (var _iterator5 = (_context4 = this.fields, _entries2.default).call(_context4)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
 							var _context4;
 	
-							var _step5$value = _slicedToArray(_step5.value, 2);
-	
-							var key = _step5$value[0];
-							var field = _step5$value[1];
+							var _step5$value = _slicedToArray(_step5.value, 2),
+							    key = _step5$value[0],
+							    field = _step5$value[1];
 	
 							var fieldIsShortcut = field.constructor.name === 'RelShortcut$Field' || field.constructor.name === 'RelShortcut1Field';
 							if (fieldIsShortcut) {
@@ -11697,7 +11661,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'set',
 				value: function set(key, val) {
-					var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+					var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 					return this.fields[key].set(val, _extends({ createEditCommand: true }, options));
 				}
 	
@@ -11859,7 +11823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}], [{
 				key: 'objectToJSON',
 				value: function objectToJSON(obj) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 					var sourceEntity = options.sourceEntity;
 					// TODO: rather than sourceEntity, accept an entity CLASS,
 					//       which should have a good description of the fields
@@ -11871,10 +11835,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator8 = _entries2.default.call(obj)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-							var _step8$value = _slicedToArray(_step8.value, 2);
-	
-							var key = _step8$value[0];
-							var value = _step8$value[1];
+							var _step8$value = _slicedToArray(_step8.value, 2),
+							    key = _step8$value[0],
+							    value = _step8$value[1];
 	
 							var field = sourceEntity.fields[key];
 							var opts = void 0;
@@ -12053,7 +12016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
@@ -12092,11 +12055,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			}], [{
 				key: 'processOptions',
 				value: function processOptions(cmd) {
-					var _cmd$options = cmd.options;
-					var run = _cmd$options.run;
-					var hasRun = _cmd$options.hasRun;
-					var committed = _cmd$options.committed;
-					var rolledBack = _cmd$options.rolledBack;
+					var _cmd$options = cmd.options,
+					    run = _cmd$options.run,
+					    hasRun = _cmd$options.hasRun,
+					    committed = _cmd$options.committed,
+					    rolledBack = _cmd$options.rolledBack;
 	
 					/* option normalization and sanity-check */
 	
@@ -12115,8 +12078,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				key: 'create',
 				value: function create(initialArgs, options) {
 					// TODO: how to streamline the possible duplication of both initialArgs and options containing `values`?
-					var _options$values = options.values;
-					var values = _options$values === undefined ? {} : _options$values;
+					var _options$values = options.values,
+					    values = _options$values === undefined ? {} : _options$values;
 	
 					/* fetch references for given values */
 	
@@ -12128,10 +12091,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						try {
 							for (var _iterator = _entries2.default.call(values)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-								var _step$value = _slicedToArray(_step.value, 2);
-	
-								var key = _step$value[0];
-								var value = _step$value[1];
+								var _step$value = _slicedToArray(_step.value, 2),
+								    key = _step$value[0],
+								    value = _step$value[1];
 	
 								var relDesc = cls.relationships[key] || cls.relationshipShortcuts[key];
 								if (relDesc && value) {
@@ -12178,7 +12140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}]);
 	
 			function Command() {
-				var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+				var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
 				_classCallCheck(this, Command);
 	
@@ -12220,7 +12182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'toJSON',
 				value: function toJSON() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 				}
 	
 				/// /// /// /// /// Smart run, commit, rollback /// /// /// /// ///
@@ -12381,7 +12343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			function TrackedCommand() {
 				_classCallCheck(this, TrackedCommand);
 	
-				return _possibleConstructorReturn(this, Object.getPrototypeOf(TrackedCommand).apply(this, arguments));
+				return _possibleConstructorReturn(this, (TrackedCommand.__proto__ || Object.getPrototypeOf(TrackedCommand)).apply(this, arguments));
 			}
 	
 			_createClass(TrackedCommand, [{
@@ -12449,10 +12411,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator3 = commandGraph.verticesTo(this)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-							var _step3$value = _slicedToArray(_step3.value, 3);
-	
-							var dep = _step3$value[0];
-							var runDependency = _step3$value[2].runDependency;
+							var _step3$value = _slicedToArray(_step3.value, 3),
+							    dep = _step3$value[0],
+							    runDependency = _step3$value[2].runDependency;
 	
 							if (dep[$$running] || dep[$$hasRun]) {
 								continue;
@@ -12483,10 +12444,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator4 = commandGraph.verticesFrom(this)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-							var _step4$value = _slicedToArray(_step4.value, 3);
-	
-							var rdep = _step4$value[0];
-							var forcedDependency = _step4$value[2].forcedDependency;
+							var _step4$value = _slicedToArray(_step4.value, 3),
+							    rdep = _step4$value[0],
+							    forcedDependency = _step4$value[2].forcedDependency;
 	
 							if (!forcedDependency) {
 								continue;
@@ -12553,7 +12513,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'commitDependencies',
 				value: function commitDependencies() {
-					var commandsFoundSoFar = arguments.length <= 0 || arguments[0] === undefined ? new Set() : arguments[0];
+					var commandsFoundSoFar = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
 	
 					// We're passing and returning the command set by reference
 					/* only visit each command once */
@@ -12568,10 +12528,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator6 = commandGraph.verticesTo(this)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-							var _step6$value = _slicedToArray(_step6.value, 3);
-	
-							var dep = _step6$value[0];
-							var commitDependency = _step6$value[2].commitDependency;
+							var _step6$value = _slicedToArray(_step6.value, 3),
+							    dep = _step6$value[0],
+							    commitDependency = _step6$value[2].commitDependency;
 	
 							if (!commitDependency) {
 								continue;
@@ -12603,10 +12562,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator7 = commandGraph.verticesFrom(this)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-							var _step7$value = _slicedToArray(_step7.value, 3);
-	
-							var rdep = _step7$value[0];
-							var forcedDependency = _step7$value[2].forcedDependency;
+							var _step7$value = _slicedToArray(_step7.value, 3),
+							    rdep = _step7$value[0],
+							    forcedDependency = _step7$value[2].forcedDependency;
 	
 							if (!forcedDependency) {
 								continue;
@@ -12663,64 +12621,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 									case 9:
 										if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
-											_context3.next = 19;
+											_context3.next = 17;
 											break;
 										}
 	
-										_step8$value = _slicedToArray(_step8.value, 3);
-										dep = _step8$value[0];
-										commitDependency = _step8$value[2].commitDependency;
+										_step8$value = _slicedToArray(_step8.value, 3), dep = _step8$value[0], commitDependency = _step8$value[2].commitDependency;
 	
 										if (!(!commitDependency || dep[$$committing] || dep[$$committed])) {
-											_context3.next = 15;
+											_context3.next = 13;
 											break;
 										}
 	
-										return _context3.abrupt('continue', 16);
+										return _context3.abrupt('continue', 14);
 	
-									case 15:
+									case 13:
 										commandsToCommitBeforeMe.add(dep);
 	
-									case 16:
+									case 14:
 										_iteratorNormalCompletion8 = true;
 										_context3.next = 9;
 										break;
 	
-									case 19:
-										_context3.next = 25;
+									case 17:
+										_context3.next = 23;
 										break;
 	
-									case 21:
-										_context3.prev = 21;
+									case 19:
+										_context3.prev = 19;
 										_context3.t0 = _context3['catch'](7);
 										_didIteratorError8 = true;
 										_iteratorError8 = _context3.t0;
 	
-									case 25:
-										_context3.prev = 25;
-										_context3.prev = 26;
+									case 23:
+										_context3.prev = 23;
+										_context3.prev = 24;
 	
 										if (!_iteratorNormalCompletion8 && _iterator8.return) {
 											_iterator8.return();
 										}
 	
-									case 28:
-										_context3.prev = 28;
+									case 26:
+										_context3.prev = 26;
 	
 										if (!_didIteratorError8) {
-											_context3.next = 31;
+											_context3.next = 29;
 											break;
 										}
 	
 										throw _iteratorError8;
 	
+									case 29:
+										return _context3.finish(26);
+	
+									case 30:
+										return _context3.finish(23);
+	
 									case 31:
-										return _context3.finish(28);
-	
-									case 32:
-										return _context3.finish(25);
-	
-									case 33:
 	
 										/* scheduling commits that need to be forced after this one */
 										commandsToCommitAfterMe = new Set();
@@ -12729,94 +12685,92 @@ return /******/ (function(modules) { // webpackBootstrap
 										_iteratorNormalCompletion9 = true;
 										_didIteratorError9 = false;
 										_iteratorError9 = undefined;
-										_context3.prev = 37;
+										_context3.prev = 35;
 										_iterator9 = commandGraph.verticesFrom(this)[Symbol.iterator]();
 	
-									case 39:
+									case 37:
 										if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-											_context3.next = 51;
-											break;
-										}
-	
-										_step9$value = _slicedToArray(_step9.value, 3);
-										rdep = _step9$value[0];
-										forcedDependency = _step9$value[2].forcedDependency;
-	
-										if (forcedDependency) {
-											_context3.next = 45;
-											break;
-										}
-	
-										return _context3.abrupt('continue', 48);
-	
-									case 45:
-										if (!(rdep[$$committing] || rdep[$$committed])) {
 											_context3.next = 47;
 											break;
 										}
 	
-										return _context3.abrupt('continue', 48);
+										_step9$value = _slicedToArray(_step9.value, 3), rdep = _step9$value[0], forcedDependency = _step9$value[2].forcedDependency;
 	
-									case 47:
+										if (forcedDependency) {
+											_context3.next = 41;
+											break;
+										}
+	
+										return _context3.abrupt('continue', 44);
+	
+									case 41:
+										if (!(rdep[$$committing] || rdep[$$committed])) {
+											_context3.next = 43;
+											break;
+										}
+	
+										return _context3.abrupt('continue', 44);
+	
+									case 43:
 										commandsToCommitAfterMe.add(rdep);
 	
-									case 48:
+									case 44:
 										_iteratorNormalCompletion9 = true;
-										_context3.next = 39;
+										_context3.next = 37;
 										break;
 	
-									case 51:
-										_context3.next = 57;
+									case 47:
+										_context3.next = 53;
 										break;
 	
-									case 53:
-										_context3.prev = 53;
-										_context3.t1 = _context3['catch'](37);
+									case 49:
+										_context3.prev = 49;
+										_context3.t1 = _context3['catch'](35);
 										_didIteratorError9 = true;
 										_iteratorError9 = _context3.t1;
 	
-									case 57:
-										_context3.prev = 57;
-										_context3.prev = 58;
+									case 53:
+										_context3.prev = 53;
+										_context3.prev = 54;
 	
 										if (!_iteratorNormalCompletion9 && _iterator9.return) {
 											_iterator9.return();
 										}
 	
-									case 60:
-										_context3.prev = 60;
+									case 56:
+										_context3.prev = 56;
 	
 										if (!_didIteratorError9) {
-											_context3.next = 63;
+											_context3.next = 59;
 											break;
 										}
 	
 										throw _iteratorError9;
 	
-									case 63:
-										return _context3.finish(60);
+									case 59:
+										return _context3.finish(56);
 	
-									case 64:
-										return _context3.finish(57);
+									case 60:
+										return _context3.finish(53);
 	
-									case 65:
-										_context3.next = 67;
+									case 61:
+										_context3.next = 63;
 										return Promise.all([].concat(_toConsumableArray(commandsToCommitBeforeMe)).map(function (c) {
 											return c.commit();
 										}));
 	
-									case 67:
-										_context3.next = 69;
+									case 63:
+										_context3.next = 65;
 										return this.localCommit();
 	
-									case 69:
+									case 65:
 										response = _context3.sent;
-										_context3.next = 72;
+										_context3.next = 68;
 										return Promise.all([].concat(_toConsumableArray(commandsToCommitAfterMe)).map(function (c) {
 											return c.commit();
 										}));
 	
-									case 72:
+									case 68:
 	
 										/* handle local commit response */
 										this.handleCommitResponse(response);
@@ -12824,12 +12778,12 @@ return /******/ (function(modules) { // webpackBootstrap
 										/* post process entities (e.g., to set 'pristine' flag) */
 										this.postProcessAssociatedEntities();
 	
-									case 74:
+									case 70:
 									case 'end':
 										return _context3.stop();
 								}
 							}
-						}, _callee3, this, [[7, 21, 25, 33], [26,, 28, 32], [37, 53, 57, 65], [58,, 60, 64]]);
+						}, _callee3, this, [[7, 19, 23, 31], [24,, 26, 30], [35, 49, 53, 61], [54,, 56, 60]]);
 					}));
 	
 					function commit() {
@@ -12859,10 +12813,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator10 = commandGraph.verticesFrom(this)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-							var _step10$value = _slicedToArray(_step10.value, 3);
-	
-							var rdep = _step10$value[0];
-							var rollbackDependency = _step10$value[2].rollbackDependency;
+							var _step10$value = _slicedToArray(_step10.value, 3),
+							    rdep = _step10$value[0],
+							    rollbackDependency = _step10$value[2].rollbackDependency;
 	
 							if (!rollbackDependency) {
 								continue;
@@ -12895,10 +12848,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator11 = commandGraph.verticesTo(this)[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-							var _step11$value = _slicedToArray(_step11.value, 3);
-	
-							var dep = _step11$value[0];
-							var forcedDependency = _step11$value[2].forcedDependency;
+							var _step11$value = _slicedToArray(_step11.value, 3),
+							    dep = _step11$value[0],
+							    forcedDependency = _step11$value[2].forcedDependency;
 	
 							if (!forcedDependency) {
 								continue;
@@ -12978,13 +12930,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			}], [{
 				key: 'processOptions',
 				value: function processOptions(cmd) {
-					var _cmd$options2 = cmd.options;
-					var _cmd$options2$commitD = _cmd$options2.commitDependencies;
-					var commitDependencies = _cmd$options2$commitD === undefined ? [] : _cmd$options2$commitD;
-					var _cmd$options2$command = _cmd$options2.commandDependencies;
-					var commandDependencies = _cmd$options2$command === undefined ? [] : _cmd$options2$command;
-					var _cmd$options2$forcedD = _cmd$options2.forcedDependencies;
-					var forcedDependencies = _cmd$options2$forcedD === undefined ? [] : _cmd$options2$forcedD;
+					var _cmd$options2 = cmd.options,
+					    _cmd$options2$commitD = _cmd$options2.commitDependencies,
+					    commitDependencies = _cmd$options2$commitD === undefined ? [] : _cmd$options2$commitD,
+					    _cmd$options2$command = _cmd$options2.commandDependencies,
+					    commandDependencies = _cmd$options2$command === undefined ? [] : _cmd$options2$command,
+					    _cmd$options2$forcedD = _cmd$options2.forcedDependencies,
+					    forcedDependencies = _cmd$options2$forcedD === undefined ? [] : _cmd$options2$forcedD;
 	
 					commandGraph.addVertex(cmd, cmd);
 					var _iteratorNormalCompletion13 = true;
@@ -13059,17 +13011,16 @@ return /******/ (function(modules) { // webpackBootstrap
 						}
 					}
 	
-					_get(Object.getPrototypeOf(TrackedCommand), 'processOptions', this).call(this, cmd);
+					_get(TrackedCommand.__proto__ || Object.getPrototypeOf(TrackedCommand), 'processOptions', this).call(this, cmd);
 				}
 			}, {
 				key: 'latest',
 				value: function latest() {
 					var _context5;
 	
-					var _ref5 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-					var entity = _ref5.entity;
-					var committable = _ref5.committable;
+					var _ref5 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+					    entity = _ref5.entity,
+					    committable = _ref5.committable;
 	
 					/* checking if a command is a candidate */
 					var isCandidate = function isCandidate(cmd) {
@@ -13081,30 +13032,30 @@ return /******/ (function(modules) { // webpackBootstrap
 						var _context4;
 	
 						return new Set((_context4 = (_context4 = commandGraph.sinks(), _boundHybridFunctions.filter).call(_context4, function (_ref6) {
-							var _ref7 = _slicedToArray(_ref6, 2);
+							var _ref7 = _slicedToArray(_ref6, 2),
+							    key = _ref7[0],
+							    cmd = _ref7[1];
 	
-							var key = _ref7[0];
-							var cmd = _ref7[1];
 							return isCandidate(cmd);
 						}), _boundHybridFunctions.map).call(_context4, function (_ref8) {
-							var _ref9 = _slicedToArray(_ref8, 1);
+							var _ref9 = _slicedToArray(_ref8, 1),
+							    key = _ref9[0];
 	
-							var key = _ref9[0];
 							return key;
 						}));
 					}
 	
 					/* otherwise, find all associated commands that are not dependencies of other associated commands */
 					var result = new Set((_context5 = (_context5 = commandGraph.vertices(), _boundHybridFunctions.filter).call(_context5, function (_ref10) {
-						var _ref11 = _slicedToArray(_ref10, 2);
+						var _ref11 = _slicedToArray(_ref10, 2),
+						    key = _ref11[0],
+						    cmd = _ref11[1];
 	
-						var key = _ref11[0];
-						var cmd = _ref11[1];
 						return isCandidate(cmd);
 					}), _boundHybridFunctions.map).call(_context5, function (_ref12) {
-						var _ref13 = _slicedToArray(_ref12, 1);
+						var _ref13 = _slicedToArray(_ref12, 1),
+						    key = _ref13[0];
 	
-						var key = _ref13[0];
 						return key;
 					}));
 					var visited = new WeakSet();
@@ -13119,9 +13070,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						try {
 							for (var _iterator16 = commandGraph.verticesFrom(cmd)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-								var _step16$value = _slicedToArray(_step16.value, 1);
-	
-								var postCmd = _step16$value[0];
+								var _step16$value = _slicedToArray(_step16.value, 1),
+								    postCmd = _step16$value[0];
 	
 								if (isCandidate(postCmd)) {
 									result.delete(latestAssociatedCmd);
@@ -13176,10 +13126,9 @@ return /******/ (function(modules) { // webpackBootstrap
 				value: function earliest() {
 					var _context7;
 	
-					var _ref14 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-					var entity = _ref14.entity;
-					var rollbackable = _ref14.rollbackable;
+					var _ref14 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+					    entity = _ref14.entity,
+					    rollbackable = _ref14.rollbackable;
 	
 					/* checking if a command is a candidate */
 					var isCandidate = function isCandidate(cmd) {
@@ -13191,30 +13140,30 @@ return /******/ (function(modules) { // webpackBootstrap
 						var _context6;
 	
 						return new Set((_context6 = (_context6 = commandGraph.sources(), _boundHybridFunctions.filter).call(_context6, function (_ref15) {
-							var _ref16 = _slicedToArray(_ref15, 2);
+							var _ref16 = _slicedToArray(_ref15, 2),
+							    key = _ref16[0],
+							    cmd = _ref16[1];
 	
-							var key = _ref16[0];
-							var cmd = _ref16[1];
 							return isCandidate(cmd);
 						}), _boundHybridFunctions.map).call(_context6, function (_ref17) {
-							var _ref18 = _slicedToArray(_ref17, 1);
+							var _ref18 = _slicedToArray(_ref17, 1),
+							    key = _ref18[0];
 	
-							var key = _ref18[0];
 							return key;
 						}));
 					}
 	
 					/* otherwise, find all associated commands that are not dependencies of other associated commands */
 					var result = new Set((_context7 = (_context7 = commandGraph.vertices(), _boundHybridFunctions.filter).call(_context7, function (_ref19) {
-						var _ref20 = _slicedToArray(_ref19, 2);
+						var _ref20 = _slicedToArray(_ref19, 2),
+						    key = _ref20[0],
+						    cmd = _ref20[1];
 	
-						var key = _ref20[0];
-						var cmd = _ref20[1];
 						return isCandidate(cmd);
 					}), _boundHybridFunctions.map).call(_context7, function (_ref21) {
-						var _ref22 = _slicedToArray(_ref21, 1);
+						var _ref22 = _slicedToArray(_ref21, 1),
+						    key = _ref22[0];
 	
-						var key = _ref22[0];
 						return key;
 					}));
 					var visited = new WeakSet();
@@ -13229,9 +13178,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						try {
 							for (var _iterator18 = commandGraph.verticesTo(cmd)[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
-								var _step18$value = _slicedToArray(_step18.value, 1);
-	
-								var preCmd = _step18$value[0];
+								var _step18$value = _slicedToArray(_step18.value, 1),
+								    preCmd = _step18$value[0];
 	
 								if (isCandidate(preCmd)) {
 									result.delete(latestAssociatedCmd);
@@ -13291,7 +13239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		////////////////////////////////////////////////////////////////////////////
 	
 		/* tracking temporary ids */
-		// temporary ids are negative
+		// temporary ids are negative // TODO: create regression test to confirm this
 	
 	
 		function newTemporaryId() {
@@ -13307,21 +13255,21 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(Command_batch, null, [{
 				key: 'create',
 				value: function create(commands) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 					(0, _misc.constraint)(_every2.default.call(commands, function (command) {
 						return command.hasRun;
 					}));
-					return _get(Object.getPrototypeOf(Command_batch), 'create', this).call(this, [commands], options);
+					return _get(Command_batch.__proto__ || Object.getPrototypeOf(Command_batch), 'create', this).call(this, [commands], options);
 				}
 			}]);
 	
 			function Command_batch(commands) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				_classCallCheck(this, Command_batch);
 	
-				var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Command_batch).call(this, _extends({}, options, { hasRun: true })));
+				var _this2 = _possibleConstructorReturn(this, (Command_batch.__proto__ || Object.getPrototypeOf(Command_batch)).call(this, _extends({}, options, { hasRun: true })));
 	
 				_this2.commands = new Set(commands);
 				return _this2;
@@ -13500,9 +13448,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 									case 65:
 										this.commandList = [].concat(_toConsumableArray((_context9 = (_context9 = commandGraph.vertices_topologically(), _boundHybridFunctions.map).call(_context9, function (_ref24) {
-											var _ref25 = _slicedToArray(_ref24, 1);
+											var _ref25 = _slicedToArray(_ref24, 1),
+											    cmd = _ref25[0];
 	
-											var cmd = _ref25[0];
 											return cmd;
 										}), _boundHybridFunctions.filter).call(_context9, function (cmd) {
 											return _this3.commands.has(cmd);
@@ -13521,7 +13469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 									case 69:
 										if (!(i < this.commandList.length)) {
-											_context10.next = 130;
+											_context10.next = 128;
 											break;
 										}
 	
@@ -13541,138 +13489,134 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 									case 80:
 										if (_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done) {
-											_context10.next = 113;
+											_context10.next = 111;
 											break;
 										}
 	
-										_step22$value = _slicedToArray(_step22.value, 2);
-										key = _step22$value[0];
-										valueJSON = _step22$value[1];
+										_step22$value = _slicedToArray(_step22.value, 2), key = _step22$value[0], valueJSON = _step22$value[1];
 										_context10.t3 = entity.fields[key].constructor.name;
-										_context10.next = _context10.t3 === 'Rel$Field' ? 87 : _context10.t3 === 'Rel1Field' ? 108 : 110;
+										_context10.next = _context10.t3 === 'Rel$Field' ? 85 : _context10.t3 === 'Rel1Field' ? 106 : 108;
 										break;
 	
-									case 87:
+									case 85:
 										_iteratorNormalCompletion23 = true;
 										_didIteratorError23 = false;
 										_iteratorError23 = undefined;
-										_context10.prev = 90;
+										_context10.prev = 88;
 	
 										for (_iterator23 = _entries2.default.call(valueJSON)[Symbol.iterator](); !(_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done); _iteratorNormalCompletion23 = true) {
-											_step23$value = _slicedToArray(_step23.value, 2);
-											_i2 = _step23$value[0];
-											valJSON = _step23$value[1];
+											_step23$value = _slicedToArray(_step23.value, 2), _i2 = _step23$value[0], valJSON = _step23$value[1];
 	
 											if (temporaryIds.has(valJSON.id) && !tmpIdsSeen.has(valJSON.id)) {
 												valueJSON.splice(_i2, 1);
 											}
 										}
-										_context10.next = 98;
+										_context10.next = 96;
 										break;
 	
-									case 94:
-										_context10.prev = 94;
-										_context10.t4 = _context10['catch'](90);
+									case 92:
+										_context10.prev = 92;
+										_context10.t4 = _context10['catch'](88);
 										_didIteratorError23 = true;
 										_iteratorError23 = _context10.t4;
 	
-									case 98:
-										_context10.prev = 98;
-										_context10.prev = 99;
+									case 96:
+										_context10.prev = 96;
+										_context10.prev = 97;
 	
 										if (!_iteratorNormalCompletion23 && _iterator23.return) {
 											_iterator23.return();
 										}
 	
-									case 101:
-										_context10.prev = 101;
+									case 99:
+										_context10.prev = 99;
 	
 										if (!_didIteratorError23) {
-											_context10.next = 104;
+											_context10.next = 102;
 											break;
 										}
 	
 										throw _iteratorError23;
 	
+									case 102:
+										return _context10.finish(99);
+	
+									case 103:
+										return _context10.finish(96);
+	
 									case 104:
-										return _context10.finish(101);
-	
-									case 105:
-										return _context10.finish(98);
-	
-									case 106:
 										if (valueJSON.length === 0) {
 											delete valuesJSON[key];
 										}
-										return _context10.abrupt('break', 110);
+										return _context10.abrupt('break', 108);
 	
-									case 108:
+									case 106:
 										if (valueJSON && temporaryIds.has(valueJSON.id) && !tmpIdsSeen.has(valueJSON.id)) {
 											delete valuesJSON[key];
 										}
-										return _context10.abrupt('break', 110);
+										return _context10.abrupt('break', 108);
 	
-									case 110:
+									case 108:
 										_iteratorNormalCompletion22 = true;
 										_context10.next = 80;
 										break;
 	
-									case 113:
-										_context10.next = 119;
+									case 111:
+										_context10.next = 117;
 										break;
 	
-									case 115:
-										_context10.prev = 115;
+									case 113:
+										_context10.prev = 113;
 										_context10.t5 = _context10['catch'](78);
 										_didIteratorError22 = true;
 										_iteratorError22 = _context10.t5;
 	
-									case 119:
-										_context10.prev = 119;
-										_context10.prev = 120;
+									case 117:
+										_context10.prev = 117;
+										_context10.prev = 118;
 	
 										if (!_iteratorNormalCompletion22 && _iterator22.return) {
 											_iterator22.return();
 										}
 	
-									case 122:
-										_context10.prev = 122;
+									case 120:
+										_context10.prev = 120;
 	
 										if (!_didIteratorError22) {
-											_context10.next = 125;
+											_context10.next = 123;
 											break;
 										}
 	
 										throw _iteratorError22;
 	
+									case 123:
+										return _context10.finish(120);
+	
+									case 124:
+										return _context10.finish(117);
+	
 									case 125:
-										return _context10.finish(122);
-	
-									case 126:
-										return _context10.finish(119);
-	
-									case 127:
 										++i;
 										_context10.next = 69;
 										break;
 	
-									case 130:
-										_context10.next = 132;
+									case 128:
+										_context10.next = 130;
 										return backend.commit_batch((0, _deepFreezeStrict2.default)({
 											commandType: 'batch',
 											temporaryIds: [].concat(_toConsumableArray(temporaryIds)),
 											commands: [].concat(_toConsumableArray(commandListJSON))
 										}));
 	
-									case 132:
+									case 130:
 										return _context10.abrupt('return', _context10.sent);
 	
-									case 133:
+									case 131:
 									case 'end':
 										return _context10.stop();
 								}
 							}
-						}, _callee4, this, [[4, 32, 36, 44], [11, 15, 19, 27], [20,, 22, 26], [37,, 39, 43], [49, 53, 57, 65], [58,, 60, 64], [78, 115, 119, 127], [90, 94, 98, 106], [99,, 101, 105], [120,, 122, 126]]);
+						}, _callee4, this, [[4, 32, 36, 44], [11, 15, 19, 27], [20,, 22, 26], [37,, 39, 43], [49, 53, 57, 65], [58,, 60, 64], [78, 113, 117, 125], [88, 92, 96, 104], [97,, 99, 103], [118,, 120, 124]]);
 					}));
 	
 					function localCommit() {
@@ -13735,7 +13679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
@@ -13760,9 +13704,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(Command_delete, null, [{
 				key: 'create',
 				value: function create(entity) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-					return _get(Object.getPrototypeOf(Command_delete), 'create', this).call(this, [entity], options);
+					return _get(Command_delete.__proto__ || Object.getPrototypeOf(Command_delete), 'create', this).call(this, [entity], options);
 				}
 			}, {
 				key: 'entityClass',
@@ -13772,11 +13716,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			}]);
 	
 			function Command_delete(entity) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				_classCallCheck(this, Command_delete);
 	
-				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Command_delete).call(this, _extends({}, options, {
+				var _this = _possibleConstructorReturn(this, (Command_delete.__proto__ || Object.getPrototypeOf(Command_delete)).call(this, _extends({}, options, {
 					commandDependencies: [entity.originCommand].concat(_toConsumableArray(entity.editCommands || []), _toConsumableArray(options.commandDependencies || []))
 				})));
 	
@@ -13834,7 +13778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'toJSON',
 				value: function toJSON() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
 					return {
 						commandType: 'delete',
@@ -13939,7 +13883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
@@ -13967,10 +13911,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(Command_edit, null, [{
 				key: 'create',
 				value: function create(entity) {
-					var newValues = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-					var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+					var newValues = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+					var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
-					return _get(Object.getPrototypeOf(Command_edit), 'create', this).call(this, [entity, newValues], _extends({}, options, { values: newValues }));
+					return _get(Command_edit.__proto__ || Object.getPrototypeOf(Command_edit), 'create', this).call(this, [entity, newValues], _extends({}, options, { values: newValues }));
 				}
 			}, {
 				key: 'entityClass',
@@ -13980,12 +13924,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			}]);
 	
 			function Command_edit(entity) {
-				var newValues = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-				var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+				var newValues = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+				var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
 				_classCallCheck(this, Command_edit);
 	
-				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Command_edit).call(this, _extends({}, options, {
+				var _this = _possibleConstructorReturn(this, (Command_edit.__proto__ || Object.getPrototypeOf(Command_edit)).call(this, _extends({}, options, {
 					commitDependencies: [].concat(_toConsumableArray(options.commitDependencies || []), _toConsumableArray(function () {
 						if (!cls.isResource) {
 							return [];
@@ -13997,10 +13941,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						try {
 							for (var _iterator = _entries2.default.call(newValues)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-								var _step$value = _slicedToArray(_step.value, 2);
-	
-								var key = _step$value[0];
-								var value = _step$value[1];
+								var _step$value = _slicedToArray(_step.value, 2),
+								    key = _step$value[0],
+								    value = _step$value[1];
 	
 								if ((cls.relationships[key] || cls.relationshipShortcuts[key]) && value) {
 									var _context;
@@ -14106,10 +14049,9 @@ return /******/ (function(modules) { // webpackBootstrap
 						for (var _iterator3 = (_context3 = this.newValues, _entries2.default).call(_context3)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 							var _context3;
 	
-							var _step3$value = _slicedToArray(_step3.value, 2);
-	
-							var _key = _step3$value[0];
-							var newValue = _step3$value[1];
+							var _step3$value = _slicedToArray(_step3.value, 2),
+							    _key = _step3$value[0],
+							    newValue = _step3$value[1];
 	
 							this.entity.fields[_key].set(newValue, { createEditCommand: false });
 						}
@@ -14137,7 +14079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'toJSON',
 				value: function toJSON() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
 					return {
 						commandType: 'edit',
@@ -14196,10 +14138,9 @@ return /******/ (function(modules) { // webpackBootstrap
 						for (var _iterator4 = (_context5 = this.oldValues, _entries2.default).call(_context5)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 							var _context5;
 	
-							var _step4$value = _slicedToArray(_step4.value, 2);
-	
-							var key = _step4$value[0];
-							var oldValue = _step4$value[1];
+							var _step4$value = _slicedToArray(_step4.value, 2),
+							    key = _step4$value[0],
+							    oldValue = _step4$value[1];
 	
 							this.entity.fields[key].set(oldValue, { createEditCommand: false });
 						}
@@ -14302,9 +14243,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(Command_load, null, [{
 				key: 'create',
 				value: function create(values) {
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-					return _get(Object.getPrototypeOf(Command_load), 'create', this).call(this, [values], _extends({}, options, { values: values }));
+					return _get(Command_load.__proto__ || Object.getPrototypeOf(Command_load), 'create', this).call(this, [values], _extends({}, options, { values: values }));
 				}
 			}, {
 				key: 'entityClass',
@@ -14314,12 +14255,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			}]);
 	
 			function Command_load() {
-				var values = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var values = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				_classCallCheck(this, Command_load);
 	
-				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Command_load).call(this, _extends({}, options, {
+				var _this = _possibleConstructorReturn(this, (Command_load.__proto__ || Object.getPrototypeOf(Command_load)).call(this, _extends({}, options, {
 					run: true,
 					committed: true,
 					commitDependencies: [].concat(_toConsumableArray(options.commitDependencies || []), _toConsumableArray(function () {
@@ -14333,10 +14274,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						try {
 							for (var _iterator = _entries2.default.call(values)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-								var _step$value = _slicedToArray(_step.value, 2);
-	
-								var key = _step$value[0];
-								var value = _step$value[1];
+								var _step$value = _slicedToArray(_step.value, 2),
+								    key = _step$value[0],
+								    value = _step$value[1];
 	
 								var relDesc = cls.relationships[key] || cls.relationshipShortcuts[key];
 								if (relDesc && value) {
@@ -14479,10 +14419,9 @@ return /******/ (function(modules) { // webpackBootstrap
 								for (var _iterator2 = (_context3 = this.values, _entries2.default).call(_context3)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 									var _context3;
 	
-									var _step2$value = _slicedToArray(_step2.value, 2);
-	
-									var key = _step2$value[0];
-									var value = _step2$value[1];
+									var _step2$value = _slicedToArray(_step2.value, 2),
+									    key = _step2$value[0],
+									    value = _step2$value[1];
 	
 									this.result.fields[key].set(value, {
 										createEditCommand: false,
@@ -14511,7 +14450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'toJSON',
 				value: function toJSON() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 				}
 			}, {
 				key: 'localCommit',
@@ -14588,7 +14527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
@@ -14611,10 +14550,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			_createClass(Command_new, null, [{
 				key: 'create',
 				value: function create() {
-					var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-					var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+					var initialValues = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+					var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-					return _get(Object.getPrototypeOf(Command_new), 'create', this).call(this, [initialValues], _extends({}, options, { values: initialValues }));
+					return _get(Command_new.__proto__ || Object.getPrototypeOf(Command_new), 'create', this).call(this, [initialValues], _extends({}, options, { values: initialValues }));
 				}
 			}, {
 				key: 'entityClass',
@@ -14624,12 +14563,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			}]);
 	
 			function Command_new() {
-				var initialValues = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var initialValues = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				_classCallCheck(this, Command_new);
 	
-				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Command_new).call(this, _extends({}, options, {
+				var _this = _possibleConstructorReturn(this, (Command_new.__proto__ || Object.getPrototypeOf(Command_new)).call(this, _extends({}, options, {
 					commitDependencies: [].concat(_toConsumableArray(options.commitDependencies || []), _toConsumableArray(function () {
 						if (!cls.isResource) {
 							return [];
@@ -14641,10 +14580,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 						try {
 							for (var _iterator = _entries2.default.call(initialValues)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-								var _step$value = _slicedToArray(_step.value, 2);
-	
-								var key = _step$value[0];
-								var value = _step$value[1];
+								var _step$value = _slicedToArray(_step.value, 2),
+								    key = _step$value[0],
+								    value = _step$value[1];
 	
 								var relDesc = cls.relationships[key] || cls.relationshipShortcuts[key];
 								if (relDesc && value) {
@@ -14720,10 +14658,9 @@ return /******/ (function(modules) { // webpackBootstrap
 						for (var _iterator2 = (_context2 = this.result.fields, _entries2.default).call(_context2)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 							var _context2;
 	
-							var _step2$value = _slicedToArray(_step2.value, 2);
-	
-							var key = _step2$value[0];
-							var field = _step2$value[1];
+							var _step2$value = _slicedToArray(_step2.value, 2),
+							    key = _step2$value[0],
+							    field = _step2$value[1];
 	
 							var value = field.get();
 							if (['Rel$Field', 'RelShortcut$Field'].includes(field.constructor.name)) {
@@ -14764,9 +14701,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			}, {
 				key: 'toJSON',
 				value: function toJSON() {
-					var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-					var _options$entityToTemp = options.entityToTemporaryId;
-					var entityToTemporaryId = _options$entityToTemp === undefined ? new Set() : _options$entityToTemp;
+					var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+					var _options$entityToTemp = options.entityToTemporaryId,
+					    entityToTemporaryId = _options$entityToTemp === undefined ? new Set() : _options$entityToTemp;
 	
 					return {
 						commandType: 'new',
@@ -14821,10 +14758,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					try {
 						for (var _iterator3 = _entries2.default.call(response)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-							var _step3$value = _slicedToArray(_step3.value, 2);
-	
-							var key = _step3$value[0];
-							var newValue = _step3$value[1];
+							var _step3$value = _slicedToArray(_step3.value, 2),
+							    key = _step3$value[0],
+							    newValue = _step3$value[1];
 	
 							if (this.result.fields[key]) {
 								this.result.fields[key].set(newValue, {
@@ -14954,9 +14890,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function initClass(_ref) {
 				var _context;
 	
-				var cls = _ref.cls;
-				var key = _ref.key;
-				var readonly = _ref.desc.readonly;
+				var cls = _ref.cls,
+				    key = _ref.key,
+				    readonly = _ref.desc.readonly;
 	
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -14980,10 +14916,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				var _context2;
 	
 				return (_context2 = cls.properties, _entries2.default).call(_context2).map(function (_ref2) {
-					var _ref3 = _slicedToArray(_ref2, 2);
+					var _ref3 = _slicedToArray(_ref2, 2),
+					    key = _ref3[0],
+					    desc = _ref3[1];
 	
-					var key = _ref3[0];
-					var desc = _ref3[1];
 					return {
 						key: key,
 						desc: desc,
@@ -15003,12 +14939,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_classCallCheck(this, PropertyField);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PropertyField).call(this, options));
+			var _this = _possibleConstructorReturn(this, (PropertyField.__proto__ || Object.getPrototypeOf(PropertyField)).call(this, options));
 	
-			var owner = options.owner;
-			var key = options.key;
-			var desc = options.desc;
-			var initialValue = options.initialValue;
+			var owner = options.owner,
+			    key = options.key,
+			    desc = options.desc,
+			    initialValue = options.initialValue;
 	
 			/* sanity checks */
 	
@@ -15036,7 +14972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function get() {
 				/* lazy loading of default or constant value */
 				// TODO: also lazy-load when subscription is taken
-				var value = _get(Object.getPrototypeOf(PropertyField.prototype), 'get', this).call(this);
+				var value = _get(PropertyField.prototype.__proto__ || Object.getPrototypeOf(PropertyField.prototype), 'get', this).call(this);
 				if (_isUndefined2.default.call(value)) {
 					if ('default' in this[_symbols.$$desc]) {
 						var _context5;
@@ -15048,12 +14984,12 @@ return /******/ (function(modules) { // webpackBootstrap
 						this.set((_context6 = (_context6 = this[_symbols.$$desc].value, _misc.callOrReturn).call(_context6, this[_symbols.$$owner]), _cloneDeep2.default).call(_context6), { createEditCommand: false });
 					}
 				}
-				return _get(Object.getPrototypeOf(PropertyField.prototype), 'get', this).call(this);
+				return _get(PropertyField.prototype.__proto__ || Object.getPrototypeOf(PropertyField.prototype), 'get', this).call(this);
 			}
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+				var stages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	
 	
 				if (stages.includes('commit')) {
@@ -15067,10 +15003,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		}], [{
 			key: 'valueToJSON',
 			value: function valueToJSON(value) {
-				var _ref4 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-				var _ref4$flattenFieldVal = _ref4.flattenFieldValues;
-				var flattenFieldValues = _ref4$flattenFieldVal === undefined ? false : _ref4$flattenFieldVal;
+				var _ref4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+				    _ref4$flattenFieldVal = _ref4.flattenFieldValues,
+				    flattenFieldValues = _ref4$flattenFieldVal === undefined ? false : _ref4$flattenFieldVal;
 	
 				if (flattenFieldValues) {
 					value = JSON.stringify(value);
@@ -15144,7 +15079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 	
@@ -15177,9 +15112,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function initClass(_ref) {
 				var _context;
 	
-				var cls = _ref.cls;
-				var key = _ref.key;
-				var readonly = _ref.desc.readonly;
+				var cls = _ref.cls,
+				    key = _ref.key,
+				    readonly = _ref.desc.readonly;
 	
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -15206,15 +15141,15 @@ return /******/ (function(modules) { // webpackBootstrap
 					return [];
 				}
 				return (_context2 = cls.relationships, _entries2.default).call(_context2).filter(function (_ref2) {
-					var _ref3 = _slicedToArray(_ref2, 2);
+					var _ref3 = _slicedToArray(_ref2, 2),
+					    rel = _ref3[1];
 	
-					var rel = _ref3[1];
 					return rel.cardinality.max > 1;
 				}).map(function (_ref4) {
-					var _ref5 = _slicedToArray(_ref4, 2);
+					var _ref5 = _slicedToArray(_ref4, 2),
+					    key = _ref5[0],
+					    desc = _ref5[1];
 	
-					var key = _ref5[0];
-					var desc = _ref5[1];
 					return {
 						key: key,
 						desc: desc,
@@ -15233,14 +15168,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_classCallCheck(this, Rel$Field);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Rel$Field).call(this, _extends({}, options, { setValueThroughSignal: false })));
+			var _this = _possibleConstructorReturn(this, (Rel$Field.__proto__ || Object.getPrototypeOf(Rel$Field)).call(this, _extends({}, options, { setValueThroughSignal: false })));
 	
-			var owner = options.owner;
-			var desc = options.desc;
-			var initialValue = options.initialValue;
-			var waitUntilConstructed = options.waitUntilConstructed;
-			var constructingOwner = options.constructingOwner;
-			var related = options.related;
+			var owner = options.owner,
+			    desc = options.desc,
+			    initialValue = options.initialValue,
+			    waitUntilConstructed = options.waitUntilConstructed,
+			    constructingOwner = options.constructingOwner,
+			    related = options.related;
 	
 	
 			_boundNativeMethods.defineProperty.call(_this, _symbols.$$value, { value: new _ObservableSet2.default() });
@@ -15266,10 +15201,9 @@ return /******/ (function(modules) { // webpackBootstrap
 							} else {
 								// Rel1Field
 								subField.p('value').startWith(null).pairwise().subscribe(function (_ref6) {
-									var _ref7 = _slicedToArray(_ref6, 2);
-	
-									var prev = _ref7[0];
-									var curr = _ref7[1];
+									var _ref7 = _slicedToArray(_ref6, 2),
+									    prev = _ref7[0],
+									    curr = _ref7[1];
 	
 									if (prev) {
 										_this.get().delete(prev);
@@ -15387,14 +15321,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function set(newValue) {
 				var _context4;
 	
-				var _ref8 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-				var _ref8$ignoreReadonly = _ref8.ignoreReadonly;
-				var ignoreReadonly = _ref8$ignoreReadonly === undefined ? false : _ref8$ignoreReadonly;
-				var _ref8$ignoreValidatio = _ref8.ignoreValidation;
-				var ignoreValidation = _ref8$ignoreValidatio === undefined ? false : _ref8$ignoreValidatio;
-				var _ref8$updatePristine = _ref8.updatePristine;
-				var updatePristine = _ref8$updatePristine === undefined ? false : _ref8$updatePristine;
+				var _ref8 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+				    _ref8$ignoreReadonly = _ref8.ignoreReadonly,
+				    ignoreReadonly = _ref8$ignoreReadonly === undefined ? false : _ref8$ignoreReadonly,
+				    _ref8$ignoreValidatio = _ref8.ignoreValidation,
+				    ignoreValidation = _ref8$ignoreValidatio === undefined ? false : _ref8$ignoreValidatio,
+				    _ref8$updatePristine = _ref8.updatePristine,
+				    updatePristine = _ref8$updatePristine === undefined ? false : _ref8$updatePristine;
 	
 				(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly);
 				if ((_context4 = newValue, _isArray2.default).call(_context4)) {
@@ -15408,7 +15341,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'jsonToValue',
 			value: function jsonToValue(json) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				var Entity = this[_symbols.$$owner].constructor.Entity;
 				var result = new Set();
@@ -15451,20 +15384,20 @@ return /******/ (function(modules) { // webpackBootstrap
 					ignoreValidation: true,
 					createEditCommand: false
 				});
-				_get(Object.getPrototypeOf(Rel$Field.prototype), _symbols.$$destruct, this).call(this);
+				_get(Rel$Field.prototype.__proto__ || Object.getPrototypeOf(Rel$Field.prototype), _symbols.$$destruct, this).call(this);
 			}
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+				var stages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	
 				(0, _misc.constraint)(val[Symbol.iterator], (0, _misc.humanMsg)(_templateObject, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (stages.includes('commit')) {
 					var _context5;
 	
-					var _$$desc$cardinality = this[_symbols.$$desc].cardinality;
-					var min = _$$desc$cardinality.min;
-					var max = _$$desc$cardinality.max;
+					var _$$desc$cardinality = this[_symbols.$$desc].cardinality,
+					    min = _$$desc$cardinality.min,
+					    max = _$$desc$cardinality.max;
 	
 					(0, _misc.constraint)((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, min, max + 1), (0, _misc.humanMsg)(_templateObject2, this[_symbols.$$owner].constructor.name, this[_symbols.$$key], min, max));
 				}
@@ -15507,11 +15440,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function valueToJSON(value) {
 				var _context7;
 	
-				var _ref10 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var _ref10 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-				var requireClass = _ref10.requireClass;
-	
-				var options = _objectWithoutProperties(_ref10, ['requireClass']);
+				var requireClass = _ref10.requireClass,
+				    options = _objectWithoutProperties(_ref10, ['requireClass']);
 	
 				return [].concat(_toConsumableArray((_context7 = _boundHybridFunctions.map.call(value, function (e) {
 					var Entity = e.constructor.Entity;
@@ -15613,9 +15545,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function initClass(_ref) {
 				var _context;
 	
-				var cls = _ref.cls;
-				var key = _ref.key;
-				var readonly = _ref.desc.readonly;
+				var cls = _ref.cls,
+				    key = _ref.key,
+				    readonly = _ref.desc.readonly;
 	
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -15642,15 +15574,15 @@ return /******/ (function(modules) { // webpackBootstrap
 					return [];
 				}
 				return (_context2 = cls.relationships, _entries2.default).call(_context2).filter(function (_ref2) {
-					var _ref3 = _slicedToArray(_ref2, 2);
+					var _ref3 = _slicedToArray(_ref2, 2),
+					    desc = _ref3[1];
 	
-					var desc = _ref3[1];
 					return desc.cardinality.max === 1;
 				}).map(function (_ref4) {
-					var _ref5 = _slicedToArray(_ref4, 2);
+					var _ref5 = _slicedToArray(_ref4, 2),
+					    key = _ref5[0],
+					    desc = _ref5[1];
 	
-					var key = _ref5[0];
-					var desc = _ref5[1];
 					return {
 						key: key,
 						desc: desc,
@@ -15670,15 +15602,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_classCallCheck(this, Rel1Field);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Rel1Field).call(this, options));
+			var _this = _possibleConstructorReturn(this, (Rel1Field.__proto__ || Object.getPrototypeOf(Rel1Field)).call(this, options));
 	
-			var owner = options.owner;
-			var key = options.key;
-			var desc = options.desc;
-			var initialValue = options.initialValue;
-			var waitUntilConstructed = options.waitUntilConstructed;
-			var constructingOwner = options.constructingOwner;
-			var related = options.related;
+			var owner = options.owner,
+			    key = options.key,
+			    desc = options.desc,
+			    initialValue = options.initialValue,
+			    waitUntilConstructed = options.waitUntilConstructed,
+			    constructingOwner = options.constructingOwner,
+			    related = options.related;
 	
 			/* you cannot give a value as an actual relation and as a shortcut at the same time */
 	
@@ -15747,10 +15679,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* keep the relationship up to date with changes here */
 			(_context4 = _this.p('value'), waitUntilConstructed).call(_context4).startWith(null).pairwise().subscribe(function (_ref6) {
-				var _ref7 = _slicedToArray(_ref6, 2);
-	
-				var prev = _ref7[0];
-				var curr = _ref7[1];
+				var _ref7 = _slicedToArray(_ref6, 2),
+				    prev = _ref7[0],
+				    curr = _ref7[1];
 	
 				// TODO: prev or curr being placeholders may be a complex situation; model it properly
 				if (prev && !prev.isPlaceholder) {
@@ -15777,7 +15708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(Rel1Field, [{
 			key: 'jsonToValue',
 			value: function jsonToValue(json) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				if (json === null) {
 					return null;
@@ -15798,12 +15729,12 @@ return /******/ (function(modules) { // webpackBootstrap
 					// updatePristine:   true,// TODO: remove all 'pristine' related stuff from the field classes
 					createEditCommand: false
 				});
-				_get(Object.getPrototypeOf(Rel1Field.prototype), _symbols.$$destruct, this).call(this);
+				_get(Rel1Field.prototype.__proto__ || Object.getPrototypeOf(Rel1Field.prototype), _symbols.$$destruct, this).call(this);
 			}
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+				var stages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	
 	
 				var notGiven = _isNull2.default.call(val) || _isUndefined2.default.call(val);
@@ -15824,11 +15755,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		}], [{
 			key: 'valueToJSON',
 			value: function valueToJSON(value) {
-				var _ref8 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var _ref8 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-				var requireClass = _ref8.requireClass;
-	
-				var options = _objectWithoutProperties(_ref8, ['requireClass']);
+				var requireClass = _ref8.requireClass,
+				    options = _objectWithoutProperties(_ref8, ['requireClass']);
 	
 				// const {entityToTemporaryId = new Map} = options;
 				if (!value) {
@@ -15939,9 +15869,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function initClass(_ref) {
 				var _context;
 	
-				var key = _ref.key;
-				var cls = _ref.cls;
-				var readonly = _ref.desc.readonly;
+				var key = _ref.key,
+				    cls = _ref.cls,
+				    readonly = _ref.desc.readonly;
 	
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -15968,15 +15898,15 @@ return /******/ (function(modules) { // webpackBootstrap
 					return [];
 				}
 				return (_context2 = cls.relationshipShortcuts, _entries2.default).call(_context2).filter(function (_ref2) {
-					var _ref3 = _slicedToArray(_ref2, 2);
+					var _ref3 = _slicedToArray(_ref2, 2),
+					    rel = _ref3[1];
 	
-					var rel = _ref3[1];
 					return rel.cardinality.max > 1;
 				}).map(function (_ref4) {
-					var _ref5 = _slicedToArray(_ref4, 2);
+					var _ref5 = _slicedToArray(_ref4, 2),
+					    key = _ref5[0],
+					    desc = _ref5[1];
 	
-					var key = _ref5[0];
-					var desc = _ref5[1];
 					return {
 						key: key,
 						desc: desc,
@@ -15995,13 +15925,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_classCallCheck(this, RelShortcut$Field);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RelShortcut$Field).call(this, _extends({}, options, { setValueThroughSignal: false })));
+			var _this = _possibleConstructorReturn(this, (RelShortcut$Field.__proto__ || Object.getPrototypeOf(RelShortcut$Field)).call(this, _extends({}, options, { setValueThroughSignal: false })));
 	
-			var owner = options.owner;
-			var desc = options.desc;
-			var initialValue = options.initialValue;
-			var waitUntilConstructed = options.waitUntilConstructed;
-			var related = options.related;
+			var owner = options.owner,
+			    desc = options.desc,
+			    initialValue = options.initialValue,
+			    waitUntilConstructed = options.waitUntilConstructed,
+			    related = options.related;
 	
 			// this::defineProperty($$pristine, { value: new Set           });// TODO: remove all 'pristine' related stuff from the field classes
 	
@@ -16021,10 +15951,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					return v !== owner;
 				}).take(1);
 				newRel.fields[desc.codomain.keyInRelationship].p('value').takeUntil(newRelDisconnected).startWith(null).pairwise().subscribe(function (_ref6) {
-					var _ref7 = _slicedToArray(_ref6, 2);
-	
-					var prev = _ref7[0];
-					var curr = _ref7[1];
+					var _ref7 = _slicedToArray(_ref6, 2),
+					    prev = _ref7[0],
+					    curr = _ref7[1];
 	
 					if (prev) {
 						_this[_symbols.$$value].delete(prev);
@@ -16099,7 +16028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(RelShortcut$Field, [{
 			key: 'jsonToValue',
 			value: function jsonToValue(json) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				var Entity = this[_symbols.$$owner].constructor.Entity;
 				var result = new Set();
@@ -16139,14 +16068,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function set(newValue) {
 				var _context4;
 	
-				var _ref8 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-				var _ref8$ignoreReadonly = _ref8.ignoreReadonly;
-				var ignoreReadonly = _ref8$ignoreReadonly === undefined ? false : _ref8$ignoreReadonly;
-				var _ref8$ignoreValidatio = _ref8.ignoreValidation;
-				var ignoreValidation = _ref8$ignoreValidatio === undefined ? false : _ref8$ignoreValidatio;
-				var _ref8$updatePristine = _ref8.updatePristine;
-				var updatePristine = _ref8$updatePristine === undefined ? false : _ref8$updatePristine;
+				var _ref8 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+				    _ref8$ignoreReadonly = _ref8.ignoreReadonly,
+				    ignoreReadonly = _ref8$ignoreReadonly === undefined ? false : _ref8$ignoreReadonly,
+				    _ref8$ignoreValidatio = _ref8.ignoreValidation,
+				    ignoreValidation = _ref8$ignoreValidatio === undefined ? false : _ref8$ignoreValidatio,
+				    _ref8$updatePristine = _ref8.updatePristine,
+				    updatePristine = _ref8$updatePristine === undefined ? false : _ref8$updatePristine;
 	
 				(0, _misc.constraint)(ignoreReadonly || !this[_symbols.$$desc].readonly, (0, _misc.humanMsg)(_templateObject, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if ((_context4 = newValue, _isArray2.default).call(_context4)) {
@@ -16165,20 +16093,20 @@ return /******/ (function(modules) { // webpackBootstrap
 					ignoreValidation: true,
 					createEditCommand: false
 				});
-				_get(Object.getPrototypeOf(RelShortcut$Field.prototype), _symbols.$$destruct, this).call(this);
+				_get(RelShortcut$Field.prototype.__proto__ || Object.getPrototypeOf(RelShortcut$Field.prototype), _symbols.$$destruct, this).call(this);
 			}
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+				var stages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	
 				(0, _misc.constraint)(val[Symbol.iterator], (0, _misc.humanMsg)(_templateObject2, val, this[_symbols.$$owner].constructor.name, this[_symbols.$$key]));
 				if (stages.includes('commit')) {
 					var _context5;
 	
-					var _$$desc$cardinality = this[_symbols.$$desc].cardinality;
-					var min = _$$desc$cardinality.min;
-					var max = _$$desc$cardinality.max;
+					var _$$desc$cardinality = this[_symbols.$$desc].cardinality,
+					    min = _$$desc$cardinality.min,
+					    max = _$$desc$cardinality.max;
 	
 					(0, _misc.constraint)((_context5 = _size2.default.call(val), _inRange2.default).call(_context5, min, max + 1), (0, _misc.humanMsg)(_templateObject3, this[_symbols.$$owner].constructor.name, this[_symbols.$$key], min, max));
 				}
@@ -16207,7 +16135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}], [{
 			key: 'valueToJSON',
 			value: function valueToJSON(value) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				// const Entity = this[$$owner].constructor.Entity;
 				// const {entityToTemporaryId = new Map} = options;
@@ -16303,9 +16231,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function initClass(_ref) {
 				var _context;
 	
-				var key = _ref.key;
-				var cls = _ref.cls;
-				var readonly = _ref.desc.readonly;
+				var key = _ref.key,
+				    cls = _ref.cls,
+				    readonly = _ref.desc.readonly;
 	
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -16332,15 +16260,15 @@ return /******/ (function(modules) { // webpackBootstrap
 					return [];
 				}
 				return (_context2 = cls.relationshipShortcuts, _entries2.default).call(_context2).filter(function (_ref2) {
-					var _ref3 = _slicedToArray(_ref2, 2);
+					var _ref3 = _slicedToArray(_ref2, 2),
+					    rel = _ref3[1];
 	
-					var rel = _ref3[1];
 					return rel.cardinality.max === 1;
 				}).map(function (_ref4) {
-					var _ref5 = _slicedToArray(_ref4, 2);
+					var _ref5 = _slicedToArray(_ref4, 2),
+					    key = _ref5[0],
+					    desc = _ref5[1];
 	
-					var key = _ref5[0];
-					var desc = _ref5[1];
 					return {
 						key: key,
 						desc: desc,
@@ -16360,14 +16288,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_classCallCheck(this, RelShortcut1Field);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RelShortcut1Field).call(this, options));
+			var _this = _possibleConstructorReturn(this, (RelShortcut1Field.__proto__ || Object.getPrototypeOf(RelShortcut1Field)).call(this, options));
 	
-			var owner = options.owner;
-			var key = options.key;
-			var desc = options.desc;
-			var initialValue = options.initialValue;
-			var waitUntilConstructed = options.waitUntilConstructed;
-			var related = options.related;
+			var owner = options.owner,
+			    key = options.key,
+			    desc = options.desc,
+			    initialValue = options.initialValue,
+			    waitUntilConstructed = options.waitUntilConstructed,
+			    related = options.related;
 	
 			/* set the initial value */
 			// shortcuts are only initialized with explicit initial values;
@@ -16455,7 +16383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(RelShortcut1Field, [{
 			key: 'jsonToValue',
 			value: function jsonToValue(json) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				// TODO: expect and use option temporaryToPermanentId
 				if (json === null) {
@@ -16476,12 +16404,12 @@ return /******/ (function(modules) { // webpackBootstrap
 					ignoreValidation: true,
 					createEditCommand: false
 				});
-				_get(Object.getPrototypeOf(RelShortcut1Field.prototype), _symbols.$$destruct, this).call(this);
+				_get(RelShortcut1Field.prototype.__proto__ || Object.getPrototypeOf(RelShortcut1Field.prototype), _symbols.$$destruct, this).call(this);
 			}
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+				var stages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	
 	
 				if (stages.includes('commit')) {
@@ -16498,7 +16426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}], [{
 			key: 'valueToJSON',
 			value: function valueToJSON(value) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				// const {entityToTemporaryId = new Map} = options;
 				if (!value) {
@@ -16582,9 +16510,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			value: function initClass(_ref) {
 				var _context;
 	
-				var cls = _ref.cls;
-				var key = _ref.key;
-				var readonly = _ref.desc.readonly;
+				var cls = _ref.cls,
+				    key = _ref.key,
+				    readonly = _ref.desc.readonly;
 	
 				if (cls.prototype.hasOwnProperty(key)) {
 					return;
@@ -16623,13 +16551,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			_classCallCheck(this, SideField);
 	
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SideField).call(this, options));
+			var _this = _possibleConstructorReturn(this, (SideField.__proto__ || Object.getPrototypeOf(SideField)).call(this, options));
 	
-			var owner = options.owner;
-			var desc = options.desc;
-			var key = options.key;
-			var initialValue = options.initialValue;
-			var waitUntilConstructed = options.waitUntilConstructed;
+			var owner = options.owner,
+			    desc = options.desc,
+			    key = options.key,
+			    initialValue = options.initialValue,
+			    waitUntilConstructed = options.waitUntilConstructed;
 	
 			/* set the initial value */
 	
@@ -16646,10 +16574,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			/* when a side changes, let the relevant resources know */
 			(_context2 = _this.p('value').startWith(null), waitUntilConstructed).call(_context2).pairwise().subscribe(function (_ref2) {
-				var _ref3 = _slicedToArray(_ref2, 2);
-	
-				var prev = _ref3[0];
-				var curr = _ref3[1];
+				var _ref3 = _slicedToArray(_ref2, 2),
+				    prev = _ref3[0],
+				    curr = _ref3[1];
 	
 				// TODO: prev or curr being placeholders may be a complex situation; model it properly
 				if (desc.cardinality.max === 1) {
@@ -16675,7 +16602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		_createClass(SideField, [{
 			key: 'jsonToValue',
 			value: function jsonToValue(json) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				if (json === null) {
 					return null;
@@ -16695,12 +16622,12 @@ return /******/ (function(modules) { // webpackBootstrap
 					ignoreValidation: true,
 					createEditCommand: false
 				});
-				_get(Object.getPrototypeOf(SideField.prototype), _symbols.$$destruct, this).call(this);
+				_get(SideField.prototype.__proto__ || Object.getPrototypeOf(SideField.prototype), _symbols.$$destruct, this).call(this);
 			}
 		}, {
 			key: 'validate',
 			value: function validate(val) {
-				var stages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+				var stages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	
 	
 				var notGiven = _isNull2.default.call(val) || _isUndefined2.default.call(val);
@@ -16720,7 +16647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}], [{
 			key: 'valueToJSON',
 			value: function valueToJSON(value) {
-				var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 				// const {entityToTemporaryId = new Map} = options;
 				if (!value) {
@@ -16821,13 +16748,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = _TypedModule2.default.create('canonicalTrees', [_resources2.default, _typed2.default, _groups2.default, _lyphs2.default], function (M, _ref) {
-		var IsRelatedTo = _ref.IsRelatedTo;
-		var Template = _ref.Template;
-		var Resource = _ref.Resource;
-		var Lyph = _ref.Lyph;
-		var Node = _ref.Node;
-		var Has = _ref.Has;
-		var PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
+		var IsRelatedTo = _ref.IsRelatedTo,
+		    Template = _ref.Template,
+		    Resource = _ref.Resource,
+		    Lyph = _ref.Lyph,
+		    Node = _ref.Node,
+		    Has = _ref.Has,
+		    PullsIntoTypeDefinition = _ref.PullsIntoTypeDefinition;
 	
 	
 		var CanonicalTree = M.TYPED_RESOURCE({ ////////////////////////////////////
@@ -16923,9 +16850,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = _Module2.default.create('research', [_resources2.default, _measurables2.default], function (M, _ref) {
-		var Resource = _ref.Resource;
-		var IsRelatedTo = _ref.IsRelatedTo;
-		var Measurable = _ref.Measurable;
+		var Resource = _ref.Resource,
+		    IsRelatedTo = _ref.IsRelatedTo,
+		    Measurable = _ref.Measurable;
 	
 	
 		var Correlation = M.RESOURCE({ ////////////////////////////////////////////
@@ -17072,17 +16999,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	exports.default = _TypedModule2.default.create('visualisations', [_resources2.default, _lyphs2.default, _typed2.default, _processes2.default, _measurables2.default], function (M, _ref) {
-		var Resource = _ref.Resource;
-		var IsRelatedTo = _ref.IsRelatedTo;
-		var Material = _ref.Material;
-		var Lyph = _ref.Lyph;
-		var Border = _ref.Border;
-		var Coalescence = _ref.Coalescence;
-		var Node = _ref.Node;
-		var Template = _ref.Template;
-		var Process = _ref.Process;
-		var Measurable = _ref.Measurable;
-		var Causality = _ref.Causality;
+		var Resource = _ref.Resource,
+		    IsRelatedTo = _ref.IsRelatedTo,
+		    Material = _ref.Material,
+		    Lyph = _ref.Lyph,
+		    Border = _ref.Border,
+		    Coalescence = _ref.Coalescence,
+		    Node = _ref.Node,
+		    Template = _ref.Template,
+		    Process = _ref.Process,
+		    Measurable = _ref.Measurable,
+		    Causality = _ref.Causality;
 	
 	
 		var Theme = M.RESOURCE({ //////////////////////////////////////////////////
@@ -17444,10 +17371,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		[LyphRectangle, Lyph], //       lines are left out.
 		[BorderLine, Border], [NodeGlyph, Node], [ProcessEdge, Process], [MeasurableGlyph, Measurable], [CausalityArrow, Causality], [CoalescenceRectangle, Coalescence]];
 		for (var _i = 0; _i < _arr.length; _i++) {
-			var _arr$_i = _slicedToArray(_arr[_i], 2);
-	
-			var ArtefactClass = _arr$_i[0];
-			var ModelClass = _arr$_i[1];
+			var _arr$_i = _slicedToArray(_arr[_i], 2),
+			    ArtefactClass = _arr$_i[0],
+			    ModelClass = _arr$_i[1];
 	
 			M.RELATIONSHIP({
 	
