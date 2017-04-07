@@ -4567,6 +4567,8 @@ var TypedModule = function (_Module) {
 
 					name: conf.name,
 
+					abstract: !!conf.abstract,
+
 					extends: superClasses,
 					extendedBy: subClasses,
 

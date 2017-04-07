@@ -16,6 +16,7 @@ describe("'measurables' Module", () => {
 	it("exports the expected classes", () => {
 
 		expect(environment.classes).to.contain.resources(
+			'MeasurableLocation',
 			'Measurable',
 			'Causality'
 		);
@@ -28,4 +29,10 @@ describe("'measurables' Module", () => {
 
 	});
  
+	it("exports an abstract MeasurableLocation class", () => {
+		const {MeasurableLocation, Measurable} = environment.classes;
+		expect(MeasurableLocation.abstract).to.be.true;
+		expect(Measurable.abstract).to.be.false;
+	});
+	
 });

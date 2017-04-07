@@ -38,6 +38,8 @@ export default class TypedModule extends Module {
 				
 				name: conf.name,
 				
+				abstract: !!conf.abstract,
+				
 				extends:  superClasses,
 				extendedBy: subClasses,
 				
