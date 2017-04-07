@@ -7,15 +7,15 @@ module.exports = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				loader: 'babel'
+				loader: 'babel-loader'
+			},
+			{
+				test: /node_modules\/utilities\/src\/.*\.js$/,
+				loader: 'babel-loader'
 			},
 			{
 				test: /\.json$/,
-				loader: 'json'
-			},
-			{
-				test: /icons\/\w+\.png$/,
-				loader: 'url?limit=20000'
+				loader: 'json-loader'
 			}
 		]
 	},
@@ -25,7 +25,9 @@ module.exports = {
 		devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
 	},
 	target: 'node',
-	externals: [require('webpack-node-externals')()],
+	externals: [require('webpack-node-externals')({
+		whitelist: ['utilities']
+	})],
 	plugins: [
 		new webpack.NormalModuleReplacementPlugin(/\.(gif|png|scss|css)$/, 'node-noop')
 	]

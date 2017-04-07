@@ -16,8 +16,7 @@ import {defineProperties, defineProperty} from 'bound-native-methods';
 import assert from 'power-assert';
 
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
-import {humanMsg} from "../util/misc";
-import {map, filter} from '../util/bound-hybrid-functions';
+import {humanMsg, map} from 'utilities';
 
 import {Field, RelField} from './Field';
 

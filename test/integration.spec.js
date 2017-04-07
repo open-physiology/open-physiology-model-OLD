@@ -1,7 +1,7 @@
 import {describe, it, expect} from './test.helper';
 import moduleFactory          from '../src/index';
 import {simpleMockHandlers}   from './mock-handlers.helper';
-import {map} from '../src/util/bound-hybrid-functions';
+import {map} from 'utilities';
 import at    from 'lodash-bound/at';
 import keyBy from 'lodash-bound/keyBy';
 

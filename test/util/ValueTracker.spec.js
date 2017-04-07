@@ -1,6 +1,6 @@
 import {describe, it, expect, beforeEach} from '../test.helper';
 
-import ValueTracker, {property} from '../../src/util/ValueTracker';
+import {ValueTracker, property} from 'utilities';
 
 import {Observable} from "rxjs/Observable";
 

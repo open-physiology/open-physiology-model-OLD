@@ -28,7 +28,7 @@ chai.use(sinonChai);
 /* direct exports from respective packages */
 import mocha from 'mocha';
 
-import global from '../src/util/global.js';
+import {global} from 'utilities';
 
 export const describe   = mocha.describe   || global.describe;
 export const it         = mocha.it         || global.it;

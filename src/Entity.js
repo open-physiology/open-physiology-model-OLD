@@ -12,17 +12,17 @@ import reject      from 'lodash-bound/reject';
 import {humanMsg, definePropertiesByValue, definePropertyByValue} from './util/misc';
 import ObservableSet                   from './util/ObservableSet';
 import {Field}                         from './fields/fields';
-import ValueTracker, {event, property} from './util/ValueTracker';
+import {ValueTracker, event, property} from 'utilities';
 import {Observable, BehaviorSubject} from './libs/rxjs.js';
 // TODO: make sure we don't need to import anymore: combineLatest
 // TODO: make sure we don't need to import anymore: do
 
-import {filter, map} from './util/bound-hybrid-functions';
+import {map} from 'utilities';
 
 import {defineProperties, defineProperty, assign, setPrototype} from 'bound-native-methods';
 
-import babelHelpers from './util/babel-helpers';
-import {constraint} from './util/misc';
+import {babelHelpers} from 'utilities';
+import {constraint}   from './util/misc';
 import assert from 'power-assert';
 
 import command_newClassFactory    from './commands/Command_new';

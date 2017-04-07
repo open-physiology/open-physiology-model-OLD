@@ -4,5 +4,6 @@
     <file url="PROJECT" libraries="{chai-DefinitelyTyped, lodash-DefinitelyTyped, mocha-DefinitelyTyped, power-assert-DefinitelyTyped, rx-DefinitelyTyped}" />
     <includedPredefinedLibrary name="ECMAScript 6" />
     <includedPredefinedLibrary name="Node.js Core" />
+    <excludedPredefinedLibrary name="open-physiology-model/node_modules_OLD" />
   </component>
 </project>

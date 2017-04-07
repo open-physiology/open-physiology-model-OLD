@@ -2,7 +2,6 @@ import isUndefined from 'lodash-bound/isUndefined';
 import entries     from 'lodash-bound/entries';
 import cloneDeep   from 'lodash-bound/cloneDeep';
 
-import {filter, map}    from '../util/bound-hybrid-functions';
 import {defineProperty} from 'bound-native-methods';
 // TODO: make sure we don't need to import this anymore: take;
 

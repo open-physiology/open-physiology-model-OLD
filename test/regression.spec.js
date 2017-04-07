@@ -2,8 +2,8 @@ import {describe, expect} from './test.helper';
 import moduleFactory from '../src/index';
 import {simpleMockHandlers} from "./mock-handlers.helper";
 
-import {filter} from '../src/util/bound-hybrid-functions';
-import cloneDeep   from 'lodash-bound/cloneDeep';
+import {filter}  from 'utilities';
+import cloneDeep from 'lodash-bound/cloneDeep';
 
 describe("regression tests", () => {
 

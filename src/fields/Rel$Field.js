@@ -16,7 +16,7 @@ import assert from 'power-assert';
 
 import ObservableSet, {setEquals, copySetContent} from '../util/ObservableSet';
 import {humanMsg, constraint} from '../util/misc';
-import {map, filter} from '../util/bound-hybrid-functions';
+import {map, filter} from 'utilities';
 
 import {Field, RelField} from './Field';
 

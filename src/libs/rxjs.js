@@ -1,4 +1,4 @@
-import global from '../util/global.js';
+import {global} from 'utilities';
 const Rx = global.Rx;
 export default Rx;
 export const Observable      = Rx.Observable;

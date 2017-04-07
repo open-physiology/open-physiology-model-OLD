@@ -14,7 +14,7 @@ import {defineProperties, defineProperty} from 'bound-native-methods';
 
 import assert from 'power-assert';
 
-import ValueTracker, {event, property} from "../util/ValueTracker";
+import {ValueTracker, event, property} from 'utilities';
 import {humanMsg, assign} from "../util/misc";
 
 import {

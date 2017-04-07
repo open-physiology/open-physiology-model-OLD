@@ -8,5 +8,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="chai-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="lodash-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="mocha-DefinitelyTyped" level="project" />
+    <orderEntry type="library" name="power-assert-DefinitelyTyped" level="project" />
+    <orderEntry type="library" name="rx-DefinitelyTyped" level="project" />
   </component>
 </module>

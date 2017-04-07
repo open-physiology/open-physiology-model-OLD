@@ -13,9 +13,7 @@ import entries     from 'lodash-bound/entries';
 
 import deepFreeze  from 'deep-freeze-strict';
 
-import ValueTracker from '../util/ValueTracker';
-
-import {map, filter} from '../util/bound-hybrid-functions';
+import {map, filter} from 'utilities';
 import {constraint, humanMsg} from "../util/misc";
 
 const $$graph        = Symbol('$$graph');

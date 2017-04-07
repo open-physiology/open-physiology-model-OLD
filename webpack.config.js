@@ -1,12 +1,13 @@
 var webpack = require('webpack');
 module.exports = {
 	devtool: 'source-map',
+	context: __dirname + '/src',
 	entry: {
-		'open-physiology-model': [ 'babel-polyfill', './src/index.js' ],
-		'open-physiology-model-minimal':           [ './src/index.js' ]
+		'open-physiology-model': [ 'babel-polyfill', './index.js' ],
+		'open-physiology-model-minimal':           [ './index.js' ]
 	},
 	output: {
-		path: './dist',
+		path: __dirname + '/dist',
 		filename: '[name].js',
 		library: 'OpenPhysiologyModel',
 		libraryTarget: 'umd',
@@ -17,19 +18,23 @@ module.exports = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				loader: 'babel'
+				loader: 'babel-loader'
+			},
+			{
+				test: /node_modules\/utilities\/src\/.*\.js$/,
+				loader: 'babel-loader'
 			},
 			{
 				test: /\.json$/,
-				loader: 'json'
+				loader: 'json-loader'
 			},
 			{
 				test: /icons\/\w+\.png$/,
-				loader: 'url'
+				loader: 'url-loader'
 			}
 		]
 	},
 	plugins: [
-		new webpack.optimize.OccurenceOrderPlugin()
+		new webpack.optimize.OccurrenceOrderPlugin()
 	]
 };
