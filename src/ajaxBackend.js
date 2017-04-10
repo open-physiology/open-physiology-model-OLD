@@ -11,14 +11,9 @@
 */
 
 /* super-simple storage implementation */
-export default () => {
-	/* a way for test suites to register the environment to these mock-handlers */
-	let environment, ajax, baseURL;
-	function register({environment: e, ajax: ajx, baseURL: burl}) {
-		environment = e;
-		ajax        = (...args) => Promise.resolve(ajx(...args));
-		baseURL     = burl;
-	}
+export default ({ajax: ajx, baseURL: burl}) => {
+	const ajax    = (...args) => Promise.resolve(ajx(...args)),
+	      baseURL = burl;
 	
 	/* the interface to hand to the library when instantiating a module */
 	const backend = {

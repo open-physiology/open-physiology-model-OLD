@@ -21,3 +21,5 @@ export default Module.create('all', [
 	visualisations,
 	canonicalTrees,
 ]);
+
+export {default as ajaxBackend} from './ajaxBackend.js';
