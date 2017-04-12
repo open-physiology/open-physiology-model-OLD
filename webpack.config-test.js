@@ -10,7 +10,7 @@ module.exports = {
 				loader: 'babel-loader'
 			},
 			{
-				test: /node_modules\/utilities\/src\/.*\.js$/,
+				test: /node_modules[\/\\]utilities[\/\\]src[\/\\].*\.js$/,
 				loader: 'babel-loader'
 			},
 			{
