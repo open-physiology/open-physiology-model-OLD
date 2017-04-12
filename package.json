@@ -47,6 +47,7 @@
     "json-stringify-safe": "5",
     "mocha": "2",
     "mocha-webpack": "0.5",
+    "najax": "1",
     "node-noop": "1",
     "polyfill-function-prototype-bind": "0.0.1",
     "power-assert": "1",
