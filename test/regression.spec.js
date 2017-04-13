@@ -567,5 +567,4 @@ describe("regression tests", () => {
         //     : The promise is rejected, and should be, so I changed the expectation.
         //     : If not, please clarify.
     });
-
 });

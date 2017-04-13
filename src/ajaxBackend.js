@@ -1,14 +1,13 @@
 /**
 	import ajaxBackend from './node_modules/open-physiology-model/dist/ajaxBackend.js';
-	let environment = moduleFactory(frontend);
-	let {backend, register} = ajaxBackend();
-	register({
-		environment: environment,
+	let {backend} = ajaxBackend({
 		baseURL:     'http://localhost:8888',
 		ajax:        $.ajax
 	});
 	// use backend
 */
+
+import {camelCase} from 'lodash-bound';
 
 /* super-simple storage implementation */
 export default ({ajax: ajx, baseURL: burl}) => {
@@ -18,38 +17,60 @@ export default ({ajax: ajx, baseURL: burl}) => {
 	/* the interface to hand to the library when instantiating a module */
 	const backend = {
 		commit_new({values}) {
+			let cls = model[values.class];
+			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
 			return ajax({
-				url:    `${baseURL}/${values.class}`,
+				url:    `${baseURL}/${classPath}`,
 				method: 'POST',
-				data:   values
+				contentType: 'application/json',
+				data:   JSON.stringify(values)
 			});
 		},
 		commit_edit({entity, newValues}) {
+			let cls = entity.constructor;
+			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
 			return ajax({
-				url:    `${baseURL}/${entity.constructor.name}/${entity.id}`,
+				url:  `${baseURL}/${classPath}/${entity.id}`,
 				method: 'POST',
-				data:   newValues
+				contentType: 'application/json',
+				data:   JSON.stringify(newValues)
 			});
 		},
 		commit_delete({entity}) {
+			let cls = entity.constructor;
+			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
 			return ajax({
-				url:    `${baseURL}/${entity.constructor.name}/${entity.id}`,
-				method: 'DELETE'
+				url: `${baseURL}/${classPath}/${entity.id}`,
+				method: 'DELETE',
+				contentType: 'application/json'
 			});
 		},
 		load(addresses, options = {}) {
-			// TODO
-			assert(false, `Sorry, the load method is not yet implemented. Please use loadAll for now.`);
+			//TODO: this is a quick implementation for testing, needs rewriting to stack requests for the same entity class
+			let responses = [];
+			Promise.all(Object.values(addresses).map(address => {
+				let cls = address.class;
+				let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
+				ajax({
+					url:    `${baseURL}/${classPath}/${address.id}`,
+					method: 'GET',
+					contentType: 'application/json'
+				}).then((res) => {
+					responses.push(res);
+				});
+			}));
+			return responses;
 		},
 		loadAll(cls, options = {}) {
 			return ajax({
-				url:    `${baseURL}/${cls.isResource ? cls.plural : cls.name}`,
-				method: 'GET'
+				url:    `${baseURL}/${cls.isResource ? cls.plural::camelCase() : cls.name}`,
+				method: 'GET',
+				contentType: 'application/json'
 			});
 		}
 	};
 	
-	return { backend, register };
+	return {backend};
 };
 
 // TODO: unit tests
