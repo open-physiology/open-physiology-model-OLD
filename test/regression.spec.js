@@ -553,7 +553,7 @@ describe("regression tests", () => {
 
     });
 
-    it("Parameter with incorrect type does not cause exception", async () => {
+    it("Parameter with incorrect class does not cause exception", async () => {
         const {Lyph, Material} = environment.classes;
 
         let material1 = Material.new({name: "Blood"});
@@ -561,7 +561,11 @@ describe("regression tests", () => {
 
         //materials expects parameter of class 'Type'
         let lyph1 = Lyph.new({name: "Heart", materials: [material1]});
-        await expect(lyph1.commit()).to.be.fulfilled;
+        await expect(lyph1.commit()).to.be.rejected;
+        // NOTE: Why did the test above expect the commit() promise to be fulfilled,
+        //     : while it was already known that a different class was expected?
+        //     : The promise is rejected, and should be, so I changed the expectation.
+        //     : If not, please clarify.
     });
 
 });
