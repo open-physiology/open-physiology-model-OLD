@@ -1,8 +1,3 @@
-// TODO: make sure we don't need to import this anymore: filter;
-// TODO: make sure we don't need to import this anymore: pairwise
-// TODO: make sure we don't need to import this anymore: startWith;
-// import 'rxjs/add/operator/do';
-
 import isUndefined from 'lodash-bound/isUndefined';
 import isNull      from 'lodash-bound/isNull';
 import isObject    from 'lodash-bound/isObject';

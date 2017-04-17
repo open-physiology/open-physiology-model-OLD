@@ -3,7 +3,6 @@ import entries     from 'lodash-bound/entries';
 import cloneDeep   from 'lodash-bound/cloneDeep';
 
 import {defineProperty} from 'bound-native-methods';
-// TODO: make sure we don't need to import this anymore: take;
 
 import {humanMsg, assign, callOrReturn} from "../util/misc";
 

@@ -1,11 +1,3 @@
-// TODO: make sure we don't need to import this anymore: filter;
-// TODO: make sure we don't need to import this anymore: switchMap;
-// TODO: make sure we don't need to import this anymore: mapTo;
-// TODO: make sure we don't need to import this anymore: take;
-// TODO: make sure we don't need to import this anymore: takeUntil;
-// import {defer as deferObservable} from 'rxjs/observable/defer';
-// import 'rxjs/add/operator/do';
-
 import {Observable} from '../libs/rxjs.js'
 
 import entries     from 'lodash-bound/entries';

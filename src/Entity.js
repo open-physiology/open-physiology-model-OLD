@@ -14,8 +14,6 @@ import ObservableSet                   from './util/ObservableSet';
 import {Field}                         from './fields/fields';
 import {ValueTracker, event, property} from 'utilities';
 import {Observable, BehaviorSubject} from './libs/rxjs.js';
-// TODO: make sure we don't need to import anymore: combineLatest
-// TODO: make sure we don't need to import anymore: do
 
 import {map} from 'utilities';
 

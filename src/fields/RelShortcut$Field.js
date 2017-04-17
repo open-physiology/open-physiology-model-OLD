@@ -1,9 +1,3 @@
-// TODO: make sure we don't need to import this anymore: pairwise;
-// TODO: make sure we don't need to import this anymore: takeUntil;
-// TODO: make sure we don't need to import this anymore: take;
-// TODO: make sure we don't need to import this anymore: startWith;
-// import 'rxjs/add/operator/do';
-
 import inRange     from 'lodash-bound/inRange';
 import size        from 'lodash-bound/size';
 import entries     from 'lodash-bound/entries';
@@ -31,7 +25,6 @@ import {
 	$$destruct
 } from './symbols';
 import {constraint} from "../util/misc";
-// TODO: make sure we don't need to import this anymore: switchMap;
 
 
 Field[$$registerFieldClass](class RelShortcut$Field extends RelField {

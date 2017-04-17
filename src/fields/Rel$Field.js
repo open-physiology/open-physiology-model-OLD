@@ -1,8 +1,3 @@
-// TODO: make sure we don't need to import this anymore: switchMap;
-// TODO: make sure we don't need to import this anymore: startWith;
-// TODO: make sure we don't need to import this anymore: pairwise;
-// import 'rxjs/add/operator/do';
-
 import inRange     from 'lodash-bound/inRange';
 import get         from 'lodash-bound/get';
 import size        from 'lodash-bound/size';

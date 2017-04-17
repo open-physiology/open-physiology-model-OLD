@@ -1,10 +1,3 @@
-// TODO: make sure we don't need to import this anymore: map;
-// TODO: make sure we don't need to import this anymore: filter;
-// TODO: make sure we don't need to import this anymore: pairwise;
-// TODO: make sure we don't need to import this anymore: switchMap;
-// TODO: make sure we don't need to import this anymore: startWith;
-// import 'rxjs/add/operator/do';
-
 import get         from 'lodash-bound/get';
 import isUndefined from 'lodash-bound/isUndefined';
 import isNull      from 'lodash-bound/isNull';
