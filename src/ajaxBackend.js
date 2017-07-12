@@ -52,8 +52,6 @@ export default ({ajax: ajx, baseURL: burl}) => {
             });
         },
 		async load(addresses) {
-			//TODO: this is a quick implementation for testing,
-			//needs rewriting to stack requests for the same entity class
 			return await Promise.all(addresses.map(address => ajax({
 				url:    `${baseURL}/${address.class}/${address.id}`,
 				method: 'GET',
