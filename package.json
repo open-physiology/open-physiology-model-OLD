@@ -1,6 +1,6 @@
 {
   "name": "open-physiology-model",
-  "version": "1.0.0-r1",
+  "version": "2.0.0",
   "description": "a full description of the open physiology model in ES6/ES7",
   "main": "src/index.js",
   "scripts": {
@@ -48,7 +48,6 @@
     "mocha": "2",
     "mocha-webpack": "0.5",
     "najax": "1",
-    "node-noop": "1",
     "polyfill-function-prototype-bind": "0.0.1",
     "power-assert": "1",
     "sinon": "1",
@@ -66,9 +65,10 @@
     "graph.js": "^1.20.10",
     "lodash": "^4.13.1",
     "lodash-bound": "^1.1.1",
+    "open-physiology-manifest": "github:open-physiology/open-physiology-manifest#master",
     "rearg": "0.0.2",
     "rxjs": "5",
-    "wu": "latest",
-    "utilities": "open-physiology/utilities#v0.1.0"
+    "utilities": "open-physiology/utilities#master",
+    "wu": "latest"
   }
 }

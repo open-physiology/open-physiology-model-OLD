@@ -1,4 +1,6 @@
-var webpack = require('webpack');
+const webpack = require('webpack');
+const loaders = require('./webpack.loaders.js');
+
 module.exports = {
 	devtool: 'source-map',
 	context: __dirname + '/src',
@@ -14,25 +16,7 @@ module.exports = {
 		sourceMapFilename: '[file].map'
 	},
 	module: {
-		loaders: [
-			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				loader: 'babel-loader'
-			},
-			{
-				test: /node_modules\/utilities\/src\/.*\.js$/,
-				loader: 'babel-loader'
-			},
-			{
-				test: /\.json$/,
-				loader: 'json-loader'
-			},
-			{
-				test: /icons\/\w+\.png$/,
-				loader: 'url-loader'
-			}
-		]
+		loaders: loaders
 	},
 	plugins: [
 		new webpack.optimize.OccurrenceOrderPlugin()

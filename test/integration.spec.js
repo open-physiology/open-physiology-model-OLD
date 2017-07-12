@@ -8,31 +8,27 @@ import keyBy from 'lodash-bound/keyBy';
 
 describe("integrated workflow", () => {
 	
-	let environment, backend, frontend;
+	let environment, storage, backend;
 	beforeEach(() => {
-		let registerEnvironment;
-		({backend, frontend, registerEnvironment} = simpleMockHandlers());
-		environment = moduleFactory(frontend);
-		registerEnvironment(environment);
+		({storage, backend} = simpleMockHandlers());
+		environment = moduleFactory(backend);
 	});
 	
-	it("can track available entities with a stream per class", async () => {
+	// TODO
+	it.skip("can track available entities with a stream per module+class", async () => {
 
+		// TODO: no longer able to do this exact thing;
+		//     : instead, tracking entities per class per instantiated module
+		
 		const {Resource, Template, Material} = environment.classes;
 
 		let gathered_Materials  = new Set;
 		let gathered_Templates  = new Set;
 		let gathered_Resources  = new Set;
-		let committed_Materials = new Set;
-		let committed_Templates = new Set;
-		let committed_Resources = new Set;
 
-		Material.p('all')         .subscribe((all) => { gathered_Materials  = all });
-		Template.p('all')         .subscribe((all) => { gathered_Templates  = all });
-		Resource.p('all')         .subscribe((all) => { gathered_Resources  = all });
-		Material.p('allCommitted').subscribe((all) => { committed_Materials = all });
-		Template.p('allCommitted').subscribe((all) => { committed_Templates = all });
-		Resource.p('allCommitted').subscribe((all) => { committed_Resources = all });
+		Material.p('all').subscribe((all) => { gathered_Materials  = all });
+		Template.p('all').subscribe((all) => { gathered_Templates  = all });
+		Resource.p('all').subscribe((all) => { gathered_Resources  = all });
 
 		expect([...gathered_Materials]).to.eql([]);
 		expect([...gathered_Templates]).to.eql([]);
@@ -42,26 +38,15 @@ describe("integrated workflow", () => {
 			name: "blood"
 		});
 
-		expect([...committed_Materials]).to.eql([]);
-		expect([...committed_Templates]).to.eql([]);
-		expect([...committed_Resources]).to.eql([]);
 		expect([...gathered_Materials ]).to.eql([blood]);
 		expect([...gathered_Templates ]).to.eql([blood]);
 		expect([...gathered_Resources ]).to.eql([blood]);
 
 		await blood.commit();
 
-		expect([...committed_Materials]).to.eql([blood]);
-		expect([...committed_Templates]).to.eql([blood]);
-		expect([...committed_Resources]).to.eql([blood]);
-
 		let water = Material.new({
 			name: "water"
 		});
-
-		expect([...committed_Materials]).to.eql([blood]);
-		expect([...committed_Templates]).to.eql([blood]);
-		expect([...committed_Resources]).to.eql([blood]);
 
 		expect([...gathered_Materials]).to.eql([blood, water]);
 		expect([...gathered_Templates]).to.eql([blood, water]);
@@ -69,13 +54,9 @@ describe("integrated workflow", () => {
 
 		await water.commit();
 
-		expect([...committed_Materials]).to.eql([blood, water]);
-		expect([...committed_Templates]).to.eql([blood, water]);
-		expect([...committed_Resources]).to.eql([blood, water]);
-
 	});
 
-	// TODO: rollback no longer works after fixing other bug; this needs to be fixed
+	// TODO (remove relationships)
 	it.skip("can create new Materials and link them", async () => {
 		const {Material, ContainsMaterial, Type} = environment.classes;
 
@@ -139,29 +120,20 @@ describe("integrated workflow", () => {
 		expect(newWater).to.have.a.property('id',   waterId2  );
 		expect(newWater).to.have.a.property('name', waterName2);
 
-		let bloodHasWater = ContainsMaterial.new({
-			1: blood,
-			2: waterType
-		});
+		// TODO: create a class method for creating new relationships this way
+		//     : (but not returning an instance)
+		// ContainsMaterial.new({
+		// 	1: blood,
+		// 	2: waterType
+		// });
+		blood.type = waterType;
 
-		expect(bloodHasWater).to.have.property(1, blood);
-		expect(bloodHasWater).to.have.property(2, waterType);
-		expect([...blood    ['-->ContainsMaterial']]).to.include(bloodHasWater);
-		expect([...blood    .materials            ] ).to.include(waterType    );
-		expect([...waterType['<--ContainsMaterial']]).to.include(bloodHasWater);
-
-		expect(bloodHasWater).to.have.a.property('id').which.is.null;
-		expect(bloodHasWater).to.have.a.property('class', 'ContainsMaterial');
-
-		await bloodHasWater.commit();
-	
-		expect(bloodHasWater).to.have.a.property('id').which.is.a('string');
-
+		expect([...blood    ['-->ContainsMaterial']]).to.include(waterType);
+		expect([...blood    .materials            ] ).to.include(waterType);
+		expect([...waterType['<--ContainsMaterial']]).to.include(blood);
 	});
 
-	// TODO: fix bug that occurs on rollback
-	
-	it.skip("can create new Materials and link them (simpler)", async () => {
+	it("can create new Materials and link them (simpler)", async () => {
 		const {Material, ContainsMaterial, Type} = environment.classes;
 
 		let water1 = Material.new({ name: "Water 1" });
@@ -180,48 +152,51 @@ describe("integrated workflow", () => {
 		
 	});
 	
-	it("can retrieve an existing entity from the backend (1)", async () => {
+	// TODO
+	it.skip("can retrieve an existing entity from the backend (1)", async () => {
 		const {Material} = environment.classes;
 		
-		let {id} = backend.create({
+		let {id} = storage.create({
 			class: 'Material',
 			name: "Created Material"
 		});
-		expect(backend.readAll()).to.have.length(1);
+		expect(storage.readAll()).to.have.length(1);
 		
-		let material = await Material.get(id);
+		let material = await Material.get(id); // TODO: use the module to get a particular instance
 		
 		expect(material).to.be.instanceof(Material);
 		expect(material.id  ).to.equal(id);
 		expect(material.name).to.equal("Created Material");
 	});
 	
-	it("can retrieve an existing entity from the backend (2)", async () => {
+	// TODO
+	it.skip("can retrieve an existing entity from the backend (2)", async () => {
 		const {Template, Material} = environment.classes;
 		
-		let {id} = backend.create({
+		let {id} = storage.create({
 			class: 'Material',
 			name: "Created Material"
 		});
-		expect(backend.readAll()).to.have.length(1);
+		expect(storage.readAll()).to.have.length(1);
 		
-		let material = await Template.get(id);
+		let material = await Template.get(id); // TODO: use the module to get a particular instance
 		
 		expect(material).to.be.instanceof(Material);
 		expect(material.id).to.equal(id);
 		expect(material.name).to.equal("Created Material");
 	});
 	
-	it("can retrieve all existing entities from the backend (1)", async () => {
+	// TODO
+	it.skip("can retrieve all existing entities from the backend (1)", async () => {
 		const {Material} = environment.classes;
 
-		let {id} = backend.create({
+		let {id} = storage.create({
 			class: 'Material',
 			name: "Created Material"
 		});
-		expect(backend.readAll()).to.have.length(1);
+		expect(storage.readAll()).to.have.length(1);
 
-		let allMaterials = [...await Material.getAll()];
+		let allMaterials = [...await Material.getAll()]; // TODO: use the module to get (all) instances
 
 		expect(allMaterials).to.have.length(1);
 		
@@ -232,21 +207,22 @@ describe("integrated workflow", () => {
 
 	});
 	
-	it("can retrieve all existing entities from the backend (2)", async () => {
+	// TODO
+	it.skip("can retrieve all existing entities from the backend (2)", async () => {
 		const {Template, CanonicalTree, Material} = environment.classes;
 
-		let { id: id1 } = backend.create({
+		let { id: id1 } = storage.create({
 			class: 'Material',
 			name: "Created Material"
 		});
-		let { id: id2 } = backend.create({
+		let { id: id2 } = storage.create({
 			class: 'CanonicalTree',
 			name: "Created Canonical Tree"
 		});
 		expect(id1).to.not.equal(id2);
-		expect(backend.readAll()).to.have.length(2);
+		expect(storage.readAll()).to.have.length(2);
 		
-		let allTemplates = [...await Template.getAll()];
+		let allTemplates = [...await Template.getAll()]; // TODO: use the module to get (all) instances
 
 		expect(allTemplates).to.have.length(2);
 		
@@ -262,11 +238,11 @@ describe("integrated workflow", () => {
 	it("accepts id in a reference", async () => {
 		const {Lyph} = environment.classes;
 
-		let { id: id1 } = backend.create({
+		let { id: id1 } = storage.create({
 			class: 'Lyph',
 			name:  "Lyph 1"
 		});
-		let { id: id2 } = backend.create({
+		let { id: id2 } = storage.create({
 			class: 'Lyph',
 			name:  "Lyph 2"
 		});
@@ -298,32 +274,31 @@ describe("integrated workflow", () => {
 	it("automatically creates certain command dependencies", async () => {
 		const {Lyph, Border} = environment.classes;
 		
-		expect(backend.readAll()).to.have.length(0);
+		expect(storage.readAll()).to.have.length(0);
 		
 		let lyph = Lyph.new({
 			name: "Lyph"
 		});
 		
-		expect(backend.readAll()).to.have.length(0);
+		expect(storage.readAll()).to.have.length(0);
 		
 		await lyph.commit();
 
-		expect(backend.readAll()).to.have.length(1);
-		// ⬑ 1 lyph // TODO: note, no longer auto-creating longitudinal borders
+		expect(storage.readAll()).to.have.length(1);
 	});
 	
 	it("can load either one or multiple entities per request", async () => {
 		const {Material} = environment.classes;
 		
-		let { id: id1 } = backend.create({
+		let { id: id1 } = storage.create({
 			class: 'Material',
 			name:  "Material 1"
 		});
-		let { id: id2 } = backend.create({
+		let { id: id2 } = storage.create({
 			class: 'Material',
 			name:  "Material 2"
 		});
-		let { id: id3 } = backend.create({
+		let { id: id3 } = storage.create({
 			class: 'Material',
 			name:  "Material 3"
 		});
@@ -344,11 +319,12 @@ describe("integrated workflow", () => {
 	
 	it("can accept an id when first creating an entity, but expects this id to remain consistent at commit");
 	
-	// TODO: delete operation
+	
+	// TODO
 	it.skip("can delete a resource", async () => {
 		const {Lyph} = environment.classes;
 
-		let { id } = backend.create({
+		let { id } = storage.create({
 			class: 'Lyph',
 			name:  "Lyph 1"
 		});
@@ -357,11 +333,19 @@ describe("integrated workflow", () => {
 		
 		expect(lyph.id).to.equal(id);
 
-		expect(Lyph.hasLocal(id)).to.be.true;
+		expect(Lyph.hasLocal(id)).to.be.true;  // TODO: use the module to get an instance
 		
 		lyph.delete();
 		
-		expect(Lyph.hasLocal(id)).to.be.false;
+		expect(Lyph.hasLocal(id)).to.be.false; // TODO: use the module to get an instance
 	});
+	
+	
+	
+	
+	
+	
+	
+	
 	
 });
