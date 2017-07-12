@@ -7,6 +7,10 @@
 	// use backend
 */
 
+
+// TODO: FIX TO NEW CODE
+
+
 import {camelCase} from 'lodash-bound';
 
 /* super-simple storage implementation */
@@ -27,7 +31,7 @@ export default ({ajax: ajx, baseURL: burl}) => {
 			});
 		},
 		commit_edit({entity, newValues}) {
-			let cls = entity.constructor;
+			let cls = entity.constructor; // TODO: FIX
 			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
 			return ajax({
 				url:  `${baseURL}/${classPath}/${entity.id}`,
@@ -37,7 +41,7 @@ export default ({ajax: ajx, baseURL: burl}) => {
 			});
 		},
 		commit_delete({entity}) {
-			let cls = entity.constructor;
+			let cls = entity.constructor; // TODO: FIX
 			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
 			return ajax({
 				url: `${baseURL}/${classPath}/${entity.id}`,
