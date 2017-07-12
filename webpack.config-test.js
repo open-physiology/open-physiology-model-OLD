@@ -1,23 +1,10 @@
-var webpack = require('webpack');
+const webpack = require('webpack');
+const loaders = require('./webpack.loaders.js');
 
 module.exports = {
 	devtool: 'source-map',
 	module: {
-		loaders: [
-			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				loader: 'babel-loader'
-			},
-			{
-				test: /node_modules[\/\\]utilities[\/\\]src[\/\\].*\.js$/,
-				loader: 'babel-loader'
-			},
-			{
-				test: /\.json$/,
-				loader: 'json-loader'
-			}
-		]
+		loaders: loaders
 	},
 	output: {
 		// source-map support for IntelliJ/WebStorm
@@ -26,9 +13,6 @@ module.exports = {
 	},
 	target: 'node',
 	externals: [require('webpack-node-externals')({
-		whitelist: ['utilities']
-	})],
-	plugins: [
-		new webpack.NormalModuleReplacementPlugin(/\.(gif|png|scss|css)$/, 'node-noop')
-	]
+		whitelist: ['utilities', 'open-physiology-manifest']
+	})]
 };

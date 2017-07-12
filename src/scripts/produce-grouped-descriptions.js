@@ -1,10 +1,13 @@
 import M from '../index';
-
-import padEnd   from 'lodash-bound/padEnd';
-import entries from 'lodash-bound/entries';
-import size     from 'lodash-bound/size';
+import {
+	padEnd,
+	entries,
+	size
+} from 'lodash-bound';
 
 ////////////////////////////////////////////////////////////////////////////////
+
+// TODO: This script should be in manifest repo
 
 let output = "";
 const o = (...t) => {

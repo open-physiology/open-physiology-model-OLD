@@ -1,92 +1,71 @@
-import {constraint, humanMsg} from '../util/misc';
-
+import {humanMsg} from 'utilities';
 import deepFreeze from 'deep-freeze-strict';
 
-// import {
-// 	$$isPlaceholder
-// } from '../symbols';
 
-export default (cls) => class Command_delete extends cls.TrackedCommand {
-	
-	static commandType = 'delete';
-	
-	static get entityClass() { return cls }
-	
-	static create(entity, options = {}) {
-		return super.create([entity], options);
-	}
-	
-	constructor(entity, options = {}) {
-		super({
-			...options,
-			commandDependencies: [
-				entity.originCommand,
-				...(entity.editCommands || []),
-				...(options.commandDependencies || [])
-			]
-		});
-		this.entity = entity;
-	}
-	
-	get associatedEntities() {
-		return new Set(this.entity ? [this.entity] : []);
-	}
+import Command_factory from './Command.js';
 
-	entity    = null;
-	oldValues = null;
+
+export default (env) => {
 	
-	localRun() {
-		/* sanity checks */
-		constraint(this.entity, humanMsg`
-			Cannot delete an entity
-			that was not specified in
-			the Command_delete constructor.
-		`);
-		constraint(!this.entity.isPlaceholder, humanMsg`
-			Cannot delete a placeholder.
-			Load the entity fully before editing.
-		`);
+	const {backend, registerCommandClass} = env;
+	
+	const Command = Command_factory(env);
+
+	class Command_delete extends Command {
 		
-		
-		// TODO: Command_delete on all relevant linked entities (test if they're already scheduled for deletion)
-		// TODO: Keep a reference to the entity (this.entity) so the deletion can be rolled back.
-		
-		
-		
-		/* track this command in the entity */
-		this.entity.deleteCommand = this;
-		
-		/* invalidate field subject caches */
-		for (let key of this.entity.fields::keys()) {
-			this.entity.p(key).invalidateCache();
+		constructor(entity, options = {}) {
+			super({
+				...options,
+				dependencies: [
+					...(options.dependencies || []),
+					...Command.getDeleteDependencies(entity)
+				]
+			});
+			this.entity = entity;
+				
+			// TODO: register command in env.entityToCommand
+			
 		}
 		
+		get associatedEntities() {
+			return new Set(this.entity ? [this.entity] : []);
+		}
+	
+		entity;
 		
-		this.entity.pSubject('isDeleted').next(true);
+		localRun() {
+			/* sanity checks */
+			assert(!this.entity.isPlaceholder, humanMsg`
+				Cannot delete a placeholder.
+				Load the entity fully before editing.
+			`);
+			/* delete the entity */
+			env.internalOperation(() => {
+				this.entity.delete();
+			});
+		}
+		
+		toJSON(options = {}) {
+			return {
+				commandType: 'delete',
+				address: this.entity::pick('class', 'id')
+			};
+		}
+		
+		async localCommit() {
+			this.entity.silence();
+			return await env.backend.commit_delete(
+				this.entity::pick('class', 'id')
+			);
+		}
+		
+		localRollback() {
+			env.internalOperation(() => {
+				this.entity.undelete();
+			});
+		}
 	}
 	
-	toJSON(options = {}) {
-		return {
-			commandType: 'delete',
-			entity: this.entity.constructor.normalizeAddress(this, options)
-		};
-	}
+	return registerCommandClass('Command_delete', Command_delete);
 	
-	async localCommit() {
-		const backend = cls.environment.backend;
-		return await backend.commit_delete(deepFreeze(this.toJSON()));
-		// this.handleCommitResponse(response);
-	}
-	
-	localHandleCommitResponse(response) {
-		// TODO: stuff?
-	}
-
-	localRollback() {
-		
-		/* untrack this command in the entity */
-		this.entity.deleteCommand = null;
-		
-		// TODO: other stuff?
-	}
 };
