@@ -150,7 +150,7 @@ export default (env) => {
 				if (states.includes(cmd.state)) {
 					result.add(cmd);
 				} else {
-					for (let [,prevCmd] of Command[verticesFromTo](cmd)) {
+					for (let [,prevCmd] of Command.commandGraph[verticesFromTo](cmd)) {
 						process(prevCmd);
 					}
 				}

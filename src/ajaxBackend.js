@@ -7,12 +7,6 @@
 	// use backend
 */
 
-
-// TODO: FIX TO NEW CODE
-
-
-import {camelCase} from 'lodash-bound';
-
 /* super-simple storage implementation */
 export default ({ajax: ajx, baseURL: burl}) => {
 	const ajax    = (...args) => Promise.resolve(ajx(...args)),
@@ -20,54 +14,53 @@ export default ({ajax: ajx, baseURL: burl}) => {
 	
 	/* the interface to hand to the library when instantiating a module */
 	const backend = {
-		commit_new({values}) {
-			let cls = model[values.class];
-			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
-			return ajax({
-				url:    `${baseURL}/${classPath}`,
+		async commit_new(values) {
+			return await ajax({
+				url:    `${baseURL}/${values.class}`,
 				method: 'POST',
 				contentType: 'application/json',
 				data:   JSON.stringify(values)
 			});
 		},
-		commit_edit({entity, newValues}) {
-			let cls = entity.constructor; // TODO: FIX
-			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
-			return ajax({
-				url:  `${baseURL}/${classPath}/${entity.id}`,
+		async commit_edit(address, newValues) {
+			return await ajax({
+				url:  `${baseURL}/${address.class}/${address.id}`,
 				method: 'POST',
 				contentType: 'application/json',
 				data:   JSON.stringify(newValues)
 			});
 		},
-		commit_delete({entity}) {
-			let cls = entity.constructor; // TODO: FIX
-			let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
+		async commit_delete(address) {
 			return ajax({
-				url: `${baseURL}/${classPath}/${entity.id}`,
+				url: `${baseURL}/${address.class}/${address.id}`,
 				method: 'DELETE',
 				contentType: 'application/json'
 			});
 		},
-		load(addresses, options = {}) {
-			//TODO: this is a quick implementation for testing, needs rewriting to stack requests for the same entity class
-			let responses = [];
-			Promise.all(Object.values(addresses).map(address => {
-				let cls = address.class;
-				let classPath = cls.isResource ? cls.plural::camelCase() : cls.name;
-				ajax({
-					url:    `${baseURL}/${classPath}/${address.id}`,
-					method: 'GET',
-					contentType: 'application/json'
-				}).then((res) => {
-					responses.push(res);
-				});
-			}));
-			return responses;
+        async commit_link(address1, key, address2) {
+            return ajax({
+                url: `${baseURL}/${address1.class}/${address1.id}/${key}/${address2.id}`,
+                method: 'PUT',
+                contentType: 'application/json'
+            });
+        },
+        async commit_unlink(address1, key, address2) {
+            return ajax({
+                url: `${baseURL}/${address1.class}/${address1.id}/${key}/${address2.id}`,
+                method: 'DELETE',
+                contentType: 'application/json'
+            });
+        },
+		async load(addresses) {
+			return await Promise.all(addresses.map(address => ajax({
+				url:    `${baseURL}/${address.class}/${address.id}`,
+				method: 'GET',
+				contentType: 'application/json'
+			})));
 		},
-		loadAll(cls, options = {}) {
-			return ajax({
-				url:    `${baseURL}/${cls.isResource ? cls.plural::camelCase() : cls.name}`,
+		async loadAll({class: clsName}) {
+			return await ajax({
+				url:    `${baseURL}/${clsName}`,
 				method: 'GET',
 				contentType: 'application/json'
 			});
