@@ -232,7 +232,7 @@ export default (env) => {
 		}
 		
 		async commit() {
-			assert(this.state === 'post-run', "Cannot commit a command that hasn't yet run.");
+			assert(this.state !== 'pre-run', "Cannot commit a command that hasn't yet run.");
 			if (this[$$committing] || this.state === 'post-commit') { return }
 			this[$$committing] = true;
 
@@ -252,7 +252,7 @@ export default (env) => {
 		}
 		
 		rollback() {
-			assert(this.state === 'post-run', "Can only roll back a command that has been run but not committed.");
+			assert(this.state !== 'post-commit', "Can only roll back a command that has been run but not committed.");
 			assert(!this[$$committing], "Cannot roll back a command that's in the process of being committed.");
 			if (this[$$rollingBack] || this.state === 'pre-run') { return }
 			this[$$rollingBack] = true;
