@@ -40,6 +40,20 @@ describe("Module instance", () => {
 		
 	});
 	
+	it("can delete resources (uncommitted)", async () => {
+		
+		const {Entity, Material, Lyph} = classes;
+		
+		let water = module.new({ class: 'Material', name: "Water" });
+		
+		water.delete();
+		
+		let [waterRetrieved] = await module.get([{ class: 'Material', id: water.id }]);
+		
+		expect(waterRetrieved).to.be.null;
+		
+	});
+	
 	it("can commit, giving resources new ids", async () => {
 		
 		const {Entity, Material, Lyph} = classes;

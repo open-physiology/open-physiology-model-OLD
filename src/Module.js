@@ -88,12 +88,12 @@ export class Module {
 		/* create Command_new for this, in 'post-run' state */
 		let commandNew = this._new(entity);
 		
-		/* handling command state-changes */
-		commandNew.p('state').subscribe((state) => {
-			if (state === 'pre-run') {
+		/* synchronizing entity deletion with deletion from storage */
+		entity.p('deleted').subscribe((deleted) => {
+			if (deleted) {
 				this.resourcesById.delete(entity.id);
 				this.resources.delete(entity);
-			} else if (state === 'post-run' || state === 'post-commit') {
+			} else {
 				this.resourcesById.set(entity.id, entity);
 				this.resources.add(entity);
 			}
