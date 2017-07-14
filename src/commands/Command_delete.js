@@ -1,6 +1,6 @@
 import {humanMsg} from 'utilities';
 import deepFreeze from 'deep-freeze-strict';
-
+import {pick} from 'lodash-bound';
 
 import Command_factory from './Command.js';
 
