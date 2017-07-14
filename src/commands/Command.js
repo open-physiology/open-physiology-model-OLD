@@ -55,8 +55,8 @@ export default (env) => {
 			const rKey = key.replace(/^(-->|<--)/, m => m[0] === '<' ? '-->' : '<--');
 			
 			/* prime the data-structures */
-			if (!e1.relationships[key])  { e1.relationships[key]  = new WeakMap }
-			if (!e2.relationships[rKey]) { e2.relationships[rKey] = new WeakMap }
+			if (!e1.relationships[key])  { e1.relationships[key]  = new Map }
+			if (!e2.relationships[rKey]) { e2.relationships[rKey] = new Map }
 			if (!e1.relationships[key].has(entity2)) {
 				let linkUnlinkCommands = [];
 				e1.relationships[key] .set(entity2, linkUnlinkCommands);

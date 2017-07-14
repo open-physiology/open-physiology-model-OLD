@@ -4017,10 +4017,10 @@ exports.default = function (env) {
 
 				/* prime the data-structures */
 				if (!e1.relationships[key]) {
-					e1.relationships[key] = new WeakMap();
+					e1.relationships[key] = new Map();
 				}
 				if (!e2.relationships[rKey]) {
-					e2.relationships[rKey] = new WeakMap();
+					e2.relationships[rKey] = new Map();
 				}
 				if (!e1.relationships[key].has(entity2)) {
 					var linkUnlinkCommands = [];
@@ -22210,12 +22210,12 @@ var Module = exports.Module = function () {
 			/* create Command_new for this, in 'post-run' state */
 			var commandNew = this._new(entity);
 
-			/* handling command state-changes */
-			commandNew.p('state').subscribe(function (state) {
-				if (state === 'pre-run') {
+			/* synchronizing entity deletion with deletion from storage */
+			entity.p('deleted').subscribe(function (deleted) {
+				if (deleted) {
 					_this2.resourcesById.delete(entity.id);
 					_this2.resources.delete(entity);
-				} else if (state === 'post-run' || state === 'post-commit') {
+				} else {
 					_this2.resourcesById.set(entity.id, entity);
 					_this2.resources.add(entity);
 				}
