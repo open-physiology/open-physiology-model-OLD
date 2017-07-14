@@ -108,12 +108,12 @@ export class Module {
 		
 		/* respond to edit, link and unlink from outside */
 		const isConcreteRelKey = (key) => {
-			let match = key.match(/^(?:<--|-->)(\w+)/);
+			let match = key.match(/^-->(\w+)/); // we only record --> commands (model lib always pairs them for us)
 			if (!match) { return false }
 			return !this.entityClasses[match[1]].abstract;
 		};
 		const reactive = ()=>!this.nonReactiveMode;
-		for (let [key, field] of entity.fields::omit('id')::entries()) {
+		for (let [key, field] of entity.fields::omit('id', 'class')::entries()) {
 			if (field instanceof this.Rel1Field && isConcreteRelKey(key)) {
 				field.p('value').startWith(null).pairwise().filter(reactive).subscribe(([prev, next]) => {
 					if (prev) { this._unlink(entity, key, prev) }

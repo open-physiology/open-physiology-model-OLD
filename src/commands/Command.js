@@ -1,6 +1,6 @@
 import Graph from 'graph.js/dist/graph';
 import assert from 'power-assert';
-import {last, values, flattenDepth} from 'lodash-bound';
+import {last, values, flatten} from 'lodash-bound';
 import {event, ValueTracker, property} from 'utilities';
 
 const $$running      = Symbol('$$running');
@@ -128,7 +128,7 @@ export default (env) => {
 			let e = Command.registerEntity(entity);
 			return Command.getDependencies(entity, [
 				...e.edit::values(),
-				...e.relationships::values().map(m=>[...m.values()])::flattenDepth(2)
+				...e.relationships::values().map(m=>[...m.values()])::flatten()
 			]);
 		}
 		
