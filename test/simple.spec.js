@@ -186,4 +186,18 @@ describe("Module instance", () => {
 		
 	});
 	
+	it("responds with null when asked for a resource that doesn't exist", async () => {
+		
+		const {Entity, Material, Lyph, Type} = classes;
+		
+		let blood = await module.get({ class: 'Material', id: 12345 });
+		
+		expect(blood).to.be.null;
+		
+		let heart = await module.get({ class: 'Lyph', id: 12345 });
+		
+		expect(heart).to.be.null;
+		
+	});
+	
 });

@@ -1,4 +1,4 @@
-import {assign, pick, omit, parseInt, entries} from 'lodash-bound';
+import {assign, pick, omit, parseInt, entries, isArray} from 'lodash-bound';
 import _uniqueId from 'lodash/uniqueId';
 import assert from 'power-assert';
 import commandClassesFactory from './commands/commandClasses.js';
@@ -148,17 +148,26 @@ export class Module {
 	}
 	
 	async get(addresses = []) {
-		return await Promise.all(addresses.map(async (addr) => {
+		// TODO: can be made faster, maybe, loading
+		// TODO: multiple at the same time from backend
+		let paramIsArray = addresses::isArray();
+		if (!paramIsArray) { addresses = [addresses] }
+		let result = await Promise.all(addresses.map(async (addr) => {
 			let entity = this._getLocalOrPlaceholder(addr);
 			if (entity.isPlaceholder) {
 				const command = this.Command.entityToCommand.get(entity).origin;
 				assert(command instanceof this.Command_load);
 				entity = await command.load();
-				// TODO: can be made faster, maybe, loading
-				// TODO: multiple at the same time from backend
+				if (entity === null) {
+					// TODO: it's not very elegant that we're doing this test here,
+					//     : whereas we're putting the placeholder into storage in _getLocalOrPlaceholder
+					this.resources.delete(entity);
+					this.resourcesById.delete(addr.id);
+				}
 			}
 			return entity;
 		}));
+		return paramIsArray ? result : result[0];
 	}
 	
 	async getAll(descriptor) {
@@ -221,9 +230,10 @@ export class Module {
 	_getLocalOrPlaceholder({ class: cls, id }) {
 		let entity = this.resourcesById.get(id) || null;
 		if (entity) {
-			assert(!cls || cls === entity.class);
+			assert(!cls || this.entityClasses[cls].hasSubclass(entity.constructor));
 		} else {
 			entity = this.entityClasses[cls].new({ id }, { isPlaceholder: true });
+			this.resources.add(entity);
 			this.resourcesById.set(entity.id, entity);
 			new this.Command_load(entity);
 		}
