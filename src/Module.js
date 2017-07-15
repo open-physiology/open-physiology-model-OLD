@@ -230,7 +230,7 @@ export class Module {
 	_getLocalOrPlaceholder({ class: cls, id }) {
 		let entity = this.resourcesById.get(id) || null;
 		if (entity) {
-			assert(!cls || cls === entity.class);
+			assert(!cls || this.entityClasses[cls].hasSubclass(entity.constructor));
 		} else {
 			entity = this.entityClasses[cls].new({ id }, { isPlaceholder: true });
 			this.resources.add(entity);
