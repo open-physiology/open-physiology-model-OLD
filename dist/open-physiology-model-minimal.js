@@ -751,7 +751,7 @@ module.exports = toInteger;
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(41);
+var baseToString = __webpack_require__(42);
 
 /**
  * Converts `value` to a string. An empty string is returned for `null`
@@ -1609,7 +1609,7 @@ module.exports = apply;
 /* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(45),
+var eq = __webpack_require__(46),
     isArrayLike = __webpack_require__(25),
     isIndex = __webpack_require__(62),
     isObject = __webpack_require__(12);
@@ -1856,185 +1856,6 @@ module.exports = last;
 /* 39 */,
 /* 40 */,
 /* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Symbol = __webpack_require__(68),
-    arrayMap = __webpack_require__(10),
-    isArray = __webpack_require__(7),
-    isSymbol = __webpack_require__(37);
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0;
-
-/** Used to convert symbols to primitives and strings. */
-var symbolProto = Symbol ? Symbol.prototype : undefined,
-    symbolToString = symbolProto ? symbolProto.toString : undefined;
-
-/**
- * The base implementation of `_.toString` which doesn't convert nullish
- * values to empty strings.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {string} Returns the string.
- */
-function baseToString(value) {
-  // Exit early for strings to avoid a performance hit in some environments.
-  if (typeof value == 'string') {
-    return value;
-  }
-  if (isArray(value)) {
-    // Recursively convert values (susceptible to call stack limits).
-    return arrayMap(value, baseToString) + '';
-  }
-  if (isSymbol(value)) {
-    return symbolToString ? symbolToString.call(value) : '';
-  }
-  var result = (value + '');
-  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
-}
-
-module.exports = baseToString;
-
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var identity = __webpack_require__(30);
-
-/**
- * Casts `value` to `identity` if it's not a function.
- *
- * @private
- * @param {*} value The value to inspect.
- * @returns {Function} Returns cast function.
- */
-function castFunction(value) {
-  return typeof value == 'function' ? value : identity;
-}
-
-module.exports = castFunction;
-
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var assignValue = __webpack_require__(103),
-    baseAssignValue = __webpack_require__(47);
-
-/**
- * Copies properties of `source` to `object`.
- *
- * @private
- * @param {Object} source The object to copy properties from.
- * @param {Array} props The property identifiers to copy.
- * @param {Object} [object={}] The object to copy properties to.
- * @param {Function} [customizer] The function to customize copied values.
- * @returns {Object} Returns `object`.
- */
-function copyObject(source, props, object, customizer) {
-  var isNew = !object;
-  object || (object = {});
-
-  var index = -1,
-      length = props.length;
-
-  while (++index < length) {
-    var key = props[index];
-
-    var newValue = customizer
-      ? customizer(object[key], source[key], key, object, source)
-      : undefined;
-
-    if (newValue === undefined) {
-      newValue = source[key];
-    }
-    if (isNew) {
-      baseAssignValue(object, key, newValue);
-    } else {
-      assignValue(object, key, newValue);
-    }
-  }
-  return object;
-}
-
-module.exports = copyObject;
-
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var isSymbol = __webpack_require__(37);
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0;
-
-/**
- * Converts `value` to a string key if it's not a string or symbol.
- *
- * @private
- * @param {*} value The value to inspect.
- * @returns {string|symbol} Returns the key.
- */
-function toKey(value) {
-  if (typeof value == 'string' || isSymbol(value)) {
-    return value;
-  }
-  var result = (value + '');
-  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
-}
-
-module.exports = toKey;
-
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports) {
-
-/**
- * Performs a
- * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * comparison between two values to determine if they are equivalent.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
- * @example
- *
- * var object = { 'a': 1 };
- * var other = { 'a': 1 };
- *
- * _.eq(object, object);
- * // => true
- *
- * _.eq(object, other);
- * // => false
- *
- * _.eq('a', 'a');
- * // => true
- *
- * _.eq('a', Object('a'));
- * // => false
- *
- * _.eq(NaN, NaN);
- * // => true
- */
-function eq(value, other) {
-  return value === other || (value !== value && other !== other);
-}
-
-module.exports = eq;
-
-
-/***/ }),
-/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = {
@@ -2949,6 +2770,185 @@ module.exports = {
   _zipWith: __webpack_require__(538),
   
 };
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Symbol = __webpack_require__(68),
+    arrayMap = __webpack_require__(10),
+    isArray = __webpack_require__(7),
+    isSymbol = __webpack_require__(37);
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0;
+
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol ? Symbol.prototype : undefined,
+    symbolToString = symbolProto ? symbolProto.toString : undefined;
+
+/**
+ * The base implementation of `_.toString` which doesn't convert nullish
+ * values to empty strings.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ */
+function baseToString(value) {
+  // Exit early for strings to avoid a performance hit in some environments.
+  if (typeof value == 'string') {
+    return value;
+  }
+  if (isArray(value)) {
+    // Recursively convert values (susceptible to call stack limits).
+    return arrayMap(value, baseToString) + '';
+  }
+  if (isSymbol(value)) {
+    return symbolToString ? symbolToString.call(value) : '';
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+module.exports = baseToString;
+
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var identity = __webpack_require__(30);
+
+/**
+ * Casts `value` to `identity` if it's not a function.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {Function} Returns cast function.
+ */
+function castFunction(value) {
+  return typeof value == 'function' ? value : identity;
+}
+
+module.exports = castFunction;
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var assignValue = __webpack_require__(103),
+    baseAssignValue = __webpack_require__(47);
+
+/**
+ * Copies properties of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy properties from.
+ * @param {Array} props The property identifiers to copy.
+ * @param {Object} [object={}] The object to copy properties to.
+ * @param {Function} [customizer] The function to customize copied values.
+ * @returns {Object} Returns `object`.
+ */
+function copyObject(source, props, object, customizer) {
+  var isNew = !object;
+  object || (object = {});
+
+  var index = -1,
+      length = props.length;
+
+  while (++index < length) {
+    var key = props[index];
+
+    var newValue = customizer
+      ? customizer(object[key], source[key], key, object, source)
+      : undefined;
+
+    if (newValue === undefined) {
+      newValue = source[key];
+    }
+    if (isNew) {
+      baseAssignValue(object, key, newValue);
+    } else {
+      assignValue(object, key, newValue);
+    }
+  }
+  return object;
+}
+
+module.exports = copyObject;
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isSymbol = __webpack_require__(37);
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0;
+
+/**
+ * Converts `value` to a string key if it's not a string or symbol.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {string|symbol} Returns the key.
+ */
+function toKey(value) {
+  if (typeof value == 'string' || isSymbol(value)) {
+    return value;
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+module.exports = toKey;
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports) {
+
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+function eq(value, other) {
+  return value === other || (value !== value && other !== other);
+}
+
+module.exports = eq;
 
 
 /***/ }),
@@ -3893,7 +3893,7 @@ var _graph = __webpack_require__(735);
 
 var _graph2 = _interopRequireDefault(_graph);
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _utilities = __webpack_require__(98);
 
@@ -4184,7 +4184,7 @@ exports.default = function (env) {
 				var e = Command.registerEntity(entity);
 				return Command.getDependencies(entity, [].concat(_toConsumableArray((_context = e.edit, _lodashBound.values).call(_context)), _toConsumableArray((_context = (_context = e.relationships, _lodashBound.values).call(_context).map(function (m) {
 					return [].concat(_toConsumableArray(m.values()));
-				}), _lodashBound.flattenDepth).call(_context, 2))));
+				}), _lodashBound.flatten).call(_context))));
 			}
 
 			/** @private */
@@ -4449,6 +4449,8 @@ exports.default = function (env) {
 			key: 'commit',
 			value: function () {
 				var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+					var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, _step9$value, cmd;
+
 					return regeneratorRuntime.wrap(function _callee2$(_context3) {
 						while (1) {
 							switch (_context3.prev = _context3.next) {
@@ -4464,31 +4466,77 @@ exports.default = function (env) {
 									this[$$committing] = true;
 
 									/* run commits that need to happen before this one */
-									_context3.next = 5;
-									return Promise.all([].concat(_toConsumableArray(Command.commandGraph.verticesTo(this))).map(function (_ref11) {
-										var _ref12 = _slicedToArray(_ref11, 1),
-										    dep = _ref12[0];
+									_iteratorNormalCompletion9 = true;
+									_didIteratorError9 = false;
+									_iteratorError9 = undefined;
+									_context3.prev = 6;
+									_iterator9 = Command.commandGraph.verticesTo(this)[Symbol.iterator]();
 
-										return dep.commit();
-									}));
+								case 8:
+									if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
+										_context3.next = 15;
+										break;
+									}
 
-								case 5:
-									_context3.next = 7;
+									_step9$value = _slicedToArray(_step9.value, 1), cmd = _step9$value[0];
+									_context3.next = 12;
+									return cmd.commit();
+
+								case 12:
+									_iteratorNormalCompletion9 = true;
+									_context3.next = 8;
+									break;
+
+								case 15:
+									_context3.next = 21;
+									break;
+
+								case 17:
+									_context3.prev = 17;
+									_context3.t0 = _context3['catch'](6);
+									_didIteratorError9 = true;
+									_iteratorError9 = _context3.t0;
+
+								case 21:
+									_context3.prev = 21;
+									_context3.prev = 22;
+
+									if (!_iteratorNormalCompletion9 && _iterator9.return) {
+										_iterator9.return();
+									}
+
+								case 24:
+									_context3.prev = 24;
+
+									if (!_didIteratorError9) {
+										_context3.next = 27;
+										break;
+									}
+
+									throw _iteratorError9;
+
+								case 27:
+									return _context3.finish(24);
+
+								case 28:
+									return _context3.finish(21);
+
+								case 29:
+									_context3.next = 31;
 									return this.localCommit();
 
-								case 7:
+								case 31:
 
 									/***/
 									this[$$committing] = false;
 									this.pSubject('state').next('post-commit');
-									// this.e('commit').next();
 
-								case 9:
+								case 33:
 								case 'end':
 									return _context3.stop();
 							}
 						}
-					}, _callee2, this);
+					}, _callee2, this, [[6, 17, 21, 29], [22,, 24, 28]]);
 				}));
 
 				function commit() {
@@ -4506,30 +4554,30 @@ exports.default = function (env) {
 				this[$$rollingBack] = true;
 
 				/* rollbacks that need to happen before this one */
-				var _iteratorNormalCompletion9 = true;
-				var _didIteratorError9 = false;
-				var _iteratorError9 = undefined;
+				var _iteratorNormalCompletion10 = true;
+				var _didIteratorError10 = false;
+				var _iteratorError10 = undefined;
 
 				try {
-					for (var _iterator9 = Command.commandGraph.verticesFrom(this)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-						var _step9$value = _slicedToArray(_step9.value, 1),
-						    rdep = _step9$value[0];
+					for (var _iterator10 = Command.commandGraph.verticesFrom(this)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+						var _step10$value = _slicedToArray(_step10.value, 1),
+						    rdep = _step10$value[0];
 
 						rdep.rollback();
 					}
 
 					/* then roll back this command */
 				} catch (err) {
-					_didIteratorError9 = true;
-					_iteratorError9 = err;
+					_didIteratorError10 = true;
+					_iteratorError10 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion9 && _iterator9.return) {
-							_iterator9.return();
+						if (!_iteratorNormalCompletion10 && _iterator10.return) {
+							_iterator10.return();
 						}
 					} finally {
-						if (_didIteratorError9) {
-							throw _iteratorError9;
+						if (_didIteratorError10) {
+							throw _iteratorError10;
 						}
 					}
 				}
@@ -4540,7 +4588,6 @@ exports.default = function (env) {
 				Command.commandHistory.splice(Command.commandHistory.indexOf(this), 1);
 				this[$$rollingBack] = false;
 				this.pSubject('state').next('pre-run');
-				// this.e('rollback').next();
 			}
 		}, {
 			key: 'associatedEntities',
@@ -4952,7 +4999,7 @@ module.exports = baseCreate;
 /***/ (function(module, exports, __webpack_require__) {
 
 var castPath = __webpack_require__(59),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * The base implementation of `_.get` without support for default values.
@@ -5474,7 +5521,7 @@ module.exports = function deepFreeze (o) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseAssignValue = __webpack_require__(47),
-    eq = __webpack_require__(45);
+    eq = __webpack_require__(46);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -5584,7 +5631,7 @@ var assignValue = __webpack_require__(103),
     castPath = __webpack_require__(59),
     isIndex = __webpack_require__(62),
     isObject = __webpack_require__(12),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * The base implementation of `_.set`.
@@ -6372,7 +6419,7 @@ module.exports = arrayReduce;
 /* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(45);
+var eq = __webpack_require__(46);
 
 /**
  * Gets the index at which the `key` is found in `array` of key-value pairs.
@@ -6471,7 +6518,7 @@ var apply = __webpack_require__(28),
     castPath = __webpack_require__(59),
     last = __webpack_require__(38),
     parent = __webpack_require__(604),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * The base implementation of `_.invoke` without support for individual
@@ -6703,7 +6750,7 @@ module.exports = createCtor;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseToNumber = __webpack_require__(778),
-    baseToString = __webpack_require__(41);
+    baseToString = __webpack_require__(42);
 
 /**
  * Creates a function that performs a mathematical operation on two values.
@@ -6878,7 +6925,7 @@ module.exports = shuffleSelf;
 /* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     createAssigner = __webpack_require__(86),
     keysIn = __webpack_require__(33);
 
@@ -8241,7 +8288,7 @@ module.exports = baseTimes;
 var castPath = __webpack_require__(59),
     last = __webpack_require__(38),
     parent = __webpack_require__(604),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * The base implementation of `_.unset`.
@@ -8407,7 +8454,7 @@ module.exports = createOver;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseRepeat = __webpack_require__(566),
-    baseToString = __webpack_require__(41),
+    baseToString = __webpack_require__(42),
     castSlice = __webpack_require__(60),
     hasUnicode = __webpack_require__(89),
     stringSize = __webpack_require__(91),
@@ -10168,7 +10215,7 @@ exports.definePropertiesByValue = definePropertiesByValue;
 exports.callOrReturn = callOrReturn;
 exports.repeat = repeat;
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _rearg = __webpack_require__(1090);
 
@@ -11181,7 +11228,7 @@ module.exports = function entriesIn() {
 "use strict";
 
 
-var fn = __webpack_require__(45);
+var fn = __webpack_require__(46);
 
 module.exports = function eq() {
   return fn.apply(undefined, [this].concat(Array.prototype.slice.apply(arguments)));
@@ -14808,7 +14855,7 @@ module.exports = arraySample;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseAssignValue = __webpack_require__(47),
-    eq = __webpack_require__(45);
+    eq = __webpack_require__(46);
 
 /**
  * This function is like `assignValue` except that it doesn't assign
@@ -14833,7 +14880,7 @@ module.exports = assignMergeValue;
 /* 546 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     keys = __webpack_require__(16);
 
 /**
@@ -15201,7 +15248,7 @@ var baseIsEqual = __webpack_require__(131),
     isKey = __webpack_require__(206),
     isStrictComparable = __webpack_require__(599),
     matchesStrictComparable = __webpack_require__(600),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -15498,7 +15545,7 @@ module.exports = baseSetData;
 /* 568 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(45);
+var eq = __webpack_require__(46);
 
 /**
  * The base implementation of `_.sortedUniq` and `_.sortedUniqBy` without
@@ -16331,7 +16378,7 @@ module.exports = createToPairs;
 /* 589 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(45);
+var eq = __webpack_require__(46);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -16578,7 +16625,7 @@ var castPath = __webpack_require__(59),
     isArray = __webpack_require__(7),
     isIndex = __webpack_require__(62),
     isLength = __webpack_require__(145),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * Checks if `path` exists on `object`.
@@ -17027,7 +17074,7 @@ module.exports = ary;
 /* 612 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     createAssigner = __webpack_require__(86),
     keysIn = __webpack_require__(33);
 
@@ -17702,7 +17749,7 @@ module.exports = flatten;
 
 var arrayEach = __webpack_require__(81),
     baseEach = __webpack_require__(58),
-    castFunction = __webpack_require__(42),
+    castFunction = __webpack_require__(43),
     isArray = __webpack_require__(7);
 
 /**
@@ -17749,7 +17796,7 @@ module.exports = forEach;
 
 var arrayEachRight = __webpack_require__(742),
     baseEachRight = __webpack_require__(550),
-    castFunction = __webpack_require__(42),
+    castFunction = __webpack_require__(43),
     isArray = __webpack_require__(7);
 
 /**
@@ -18151,7 +18198,7 @@ module.exports = pickBy;
 var baseProperty = __webpack_require__(187),
     basePropertyDeep = __webpack_require__(770),
     isKey = __webpack_require__(206),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * Creates a function that returns the value at `path` of a given object.
@@ -18337,7 +18384,7 @@ module.exports = toPairsIn;
 /* 638 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     keysIn = __webpack_require__(33);
 
 /**
@@ -21470,7 +21517,7 @@ var _dec, _desc, _value, _class;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _lodash = __webpack_require__(964);
 
@@ -22119,7 +22166,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _uniqueId2 = __webpack_require__(639);
 
@@ -22171,9 +22218,6 @@ var Module = exports.Module = function () {
 			},
 			getLocalOrPlaceholder: function getLocalOrPlaceholder(address) {
 				return _this._getLocalOrPlaceholder(address);
-			},
-			registerToModule: function registerToModule(entity) {
-				return _this.register(entity);
 			}
 		}));
 		_lodashBound.assign.call(this, env);
@@ -22204,11 +22248,11 @@ var Module = exports.Module = function () {
 			if (!entity.fields['id'].get()) {
 				var _context2;
 
-				entity.fields['id'].set(-(_context2 = (0, _uniqueId3.default)(), _lodashBound.parseInt).call(_context2), { ignoreReadonly: true });
-			}
+				entity.fields['id'].set(-(_context2 = (0, _uniqueId3.default)(), _lodashBound.parseInt).call(_context2), { ignoreReadonly: true }); // TODO: do this in Command_new
 
-			/* create Command_new for this, in 'post-run' state */
-			var commandNew = this._new(entity);
+				/* create Command_new for this, in 'post-run' state */
+				this._new(entity);
+			}
 
 			/* synchronizing entity deletion with deletion from storage */
 			entity.p('deleted').subscribe(function (deleted) {
@@ -22234,7 +22278,7 @@ var Module = exports.Module = function () {
 
 			/* respond to edit, link and unlink from outside */
 			var isConcreteRelKey = function isConcreteRelKey(key) {
-				var match = key.match(/^(?:<--|-->)(\w+)/);
+				var match = key.match(/^-->(\w+)/); // we only record --> commands (model lib always pairs them for us)
 				if (!match) {
 					return false;
 				}
@@ -22274,7 +22318,7 @@ var Module = exports.Module = function () {
 							_this2._link(entity, key, next);
 						});
 					} else if (_instanceof(field, _this2.PropertyField)) {
-						field.p('value').startWith($$noValue).pairwise().filter(reactive).subscribe(function (_ref6) {
+						field.p('value').skip(1).startWith($$noValue).pairwise().filter(reactive).subscribe(function (_ref6) {
 							var _ref7 = _slicedToArray(_ref6, 2),
 							    prev = _ref7[0],
 							    next = _ref7[1];
@@ -22292,7 +22336,7 @@ var Module = exports.Module = function () {
 					}
 				};
 
-				for (var _iterator = (_context3 = (_context3 = entity.fields, _lodashBound.omit).call(_context3, 'id'), _lodashBound.entries).call(_context3)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				for (var _iterator = (_context3 = (_context3 = entity.fields, _lodashBound.omit).call(_context3, 'id', 'class'), _lodashBound.entries).call(_context3)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 					var _context3;
 
 					_loop();
@@ -22324,6 +22368,123 @@ var Module = exports.Module = function () {
 			return entity;
 		}
 	}, {
+		key: 'setEntityFields',
+		value: function setEntityFields(entity, initialValues) {
+			var _iteratorNormalCompletion2 = true;
+			var _didIteratorError2 = false;
+			var _iteratorError2 = undefined;
+
+			try {
+				for (var _iterator2 = (_context4 = (_context4 = entity.fields, _lodashBound.omit).call(_context4, 'id', 'class'), _lodashBound.entries).call(_context4)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					var _context4, _context5;
+
+					var _step2$value = _slicedToArray(_step2.value, 2),
+					    _key = _step2$value[0],
+					    _field = _step2$value[1];
+
+					if (!(_context5 = initialValues[_key], _lodashBound.isUndefined).call(_context5)) {
+						if (_instanceof(_field, this.Rel1Field)) {
+
+							if (initialValues[_key] === null) {
+								_field.set(null);
+							} else {
+								var relatedResource = this.getLocalOrPlaceholder(initialValues[_key]);
+
+								_field.set(relatedResource);
+							}
+						} else if (_instanceof(_field, this.Rel$Field)) {
+							var _iteratorNormalCompletion3 = true;
+							var _didIteratorError3 = false;
+							var _iteratorError3 = undefined;
+
+							try {
+
+								for (var _iterator3 = initialValues[_key][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+									var addr = _step3.value;
+
+									var _relatedResource = this.getLocalOrPlaceholder(addr);
+
+									_field.add(_relatedResource);
+								}
+							} catch (err) {
+								_didIteratorError3 = true;
+								_iteratorError3 = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion3 && _iterator3.return) {
+										_iterator3.return();
+									}
+								} finally {
+									if (_didIteratorError3) {
+										throw _iteratorError3;
+									}
+								}
+							}
+						} else if (_instanceof(_field, this.PropertyField)) {
+
+							_field.set(initialValues[_key]);
+						}
+					}
+				}
+			} catch (err) {
+				_didIteratorError2 = true;
+				_iteratorError2 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion2 && _iterator2.return) {
+						_iterator2.return();
+					}
+				} finally {
+					if (_didIteratorError2) {
+						throw _iteratorError2;
+					}
+				}
+			}
+		}
+	}, {
+		key: 'resetEntityFields',
+		value: function resetEntityFields(entity, keys) {
+			var _iteratorNormalCompletion4 = true;
+			var _didIteratorError4 = false;
+			var _iteratorError4 = undefined;
+
+			try {
+				for (var _iterator4 = (_context6 = (_context6 = entity.fields, _lodashBound.omit).call(_context6, 'id', 'class'), _lodashBound.entries).call(_context6)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+					var _context6;
+
+					var _step4$value = _slicedToArray(_step4.value, 2),
+					    _key2 = _step4$value[0],
+					    _field2 = _step4$value[1];
+
+					if (!keys || keys.includes(_key2)) {
+						if (_instanceof(_field2, this.Rel1Field)) {
+
+							_field2.set(null);
+						} else if (_instanceof(_field2, this.Rel$Field)) {
+
+							_field2.get().clear();
+						} else if (_instanceof(_field2, this.PropertyField)) {
+
+							_field2.set(entity.constructor.properties[_key2].default);
+						}
+					}
+				}
+			} catch (err) {
+				_didIteratorError4 = true;
+				_iteratorError4 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion4 && _iterator4.return) {
+						_iterator4.return();
+					}
+				} finally {
+					if (_didIteratorError4) {
+						throw _iteratorError4;
+					}
+				}
+			}
+		}
+	}, {
 		key: 'new',
 		value: function _new(_ref8) {
 			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -22333,48 +22494,65 @@ var Module = exports.Module = function () {
 
 			var entity = this.entityClasses[clsName].new({}, options);
 			this.register(entity);
-			_lodashBound.assign.call(entity, initialValues);
+			this.setEntityFields(entity, initialValues);
 			return entity;
 		}
 	}, {
 		key: 'get',
 		value: function () {
 			var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-				var _this3 = this;
+				var _context7,
+				    _this3 = this;
 
 				var addresses = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-				return regeneratorRuntime.wrap(function _callee2$(_context5) {
+				var paramIsArray, result;
+				return regeneratorRuntime.wrap(function _callee2$(_context9) {
 					while (1) {
-						switch (_context5.prev = _context5.next) {
+						switch (_context9.prev = _context9.next) {
 							case 0:
-								_context5.next = 2;
+								// TODO: can be made faster, maybe, loading
+								// TODO: multiple at the same time from backend
+								paramIsArray = (_context7 = addresses, _lodashBound.isArray).call(_context7);
+
+								if (!paramIsArray) {
+									addresses = [addresses];
+								}
+								_context9.next = 4;
 								return Promise.all(addresses.map(function () {
 									var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee(addr) {
-										var entity, command;
-										return regeneratorRuntime.wrap(function _callee$(_context4) {
+										var entity, placeholder, command;
+										return regeneratorRuntime.wrap(function _callee$(_context8) {
 											while (1) {
-												switch (_context4.prev = _context4.next) {
+												switch (_context8.prev = _context8.next) {
 													case 0:
 														entity = _this3._getLocalOrPlaceholder(addr);
 
-														if (!entity.isPlaceholder) {
-															_context4.next = 6;
+														if (!(entity && entity.isPlaceholder)) {
+															_context8.next = 8;
 															break;
 														}
 
-														command = _this3.Command.entityToCommand.get(entity).origin;
-														_context4.next = 5;
+														placeholder = entity;
+														command = _this3.Command.entityToCommand.get(placeholder).origin;
+														_context8.next = 6;
 														return command.load();
 
-													case 5:
-														entity = _context4.sent;
-
 													case 6:
-														return _context4.abrupt('return', entity);
+														entity = _context8.sent;
 
-													case 7:
+
+														if (entity === null) {
+															_this3._undoEntityCreation(placeholder);
+														} else {
+															_this3.setEntityFields(entity, command.response);
+														}
+
+													case 8:
+														return _context8.abrupt('return', entity);
+
+													case 9:
 													case 'end':
-														return _context4.stop();
+														return _context8.stop();
 												}
 											}
 										}, _callee, _this3);
@@ -22385,12 +22563,13 @@ var Module = exports.Module = function () {
 									};
 								}()));
 
-							case 2:
-								return _context5.abrupt('return', _context5.sent);
+							case 4:
+								result = _context9.sent;
+								return _context9.abrupt('return', paramIsArray ? result : result[0]);
 
-							case 3:
+							case 6:
 							case 'end':
-								return _context5.stop();
+								return _context9.stop();
 						}
 					}
 				}, _callee2, this);
@@ -22409,28 +22588,38 @@ var Module = exports.Module = function () {
 				var _this4 = this;
 
 				var entitiesJson;
-				return regeneratorRuntime.wrap(function _callee3$(_context6) {
+				return regeneratorRuntime.wrap(function _callee3$(_context10) {
 					while (1) {
-						switch (_context6.prev = _context6.next) {
+						switch (_context10.prev = _context10.next) {
 							case 0:
-								_context6.next = 2;
+								_context10.next = 2;
 								return this.backend.loadAll(descriptor);
 
 							case 2:
-								entitiesJson = _context6.sent;
-								return _context6.abrupt('return', entitiesJson.map(function (json) {
+								entitiesJson = _context10.sent;
+								return _context10.abrupt('return', entitiesJson.map(function (json) {
 									var entity = _this4._getLocalOrPlaceholder(json);
-									if (entity.isPlaceholder) {
-										var command = _this4.Command.entityToCommand.get(entity).origin;
+									if (entity && entity.isPlaceholder) {
+
+										var placeholder = entity;
+
+										var command = _this4.Command.entityToCommand.get(placeholder).origin;
 
 										entity = command.syncLoad(json);
+
+										if (entity === null) {
+											// TODO: Double check. Does this ever become null here? Probably not.
+											_this4._undoEntityCreation(placeholder);
+										} else {
+											_this4.setEntityFields(entity, command.response);
+										}
 									}
 									return entity;
 								}));
 
 							case 4:
 							case 'end':
-								return _context6.stop();
+								return _context10.stop();
 						}
 					}
 				}, _callee3, this);
@@ -22450,21 +22639,74 @@ var Module = exports.Module = function () {
 				    _ref13$entities = _ref13.entities,
 				    entities = _ref13$entities === undefined ? null : _ref13$entities;
 
-				return regeneratorRuntime.wrap(function _callee4$(_context7) {
-					while (1) {
-						switch (_context7.prev = _context7.next) {
-							case 0:
-								_context7.next = 2;
-								return Promise.all([].concat(_toConsumableArray(this.Command.latest({ entities: entities, states: ['post-run'] }))).map(function (cmd) {
-									return cmd.commit();
-								}));
+				var latestCmds, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, cmd;
 
-							case 2:
+				return regeneratorRuntime.wrap(function _callee4$(_context11) {
+					while (1) {
+						switch (_context11.prev = _context11.next) {
+							case 0:
+								latestCmds = [].concat(_toConsumableArray(this.Command.latest({ entities: entities, states: ['post-run'] })));
+								_iteratorNormalCompletion5 = true;
+								_didIteratorError5 = false;
+								_iteratorError5 = undefined;
+								_context11.prev = 4;
+								_iterator5 = latestCmds[Symbol.iterator]();
+
+							case 6:
+								if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
+									_context11.next = 13;
+									break;
+								}
+
+								cmd = _step5.value;
+								_context11.next = 10;
+								return cmd.commit();
+
+							case 10:
+								_iteratorNormalCompletion5 = true;
+								_context11.next = 6;
+								break;
+
+							case 13:
+								_context11.next = 19;
+								break;
+
+							case 15:
+								_context11.prev = 15;
+								_context11.t0 = _context11['catch'](4);
+								_didIteratorError5 = true;
+								_iteratorError5 = _context11.t0;
+
+							case 19:
+								_context11.prev = 19;
+								_context11.prev = 20;
+
+								if (!_iteratorNormalCompletion5 && _iterator5.return) {
+									_iterator5.return();
+								}
+
+							case 22:
+								_context11.prev = 22;
+
+								if (!_didIteratorError5) {
+									_context11.next = 25;
+									break;
+								}
+
+								throw _iteratorError5;
+
+							case 25:
+								return _context11.finish(22);
+
+							case 26:
+								return _context11.finish(19);
+
+							case 27:
 							case 'end':
-								return _context7.stop();
+								return _context11.stop();
 						}
 					}
-				}, _callee4, this);
+				}, _callee4, this, [[4, 15, 19, 27], [20,, 22, 26]]);
 			}));
 
 			function commit() {
@@ -22480,27 +22722,27 @@ var Module = exports.Module = function () {
 			    _ref14$entities = _ref14.entities,
 			    entities = _ref14$entities === undefined ? null : _ref14$entities;
 
-			var _iteratorNormalCompletion2 = true;
-			var _didIteratorError2 = false;
-			var _iteratorError2 = undefined;
+			var _iteratorNormalCompletion6 = true;
+			var _didIteratorError6 = false;
+			var _iteratorError6 = undefined;
 
 			try {
-				for (var _iterator2 = this.Command.earliest({ entities: entities, states: ['post-run'] })[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-					var cmd = _step2.value;
+				for (var _iterator6 = this.Command.earliest({ entities: entities, states: ['post-run'] })[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+					var cmd = _step6.value;
 
 					cmd.rollback();
 				}
 			} catch (err) {
-				_didIteratorError2 = true;
-				_iteratorError2 = err;
+				_didIteratorError6 = true;
+				_iteratorError6 = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion2 && _iterator2.return) {
-						_iterator2.return();
+					if (!_iteratorNormalCompletion6 && _iterator6.return) {
+						_iterator6.return();
 					}
 				} finally {
-					if (_didIteratorError2) {
-						throw _iteratorError2;
+					if (_didIteratorError6) {
+						throw _iteratorError6;
 					}
 				}
 			}
@@ -22551,16 +22793,86 @@ var Module = exports.Module = function () {
 		///// Other operations /////
 
 	}, {
+		key: '_undoEntityCreation',
+		value: function _undoEntityCreation(entity) {
+			/* clean up related commands */
+			var e = this.Command.entityToCommand.get(entity);
+			var _iteratorNormalCompletion7 = true;
+			var _didIteratorError7 = false;
+			var _iteratorError7 = undefined;
+
+			try {
+				for (var _iterator7 = (_context12 = e.relationships, _lodashBound.entries).call(_context12)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+					var _context12;
+
+					var _step7$value = _slicedToArray(_step7.value, 2),
+					    _key3 = _step7$value[0],
+					    r = _step7$value[1];
+
+					var _iteratorNormalCompletion8 = true;
+					var _didIteratorError8 = false;
+					var _iteratorError8 = undefined;
+
+					try {
+						for (var _iterator8 = r.entries()[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+							var _step8$value = _slicedToArray(_step8.value, 2),
+							    otherEntity = _step8$value[0],
+							    arr = _step8$value[1];
+
+							this.Command.entityToCommand.get(otherEntity).relationships[_key3].delete(entity);
+						}
+					} catch (err) {
+						_didIteratorError8 = true;
+						_iteratorError8 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion8 && _iterator8.return) {
+								_iterator8.return();
+							}
+						} finally {
+							if (_didIteratorError8) {
+								throw _iteratorError8;
+							}
+						}
+					}
+				}
+			} catch (err) {
+				_didIteratorError7 = true;
+				_iteratorError7 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion7 && _iterator7.return) {
+						_iterator7.return();
+					}
+				} finally {
+					if (_didIteratorError7) {
+						throw _iteratorError7;
+					}
+				}
+			}
+
+			this.Command.entityToCommand.delete(entity);
+
+			/* remove from storage */
+			this.resourcesById.delete(entity.id);
+			this.resources.delete(entity);
+
+			/* delete for good measure */
+			entity.delete();
+		}
+	}, {
 		key: '_getLocalOrPlaceholder',
 		value: function _getLocalOrPlaceholder(_ref15) {
 			var cls = _ref15.class,
 			    id = _ref15.id;
 
 			var entity = this.resourcesById.get(id) || null;
-			if (entity) {} else {
+			if (!entity) {
 				entity = this.entityClasses[cls].new({ id: id }, { isPlaceholder: true });
-				this.resourcesById.set(entity.id, entity);
+				this.register(entity);
 				new this.Command_load(entity);
+			} else if (!this.entityClasses[cls].hasSubclass(entity.constructor)) {
+				entity = null;
 			}
 			return entity;
 		}
@@ -22806,6 +23118,8 @@ var _deepFreezeStrict = __webpack_require__(102);
 
 var _deepFreezeStrict2 = _interopRequireDefault(_deepFreezeStrict);
 
+var _lodashBound = __webpack_require__(41);
+
 var _Command2 = __webpack_require__(67);
 
 var _Command3 = _interopRequireDefault(_Command2);
@@ -22870,7 +23184,7 @@ exports.default = function (env) {
 
 				return {
 					commandType: 'delete',
-					address: (_context = this.entity, pick).call(_context, 'class', 'id')
+					address: (_context = this.entity, _lodashBound.pick).call(_context, 'class', 'id')
 				};
 			}
 		}, {
@@ -22885,7 +23199,7 @@ exports.default = function (env) {
 								case 0:
 									this.entity.silence();
 									_context3.next = 3;
-									return env.backend.commit_delete((_context2 = this.entity, pick).call(_context2, 'class', 'id'));
+									return env.backend.commit_delete((_context2 = this.entity, _lodashBound.pick).call(_context2, 'class', 'id'));
 
 								case 3:
 									return _context3.abrupt('return', _context3.sent);
@@ -22945,7 +23259,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _utilities = __webpack_require__(98);
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _deepFreezeStrict = __webpack_require__(102);
 
@@ -23090,7 +23404,7 @@ exports.default = function (env) {
 				return {
 					commandType: 'edit',
 					address: (_context5 = this.entity, _lodashBound.pick).call(_context5, 'class', 'id'),
-					newValues: this.newValues
+					newValues: (0, _deepFreezeStrict2.default)(this.newValues)
 				};
 			}
 		}, {
@@ -23200,7 +23514,7 @@ var _deepFreezeStrict = __webpack_require__(102);
 
 var _deepFreezeStrict2 = _interopRequireDefault(_deepFreezeStrict);
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _Command2 = __webpack_require__(67);
 
@@ -23332,7 +23646,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _utilities = __webpack_require__(98);
 
@@ -23342,9 +23656,9 @@ var _Command3 = _interopRequireDefault(_Command2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -23378,121 +23692,63 @@ exports.default = function (env) {
 		_createClass(Command_load, [{
 			key: 'syncLoad',
 			value: function syncLoad(values) {
-				/* register the entity */
-				env.registerToModule(this.entity);
 
 				/* add to command-tracking data-structures */
 				Command.registerEntity(this.entity).origin = this;
+
+				/* fill in the fields */
+				this.response = values;
 
 				if (this.entity.isPlaceholder) {
 
 					/* make the entity not be a placeholder anymore */
 					this.entity.pSubject('isPlaceholder').next(false);
-
-					/* fill in the fields */
-
 					/* sanity check */
-					this.response = values;
-					var _iteratorNormalCompletion = true;
-					var _didIteratorError = false;
-					var _iteratorError = undefined;
-
-					try {
-						for (var _iterator = (_context = (_context = this.entity.fields, _lodashBound.omit).call(_context, 'id', 'class'), _lodashBound.entries).call(_context)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-							var _context, _context2;
-
-							var _step$value = _slicedToArray(_step.value, 2),
-							    key = _step$value[0],
-							    field = _step$value[1];
-
-							if (!(_context2 = this.response[key], _lodashBound.isUndefined).call(_context2)) {
-								if (_instanceof(field, env.Rel1Field)) {
-
-									field.set(env.getLocalOrPlaceholder(this.response[key]));
-								} else if (_instanceof(field, env.Rel$Field)) {
-									var _iteratorNormalCompletion2 = true;
-									var _didIteratorError2 = false;
-									var _iteratorError2 = undefined;
-
-									try {
-
-										for (var _iterator2 = this.response[key][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-											var addr = _step2.value;
-
-											field.add(env.getLocalOrPlaceholder(addr));
-										}
-									} catch (err) {
-										_didIteratorError2 = true;
-										_iteratorError2 = err;
-									} finally {
-										try {
-											if (!_iteratorNormalCompletion2 && _iterator2.return) {
-												_iterator2.return();
-											}
-										} finally {
-											if (_didIteratorError2) {
-												throw _iteratorError2;
-											}
-										}
-									}
-								} else if (_instanceof(field, env.PropertyField)) {
-
-									field.set(this.response[key]);
-								}
-							}
-						}
-					} catch (err) {
-						_didIteratorError = true;
-						_iteratorError = err;
-					} finally {
-						try {
-							if (!_iteratorNormalCompletion && _iterator.return) {
-								_iterator.return();
-							}
-						} finally {
-							if (_didIteratorError) {
-								throw _iteratorError;
-							}
-						}
-					}
 				}
+
 				return this.entity;
 			}
 		}, {
 			key: 'load',
 			value: function () {
 				var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-					var _context3, _ref2, _ref3, response;
+					var _context, _ref2, _ref3, response;
 
-					return regeneratorRuntime.wrap(function _callee$(_context4) {
+					return regeneratorRuntime.wrap(function _callee$(_context2) {
 						while (1) {
-							switch (_context4.prev = _context4.next) {
+							switch (_context2.prev = _context2.next) {
 								case 0:
 									if (!this.entity.isPlaceholder) {
-										_context4.next = 7;
+										_context2.next = 11;
 										break;
 									}
 
-									_context4.next = 3;
-									return env.backend.load([(_context3 = this.entity, _lodashBound.pick).call(_context3, 'class', 'id')]);
+									_context2.next = 3;
+									return env.backend.load([(_context = this.entity, _lodashBound.pick).call(_context, 'class', 'id')]);
 
 								case 3:
-									_ref2 = _context4.sent;
+									_ref2 = _context2.sent;
 									_ref3 = _slicedToArray(_ref2, 1);
 									response = _ref3[0];
 
-									if (response) {
-										this.syncLoad(response);
-									} else {
-										this.entity = null;
+									if (!response) {
+										_context2.next = 10;
+										break;
 									}
 
-								case 7:
-									return _context4.abrupt('return', this.entity);
+									this.syncLoad(response);
+									_context2.next = 11;
+									break;
 
-								case 8:
+								case 10:
+									return _context2.abrupt('return', null);
+
+								case 11:
+									return _context2.abrupt('return', this.entity);
+
+								case 12:
 								case 'end':
-									return _context4.stop();
+									return _context2.stop();
 							}
 						}
 					}, _callee, this);
@@ -23546,7 +23802,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _deepFreezeStrict = __webpack_require__(102);
 
@@ -23736,7 +23992,7 @@ var _deepFreezeStrict = __webpack_require__(102);
 
 var _deepFreezeStrict2 = _interopRequireDefault(_deepFreezeStrict);
 
-var _lodashBound = __webpack_require__(46);
+var _lodashBound = __webpack_require__(41);
 
 var _Command2 = __webpack_require__(67);
 
@@ -27947,7 +28203,7 @@ module.exports = baseAggregator;
 /* 750 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     keysIn = __webpack_require__(33);
 
 /**
@@ -29098,7 +29354,7 @@ module.exports = compareMultiple;
 /* 787 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     getSymbols = __webpack_require__(205);
 
 /**
@@ -29120,7 +29376,7 @@ module.exports = copySymbols;
 /* 788 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     getSymbolsIn = __webpack_require__(595);
 
 /**
@@ -29464,7 +29720,7 @@ module.exports = deburrLetter;
 
 var Symbol = __webpack_require__(68),
     Uint8Array = __webpack_require__(540),
-    eq = __webpack_require__(45),
+    eq = __webpack_require__(46),
     equalArrays = __webpack_require__(591),
     mapToArray = __webpack_require__(141),
     setToArray = __webpack_require__(107);
@@ -31374,7 +31630,7 @@ module.exports = after;
 /***/ (function(module, exports, __webpack_require__) {
 
 var assignValue = __webpack_require__(103),
-    copyObject = __webpack_require__(43),
+    copyObject = __webpack_require__(44),
     createAssigner = __webpack_require__(86),
     isArrayLike = __webpack_require__(25),
     isPrototype = __webpack_require__(106),
@@ -31437,7 +31693,7 @@ module.exports = assign;
 /* 856 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(43),
+var copyObject = __webpack_require__(44),
     createAssigner = __webpack_require__(86),
     keys = __webpack_require__(16);
 
@@ -31513,7 +31769,7 @@ var arrayEach = __webpack_require__(81),
     baseAssignValue = __webpack_require__(47),
     bind = __webpack_require__(615),
     flatRest = __webpack_require__(61),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * Binds methods of an object to the object itself, overwriting the existing
@@ -33052,7 +33308,7 @@ module.exports = __webpack_require__(624);
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseClamp = __webpack_require__(69),
-    baseToString = __webpack_require__(41),
+    baseToString = __webpack_require__(42),
     toInteger = __webpack_require__(8),
     toString = __webpack_require__(9);
 
@@ -33830,7 +34086,7 @@ module.exports = flowRight;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseFor = __webpack_require__(177),
-    castFunction = __webpack_require__(42),
+    castFunction = __webpack_require__(43),
     keysIn = __webpack_require__(33);
 
 /**
@@ -33875,7 +34131,7 @@ module.exports = forIn;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseForRight = __webpack_require__(553),
-    castFunction = __webpack_require__(42),
+    castFunction = __webpack_require__(43),
     keysIn = __webpack_require__(33);
 
 /**
@@ -33918,7 +34174,7 @@ module.exports = forInRight;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseForOwn = __webpack_require__(70),
-    castFunction = __webpack_require__(42);
+    castFunction = __webpack_require__(43);
 
 /**
  * Iterates over own enumerable string keyed properties of an object and
@@ -33960,7 +34216,7 @@ module.exports = forOwn;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseForOwnRight = __webpack_require__(178),
-    castFunction = __webpack_require__(42);
+    castFunction = __webpack_require__(43);
 
 /**
  * This method is like `_.forOwn` except that it iterates over properties of
@@ -53690,7 +53946,7 @@ var arrayMap = __webpack_require__(10),
     baseClone = __webpack_require__(48),
     baseUnset = __webpack_require__(194),
     castPath = __webpack_require__(59),
-    copyObject = __webpack_require__(43),
+    copyObject = __webpack_require__(44),
     customOmitClone = __webpack_require__(795),
     flatRest = __webpack_require__(61),
     getAllKeysIn = __webpack_require__(202);
@@ -55125,7 +55381,7 @@ module.exports = rest;
 
 var castPath = __webpack_require__(59),
     isFunction = __webpack_require__(51),
-    toKey = __webpack_require__(44);
+    toKey = __webpack_require__(45);
 
 /**
  * This method is like `_.get` except that if the resolved value is a
@@ -55750,7 +56006,7 @@ module.exports = sortedIndexBy;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseSortedIndex = __webpack_require__(132),
-    eq = __webpack_require__(45);
+    eq = __webpack_require__(46);
 
 /**
  * This method is like `_.indexOf` except that it performs a binary
@@ -55857,7 +56113,7 @@ module.exports = sortedLastIndexBy;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseSortedIndex = __webpack_require__(132),
-    eq = __webpack_require__(45);
+    eq = __webpack_require__(46);
 
 /**
  * This method is like `_.lastIndexOf` except that it performs a binary
@@ -55955,7 +56211,7 @@ module.exports = sortedUniqBy;
 /* 1038 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(41),
+var baseToString = __webpack_require__(42),
     castSlice = __webpack_require__(60),
     hasUnicode = __webpack_require__(89),
     isIterateeCall = __webpack_require__(29),
@@ -56118,7 +56374,7 @@ module.exports = startCase;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseClamp = __webpack_require__(69),
-    baseToString = __webpack_require__(41),
+    baseToString = __webpack_require__(42),
     toInteger = __webpack_require__(8),
     toString = __webpack_require__(9);
 
@@ -57016,7 +57272,7 @@ module.exports = thru;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseTimes = __webpack_require__(193),
-    castFunction = __webpack_require__(42),
+    castFunction = __webpack_require__(43),
     toInteger = __webpack_require__(8);
 
 /** Used as references for various `Number` constants. */
@@ -57175,7 +57431,7 @@ var arrayMap = __webpack_require__(10),
     isArray = __webpack_require__(7),
     isSymbol = __webpack_require__(37),
     stringToPath = __webpack_require__(609),
-    toKey = __webpack_require__(44),
+    toKey = __webpack_require__(45),
     toString = __webpack_require__(9);
 
 /**
@@ -57357,7 +57613,7 @@ module.exports = transform;
 /* 1065 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(41),
+var baseToString = __webpack_require__(42),
     castSlice = __webpack_require__(60),
     charsEndIndex = __webpack_require__(571),
     charsStartIndex = __webpack_require__(572),
@@ -57412,7 +57668,7 @@ module.exports = trim;
 /* 1066 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(41),
+var baseToString = __webpack_require__(42),
     castSlice = __webpack_require__(60),
     charsEndIndex = __webpack_require__(571),
     stringToArray = __webpack_require__(63),
@@ -57461,7 +57717,7 @@ module.exports = trimEnd;
 /* 1067 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(41),
+var baseToString = __webpack_require__(42),
     castSlice = __webpack_require__(60),
     charsStartIndex = __webpack_require__(572),
     stringToArray = __webpack_require__(63),
@@ -57510,7 +57766,7 @@ module.exports = trimStart;
 /* 1068 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(41),
+var baseToString = __webpack_require__(42),
     castSlice = __webpack_require__(60),
     hasUnicode = __webpack_require__(89),
     isObject = __webpack_require__(12),
@@ -57955,7 +58211,7 @@ module.exports = unset;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseUpdate = __webpack_require__(569),
-    castFunction = __webpack_require__(42);
+    castFunction = __webpack_require__(43);
 
 /**
  * This method is like `_.set` except that accepts `updater` to produce the
@@ -57996,7 +58252,7 @@ module.exports = update;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseUpdate = __webpack_require__(569),
-    castFunction = __webpack_require__(42);
+    castFunction = __webpack_require__(43);
 
 /**
  * This method is like `_.update` except that it accepts `customizer` which is
@@ -58142,7 +58398,7 @@ module.exports = without;
 /* 1083 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var castFunction = __webpack_require__(42),
+var castFunction = __webpack_require__(43),
     partial = __webpack_require__(631);
 
 /**

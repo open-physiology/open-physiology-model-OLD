@@ -237,10 +237,9 @@ export default (env) => {
 			this[$$committing] = true;
 
 			/* run commits that need to happen before this one */
-			await Promise.all(
-				[...Command.commandGraph.verticesTo(this)]
-					.map(([dep])=>dep.commit())
-			);
+			for (let [cmd] of Command.commandGraph.verticesTo(this)) {
+				await cmd.commit();
+			}
 
 			/* then commit this command */
 			await this.localCommit();
@@ -248,7 +247,6 @@ export default (env) => {
 			/***/
 			this[$$committing] = false;
 			this.pSubject('state').next('post-commit');
-			// this.e('commit').next();
 		}
 		
 		rollback() {
@@ -267,7 +265,6 @@ export default (env) => {
 			Command.commandHistory.splice(Command.commandHistory.indexOf(this), 1);
 			this[$$rollingBack] =  false;
 			this.pSubject('state').next('pre-run');
-			// this.e('rollback').next();
 		}
 		
 	}

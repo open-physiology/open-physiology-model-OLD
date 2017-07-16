@@ -44,7 +44,7 @@ export default (env) => {
 			for (let key of (oldValues || newValues)::keys()) {
 				Command.registerEntityProperty(entity, key).push(this);
 			}
-			
+
 			assert(options.state !== 'pre-run'  || newValues);
 			assert(options.state !== 'post-run' || oldValues);
 		}
@@ -77,7 +77,7 @@ export default (env) => {
 			return {
 				commandType: 'edit',
 				address:     this.entity::pick('class', 'id'),
-				newValues:   this.newValues
+				newValues:   deepFreeze(this.newValues)
 			};
 		}
 		
