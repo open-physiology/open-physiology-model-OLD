@@ -24,6 +24,7 @@ export default (env) => {
 					       ? 'post-run'
 					       : 'pre-run'
 			});
+
 			if (entityOrClass instanceof env.entityClasses.Entity) {
 				
 				this.entity = entityOrClass;

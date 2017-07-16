@@ -37,41 +37,21 @@ export default (env) => {
 		}
 		
 		syncLoad(values) {
-			/* register the entity */
-			env.registerToModule(this.entity);
-			
+
 			/* add to command-tracking data-structures */
 			Command.registerEntity(this.entity).origin = this;
+
+			/* fill in the fields */
+			this.response = values;
 			
 			if (this.entity.isPlaceholder) {
 				/* sanity check */
 				assert(values.class === this.entity.constructor.name);
-				
+
 				/* make the entity not be a placeholder anymore */
 				this.entity.pSubject('isPlaceholder').next(false);
-				
-				/* fill in the fields */
-				this.response = values;
-				for (let [key, field] of this.entity.fields::omit('id', 'class')::entries()) {
-					if (!this.response[key]::isUndefined()) {
-						if (field instanceof env.Rel1Field) {
-							
-							field.set( env.getLocalOrPlaceholder(this.response[key]) );
-							
-						} else if (field instanceof env.Rel$Field) {
-							
-							for (let addr of this.response[key]) {
-								field.add( env.getLocalOrPlaceholder(addr) );
-							}
-							
-						} else if (field instanceof env.PropertyField) {
-							
-							field.set( this.response[key] );
-							
-						}
-					}
-				}
 			}
+
 			return this.entity;
 		}
 		
@@ -81,7 +61,7 @@ export default (env) => {
 				if (response) {
 					this.syncLoad(response);
 				} else {
-					this.entity = null;
+					return null;
 				}
 			}
 			return this.entity;
