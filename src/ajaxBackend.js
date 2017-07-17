@@ -15,20 +15,28 @@ export default ({ajax: ajx, baseURL: burl}) => {
 	/* the interface to hand to the library when instantiating a module */
 	const backend = {
 		async commit_new(values) {
-			return JSON.parse(await ajax({
-				url:    `${baseURL}/${values.class}`,
-				method: 'POST',
+			let response = await ajax({
+				url:         `${baseURL}/${values.class}`,
+				method:      'POST',
 				contentType: 'application/json',
-				data:   JSON.stringify(values)
-			}))[0];
+				data:        JSON.stringify(values)
+			});
+			if (typeof response === 'string') {
+				response = JSON.parse(response);
+			}
+			return response[0];
 		},
 		async commit_edit(address, newValues) {
-			return JSON.parse(await ajax({
+			let response = await ajax({
 				url:  `${baseURL}/${address.class}/${address.id}`,
 				method: 'POST',
 				contentType: 'application/json',
 				data:   JSON.stringify(newValues)
-			}))[0];
+			});
+			if (typeof response === 'string') {
+				response = JSON.parse(response);
+			}
+			return response[0];
 		},
 		async commit_delete(address) {
 			return await ajax({
@@ -69,5 +77,3 @@ export default ({ajax: ajx, baseURL: burl}) => {
 	
 	return {backend};
 };
-
-// TODO: unit tests
