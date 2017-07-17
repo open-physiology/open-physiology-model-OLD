@@ -24495,7 +24495,8 @@ exports.default = function (_ref) {
 					while (1) {
 						switch (_context.prev = _context.next) {
 							case 0:
-								_context.next = 2;
+								_context.t0 = JSON;
+								_context.next = 3;
 								return ajax({
 									url: baseURL + '/' + values.class,
 									method: 'POST',
@@ -24503,10 +24504,11 @@ exports.default = function (_ref) {
 									data: JSON.stringify(values)
 								});
 
-							case 2:
-								return _context.abrupt('return', _context.sent);
-
 							case 3:
+								_context.t1 = _context.sent;
+								return _context.abrupt('return', _context.t0.parse.call(_context.t0, _context.t1)[0]);
+
+							case 5:
 							case 'end':
 								return _context.stop();
 						}
@@ -24522,7 +24524,8 @@ exports.default = function (_ref) {
 					while (1) {
 						switch (_context2.prev = _context2.next) {
 							case 0:
-								_context2.next = 2;
+								_context2.t0 = JSON;
+								_context2.next = 3;
 								return ajax({
 									url: baseURL + '/' + address.class + '/' + address.id,
 									method: 'POST',
@@ -24530,10 +24533,11 @@ exports.default = function (_ref) {
 									data: JSON.stringify(newValues)
 								});
 
-							case 2:
-								return _context2.abrupt('return', _context2.sent);
-
 							case 3:
+								_context2.t1 = _context2.sent;
+								return _context2.abrupt('return', _context2.t0.parse.call(_context2.t0, _context2.t1)[0]);
+
+							case 5:
 							case 'end':
 								return _context2.stop();
 						}
@@ -24549,13 +24553,17 @@ exports.default = function (_ref) {
 					while (1) {
 						switch (_context3.prev = _context3.next) {
 							case 0:
-								return _context3.abrupt('return', ajax({
+								_context3.next = 2;
+								return ajax({
 									url: baseURL + '/' + address.class + '/' + address.id,
 									method: 'DELETE',
 									contentType: 'application/json'
-								}));
+								});
 
-							case 1:
+							case 2:
+								return _context3.abrupt('return', _context3.sent);
+
+							case 3:
 							case 'end':
 								return _context3.stop();
 						}
@@ -24571,13 +24579,17 @@ exports.default = function (_ref) {
 					while (1) {
 						switch (_context4.prev = _context4.next) {
 							case 0:
-								return _context4.abrupt('return', ajax({
+								_context4.next = 2;
+								return ajax({
 									url: baseURL + '/' + address1.class + '/' + address1.id + '/' + key + '/' + address2.id,
 									method: 'PUT',
 									contentType: 'application/json'
-								}));
+								});
 
-							case 1:
+							case 2:
+								return _context4.abrupt('return', _context4.sent);
+
+							case 3:
 							case 'end':
 								return _context4.stop();
 						}
@@ -24593,13 +24605,17 @@ exports.default = function (_ref) {
 					while (1) {
 						switch (_context5.prev = _context5.next) {
 							case 0:
-								return _context5.abrupt('return', ajax({
+								_context5.next = 2;
+								return ajax({
 									url: baseURL + '/' + address1.class + '/' + address1.id + '/' + key + '/' + address2.id,
 									method: 'DELETE',
 									contentType: 'application/json'
-								}));
+								});
 
-							case 1:
+							case 2:
+								return _context5.abrupt('return', _context5.sent);
+
+							case 3:
 							case 'end':
 								return _context5.stop();
 						}
@@ -24615,7 +24631,8 @@ exports.default = function (_ref) {
 					while (1) {
 						switch (_context6.prev = _context6.next) {
 							case 0:
-								_context6.next = 2;
+								_context6.t0 = JSON;
+								_context6.next = 3;
 								return Promise.all(addresses.map(function (address) {
 									return ajax({
 										url: baseURL + '/' + address.class + '/' + address.id,
@@ -24624,10 +24641,11 @@ exports.default = function (_ref) {
 									});
 								}));
 
-							case 2:
-								return _context6.abrupt('return', _context6.sent);
-
 							case 3:
+								_context6.t1 = _context6.sent;
+								return _context6.abrupt('return', _context6.t0.parse.call(_context6.t0, _context6.t1));
+
+							case 5:
 							case 'end':
 								return _context6.stop();
 						}
@@ -24644,17 +24662,19 @@ exports.default = function (_ref) {
 					while (1) {
 						switch (_context7.prev = _context7.next) {
 							case 0:
-								_context7.next = 2;
+								_context7.t0 = JSON;
+								_context7.next = 3;
 								return ajax({
 									url: baseURL + '/' + clsName,
 									method: 'GET',
 									contentType: 'application/json'
 								});
 
-							case 2:
-								return _context7.abrupt('return', _context7.sent);
-
 							case 3:
+								_context7.t1 = _context7.sent;
+								return _context7.abrupt('return', _context7.t0.parse.call(_context7.t0, _context7.t1));
+
+							case 5:
 							case 'end':
 								return _context7.stop();
 						}
