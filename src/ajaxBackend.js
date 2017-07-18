@@ -7,6 +7,12 @@
 	// use backend
 */
 
+
+import manifestFactory from 'open-physiology-manifest';
+
+const classes = manifestFactory().classes;
+
+
 /* super-simple storage implementation */
 export default ({ajax: ajx, baseURL: burl}) => {
 	const ajax    = (...args) => Promise.resolve(ajx(...args)),
@@ -46,15 +52,17 @@ export default ({ajax: ajx, baseURL: burl}) => {
 			});
 		},
         async commit_link(address1, key, address2) {
+			let class1 = classes[address1.class].relationships[key].resourceClass.name;
             return await ajax({
-                url: `${baseURL}/${address1.class}/${address1.id}/${key}/${address2.id}`,
+                url: `${baseURL}/${class1}/${address1.id}/${key}/${address2.id}`,
                 method: 'PUT',
                 contentType: 'application/json'
             });
         },
         async commit_unlink(address1, key, address2) {
+	        let class1 = classes[address1.class].relationships[key].resourceClass.name;
             return await ajax({
-                url: `${baseURL}/${address1.class}/${address1.id}/${key}/${address2.id}`,
+                url: `${baseURL}/${class1}/${address1.id}/${key}/${address2.id}`,
                 method: 'DELETE',
                 contentType: 'application/json'
             });
