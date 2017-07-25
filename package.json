@@ -1,7 +1,7 @@
 {
   "name": "open-physiology-model",
   "version": "2.1.2",
-  "description": "a full description of the open physiology model in ES6/ES7",
+  "description": "tracking and syncing entities from open-physiology-manifest",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha-webpack --opts mocha-webpack.opts",
