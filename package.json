@@ -5,7 +5,6 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha-webpack --opts mocha-webpack.opts",
-    "produce-grouped-descriptions": "babel-node src/scripts/produce-grouped-descriptions.js",
     "build": "cross-env BABEL_ENV=production webpack"
   },
   "repository": {
