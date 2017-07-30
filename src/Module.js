@@ -6,31 +6,95 @@ import commandClassesFactory from './commands/commandClasses.js';
 const $$noValue = Symbol('$$noValue');
 
 
+/**
+ * An entity address that uniquely identifies it.
+ * @typedef {{ class: string, id: number }} Address
+ */
+
+/**
+ * The Entity class from open-physiology-manifest.
+ * @typedef {open-physiology-manifest~Entity} Entity
+ */
+
+/**
+ * The Module class from open-physiology-manifest.
+ * @typedef {open-physiology-manifest~Module} opmModule
+ */
+
+/**
+ * An object with asynchronous functions that should be provided to
+ * a new `Module`, and determines how to store and retrieve entities.
+ * @typedef {{
+ *     commit_new:    function (:{class: string})         : Promise<Object>,
+ *     commit_edit:   function (Address, Object)         : Promise<Object>,
+ *     commit_delete: function (Address)                 : Promise,
+ *     commit_link:   function (Address, string, Address): Promise,
+ *     commit_unlink: function (Address, string, Address): Promise,
+ *     load:          function (Array<Address>)          : Promise<Array<Object>>,
+ *     loadAll:       function (:{class: string})         : Promise<Array<Object>>
+ * }} Backend
+ */
+
+/**
+ * A module that can track and synchronize entities from open-physiology-manifest.
+ */
 export class Module {
 	
+	/**
+	 * the backend used by this module
+	 * @type {Backend}
+	 */
 	backend;
+	
+	/**
+	 * a graph and string-to-Class dictionary of the Entity subclasses (straight from open-physiology-manifest)
+	 * @type {Graph}
+	 */
 	entityClasses;
 	
-	Command        : Class;
-	Command_new    : Class;
-	Command_load   : Class;
-	Command_edit   : Class;
-	Command_delete : Class;
-	Command_link   : Class;
-	Command_unlink : Class;
+	/** The `Command`        class. */ Command        : Class;
+	/** The `Command_new`    class. */ Command_new    : Class;
+	/** The `Command_load`   class. */ Command_load   : Class;
+	/** The `Command_edit`   class. */ Command_edit   : Class;
+	/** The `Command_delete` class. */ Command_delete : Class;
+	/** The `Command_link`   class. */ Command_link   : Class;
+	/** The `Command_unlink` class. */ Command_unlink : Class;
 	
-	Field         : Class;
-	PropertyField : Class;
-	RelField      : Class;
-	Rel1Field     : Class;
-	Rel$Field     : Class;
+	/** The `Field`         class. */ Field         : Class;
+	/** The `PropertyField` class. */ PropertyField : Class;
+	/** The `RelField`      class. */ RelField      : Class;
+	/** The `Rel1Field`     class. */ Rel1Field     : Class;
+	/** The `Rel$Field`     class. */ Rel$Field     : Class;
 	
+	/**
+	 * the currently registered resource entities
+	 * @type {Set<Entity>}
+	 */
 	resources     = new Set;
+	
+	/**
+	 * the currently registered resource entities mapped from their `id`
+	 * @type {Map<number, Entity>}
+	 */
 	resourcesById = new Map; // id --> entity
 	
+	/**
+	 * whether this Module is currently listening to entity-mutations
+	 * (to generate commands representing them);
+	 * `true` means it is _not_ listening
+	 * @type {boolean}
+	 */
 	nonReactiveMode = false;
 	
-	constructor({manifest, backend}) {
+	/**
+	 * Create a new Module for tracking and synchronizing entities
+	 * from the open-physiology-manifest.
+	 * @param {Object}    options
+	 * @param {opmModule} options.manifest - an open-physiology-manifest module
+	 * @param {Backend}   options.backend  - the backend to be used by this module
+	 */
+	constructor(options) {
+		const {manifest, backend} = options;
 		let env = {};
 		env::assign({
 			backend,
@@ -68,10 +132,10 @@ export class Module {
 
 	/**
 	 * Register a local entity to this module and assign a
-	 * temporary id to it. Note that you may instead want to
+	 * temporary id to it if it doesn't have an id already.
+	 * Note that you may instead want to
 	 * create new resources directly from this module.
-	 *
-	 * @param entity
+	 * @param {Entity} entity - the entity to register
 	 */
 	register(entity) {
 		/* only register once */
@@ -136,23 +200,33 @@ export class Module {
 		/***/
 		return entity;
 	}
-
-	setEntityFields(entity, initialValues) {
+	
+	/**
+	 * Set a number of fields of an entity at the same time,
+	 * including both property and relationship fields.
+	 * Relationship fields can be just addresses, which are
+	 * replaced by actual entities; loaded if locally available,
+	 * placeholders if not.
+	 * @param {Entity} entity - the entity on which to set fields
+	 * @param {Object} values - the new field values (with either
+	 *                          addresses or actual entities for relationship fields)
+	 */
+	setEntityFields(entity, values) {
 		for (let [key, field] of entity.fields::omit('id', 'class')::entries()) {
-			if (!initialValues[key]::isUndefined()) {
+			if (!values[key]::isUndefined()) {
 				if (field instanceof this.Rel1Field) {
 
-					if (initialValues[key] === null) {
+					if (values[key] === null) {
 						field.set(null);
 					} else {
-						let relatedResource = this.getLocalOrPlaceholder(initialValues[key]);
+						let relatedResource = this.getLocalOrPlaceholder(values[key]);
 						assert(relatedResource);
 						field.set(relatedResource);
 					}
 
 				} else if (field instanceof this.Rel$Field) {
 
-					for (let addr of initialValues[key]) {
+					for (let addr of values[key]) {
 						let relatedResource = this.getLocalOrPlaceholder(addr);
 						assert(relatedResource);
 						field.add(relatedResource);
@@ -160,13 +234,19 @@ export class Module {
 
 				} else if (field instanceof this.PropertyField) {
 
-					field.set(initialValues[key]);
+					field.set(values[key]);
 
 				}
 			}
 		}
 	}
 
+	/**
+	 * Reset a number of fields of an entity at the same time,
+	 * including both property and relationship fields.
+	 * @param {Entity} entity        - the entity on which to reset fields
+	 * @param {Array<string>} [keys] - keys of the fields to reset
+	 */
 	resetEntityFields(entity, keys) {
 		for (let [key, field] of entity.fields::omit('id', 'class')::entries()) {
 			if (!keys || keys.includes(key)) {
@@ -186,15 +266,28 @@ export class Module {
 			}
 		}
 	}
-
-	new({ class: clsName, ...initialValues }, options = {}) {
+	
+	/**
+	 * Create a new registered entity.
+	 * @param {{class: string}}  desc - a description of the new entity, containing at least a `class` field
+	 * @param {Object} [options={}]   - options passed to the entity factory function
+	 * @return {Entity} the new entity
+	 */
+	new(desc, options = {}) {
+		const { class: clsName, ...initialValues } = desc;
 		const entity = this.entityClasses[clsName].new({}, options);
 		this.register(entity);
 		this.setEntityFields(entity, initialValues);
 		return entity;
 	}
-
-	async get(addresses = []) {
+	
+	/**
+	 * Asynchronously get one or multiple entities by address. Unknown entities
+	 * are fetched through the backend, but known ones are included from local storage.
+	 * @param  {Address|Array<Address>} addresses - a single address or an array of addresses
+	 * @return {Promise<Entity|Array<Entity>>} - an entity / entities corresponding to the given addresses
+	 */
+	async get(addresses) {
 		// TODO: can be made faster, maybe, loading
 		// TODO: multiple at the same time from backend
 		let paramIsArray = addresses::isArray();
@@ -223,7 +316,12 @@ export class Module {
 
 		return paramIsArray ? result : result[0];
 	}
-
+	
+	/**
+	 * Asynchronously get all entities of a certain description.
+	 * @param {{class: string}} descriptor - the description of which entities to get (currently only understands 'class')
+	 * @return {Promise<Array<Entity>>}    - an array of the fetched Entities
+	 */
 	async getAll(descriptor) {
 		let entitiesJson = await this.backend.loadAll(descriptor);
 		return entitiesJson.map((json) => {
@@ -246,16 +344,29 @@ export class Module {
 			return entity;
 		});
 	}
-
-	async commit({entities = null} = {}) {
+	
+	/**
+	 * Commit all commands, or only those related to a given set of entities.
+	 * @param {Object} options
+	 * @param {Array<Entity>} [options.entities] - if given, only commits commands related to the given entities (and their dependencies)
+	 * @return {Promise} a promise which resolves when the commit is complete
+	 */
+	async commit(options = {}) {
+		const {entities = null} = options;
 		let latestCmds = [...this.Command.latest({entities, states: ['post-run']})];
 		for (let cmd of latestCmds) { await cmd.commit() }
 		// TODO: we should be able to wait for all of the above commits simultaneously,
 		//     : but just awaiting a Promise.all seems to expose some race conditions,
 		//     : at least in the server test setup
 	}
-
-	rollback({entities = null} = {}) {
+	
+	/**
+	 * Roll back all commands, or only those related to a given set of entities.
+	 * @param {Object} options
+	 * @param {Array<Entity>} [options.entities] - if given, only rolls back commands related to the given entities (and the ones dependent on them)
+	 */
+	rollback(options = {}) {
+		const {entities = null} = options;
 		for (let cmd of this.Command.earliest({entities, states: ['post-run']})) {
 			cmd.rollback();
 		}
@@ -292,6 +403,7 @@ export class Module {
 
 	///// Other operations /////
 
+	/** @private */
 	_undoEntityCreation(entity) {
 		/* clean up related commands */
 		let e = this.Command.entityToCommand.get(entity);
@@ -308,6 +420,7 @@ export class Module {
 		entity.delete();
 	}
 
+	/** @private */
 	_getLocalOrPlaceholder({ class: cls, id }) {
 		let entity = this.resourcesById.get(id) || null;
 		if (!entity) {

@@ -13,10 +13,17 @@ import manifestFactory from 'open-physiology-manifest';
 const classes = manifestFactory().classes;
 
 
-/* super-simple storage implementation */
-export default ({ajax: ajx, baseURL: burl}) => {
-	const ajax    = (...args) => Promise.resolve(ajx(...args)),
-	      baseURL = burl;
+
+/**
+ * Create a module backend that synchronizes with a lyph server
+ * through its REST interface.
+ * @param {Object}   options
+ * @param {Function} options.ajax - a function with the same basic interface as `jQuery.ajax`
+ * @return {{ backend: Backend }} a backend that can be used by a `Module` from open-physiology-model
+ */
+export default (options) => {
+	const ajax    = (...args) => Promise.resolve(options.ajax(...args)),
+	      baseURL = options.baseURL;
 	
 	/* the interface to hand to the library when instantiating a module */
 	const backend = {

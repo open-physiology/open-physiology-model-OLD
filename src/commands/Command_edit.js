@@ -9,25 +9,48 @@ import Command_factory from './Command.js';
 
 
 
+/** @wrapper */
 export default (env) => {
 	
 	const Command = Command_factory(env);
 
+	/**
+	 * Commands for editing property fields on an existing entity.
+	 */
 	class Command_edit extends Command {
 		
+		/**
+		 * the entity to edit
+		 * @type {Entity}
+		 */
 		entity;
+		
+		/**
+		 * the property values before this command is/was run,
+		 * stored so that the command can be rolled back;
+		 * might be undefined if this command has never run
+		 * @type {Object}
+		 */
 		oldValues;
 		
 		/**
-		 *
-		 * @param entity
-		 * @param newValues
-		 * @param oldValues
-		 * @param options
+		 * the property values after this command is/was run;
+         * might be undefined if this command started out 'post-run' and has never been rolled back
+		 * @type {Object}
+		 */
+		newValues;
+		
+		/**
+		 * Create an entity-editing command.
+		 * @param {Entity} entity      - the entity to edit
+		 * @param {Object} [newValues] - the new values for the entity (if given, start in 'pre-run' state)
+		 * @param {Object} [oldValues] - the old values of the entity  (if given, start in 'post-run' state)
+		 * @param {Object} [options]
 		 */
 		constructor(entity, newValues = null, oldValues = null, options = {}) {
 			super({
 				...options,
+				state: options.state || (newValues ? 'pre-run' : 'post-run'),
 				dependencies: [
 					...(options.dependencies || []),
 					...Command.getEditDependencies(
@@ -49,10 +72,29 @@ export default (env) => {
 			assert(options.state !== 'post-run' || oldValues);
 		}
 		
+		/**
+		 * @returns a set that contains the entity to be edited
+		 */
 		get associatedEntities() {
-			return new Set(this.entity ? [this.entity] : []);
+			return new Set([this.entity]);
 		}
 		
+		/**
+		 * @returns a JSON (plain data) representation of this command
+		 */
+		toJSON(options = {}) {
+			return {
+				commandType: 'edit',
+				address:     this.entity::pick('class', 'id'),
+				newValues:   deepFreeze(this.newValues)
+			};
+		}
+		
+		/**
+		 * Run this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has not already run.
+		 * @protected
+		 */
 		localRun() {
 			/* sanity checks */
 			assert(!this.entity.isPlaceholder, humanMsg`
@@ -73,14 +115,12 @@ export default (env) => {
 			});
 		}
 		
-		toJSON(options = {}) {
-			return {
-				commandType: 'edit',
-				address:     this.entity::pick('class', 'id'),
-				newValues:   deepFreeze(this.newValues)
-			};
-		}
-		
+		/**
+		 * Commit this command, and only this command (i.e., not its dependencies),
+		 * by calling `commit_edit` on the backend object.
+		 * Assumes that this command has run, but has not yet committed.
+		 * @protected
+		 */
 		async localCommit() {
 			return await env.backend.commit_edit(
 				this.entity::pick('class', 'id'),
@@ -88,6 +128,11 @@ export default (env) => {
 			);
 		}
 		
+		/**
+		 * Roll back this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has run, but has not yet committed.
+		 * @protected
+		 */
 		localRollback() {
 			/* store new values so we have the ability to re-run */
 			if (!this.newValues) {
@@ -100,6 +145,7 @@ export default (env) => {
 				}
 			});
 		}
+		
 	}
 	
 	return env.registerCommandClass('Command_edit', Command_edit);

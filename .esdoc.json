@@ -1,0 +1,32 @@
+{
+  "source":      "./src",
+  "excludes":   ["libs/"],
+  "destination": "./docs",
+  "test": {
+    "type":   "mocha",
+    "source": "./test"
+  },
+  "plugins": [{
+    "name": "esdoc-babel-plugin",
+    "option": {
+      "plugins": [
+        "unwrap-wrapper-function",
+        "transform-function-bind",
+        "transform-object-rest-spread",
+        "transform-flow-strip-types",
+        "transform-class-properties",
+        "remove-decorator"
+      ]
+    }
+  }],
+  "experimentalProposal": {
+    "classProperties": true,
+    "objectRestSpread": true,
+    "decorators": true,
+    "doExpressions": true,
+    "functionBind": true,
+    "asyncGenerators": true,
+    "exportExtensions": true,
+    "dynamicImport": true
+  }
+}

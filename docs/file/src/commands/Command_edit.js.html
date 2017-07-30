@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/commands/Command_edit.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/mhelvens/open-physiology-model" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Module.js~Module.html">Module</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajaxBackend">ajaxBackend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Address">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Backend">Backend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Entity">Entity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-opmModule">opmModule</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">commands</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_delete.js~Command_delete.html">Command_delete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_edit.js~Command_edit.html">Command_edit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_link.js~Command_link.html">Command_link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_load.js~Command_load.html">Command_load</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_new.js~Command_new.html">Command_new</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_unlink.js~Command_unlink.html">Command_unlink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CommandState">CommandState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-EntityCommands">EntityCommands</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/commands/Command_edit.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {humanMsg} from &apos;utilities&apos;;
+
+import assert from &apos;power-assert&apos;;
+import {mapValues, keys, pick, entries, omit} from &apos;lodash-bound&apos;;
+
+import deepFreeze from &apos;deep-freeze-strict&apos;;
+
+import Command_factory from &apos;./Command.js&apos;;
+
+
+
+/** @wrapper */
+export default (env) =&gt; {
+	
+	const Command = Command_factory(env);
+
+	/**
+	 * Commands for editing property fields on an existing entity.
+	 */
+	class Command_edit extends Command {
+		
+		/**
+		 * the entity to edit
+		 * @type {Entity}
+		 */
+		entity;
+		
+		/**
+		 * the property values before this command is/was run,
+		 * stored so that the command can be rolled back;
+		 * might be undefined if this command has never run
+		 * @type {Object}
+		 */
+		oldValues;
+		
+		/**
+		 * the property values after this command is/was run;
+         * might be undefined if this command started out &apos;post-run&apos; and has never been rolled back
+		 * @type {Object}
+		 */
+		newValues;
+		
+		/**
+		 * Create an entity-editing command.
+		 * @param {Entity} entity      - the entity to edit
+		 * @param {Object} [newValues] - the new values for the entity (if given, start in &apos;pre-run&apos; state)
+		 * @param {Object} [oldValues] - the old values of the entity  (if given, start in &apos;post-run&apos; state)
+		 * @param {Object} [options]
+		 */
+		constructor(entity, newValues = null, oldValues = null, options = {}) {
+			super({
+				...options,
+				state: options.state || (newValues ? &apos;pre-run&apos; : &apos;post-run&apos;),
+				dependencies: [
+					...(options.dependencies || []),
+					...Command.getEditDependencies(
+						entity,
+						(oldValues || newValues)::keys()
+					)
+				]
+			});
+			this.entity    = entity;
+			this.oldValues = oldValues;
+			this.newValues = newValues;
+			
+			/* add to command-tracking data-structures */
+			for (let key of (oldValues || newValues)::keys()) {
+				Command.registerEntityProperty(entity, key).push(this);
+			}
+
+			assert(options.state !== &apos;pre-run&apos;  || newValues);
+			assert(options.state !== &apos;post-run&apos; || oldValues);
+		}
+		
+		/**
+		 * @returns a set that contains the entity to be edited
+		 */
+		get associatedEntities() {
+			return new Set([this.entity]);
+		}
+		
+		/**
+		 * @returns a JSON (plain data) representation of this command
+		 */
+		toJSON(options = {}) {
+			return {
+				commandType: &apos;edit&apos;,
+				address:     this.entity::pick(&apos;class&apos;, &apos;id&apos;),
+				newValues:   deepFreeze(this.newValues)
+			};
+		}
+		
+		/**
+		 * Run this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has not already run.
+		 * @protected
+		 */
+		localRun() {
+			/* sanity checks */
+			assert(!this.entity.isPlaceholder, humanMsg`
+				Cannot edit a placeholder.
+				Load the entity fully before editing.
+			`);
+			
+			/* store old values so we have the ability to roll back */
+			if (!this.oldValues) {
+				this.oldValues = this.newValues::mapValues((val,key) =&gt; this.entity.fields[key].get());
+			}
+			
+			/* set the new values */
+			env.internalOperation(() =&gt; {
+				for (let [key, newValue] of this.newValues::entries()) {
+					this.entity.fields[key].set(newValue);
+				}
+			});
+		}
+		
+		/**
+		 * Commit this command, and only this command (i.e., not its dependencies),
+		 * by calling `commit_edit` on the backend object.
+		 * Assumes that this command has run, but has not yet committed.
+		 * @protected
+		 */
+		async localCommit() {
+			return await env.backend.commit_edit(
+				this.entity::pick(&apos;class&apos;, &apos;id&apos;),
+				deepFreeze(this.newValues)
+			);
+		}
+		
+		/**
+		 * Roll back this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has run, but has not yet committed.
+		 * @protected
+		 */
+		localRollback() {
+			/* store new values so we have the ability to re-run */
+			if (!this.newValues) {
+				this.newValues = this.oldValues::mapValues((val,key) =&gt; entity.fields[key].get());
+			}
+			/* set the old values back */
+			env.internalOperation(() =&gt; {
+				for (let [key, oldValue] of this.oldValues::omit(&apos;id&apos;, &apos;class&apos;)::entries()) {
+					this.entity.fields[key].set(oldValue);
+				}
+			});
+		}
+		
+	}
+	
+	return env.registerCommandClass(&apos;Command_edit&apos;, Command_edit);
+	
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

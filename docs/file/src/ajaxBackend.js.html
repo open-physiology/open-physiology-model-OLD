@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/ajaxBackend.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/mhelvens/open-physiology-model" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Module.js~Module.html">Module</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajaxBackend">ajaxBackend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Address">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Backend">Backend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Entity">Entity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-opmModule">opmModule</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">commands</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_delete.js~Command_delete.html">Command_delete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_edit.js~Command_edit.html">Command_edit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_link.js~Command_link.html">Command_link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_load.js~Command_load.html">Command_load</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_new.js~Command_new.html">Command_new</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_unlink.js~Command_unlink.html">Command_unlink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CommandState">CommandState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-EntityCommands">EntityCommands</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/ajaxBackend.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+	import ajaxBackend from &apos;./node_modules/open-physiology-model/dist/ajaxBackend.js&apos;;
+	let {backend} = ajaxBackend({
+		baseURL:     &apos;http://localhost:8888&apos;,
+		ajax:        $.ajax
+	});
+	// use backend
+*/
+
+
+import manifestFactory from &apos;open-physiology-manifest&apos;;
+
+const classes = manifestFactory().classes;
+
+
+
+/**
+ * Create a module backend that synchronizes with a lyph server
+ * through its REST interface.
+ * @param {Object}   options
+ * @param {Function} options.ajax - a function with the same basic interface as `jQuery.ajax`
+ * @return {{ backend: Backend }} a backend that can be used by a `Module` from open-physiology-model
+ */
+export default (options) =&gt; {
+	const ajax    = (...args) =&gt; Promise.resolve(options.ajax(...args)),
+	      baseURL = options.baseURL;
+	
+	/* the interface to hand to the library when instantiating a module */
+	const backend = {
+		async commit_new(values) {
+			let response = await ajax({
+				url:         `${baseURL}/${values.class}`,
+				method:      &apos;POST&apos;,
+				contentType: &apos;application/json&apos;,
+				data:        JSON.stringify(values)
+			});
+			if (typeof response === &apos;string&apos;) {
+				response = JSON.parse(response);
+			}
+			return response[0];
+		},
+		async commit_edit(address, newValues) {
+			let response = await ajax({
+				url:  `${baseURL}/${address.class}/${address.id}`,
+				method: &apos;POST&apos;,
+				contentType: &apos;application/json&apos;,
+				data:   JSON.stringify(newValues)
+			});
+			if (typeof response === &apos;string&apos;) {
+				response = JSON.parse(response);
+			}
+			return response[0];
+		},
+		async commit_delete(address) {
+			return await ajax({
+				url: `${baseURL}/${address.class}/${address.id}`,
+				method: &apos;DELETE&apos;,
+				contentType: &apos;application/json&apos;
+			});
+		},
+        async commit_link(address1, key, address2) {
+			let class1 = classes[address1.class].relationships[key].resourceClass.name;
+            return await ajax({
+                url: `${baseURL}/${class1}/${address1.id}/${key}/${address2.id}`,
+                method: &apos;PUT&apos;,
+                contentType: &apos;application/json&apos;
+            });
+        },
+        async commit_unlink(address1, key, address2) {
+	        let class1 = classes[address1.class].relationships[key].resourceClass.name;
+            return await ajax({
+                url: `${baseURL}/${class1}/${address1.id}/${key}/${address2.id}`,
+                method: &apos;DELETE&apos;,
+                contentType: &apos;application/json&apos;
+            });
+        },
+		async load(addresses) {
+			return JSON.parse(await Promise.all(addresses.map(address =&gt; ajax({
+				url:    `${baseURL}/${address.class}/${address.id}`,
+				method: &apos;GET&apos;,
+				contentType: &apos;application/json&apos;
+			}))));
+		},
+		async loadAll({class: clsName}) {
+			return JSON.parse(await ajax({
+				url:    `${baseURL}/${clsName}`,
+				method: &apos;GET&apos;,
+				contentType: &apos;application/json&apos;
+			}));
+		}
+	};
+	
+	return {backend};
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
