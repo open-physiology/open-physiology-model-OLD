@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/commands/Command_load.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/mhelvens/open-physiology-model" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Module.js~Module.html">Module</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajaxBackend">ajaxBackend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Address">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Backend">Backend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Entity">Entity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-opmModule">opmModule</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">commands</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_delete.js~Command_delete.html">Command_delete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_edit.js~Command_edit.html">Command_edit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_link.js~Command_link.html">Command_link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_load.js~Command_load.html">Command_load</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_new.js~Command_new.html">Command_new</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_unlink.js~Command_unlink.html">Command_unlink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CommandState">CommandState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-EntityCommands">EntityCommands</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/commands/Command_load.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {entries, isUndefined, pick, omit} from &apos;lodash-bound&apos;;
+import assert from &apos;power-assert&apos;;
+
+import {humanMsg} from &apos;utilities&apos;;
+
+import Command_factory from &apos;./Command.js&apos;;
+
+
+
+/** @wrapper */
+export default (env) =&gt; {
+	
+	const Command = Command_factory(env);
+
+	/**
+	 * Commands for loading a specific entity (for which we have an address)
+	 * from an asynchronous source.
+	 */
+	class Command_load extends Command {
+		
+		entity;
+		response;
+		
+		/**
+		 * Create an entity-loading command. It expects an already existing
+		 * entity placeholder to load the values into.
+		 * @param {Entity}  entity - an existing entity with `entity.isPlaceholder === true`
+		 * @param {Object} [options]
+		 */
+		constructor(entity, options = {}) {
+			super({
+				...options,
+				state: &apos;post-commit&apos;
+			});
+			assert(entity instanceof env.entityClasses.Entity, humanMsg`
+				A Command_load must be constructed with the entity that
+				was or should be loaded. It can be a placeholder entity
+				to be filled in later.
+			`);
+			this.entity = entity;
+			
+			/* add to command-tracking data-structures */
+			Command.registerEntity(this.entity).origin = this;
+		}
+		
+		/**
+		 * @returns a set that contains the (to be) loaded entity
+		 */
+		get associatedEntities() {
+			return new Set([this.entity]);
+		}
+		
+		/**
+		 * Synchronously load the entity with values already available in JSON form.
+		 * @param {Object} values - the values to put into the entity
+		 * @return {Entity} the loaded entity
+		 */
+		syncLoad(values) {
+
+			/* add to command-tracking data-structures */
+			Command.registerEntity(this.entity).origin = this;
+
+			/* fill in the fields */
+			this.response = values;
+			
+			if (this.entity.isPlaceholder) {
+				/* sanity check */
+				assert(values.class === this.entity.constructor.name);
+
+				/* make the entity not be a placeholder anymore */
+				this.entity.pSubject(&apos;isPlaceholder&apos;).next(false);
+			}
+
+			return this.entity;
+		}
+		
+		/**
+		 * Asynchronously load the entity by calling `commit_edit` on the backend object.
+		 * @return {Promise&lt;Entity&gt;} a promise that resolves as the entity after it is loaded
+		 */
+		async load() {
+			if (this.entity.isPlaceholder) {
+				const [response] = await env.backend.load([this.entity::pick(&apos;class&apos;, &apos;id&apos;)]);
+				if (response) {
+					this.syncLoad(response);
+				} else {
+					return null;
+				}
+			}
+			return this.entity;
+		}
+		
+		/**
+		 * This is not supposed to be called, as a load command starts out in &apos;post-commit&apos;.
+		 * (TODO: Put this class elsewhere in the class hierarchy?)
+		 */
+		localRun() {
+			assert(false, humanMsg`
+				Command_load#localRun should never be called,
+				because a load command starts out as being committed.
+				Call Command_load#load instead.
+			`);
+		}
+		
+		/**
+		 * This is not supposed to be called, as a load command starts out in &apos;post-commit&apos;.
+		 * (TODO: Put this class elsewhere in the class hierarchy?)
+		 */
+		toJSON() {
+			assert(false, humanMsg`
+				Command_load#toJSON should never be called,
+				because a load command starts out as being committed.
+			`);
+		}
+		
+		/**
+		 * This is not supposed to be called, as a load command starts out in &apos;post-commit&apos;.
+		 * (TODO: Put this class elsewhere in the class hierarchy?)
+		 */
+		localCommit() {
+			assert(false, humanMsg`
+				Command_load#localCommit should never be called,
+				because a load command starts out as being committed.
+			`);
+		}
+		
+		/**
+		 * This is not supposed to be called, as a load command starts out in &apos;post-commit&apos;.
+		 * (TODO: Put this class elsewhere in the class hierarchy?)
+		 */
+		localRollback() {
+			assert(false, humanMsg`
+				Command_load#localRollback should never be called,
+				because a load command starts out as being committed.
+			`);
+		}
+		
+	}
+	
+	return env.registerCommandClass(&apos;Command_load&apos;, Command_load);
+	
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

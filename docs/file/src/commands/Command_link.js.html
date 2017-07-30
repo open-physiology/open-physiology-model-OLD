@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/commands/Command_link.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/mhelvens/open-physiology-model" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Module.js~Module.html">Module</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajaxBackend">ajaxBackend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Address">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Backend">Backend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Entity">Entity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-opmModule">opmModule</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">commands</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_delete.js~Command_delete.html">Command_delete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_edit.js~Command_edit.html">Command_edit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_link.js~Command_link.html">Command_link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_load.js~Command_load.html">Command_load</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_new.js~Command_new.html">Command_new</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_unlink.js~Command_unlink.html">Command_unlink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CommandState">CommandState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-EntityCommands">EntityCommands</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/commands/Command_link.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import deepFreeze from &apos;deep-freeze-strict&apos;;
+import {pick} from &apos;lodash-bound&apos;;
+import Command_factory from &apos;./Command.js&apos;;
+
+/** @wrapper */
+export default (env) =&gt; {
+	
+	const {backend, registerCommandClass} = env;
+	
+	const Command = Command_factory(env);
+
+	/**
+	 * Commands for relating two specific entities through some specific relationship class.
+	 */
+	class Command_link extends Command {
+		
+		/**
+		 * the left-hand side entity to the relationship to link
+		 * @type {Entity}
+		 */
+		entity1;
+		
+		/**
+		 * the key (including &apos;--&gt;&apos; or &apos;&lt;--&apos;) of the relationship to link
+		 * @type {Entity}
+		 */
+		key;
+		
+		/**
+		 * the right-hand side entity to the relationship to link
+		 * @type {Entity}
+		 */
+		entity2;
+		
+		/**
+		 * Create a relationship-linking command.
+		 * @param {Entity}  entity1 - the left-hand side entity to the relationship to link
+		 * @param {string}  key     - the key (including &apos;--&gt;&apos; or &apos;&lt;--&apos;) of the relationship to link
+		 * @param {Entity}  entity2 - the right-hand side entity to the relationship to link
+		 * @param {Object} [options]
+		 */
+		constructor(entity1, key, entity2, options = {}) {
+			super({
+				...options,
+				dependencies: [
+					...(options.dependencies || []),
+					...Command.getLinkUnlinkDependencies(entity1, key, entity2)
+				]
+			});
+			this.entity1 = entity1;
+			this.key     = key;
+			this.entity2 = entity2;
+			
+			/* add to command-tracking data-structures */
+			Command.registerRelationship(entity1, key, entity2).push(this);
+		}
+		
+		/**
+		 * @returns a set that contains the two entities involved in the relationship
+		 */
+		get associatedEntities() {
+			return new Set([this.entity1, this.entity2]);
+		}
+		
+		/**
+		 * @returns a JSON (plain data) representation of this command
+		 */
+		toJSON(options = {}) {
+			return {
+				commandType: &apos;link&apos;,
+				address1:    this.entity1::pick(&apos;class&apos;, &apos;id&apos;),
+				key:         this.key,
+				address2:    this.entity2::pick(&apos;class&apos;, &apos;id&apos;)
+			};
+		}
+		
+		/**
+		 * Run this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has not already run.
+		 * @protected
+		 */
+		localRun() {
+			env.internalOperation(() =&gt; {
+				this.entity1.fields[this.key].add(this.entity2);
+			});
+		}
+		
+		/**
+		 * Commit this command, and only this command (i.e., not its dependencies),
+		 * by calling `commit_link` on the backend object.
+		 * Assumes that this command has run, but has not yet committed.
+		 * @protected
+		 */
+		async localCommit() {
+			return await env.backend.commit_link(
+				this.entity1::pick(&apos;class&apos;, &apos;id&apos;),
+				this.key,
+				this.entity2::pick(&apos;class&apos;, &apos;id&apos;)
+			);
+		}
+		
+		/**
+		 * Roll back this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has run, but has not yet committed.
+		 * @protected
+		 */
+		localRollback() {
+			env.internalOperation(() =&gt; {
+				this.entity1.fields[this.key].delete(this.entity2);
+			});
+		}
+		
+	}
+	
+	return registerCommandClass(&apos;Command_link&apos;, Command_link);
+	
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

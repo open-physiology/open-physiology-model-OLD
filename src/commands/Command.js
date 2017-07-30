@@ -8,26 +8,64 @@ const $$committing   = Symbol('$$committing');
 const $$rollingBack  = Symbol('$$rollingBack');
 const $$state        = Symbol('$$state');
 
+/** @wrapper */
 export default (env) => {
 	
 	/**
-	 *
+	 * an object pointing to the commands relevant to a specific entity
+	 * @typedef {{
+	 *     origin: (Command_new | Command_load),
+	 *     edit: Object<string, Array<Command_edit>>,
+	 *     delete: Command_delete?,
+	 *     relationships: Object<string, Map<Entity, Array<Command_link | Command_unlink>>>
+	 * }} EntityCommands
+	 */
+	
+	/**
+	 * one of three possible states a command can be in
+	 * @typedef {'pre-run'|'post-run'|'post-commit'} CommandState
+	 */
+	
+	/**
+	 * The main class of the command design-pattern used in this project.
+	 * There are commands for creating new entities, loading them from
+	 * an asynchronous source, editing them and deleting them; and for
+	 * linking or unlinking entities through specific relationships.
+	 * A command can be run, rolled back and committed asynchronously.
+	 * Commands have prerequisite commands. For example, a command for
+	 * editing a lyph (e.g., changing its name) has to be preceded by
+	 * a command for creating or loading that lyph.
 	 */
 	class Command extends ValueTracker {
 	
-		/* track commands */
-		static commandGraph    = new Graph;
-		static commandHistory  = new Array;
-		static entityToCommand = new WeakMap;
-		// ^ type of entityToCommand:
-		//
-		// entity -> {
-		//     origin:        cmd,                     // Command_new or Command_load
-		//     edit:        { key: [cmd] },            // Command_edit
-		//     delete:        cmd,                     // Command_delete
-		//     relationships: key --> entity --> [cmd] // alternate between Command_link and Command_unlink
-		// }
+		///// command tracking /////
 		
+		/**
+		 * the graph containing the currently relevant commands,
+		 * partially ordered by command prerequisites
+		 * @type {Graph}
+		 */
+		static commandGraph    = new Graph;
+		
+		/**
+		 * an array of commands that have been run, in the order that they were run
+		 * @type {Array}
+		 */
+		static commandHistory  = new Array;
+		
+		/**
+		 * mapping each entity to the commands relevant to it, categorized by command class
+		 * @type {
+		 *     WeakMap<Entity, EntityCommands>
+		 * }
+		 */
+		static entityToCommand = new WeakMap;
+		
+		/**
+		 * register an entity, so we can start keeping track of related commands
+		 * @param {Entity} entity - the entity to register
+		 * @return {EntityCommands} the object tracking the entity's commands
+		 */
 		static registerEntity(entity) {
 			if (!Command.entityToCommand.has(entity)) {
 				Command.entityToCommand.set(entity, {
@@ -40,12 +78,25 @@ export default (env) => {
 			return Command.entityToCommand.get(entity);
 		}
 		
+		/**
+		 * Register a property field of an entity so we can start tracking related commands.
+		 * @param {Entity} entity - the entity to track property commands for
+		 * @param {string} key    - the key of the property field
+		 * @return {Array<Command_edit>} the array tracking the relevant edit commands
+		 */
 		static registerEntityProperty(entity, key) {
 			const e = Command.registerEntity(entity);
 			if (!e.edit[key]) { e.edit[key] = [] }
 			return e.edit[key];
 		}
 		
+		/**
+		 * register a specific relationship between two specific entities so we can start tracking related commands
+		 * @param {Entity} entity1 - the entity on the left-hand side
+		 * @param {string} key     - the key of the relationship field; this should always be prefixed with '-->' or '<--'
+		 * @param {Entity} entity2 - the entity on the right-hand side
+		 * @return {Array<Command_link|Command_unlink>} the array tracking the relevant link and unlink commands
+		 */
 		static registerRelationship(entity1, key, entity2) {
 			const e1 = Command.registerEntity(entity1);
 			const e2 = Command.registerEntity(entity2);
@@ -67,7 +118,12 @@ export default (env) => {
 			return e1.relationships[key].get(entity2);
 		}
 		
-		static getDependencies(entity, arrays) {
+		/**
+		 * a method with common code used by `Command.getEditDependencies`,
+		 * `Command.getLinkUnlinkDependencies` and `Command.getDeleteDependencies`
+		 * @private
+		 */
+		static _getDependencies(entity, arrays) {
 			let result = new Set;
 			let commandsToDelete = new Set;
 			let e = Command.registerEntity(entity);
@@ -107,16 +163,31 @@ export default (env) => {
 			return result;
 		}
 		
+		/**
+		 * Get the direct dependencies for a new edit-command for specific property fields on a specific entity,
+		 * and deregister any currently rolled back commands that would now be in conflict.
+		 * @param {Entity} entity      - the entity for which to track edit commands
+		 * @param {Array<string>} keys - the keys of the property fields in the edit command
+		 * @return {Set<Command>} the requested command dependencies
+		 */
 		static getEditDependencies(entity, keys) {
 			let e = Command.registerEntity(entity);
-			return Command.getDependencies(entity, keys.map(key=>e.edit[key]).filter(v=>!!v));
+			return Command._getDependencies(entity, keys.map(key=>e.edit[key]).filter(v=>!!v));
 		}
 		
+		/**
+		 * Get the direct dependencies for a new link- or unlink-command for a specific relationship between two specific entities,
+		 * and deregister any currently rolled back commands that would now be in conflict.
+		 * @param {Entity} entity1 - the entity on the left-hand side
+		 * @param {string} key     - the key of the relationship field; this should always be prefixed with '-->' or '<--'
+		 * @param {Entity} entity2 - the entity on the right-hand side
+		 * @return {Set<Command>} the requested command dependencies
+		 */
 		static getLinkUnlinkDependencies(entity1, key, entity2) {
 			let e1e2 = Command.registerRelationship(entity1, key, entity2);
 			
-			let dep1 = [...Command.getDependencies(entity1, [e1e2])];
-			let dep2 = [...Command.getDependencies(entity2, [e1e2])];
+			let dep1 = [...Command._getDependencies(entity1, [e1e2])];
+			let dep2 = [...Command._getDependencies(entity2, [e1e2])];
 			
 			assert(dep1.length > 0 && !!dep1[0]);
 			assert(dep2.length > 0 && !!dep2[0]);
@@ -124,16 +195,27 @@ export default (env) => {
 			return new Set([...dep1, ...dep2]);
 		}
 		
+		/**
+		 * Get the direct dependencies for a new delete-command for a specific entity,
+		 * and deregister any currently rolled back commands that would now be in conflict.
+		 * @param {Entity} entity - the entity for which to track delete commands
+		 * @return {Set<Command>} the requested command dependencies
+		 */
 		static getDeleteDependencies(entity) {
 			let e = Command.registerEntity(entity);
-			return Command.getDependencies(entity, [
+			return Command._getDependencies(entity, [
 				...e.edit::values(),
 				...e.relationships::values().map(m=>[...m.values()])::flatten()
 			]);
 		}
 		
-		/** @private */
-		static _fringe({direction, entities = null, states = ['pre-run', 'post-run', 'post-commit']} = {}) {
+		/**
+		 * a method with common code used by `Command.earliest` and `Command.latest`
+		 * @private
+		 */
+		static _fringe(options = {}) {
+			const {direction, entities = null, states = ['pre-run', 'post-run', 'post-commit']} = options;
+			
 			/* distinguish between earliest and latest */
 			const [sourceSinks, verticesFromTo] = (direction === 'earliest')
 				? ['sources', 'verticesFrom']
@@ -161,6 +243,13 @@ export default (env) => {
 			return result;
 		}
 		
+		/**
+		 * Get all commands that have no dependencies, optionally filtered by entity or command state.
+		 * @param {Object}               options
+		 * @param {Array<Entity>}       [options.entities] - if given, limits the result to commands related to the given entities
+		 * @param {Array<CommandState>} [options.states]   - if given, limits the result to commands in one of the given states
+		 * @return {Set<Command>} the requested commands
+		 */
 		static earliest(options = {}) {
 			return Command._fringe({
 				...options,
@@ -168,6 +257,13 @@ export default (env) => {
 			});
 		}
 		
+		/**
+		 * Get all commands that are not dependencies, optionally filtered by entity or command state.
+		 * @param {Object}               options
+		 * @param {Array<Entity>?}      [options.entities] - if given, limits the result to commands related to the given entities
+		 * @param {Array<CommandState>} [options.states]   - if given, limits the result to commands in one of the given states
+		 * @return {Set<Command>} the requested commands
+		 */
 		static latest(options = {}) {
 			return Command._fringe({
 				...options,
@@ -178,14 +274,26 @@ export default (env) => {
 		
 		/// /// /// /// /// Instances /// /// /// /// ///
 		
+		/**
+		 * Emits an event when this command is committed.
+		 * @type {Observable}
+		 */
 		@event() commitEvent;
+		
+		/**
+		 * Emits an event when this command is rolled back.
+		 * @type {Observable}
+		 */
 		@event() rollbackEvent;
 	
+		
+		/**
+		 * Emits an event when this command is committed.
+		 * @type {CommandState}
+		 */
 		@property({ readonly: true }) state: 'pre-run' | 'post-run' | 'post-commit';
 		
-		// [$$state]: ('pre-run' | 'post-run' | 'post-commit');
-		// get state() { return this[$$state] }
-		
+		/** @protected */
 		constructor({state, dependencies = []} = {}) {
 			super();
 			
@@ -206,16 +314,52 @@ export default (env) => {
 		
 		/// /// /// /// /// Basic methods /// /// /// /// ///
 		
-		get associatedEntities()    { assert(false, `The ${this.constructor.name}#associatedEntities accessor is not implemented.`) }
-		localRun()                  { assert(false, "Command subclass must override 'localRun'.")                                   }
-		async localCommit()         { assert(false, "Command subclass must override 'localCommit'.")                                }
-		localHandleCommitResponse() { assert(false, "Command subclass must override 'localHandleCommitResponse'.")                  }
-		localRollback()             { assert(false, "Command subclass must override 'localRollback'.")                              }
+		/**
+		 * Get a set of entities associated with this command.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 */
+		get associatedEntities() { assert(false, `The ${this.constructor.name}#associatedEntities accessor is not implemented.`) }
 		
+		/**
+		 * Run this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has not already run.
+		 * This should be implemented by subclasses to bring about the effect of the command.
+		 * @abstract
+		 * @protected
+		 */
+		localRun() { assert(false, "Command subclass must override 'localRun'.")                                   }
+		
+		/**
+		 * Commit this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has run, but has not yet committed.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 * @protected
+		 */
+		async localCommit() { assert(false, "Command subclass must override 'localCommit'.")                                }
+		
+		/**
+		 * Roll back this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has run, but has not yet committed.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 * @protected
+		 */
+		localRollback() { assert(false, "Command subclass must override 'localRollback'.")                              }
+		
+		/**
+		 * Get a JSON (plain data) representation of this command.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 */
 		toJSON(options = {}) { assert(false, "Command subclass must override 'toJSON'.") }
 		
 		/// /// /// /// /// Smart run, commit, rollback /// /// /// /// ///
 		
+		/**
+		 * Run this command now.
+		 */
 		run() {
 			if (this[$$running] || this.state !== 'pre-run') { return }
 			this[$$running] = true;
@@ -231,6 +375,10 @@ export default (env) => {
 			this.pSubject('state').next('post-run');
 		}
 		
+		/**
+		 * Commit this command now.
+		 * @returns {Promise} a promise that resolves when the command is confirmed to be committed
+		 */
 		async commit() {
 			assert(this.state !== 'pre-run', "Cannot commit a command that hasn't yet run.");
 			if (this[$$committing] || this.state === 'post-commit') { return }
@@ -249,6 +397,10 @@ export default (env) => {
 			this.pSubject('state').next('post-commit');
 		}
 		
+		/**
+		 * Roll this command back now.
+		 * @throws {AssertionError} if this command was, or is being, committed
+		 */
 		rollback() {
 			assert(this.state !== 'post-commit', "Can only roll back a command that has been run but not committed.");
 			assert(!this[$$committing], "Cannot roll back a command that's in the process of being committed.");

@@ -1,0 +1,4549 @@
+[
+  {
+    "__docId__": 0,
+    "kind": "file",
+    "name": "src/Module.js",
+    "content": "import {assign, pick, omit, parseInt, entries, isArray, isUndefined} from 'lodash-bound';\nimport _uniqueId from 'lodash/uniqueId';\nimport assert from 'power-assert';\nimport commandClassesFactory from './commands/commandClasses.js';\n\nconst $$noValue = Symbol('$$noValue');\n\n\n/**\n * An entity address that uniquely identifies it.\n * @typedef {{ class: string, id: number }} Address\n */\n\n/**\n * The Entity class from open-physiology-manifest.\n * @typedef {open-physiology-manifest~Entity} Entity\n */\n\n/**\n * The Module class from open-physiology-manifest.\n * @typedef {open-physiology-manifest~Module} opmModule\n */\n\n/**\n * An object with asynchronous functions that should be provided to\n * a new `Module`, and determines how to store and retrieve entities.\n * @typedef {{\n *     commit_new:    function (:{class: string})         : Promise<Object>,\n *     commit_edit:   function (Address, Object)         : Promise<Object>,\n *     commit_delete: function (Address)                 : Promise,\n *     commit_link:   function (Address, string, Address): Promise,\n *     commit_unlink: function (Address, string, Address): Promise,\n *     load:          function (Array<Address>)          : Promise<Array<Object>>,\n *     loadAll:       function (:{class: string})         : Promise<Array<Object>>\n * }} Backend\n */\n\n/**\n * A module that can track and synchronize entities from open-physiology-manifest.\n */\nexport class Module {\n\t\n\t/**\n\t * the backend used by this module\n\t * @type {Backend}\n\t */\n\tbackend;\n\t\n\t/**\n\t * a graph and string-to-Class dictionary of the Entity subclasses (straight from open-physiology-manifest)\n\t * @type {Graph}\n\t */\n\tentityClasses;\n\t\n\t/** The `Command`        class. */ Command        : Class;\n\t/** The `Command_new`    class. */ Command_new    : Class;\n\t/** The `Command_load`   class. */ Command_load   : Class;\n\t/** The `Command_edit`   class. */ Command_edit   : Class;\n\t/** The `Command_delete` class. */ Command_delete : Class;\n\t/** The `Command_link`   class. */ Command_link   : Class;\n\t/** The `Command_unlink` class. */ Command_unlink : Class;\n\t\n\t/** The `Field`         class. */ Field         : Class;\n\t/** The `PropertyField` class. */ PropertyField : Class;\n\t/** The `RelField`      class. */ RelField      : Class;\n\t/** The `Rel1Field`     class. */ Rel1Field     : Class;\n\t/** The `Rel$Field`     class. */ Rel$Field     : Class;\n\t\n\t/**\n\t * the currently registered resource entities\n\t * @type {Set<Entity>}\n\t */\n\tresources     = new Set;\n\t\n\t/**\n\t * the currently registered resource entities mapped from their `id`\n\t * @type {Map<number, Entity>}\n\t */\n\tresourcesById = new Map; // id --> entity\n\t\n\t/**\n\t * whether this Module is currently listening to entity-mutations\n\t * (to generate commands representing them);\n\t * `true` means it is _not_ listening\n\t * @type {boolean}\n\t */\n\tnonReactiveMode = false;\n\t\n\t/**\n\t * Create a new Module for tracking and synchronizing entities\n\t * from the open-physiology-manifest.\n\t * @param {Object}    options\n\t * @param {opmModule} options.manifest - an open-physiology-manifest module\n\t * @param {Backend}   options.backend  - the backend to be used by this module\n\t */\n\tconstructor(options) {\n\t\tconst {manifest, backend} = options;\n\t\tlet env = {};\n\t\tenv::assign({\n\t\t\tbackend,\n\t\t\tentityClasses: manifest.classes,\n\t\t\t...commandClassesFactory(env)::pick(\n\t\t\t\t'Command',\n\t\t\t\t'Command_new',\n\t\t\t\t'Command_load',\n\t\t\t\t'Command_edit',\n\t\t\t\t'Command_delete',\n\t\t\t\t'Command_link',\n\t\t\t\t'Command_unlink',\n\t\t\t),\n\t\t\t...manifest::pick(\n\t\t\t\t'Field',\n\t\t\t\t'PropertyField',\n\t\t\t\t'RelField',\n\t\t\t\t'Rel1Field',\n\t\t\t\t'Rel$Field'\n\t\t\t),\n\t\t\tinternalOperation: (fn) => {\n\t\t\t\tthis.nonReactiveMode = true;\n\t\t\t\tfn();\n\t\t\t\tthis.nonReactiveMode = false;\n\t\t\t},\n\t\t\tgetLocalOrPlaceholder: (address) => {\n\t\t\t\treturn this._getLocalOrPlaceholder(address);\n\t\t\t}\n\t\t});\n\t\tthis::assign(env);\n\t}\n\n\n\t///// High level operations (defined over the whole ecosystem of browser-server-database) /////\n\n\t/**\n\t * Register a local entity to this module and assign a\n\t * temporary id to it if it doesn't have an id already.\n\t * Note that you may instead want to\n\t * create new resources directly from this module.\n\t * @param {Entity} entity - the entity to register\n\t */\n\tregister(entity) {\n\t\t/* only register once */\n\t\tif (this.resources.has(entity)) { return }\n\n\t\t/* generate unique temporary id (a negative number) if necessary */\n\t\tif (!entity.fields['id'].get()) {\n\t\t\tentity.fields['id'].set( - _uniqueId()::parseInt(), { ignoreReadonly: true } );  // TODO: do this in Command_new\n\n\t\t\t/* create Command_new for this, in 'post-run' state */\n\t\t\tthis._new(entity);\n\t\t}\n\n\t\t/* synchronizing entity deletion with deletion from storage */\n\t\tentity.p('deleted').subscribe((deleted) => {\n\t\t\tif (deleted) {\n\t\t\t\tthis.resourcesById.delete(entity.id);\n\t\t\t\tthis.resources.delete(entity);\n\t\t\t} else {\n\t\t\t\tthis.resourcesById.set(entity.id, entity);\n\t\t\t\tthis.resources.add(entity);\n\t\t\t}\n\t\t});\n\n\t\t/* handling id change (meaning the entity was committed) */\n\t\tentity.fields['id'].p('value').pairwise().subscribe(([prev, next]) => {\n\t\t\tassert(prev < 0 && next > 0); // from a temporary id to a permanent id\n\t\t\tthis.resourcesById.delete(prev);\n\t\t\tthis.resourcesById.set(next, entity);\n\t\t});\n\n\t\t/* respond to edit, link and unlink from outside */\n\t\tconst isConcreteRelKey = (key) => {\n\t\t\tlet match = key.match(/^-->(\\w+)/); // we only record --> commands (model lib always pairs them for us)\n\t\t\tif (!match) { return false }\n\t\t\treturn !this.entityClasses[match[1]].abstract;\n\t\t};\n\t\tconst reactive = ()=>!this.nonReactiveMode;\n\t\tfor (let [key, field] of entity.fields::omit('id', 'class')::entries()) {\n\t\t\tif (field instanceof this.Rel1Field && isConcreteRelKey(key)) {\n\t\t\t\tfield.p('value').startWith(null).pairwise().filter(reactive).subscribe(([prev, next]) => {\n\t\t\t\t\tif (prev) { this._unlink(entity, key, prev) }\n\t\t\t\t\tif (next) { this._link  (entity, key, next) }\n\t\t\t\t});\n\t\t\t} else if (field instanceof this.Rel$Field && isConcreteRelKey(key)) {\n\t\t\t\tfield.get().e('delete').filter(reactive).subscribe((prev) => { this._unlink(entity, key, prev) });\n\t\t\t\tfield.get().e('add'   ).filter(reactive).subscribe((next) => { this._link  (entity, key, next) });\n\t\t\t} else if (field instanceof this.PropertyField) {\n\t\t\t\tfield.p('value').skip(1).startWith($$noValue).pairwise().filter(reactive).subscribe(([prev, next]) => {\n\t\t\t\t\t// don't record commands for default values\n\t\t\t\t\tif (prev === $$noValue && next === entity.constructor.properties[key].default) { return }\n\t\t\t\t\tif (prev === $$noValue) { prev = undefined }\n\t\t\t\t\t// record commands for other values\n\t\t\t\t\tthis._edit(entity, { [key]: next }, { [key]: prev });\n\t\t\t\t});\n\t\t\t}\n\t\t}\n\n\t\t/* respond to delete from outside */\n\t\tentity.p('deleted').filter(reactive).filter(d=>!!d).subscribe(() => { this._delete(entity) });\n\n\t\t/***/\n\t\treturn entity;\n\t}\n\t\n\t/**\n\t * Set a number of fields of an entity at the same time,\n\t * including both property and relationship fields.\n\t * Relationship fields can be just addresses, which are\n\t * replaced by actual entities; loaded if locally available,\n\t * placeholders if not.\n\t * @param {Entity} entity - the entity on which to set fields\n\t * @param {Object} values - the new field values (with either\n\t *                          addresses or actual entities for relationship fields)\n\t */\n\tsetEntityFields(entity, values) {\n\t\tfor (let [key, field] of entity.fields::omit('id', 'class')::entries()) {\n\t\t\tif (!values[key]::isUndefined()) {\n\t\t\t\tif (field instanceof this.Rel1Field) {\n\n\t\t\t\t\tif (values[key] === null) {\n\t\t\t\t\t\tfield.set(null);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tlet relatedResource = this.getLocalOrPlaceholder(values[key]);\n\t\t\t\t\t\tassert(relatedResource);\n\t\t\t\t\t\tfield.set(relatedResource);\n\t\t\t\t\t}\n\n\t\t\t\t} else if (field instanceof this.Rel$Field) {\n\n\t\t\t\t\tfor (let addr of values[key]) {\n\t\t\t\t\t\tlet relatedResource = this.getLocalOrPlaceholder(addr);\n\t\t\t\t\t\tassert(relatedResource);\n\t\t\t\t\t\tfield.add(relatedResource);\n\t\t\t\t\t}\n\n\t\t\t\t} else if (field instanceof this.PropertyField) {\n\n\t\t\t\t\tfield.set(values[key]);\n\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\t/**\n\t * Reset a number of fields of an entity at the same time,\n\t * including both property and relationship fields.\n\t * @param {Entity} entity        - the entity on which to reset fields\n\t * @param {Array<string>} [keys] - keys of the fields to reset\n\t */\n\tresetEntityFields(entity, keys) {\n\t\tfor (let [key, field] of entity.fields::omit('id', 'class')::entries()) {\n\t\t\tif (!keys || keys.includes(key)) {\n\t\t\t\tif (field instanceof this.Rel1Field) {\n\n\t\t\t\t\tfield.set(null);\n\n\t\t\t\t} else if (field instanceof this.Rel$Field) {\n\n\t\t\t\t\tfield.get().clear();\n\n\t\t\t\t} else if (field instanceof this.PropertyField) {\n\n\t\t\t\t\tfield.set(entity.constructor.properties[key].default);\n\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\t\n\t/**\n\t * Create a new registered entity.\n\t * @param {{class: string}}  desc - a description of the new entity, containing at least a `class` field\n\t * @param {Object} [options={}]   - options passed to the entity factory function\n\t * @return {Entity} the new entity\n\t */\n\tnew(desc, options = {}) {\n\t\tconst { class: clsName, ...initialValues } = desc;\n\t\tconst entity = this.entityClasses[clsName].new({}, options);\n\t\tthis.register(entity);\n\t\tthis.setEntityFields(entity, initialValues);\n\t\treturn entity;\n\t}\n\t\n\t/**\n\t * Asynchronously get one or multiple entities by address. Unknown entities\n\t * are fetched through the backend, but known ones are included from local storage.\n\t * @param  {Address|Array<Address>} addresses - a single address or an array of addresses\n\t * @return {Promise<Entity|Array<Entity>>} - an entity / entities corresponding to the given addresses\n\t */\n\tasync get(addresses) {\n\t\t// TODO: can be made faster, maybe, loading\n\t\t// TODO: multiple at the same time from backend\n\t\tlet paramIsArray = addresses::isArray();\n\t\tif (!paramIsArray) { addresses = [addresses] }\n\t\tlet result = await Promise.all(addresses.map(async (addr) => {\n\n\t\t\tlet entity = this._getLocalOrPlaceholder(addr);\n\n\t\t\tif (entity && entity.isPlaceholder) {\n\t\t\t\tconst placeholder = entity;\n\n\t\t\t\tconst command = this.Command.entityToCommand.get(placeholder).origin;\n\t\t\t\tassert(command instanceof this.Command_load);\n\t\t\t\tentity = await command.load();\n\n\t\t\t\tif (entity === null) {\n\t\t\t\t\tthis._undoEntityCreation(placeholder);\n\t\t\t\t} else {\n\t\t\t\t\tthis.setEntityFields(entity, command.response);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\treturn entity;\n\n\t\t}));\n\n\t\treturn paramIsArray ? result : result[0];\n\t}\n\t\n\t/**\n\t * Asynchronously get all entities of a certain description.\n\t * @param {{class: string}} descriptor - the description of which entities to get (currently only understands 'class')\n\t * @return {Promise<Array<Entity>>}    - an array of the fetched Entities\n\t */\n\tasync getAll(descriptor) {\n\t\tlet entitiesJson = await this.backend.loadAll(descriptor);\n\t\treturn entitiesJson.map((json) => {\n\t\t\tlet entity = this._getLocalOrPlaceholder(json);\n\t\t\tif (entity && entity.isPlaceholder) {\n\n\t\t\t\tconst placeholder = entity;\n\n\t\t\t\tconst command = this.Command.entityToCommand.get(placeholder).origin;\n\t\t\t\tassert(command instanceof this.Command_load);\n\t\t\t\tentity = command.syncLoad(json);\n\n\t\t\t\tif (entity === null) { // TODO: Double check. Does this ever become null here? Probably not.\n\t\t\t\t\tthis._undoEntityCreation(placeholder);\n\t\t\t\t} else {\n\t\t\t\t\tthis.setEntityFields(entity, command.response);\n\t\t\t\t}\n\n\t\t\t}\n\t\t\treturn entity;\n\t\t});\n\t}\n\t\n\t/**\n\t * Commit all commands, or only those related to a given set of entities.\n\t * @param {Object} options\n\t * @param {Array<Entity>} [options.entities] - if given, only commits commands related to the given entities (and their dependencies)\n\t * @return {Promise} a promise which resolves when the commit is complete\n\t */\n\tasync commit(options = {}) {\n\t\tconst {entities = null} = options;\n\t\tlet latestCmds = [...this.Command.latest({entities, states: ['post-run']})];\n\t\tfor (let cmd of latestCmds) { await cmd.commit() }\n\t\t// TODO: we should be able to wait for all of the above commits simultaneously,\n\t\t//     : but just awaiting a Promise.all seems to expose some race conditions,\n\t\t//     : at least in the server test setup\n\t}\n\t\n\t/**\n\t * Roll back all commands, or only those related to a given set of entities.\n\t * @param {Object} options\n\t * @param {Array<Entity>} [options.entities] - if given, only rolls back commands related to the given entities (and the ones dependent on them)\n\t */\n\trollback(options = {}) {\n\t\tconst {entities = null} = options;\n\t\tfor (let cmd of this.Command.earliest({entities, states: ['post-run']})) {\n\t\t\tcmd.rollback();\n\t\t}\n\t}\n\n\n\t///// Reactive command creation /////\n\n\t/** @private */\n\t_new(entity) {\n\t\treturn new this.Command_new(entity, { state: 'post-run' });\n\t}\n\n\t/** @private */\n\t_edit(entity, newValues, oldValues) {\n\t\treturn new this.Command_edit(entity, newValues, oldValues, { state: 'post-run' });\n\t}\n\n\t/** @private */\n\t_link(entity1, relationship, entity2) {\n\t\treturn new this.Command_link(entity1, relationship, entity2, { state: 'post-run' });\n\t}\n\n\t/** @private */\n\t_unlink(entity1, relationship, entity2) {\n\t\treturn new this.Command_unlink(entity1, relationship, entity2, { state: 'post-run' });\n\t}\n\n\t/** @private */\n\t_delete(entity) {\n\t\treturn new this.Command_delete(entity, { state: 'post-run' });\n\t}\n\n\n\t///// Other operations /////\n\n\t/** @private */\n\t_undoEntityCreation(entity) {\n\t\t/* clean up related commands */\n\t\tlet e = this.Command.entityToCommand.get(entity);\n\t\tfor (let [key, r] of e.relationships::entries()) for (let [otherEntity, arr] of r.entries()) {\n\t\t\tthis.Command.entityToCommand.get(otherEntity).relationships[key].delete(entity);\n\t\t}\n\t\tthis.Command.entityToCommand.delete(entity);\n\n\t\t/* remove from storage */\n\t\tthis.resourcesById.delete(entity.id);\n\t\tthis.resources.delete(entity);\n\n\t\t/* delete for good measure */\n\t\tentity.delete();\n\t}\n\n\t/** @private */\n\t_getLocalOrPlaceholder({ class: cls, id }) {\n\t\tlet entity = this.resourcesById.get(id) || null;\n\t\tif (!entity) {\n\t\t\tentity = this.entityClasses[cls].new({ id }, { isPlaceholder: true });\n\t\t\tthis.register(entity);\n\t\t\tnew this.Command_load(entity);\n\t\t} else if (!this.entityClasses[cls].hasSubclass(entity.constructor)) {\n\t\t\tentity = null;\n\t\t}\n\t\treturn entity;\n\t}\n\t\n}\n",
+    "static": true,
+    "longname": "src/Module.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 1,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/Module.js",
+    "static": true,
+    "longname": "src/Module.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/Module.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 2,
+    "kind": "function",
+    "name": "_objectWithoutProperties",
+    "memberof": "src/Module.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/Module.js~_objectWithoutProperties",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/Module.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "obj",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "keys",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 3,
+    "kind": "variable",
+    "name": "$$noValue",
+    "memberof": "src/Module.js",
+    "static": true,
+    "longname": "src/Module.js~$$noValue",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/Module.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 10,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 4,
+    "kind": "typedef",
+    "name": "Address",
+    "memberof": "src/Module.js",
+    "static": true,
+    "longname": "src/Module.js~Address",
+    "access": null,
+    "description": "An entity address that uniquely identifies it.",
+    "type": {
+      "types": [
+        "{ class: string, id: number }"
+      ],
+      "optional": false,
+      "name": "Address"
+    }
+  },
+  {
+    "__docId__": 5,
+    "kind": "typedef",
+    "name": "Entity",
+    "memberof": "src/Module.js",
+    "static": true,
+    "longname": "src/Module.js~Entity",
+    "access": null,
+    "description": "The Entity class from open-physiology-manifest.",
+    "type": {
+      "types": [
+        "open-physiology-manifest~Entity"
+      ],
+      "optional": false,
+      "name": "Entity"
+    }
+  },
+  {
+    "__docId__": 6,
+    "kind": "typedef",
+    "name": "opmModule",
+    "memberof": "src/Module.js",
+    "static": true,
+    "longname": "src/Module.js~opmModule",
+    "access": null,
+    "description": "The Module class from open-physiology-manifest.",
+    "type": {
+      "types": [
+        "open-physiology-manifest~Module"
+      ],
+      "optional": false,
+      "name": "opmModule"
+    }
+  },
+  {
+    "__docId__": 7,
+    "kind": "typedef",
+    "name": "Backend",
+    "memberof": "src/Module.js",
+    "static": true,
+    "longname": "src/Module.js~Backend",
+    "access": null,
+    "description": "An object with asynchronous functions that should be provided to\na new `Module`, and determines how to store and retrieve entities.",
+    "type": {
+      "types": [
+        "{\n    commit_new:    function (:{class: string})         : Promise<Object>,\n    commit_edit:   function (Address, Object)         : Promise<Object>,\n    commit_delete: function (Address)                 : Promise,\n    commit_link:   function (Address, string, Address): Promise,\n    commit_unlink: function (Address, string, Address): Promise,\n    load:          function (Array<Address>)          : Promise<Array<Object>>,\n    loadAll:       function (:{class: string})         : Promise<Array<Object>>\n}"
+      ],
+      "optional": false,
+      "name": "Backend"
+    }
+  },
+  {
+    "__docId__": 8,
+    "kind": "class",
+    "name": "Module",
+    "memberof": "src/Module.js",
+    "static": true,
+    "longname": "src/Module.js~Module",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/Module.js",
+    "importStyle": "{Module}",
+    "description": "A module that can track and synchronize entities from open-physiology-manifest.",
+    "lineNumber": 44,
+    "interface": false
+  },
+  {
+    "__docId__": 9,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#constructor",
+    "access": null,
+    "description": "a graph and string-to-Class dictionary of the Entity subclasses (straight from open-physiology-manifest)",
+    "lineNumber": 72,
+    "params": [
+      {
+        "name": "options",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "Graph"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 10,
+    "kind": "member",
+    "name": "resources",
+    "memberof": "src/Module.js~Module",
+    "static": false,
+    "longname": "src/Module.js~Module#resources",
+    "access": null,
+    "description": null,
+    "lineNumber": 75,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 11,
+    "kind": "member",
+    "name": "resourcesById",
+    "memberof": "src/Module.js~Module",
+    "static": false,
+    "longname": "src/Module.js~Module#resourcesById",
+    "access": null,
+    "description": null,
+    "lineNumber": 76,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 12,
+    "kind": "member",
+    "name": "nonReactiveMode",
+    "memberof": "src/Module.js~Module",
+    "static": false,
+    "longname": "src/Module.js~Module#nonReactiveMode",
+    "access": null,
+    "description": null,
+    "lineNumber": 77,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 13,
+    "kind": "member",
+    "name": "nonReactiveMode",
+    "memberof": "src/Module.js~Module",
+    "static": false,
+    "longname": "src/Module.js~Module#nonReactiveMode",
+    "access": null,
+    "description": null,
+    "lineNumber": 86,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 14,
+    "kind": "member",
+    "name": "nonReactiveMode",
+    "memberof": "src/Module.js~Module",
+    "static": false,
+    "longname": "src/Module.js~Module#nonReactiveMode",
+    "access": null,
+    "description": null,
+    "lineNumber": 88,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 15,
+    "kind": "method",
+    "name": "register",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#register",
+    "access": null,
+    "description": "the backend used by this module",
+    "lineNumber": 133,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "type": {
+      "nullable": null,
+      "types": [
+        "Backend"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 16,
+    "kind": "method",
+    "name": "setEntityFields",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#setEntityFields",
+    "access": null,
+    "description": "Set a number of fields of an entity at the same time,\nincluding both property and relationship fields.\nRelationship fields can be just addresses, which are\nreplaced by actual entities; loaded if locally available,\nplaceholders if not.",
+    "lineNumber": 229,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "the entity on which to set fields"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "values",
+        "description": "the new field values (with either\n                         addresses or actual entities for relationship fields)"
+      }
+    ]
+  },
+  {
+    "__docId__": 17,
+    "kind": "method",
+    "name": "resetEntityFields",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#resetEntityFields",
+    "access": null,
+    "description": "Reset a number of fields of an entity at the same time,\nincluding both property and relationship fields.",
+    "lineNumber": 264,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "the entity on which to reset fields"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<string>"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "keys",
+        "description": "keys of the fields to reset"
+      }
+    ]
+  },
+  {
+    "__docId__": 18,
+    "kind": "method",
+    "name": "new",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#new",
+    "access": null,
+    "description": "Create a new registered entity.",
+    "lineNumber": 289,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "{class: string}"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "desc",
+        "description": "a description of the new entity, containing at least a `class` field"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "options",
+        "description": "options passed to the entity factory function"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": "the new entity"
+    }
+  },
+  {
+    "__docId__": 19,
+    "kind": "method",
+    "name": "get",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/Module.js~Module#get",
+    "access": null,
+    "description": "Asynchronously get one or multiple entities by address. Unknown entities\nare fetched through the backend, but known ones are included from local storage.",
+    "lineNumber": 304,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Address",
+          "Array<Address>"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "addresses",
+        "description": "a single address or an array of addresses"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise<Entity|Array<Entity>>"
+      ],
+      "spread": false,
+      "description": "an entity / entities corresponding to the given addresses"
+    }
+  },
+  {
+    "__docId__": 20,
+    "kind": "method",
+    "name": "getAll",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/Module.js~Module#getAll",
+    "access": null,
+    "description": "Asynchronously get all entities of a certain description.",
+    "lineNumber": 342,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "{class: string}"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "descriptor",
+        "description": "the description of which entities to get (currently only understands 'class')"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise<Array<Entity>>"
+      ],
+      "spread": false,
+      "description": "an array of the fetched Entities"
+    }
+  },
+  {
+    "__docId__": 21,
+    "kind": "method",
+    "name": "commit",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/Module.js~Module#commit",
+    "access": null,
+    "description": "Commit all commands, or only those related to a given set of entities.",
+    "lineNumber": 371,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<Entity>"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options.entities",
+        "description": "if given, only commits commands related to the given entities (and their dependencies)"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": "a promise which resolves when the commit is complete"
+    }
+  },
+  {
+    "__docId__": 22,
+    "kind": "method",
+    "name": "rollback",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#rollback",
+    "access": null,
+    "description": "Roll back all commands, or only those related to a given set of entities.",
+    "lineNumber": 387,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<Entity>"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options.entities",
+        "description": "if given, only rolls back commands related to the given entities (and the ones dependent on them)"
+      }
+    ]
+  },
+  {
+    "__docId__": 23,
+    "kind": "method",
+    "name": "_new",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#_new",
+    "access": "private",
+    "description": null,
+    "lineNumber": 397,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 24,
+    "kind": "method",
+    "name": "_edit",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#_edit",
+    "access": "private",
+    "description": null,
+    "lineNumber": 402,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "newValues",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "oldValues",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 25,
+    "kind": "method",
+    "name": "_link",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#_link",
+    "access": "private",
+    "description": null,
+    "lineNumber": 407,
+    "params": [
+      {
+        "name": "entity1",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "relationship",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "entity2",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 26,
+    "kind": "method",
+    "name": "_unlink",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#_unlink",
+    "access": "private",
+    "description": null,
+    "lineNumber": 412,
+    "params": [
+      {
+        "name": "entity1",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "relationship",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "entity2",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 27,
+    "kind": "method",
+    "name": "_delete",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#_delete",
+    "access": "private",
+    "description": null,
+    "lineNumber": 417,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 28,
+    "kind": "method",
+    "name": "_undoEntityCreation",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#_undoEntityCreation",
+    "access": "private",
+    "description": null,
+    "lineNumber": 424,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 29,
+    "kind": "method",
+    "name": "_getLocalOrPlaceholder",
+    "memberof": "src/Module.js~Module",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/Module.js~Module#_getLocalOrPlaceholder",
+    "access": "private",
+    "description": null,
+    "lineNumber": 444,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"class\": *, \"id\": *}"
+        ],
+        "defaultRaw": {
+          "class": null,
+          "id": null
+        },
+        "defaultValue": "{\"class\":null,\"id\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 30,
+    "kind": "file",
+    "name": "src/ajaxBackend.js",
+    "content": "/**\n\timport ajaxBackend from './node_modules/open-physiology-model/dist/ajaxBackend.js';\n\tlet {backend} = ajaxBackend({\n\t\tbaseURL:     'http://localhost:8888',\n\t\tajax:        $.ajax\n\t});\n\t// use backend\n*/\n\n\nimport manifestFactory from 'open-physiology-manifest';\n\nconst classes = manifestFactory().classes;\n\n\n\n/**\n * Create a module backend that synchronizes with a lyph server\n * through its REST interface.\n * @param {Object}   options\n * @param {Function} options.ajax - a function with the same basic interface as `jQuery.ajax`\n * @return {{ backend: Backend }} a backend that can be used by a `Module` from open-physiology-model\n */\nexport default (options) => {\n\tconst ajax    = (...args) => Promise.resolve(options.ajax(...args)),\n\t      baseURL = options.baseURL;\n\t\n\t/* the interface to hand to the library when instantiating a module */\n\tconst backend = {\n\t\tasync commit_new(values) {\n\t\t\tlet response = await ajax({\n\t\t\t\turl:         `${baseURL}/${values.class}`,\n\t\t\t\tmethod:      'POST',\n\t\t\t\tcontentType: 'application/json',\n\t\t\t\tdata:        JSON.stringify(values)\n\t\t\t});\n\t\t\tif (typeof response === 'string') {\n\t\t\t\tresponse = JSON.parse(response);\n\t\t\t}\n\t\t\treturn response[0];\n\t\t},\n\t\tasync commit_edit(address, newValues) {\n\t\t\tlet response = await ajax({\n\t\t\t\turl:  `${baseURL}/${address.class}/${address.id}`,\n\t\t\t\tmethod: 'POST',\n\t\t\t\tcontentType: 'application/json',\n\t\t\t\tdata:   JSON.stringify(newValues)\n\t\t\t});\n\t\t\tif (typeof response === 'string') {\n\t\t\t\tresponse = JSON.parse(response);\n\t\t\t}\n\t\t\treturn response[0];\n\t\t},\n\t\tasync commit_delete(address) {\n\t\t\treturn await ajax({\n\t\t\t\turl: `${baseURL}/${address.class}/${address.id}`,\n\t\t\t\tmethod: 'DELETE',\n\t\t\t\tcontentType: 'application/json'\n\t\t\t});\n\t\t},\n        async commit_link(address1, key, address2) {\n\t\t\tlet class1 = classes[address1.class].relationships[key].resourceClass.name;\n            return await ajax({\n                url: `${baseURL}/${class1}/${address1.id}/${key}/${address2.id}`,\n                method: 'PUT',\n                contentType: 'application/json'\n            });\n        },\n        async commit_unlink(address1, key, address2) {\n\t        let class1 = classes[address1.class].relationships[key].resourceClass.name;\n            return await ajax({\n                url: `${baseURL}/${class1}/${address1.id}/${key}/${address2.id}`,\n                method: 'DELETE',\n                contentType: 'application/json'\n            });\n        },\n\t\tasync load(addresses) {\n\t\t\treturn JSON.parse(await Promise.all(addresses.map(address => ajax({\n\t\t\t\turl:    `${baseURL}/${address.class}/${address.id}`,\n\t\t\t\tmethod: 'GET',\n\t\t\t\tcontentType: 'application/json'\n\t\t\t}))));\n\t\t},\n\t\tasync loadAll({class: clsName}) {\n\t\t\treturn JSON.parse(await ajax({\n\t\t\t\turl:    `${baseURL}/${clsName}`,\n\t\t\t\tmethod: 'GET',\n\t\t\t\tcontentType: 'application/json'\n\t\t\t}));\n\t\t}\n\t};\n\t\n\treturn {backend};\n};\n",
+    "static": true,
+    "longname": "src/ajaxBackend.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 31,
+    "kind": "variable",
+    "name": "classes",
+    "memberof": "src/ajaxBackend.js",
+    "static": true,
+    "longname": "src/ajaxBackend.js~classes",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/ajaxBackend.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 12,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 32,
+    "kind": "function",
+    "name": "ajaxBackend",
+    "memberof": "src/ajaxBackend.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/ajaxBackend.js~ajaxBackend",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/ajaxBackend.js",
+    "importStyle": "ajaxBackend",
+    "description": "Create a module backend that synchronizes with a lyph server\nthrough its REST interface.",
+    "lineNumber": 21,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options.ajax",
+        "description": "a function with the same basic interface as `jQuery.ajax`"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "{ backend: Backend }"
+      ],
+      "spread": false,
+      "description": "a backend that can be used by a `Module` from open-physiology-model"
+    }
+  },
+  {
+    "__docId__": 33,
+    "kind": "file",
+    "name": "src/commands/Command.js",
+    "content": "import Graph from 'graph.js/dist/graph';\nimport assert from 'power-assert';\nimport {last, values, flatten} from 'lodash-bound';\nimport {event, ValueTracker, property} from 'utilities';\n\nconst $$running      = Symbol('$$running');\nconst $$committing   = Symbol('$$committing');\nconst $$rollingBack  = Symbol('$$rollingBack');\nconst $$state        = Symbol('$$state');\n\n/** @wrapper */\nexport default (env) => {\n\t\n\t/**\n\t * an object pointing to the commands relevant to a specific entity\n\t * @typedef {{\n\t *     origin: (Command_new | Command_load),\n\t *     edit: Object<string, Array<Command_edit>>,\n\t *     delete: Command_delete?,\n\t *     relationships: Object<string, Map<Entity, Array<Command_link | Command_unlink>>>\n\t * }} EntityCommands\n\t */\n\t\n\t/**\n\t * one of three possible states a command can be in\n\t * @typedef {'pre-run'|'post-run'|'post-commit'} CommandState\n\t */\n\t\n\t/**\n\t * The main class of the command design-pattern used in this project.\n\t * There are commands for creating new entities, loading them from\n\t * an asynchronous source, editing them and deleting them; and for\n\t * linking or unlinking entities through specific relationships.\n\t * A command can be run, rolled back and committed asynchronously.\n\t * Commands have prerequisite commands. For example, a command for\n\t * editing a lyph (e.g., changing its name) has to be preceded by\n\t * a command for creating or loading that lyph.\n\t */\n\tclass Command extends ValueTracker {\n\t\n\t\t///// command tracking /////\n\t\t\n\t\t/**\n\t\t * the graph containing the currently relevant commands,\n\t\t * partially ordered by command prerequisites\n\t\t * @type {Graph}\n\t\t */\n\t\tstatic commandGraph    = new Graph;\n\t\t\n\t\t/**\n\t\t * an array of commands that have been run, in the order that they were run\n\t\t * @type {Array}\n\t\t */\n\t\tstatic commandHistory  = new Array;\n\t\t\n\t\t/**\n\t\t * mapping each entity to the commands relevant to it, categorized by command class\n\t\t * @type {\n\t\t *     WeakMap<Entity, EntityCommands>\n\t\t * }\n\t\t */\n\t\tstatic entityToCommand = new WeakMap;\n\t\t\n\t\t/**\n\t\t * register an entity, so we can start keeping track of related commands\n\t\t * @param {Entity} entity - the entity to register\n\t\t * @return {EntityCommands} the object tracking the entity's commands\n\t\t */\n\t\tstatic registerEntity(entity) {\n\t\t\tif (!Command.entityToCommand.has(entity)) {\n\t\t\t\tCommand.entityToCommand.set(entity, {\n\t\t\t\t\torigin: null,\n\t\t\t\t\tedit:   {},\n\t\t\t\t\tdelete: null,\n\t\t\t\t\trelationships: {}\n\t\t\t\t});\n\t\t\t}\n\t\t\treturn Command.entityToCommand.get(entity);\n\t\t}\n\t\t\n\t\t/**\n\t\t * Register a property field of an entity so we can start tracking related commands.\n\t\t * @param {Entity} entity - the entity to track property commands for\n\t\t * @param {string} key    - the key of the property field\n\t\t * @return {Array<Command_edit>} the array tracking the relevant edit commands\n\t\t */\n\t\tstatic registerEntityProperty(entity, key) {\n\t\t\tconst e = Command.registerEntity(entity);\n\t\t\tif (!e.edit[key]) { e.edit[key] = [] }\n\t\t\treturn e.edit[key];\n\t\t}\n\t\t\n\t\t/**\n\t\t * register a specific relationship between two specific entities so we can start tracking related commands\n\t\t * @param {Entity} entity1 - the entity on the left-hand side\n\t\t * @param {string} key     - the key of the relationship field; this should always be prefixed with '-->' or '<--'\n\t\t * @param {Entity} entity2 - the entity on the right-hand side\n\t\t * @return {Array<Command_link|Command_unlink>} the array tracking the relevant link and unlink commands\n\t\t */\n\t\tstatic registerRelationship(entity1, key, entity2) {\n\t\t\tconst e1 = Command.registerEntity(entity1);\n\t\t\tconst e2 = Command.registerEntity(entity2);\n\t\t\t\n\t\t\t/* reverse key */\n\t\t\t// e.g., '-->HasLayer' into '<--HasLayer'\n\t\t\tconst rKey = key.replace(/^(-->|<--)/, m => m[0] === '<' ? '-->' : '<--');\n\t\t\t\n\t\t\t/* prime the data-structures */\n\t\t\tif (!e1.relationships[key])  { e1.relationships[key]  = new Map }\n\t\t\tif (!e2.relationships[rKey]) { e2.relationships[rKey] = new Map }\n\t\t\tif (!e1.relationships[key].has(entity2)) {\n\t\t\t\tlet linkUnlinkCommands = [];\n\t\t\t\te1.relationships[key] .set(entity2, linkUnlinkCommands);\n\t\t\t\te2.relationships[rKey].set(entity1, linkUnlinkCommands);\n\t\t\t}\n\t\t\t\n\t\t\t/* return the shared array of link/unlink commands */\n\t\t\treturn e1.relationships[key].get(entity2);\n\t\t}\n\t\t\n\t\t/**\n\t\t * a method with common code used by `Command.getEditDependencies`,\n\t\t * `Command.getLinkUnlinkDependencies` and `Command.getDeleteDependencies`\n\t\t * @private\n\t\t */\n\t\tstatic _getDependencies(entity, arrays) {\n\t\t\tlet result = new Set;\n\t\t\tlet commandsToDelete = new Set;\n\t\t\tlet e = Command.registerEntity(entity);\n\t\t\t/* check out the edit and link/unlink commands */\n\t\t\tfor (let arr of arrays) {\n\t\t\t\tlet cmdToDelete = null;\n\t\t\t\twhile (arr::last() && arr::last().state === 'pre-run') {\n\t\t\t\t\tcmdToDelete = arr.pop();\n\t\t\t\t}\n\t\t\t\tif (cmdToDelete) {\n\t\t\t\t\tcommandsToDelete.add(cmdToDelete);\n\t\t\t\t}\n\t\t\t\tif (arr.length > 0) {\n\t\t\t\t\tresult.add(arr::last());\n\t\t\t\t}\n\t\t\t}\n\t\t\t/* if necessary, use the origin command */\n\t\t\tif (result.size === 0) {\n\t\t\t\tassert(!!e.origin);\n\t\t\t\tresult.add(e.origin);\n\t\t\t}\n\t\t\t/* delete commands that are pre-run and would conflict with a new delete command */\n\t\t\tlet finalCommandsToDelete = new Set(commandsToDelete);\n\t\t\tfor (let cmdI of commandsToDelete) {\n\t\t\t\tfor (let cmdJ of Command.commandGraph.verticesWithPathFrom(cmdI)) {\n\t\t\t\t\tfinalCommandsToDelete.add(cmdJ);\n\t\t\t\t}\n\t\t\t}\n\t\t\tfor (let cmd of finalCommandsToDelete) {\n\t\t\t\tCommand.commandGraph.destroyVertex(cmd);\n\t\t\t}\n\t\t\tif (e.delete) {\n\t\t\t\tassert(e.delete.state === 'pre-run');\n\t\t\t\tCommand.commandGraph.destroyVertex(e.delete);\n\t\t\t}\n\t\t\t/***/\n\t\t\treturn result;\n\t\t}\n\t\t\n\t\t/**\n\t\t * Get the direct dependencies for a new edit-command for specific property fields on a specific entity,\n\t\t * and deregister any currently rolled back commands that would now be in conflict.\n\t\t * @param {Entity} entity      - the entity for which to track edit commands\n\t\t * @param {Array<string>} keys - the keys of the property fields in the edit command\n\t\t * @return {Set<Command>} the requested command dependencies\n\t\t */\n\t\tstatic getEditDependencies(entity, keys) {\n\t\t\tlet e = Command.registerEntity(entity);\n\t\t\treturn Command._getDependencies(entity, keys.map(key=>e.edit[key]).filter(v=>!!v));\n\t\t}\n\t\t\n\t\t/**\n\t\t * Get the direct dependencies for a new link- or unlink-command for a specific relationship between two specific entities,\n\t\t * and deregister any currently rolled back commands that would now be in conflict.\n\t\t * @param {Entity} entity1 - the entity on the left-hand side\n\t\t * @param {string} key     - the key of the relationship field; this should always be prefixed with '-->' or '<--'\n\t\t * @param {Entity} entity2 - the entity on the right-hand side\n\t\t * @return {Set<Command>} the requested command dependencies\n\t\t */\n\t\tstatic getLinkUnlinkDependencies(entity1, key, entity2) {\n\t\t\tlet e1e2 = Command.registerRelationship(entity1, key, entity2);\n\t\t\t\n\t\t\tlet dep1 = [...Command._getDependencies(entity1, [e1e2])];\n\t\t\tlet dep2 = [...Command._getDependencies(entity2, [e1e2])];\n\t\t\t\n\t\t\tassert(dep1.length > 0 && !!dep1[0]);\n\t\t\tassert(dep2.length > 0 && !!dep2[0]);\n\t\t\t\n\t\t\treturn new Set([...dep1, ...dep2]);\n\t\t}\n\t\t\n\t\t/**\n\t\t * Get the direct dependencies for a new delete-command for a specific entity,\n\t\t * and deregister any currently rolled back commands that would now be in conflict.\n\t\t * @param {Entity} entity - the entity for which to track delete commands\n\t\t * @return {Set<Command>} the requested command dependencies\n\t\t */\n\t\tstatic getDeleteDependencies(entity) {\n\t\t\tlet e = Command.registerEntity(entity);\n\t\t\treturn Command._getDependencies(entity, [\n\t\t\t\t...e.edit::values(),\n\t\t\t\t...e.relationships::values().map(m=>[...m.values()])::flatten()\n\t\t\t]);\n\t\t}\n\t\t\n\t\t/**\n\t\t * a method with common code used by `Command.earliest` and `Command.latest`\n\t\t * @private\n\t\t */\n\t\tstatic _fringe(options = {}) {\n\t\t\tconst {direction, entities = null, states = ['pre-run', 'post-run', 'post-commit']} = options;\n\t\t\t\n\t\t\t/* distinguish between earliest and latest */\n\t\t\tconst [sourceSinks, verticesFromTo] = (direction === 'earliest')\n\t\t\t\t? ['sources', 'verticesFrom']\n\t\t\t\t: ['sinks'  , 'verticesTo'  ];\n\t\t\t\n\t\t\t/* fringe commands filtered by entity */\n\t\t\tlet fringe = new Set([...Command.commandGraph[sourceSinks]()]\n\t\t\t\t\t.filter(([,cmd]) => !entities || entities.some(e => cmd.associatedEntities.has(e)))\n\t\t\t\t\t.map(([,cmd]) => cmd));\n\n\t\t\t/* filtering by state */\n\t\t\tlet result = new Set;\n\t\t\tfunction process(cmd) {\n\t\t\t\tif (states.includes(cmd.state)) {\n\t\t\t\t\tresult.add(cmd);\n\t\t\t\t} else {\n\t\t\t\t\tfor (let [,prevCmd] of Command.commandGraph[verticesFromTo](cmd)) {\n\t\t\t\t\t\tprocess(prevCmd);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\tfor (let cmd of fringe) { process(cmd) }\n\t\t\t\n\t\t\t/***/\n\t\t\treturn result;\n\t\t}\n\t\t\n\t\t/**\n\t\t * Get all commands that have no dependencies, optionally filtered by entity or command state.\n\t\t * @param {Object}               options\n\t\t * @param {Array<Entity>}       [options.entities] - if given, limits the result to commands related to the given entities\n\t\t * @param {Array<CommandState>} [options.states]   - if given, limits the result to commands in one of the given states\n\t\t * @return {Set<Command>} the requested commands\n\t\t */\n\t\tstatic earliest(options = {}) {\n\t\t\treturn Command._fringe({\n\t\t\t\t...options,\n\t\t\t\tdirection: 'earliest'\n\t\t\t});\n\t\t}\n\t\t\n\t\t/**\n\t\t * Get all commands that are not dependencies, optionally filtered by entity or command state.\n\t\t * @param {Object}               options\n\t\t * @param {Array<Entity>?}      [options.entities] - if given, limits the result to commands related to the given entities\n\t\t * @param {Array<CommandState>} [options.states]   - if given, limits the result to commands in one of the given states\n\t\t * @return {Set<Command>} the requested commands\n\t\t */\n\t\tstatic latest(options = {}) {\n\t\t\treturn Command._fringe({\n\t\t\t\t...options,\n\t\t\t\tdirection: 'latest'\n\t\t\t});\n\t\t}\n\t\t\n\t\t\n\t\t/// /// /// /// /// Instances /// /// /// /// ///\n\t\t\n\t\t/**\n\t\t * Emits an event when this command is committed.\n\t\t * @type {Observable}\n\t\t */\n\t\t@event() commitEvent;\n\t\t\n\t\t/**\n\t\t * Emits an event when this command is rolled back.\n\t\t * @type {Observable}\n\t\t */\n\t\t@event() rollbackEvent;\n\t\n\t\t\n\t\t/**\n\t\t * Emits an event when this command is committed.\n\t\t * @type {CommandState}\n\t\t */\n\t\t@property({ readonly: true }) state: 'pre-run' | 'post-run' | 'post-commit';\n\t\t\n\t\t/** @protected */\n\t\tconstructor({state, dependencies = []} = {}) {\n\t\t\tsuper();\n\t\t\t\n\t\t\t/* register in the command graph and history */\n\t\t\tCommand.commandGraph.addVertex(this, this);\n\t\t\tfor (let dep of dependencies) {\n\t\t\t\tCommand.commandGraph.addEdge(dep, this);\n\t\t\t}\n\t\t\tCommand.commandHistory.push(this);\n\n\t\t\t/* handle state */\n\t\t\tthis[$$running]     = false;\n\t\t\tthis[$$committing]  = false;\n\t\t\tthis[$$rollingBack] = false;\n\t\t\tthis.pSubject('state').next(state);\n\t\t}\n\t\t\n\t\t\n\t\t/// /// /// /// /// Basic methods /// /// /// /// ///\n\t\t\n\t\t/**\n\t\t * Get a set of entities associated with this command.\n\t\t * This should be implemented by subclasses.\n\t\t * @abstract\n\t\t */\n\t\tget associatedEntities() { assert(false, `The ${this.constructor.name}#associatedEntities accessor is not implemented.`) }\n\t\t\n\t\t/**\n\t\t * Run this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has not already run.\n\t\t * This should be implemented by subclasses to bring about the effect of the command.\n\t\t * @abstract\n\t\t * @protected\n\t\t */\n\t\tlocalRun() { assert(false, \"Command subclass must override 'localRun'.\")                                   }\n\t\t\n\t\t/**\n\t\t * Commit this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * This should be implemented by subclasses.\n\t\t * @abstract\n\t\t * @protected\n\t\t */\n\t\tasync localCommit() { assert(false, \"Command subclass must override 'localCommit'.\")                                }\n\t\t\n\t\t/**\n\t\t * Roll back this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * This should be implemented by subclasses.\n\t\t * @abstract\n\t\t * @protected\n\t\t */\n\t\tlocalRollback() { assert(false, \"Command subclass must override 'localRollback'.\")                              }\n\t\t\n\t\t/**\n\t\t * Get a JSON (plain data) representation of this command.\n\t\t * This should be implemented by subclasses.\n\t\t * @abstract\n\t\t */\n\t\ttoJSON(options = {}) { assert(false, \"Command subclass must override 'toJSON'.\") }\n\t\t\n\t\t/// /// /// /// /// Smart run, commit, rollback /// /// /// /// ///\n\t\t\n\t\t/**\n\t\t * Run this command now.\n\t\t */\n\t\trun() {\n\t\t\tif (this[$$running] || this.state !== 'pre-run') { return }\n\t\t\tthis[$$running] = true;\n\n\t\t\t/* scheduling runs that need to happen before this one */\n\t\t\t// NOTE: We always have to ensure that the graph has no cycles.\n\t\t\tfor (let [dep] of Command.commandGraph.verticesTo(this)) { dep.run() }\n\n\t\t\t/* then run this command */\n\t\t\tthis.localRun();\n\t\t\tCommand.commandHistory.push(this);\n\t\t\tthis[$$running] = false;\n\t\t\tthis.pSubject('state').next('post-run');\n\t\t}\n\t\t\n\t\t/**\n\t\t * Commit this command now.\n\t\t * @returns {Promise} a promise that resolves when the command is confirmed to be committed\n\t\t */\n\t\tasync commit() {\n\t\t\tassert(this.state !== 'pre-run', \"Cannot commit a command that hasn't yet run.\");\n\t\t\tif (this[$$committing] || this.state === 'post-commit') { return }\n\t\t\tthis[$$committing] = true;\n\n\t\t\t/* run commits that need to happen before this one */\n\t\t\tfor (let [cmd] of Command.commandGraph.verticesTo(this)) {\n\t\t\t\tawait cmd.commit();\n\t\t\t}\n\n\t\t\t/* then commit this command */\n\t\t\tawait this.localCommit();\n\t\t\t\n\t\t\t/***/\n\t\t\tthis[$$committing] = false;\n\t\t\tthis.pSubject('state').next('post-commit');\n\t\t}\n\t\t\n\t\t/**\n\t\t * Roll this command back now.\n\t\t * @throws {AssertionError} if this command was, or is being, committed\n\t\t */\n\t\trollback() {\n\t\t\tassert(this.state !== 'post-commit', \"Can only roll back a command that has been run but not committed.\");\n\t\t\tassert(!this[$$committing], \"Cannot roll back a command that's in the process of being committed.\");\n\t\t\tif (this[$$rollingBack] || this.state === 'pre-run') { return }\n\t\t\tthis[$$rollingBack] = true;\n\n\t\t\t/* rollbacks that need to happen before this one */\n\t\t\tfor (let [rdep] of Command.commandGraph.verticesFrom(this)) { rdep.rollback() }\n\n\t\t\t/* then roll back this command */\n\t\t\tthis.localRollback();\n\t\t\t\n\t\t\t/***/\n\t\t\tCommand.commandHistory.splice(Command.commandHistory.indexOf(this), 1);\n\t\t\tthis[$$rollingBack] =  false;\n\t\t\tthis.pSubject('state').next('pre-run');\n\t\t}\n\t\t\n\t}\n\t\n\t/* debugging output for command dependencies */\n\t// commands.on('vertex-added', ([k, v]) => {\n\t// \tswitch (k.commandType) {\n\t// \t\tcase 'new':    console.log('+   NEW ', k.entityClass.name, k.initialValues.name); break;\n\t// \t\tcase 'edit':   console.log('+   EDIT', k.entityClass.name, k.entity.name);        break;\n\t// \t\tcase 'delete': console.log('+   DEL ', k.entityClass.name, k.entity.name);        break;\n\t// \t}\n\t// });\n\t// commands.on('edge-added', ([[f, t], e]) => {\n\t// \tlet fromCmd, toCmd;\n\t// \tswitch (f.commandType) {\n\t// \t\tcase 'new':    fromCmd = ('NEW  ' + f.entityClass.name + ' ' + f.initialValues.name); break;\n\t// \t\tcase 'edit':   fromCmd = ('EDIT ' + f.entityClass.name + ' ' + f.entity.name);        break;\n\t// \t\tcase 'delete': fromCmd = ('DEL  ' + f.entityClass.name + ' ' + f.entity.name);        break;\n\t// \t}\n\t// \tswitch (t.commandType) {\n\t// \t\tcase 'new':    toCmd = ('NEW  ' + t.entityClass.name + ' ' + t.initialValues.name); break;\n\t// \t\tcase 'edit':   toCmd = ('EDIT ' + t.entityClass.name + ' ' + t.entity.name);        break;\n\t// \t\tcase 'delete': toCmd = ('DEL  ' + t.entityClass.name + ' ' + t.entity.name);        break;\n\t// \t}\n\t// \tconsole.log(`+  (${fromCmd}) --> (${toCmd})`, e);\n\t// });\n\t// commands.on('vertex-removed', (k) => {\n\t// \tswitch (k.commandType) {\n\t// \t\tcase 'new':    console.log('-   NEW ', k.entityClass.name, k.initialValues.name); break;\n\t// \t\tcase 'edit':   console.log('-   EDIT', k.entityClass.name, k.entity.name);        break;\n\t// \t\tcase 'delete': console.log('-   DEL ', k.entityClass.name, k.entity.name);        break;\n\t// \t}\n\t// });\n\t// commands.on('edge-removed', ([f, t]) => {\n\t// \tlet fromCmd, toCmd;\n\t// \tswitch (f.commandType) {\n\t// \t\tcase 'new':    fromCmd = ('NEW  ' + f.entityClass.name + ' ' + f.initialValues.name); break;\n\t// \t\tcase 'edit':   fromCmd = ('EDIT ' + f.entityClass.name + ' ' + f.entity.name);        break;\n\t// \t\tcase 'delete': fromCmd = ('DEL  ' + f.entityClass.name + ' ' + f.entity.name);        break;\n\t// \t}\n\t// \tswitch (t.commandType) {\n\t// \t\tcase 'new':    toCmd = ('NEW  ' + t.entityClass.name + ' ' + t.initialValues.name); break;\n\t// \t\tcase 'edit':   toCmd = ('EDIT ' + t.entityClass.name + ' ' + t.entity.name);        break;\n\t// \t\tcase 'delete': toCmd = ('DEL  ' + t.entityClass.name + ' ' + t.entity.name);        break;\n\t// \t}\n\t// \tconsole.log(`-  (${fromCmd}) --> (${toCmd})`);\n\t// });\n\t\n\t/***/\n\treturn env.registerCommandClass('Command', Command);\n\t\n};\n",
+    "static": true,
+    "longname": "src/commands/Command.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 34,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 35,
+    "kind": "variable",
+    "name": "$$running",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~$$running",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 36,
+    "kind": "variable",
+    "name": "$$committing",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~$$committing",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 37,
+    "kind": "variable",
+    "name": "$$rollingBack",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~$$rollingBack",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 10,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 38,
+    "kind": "variable",
+    "name": "$$state",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~$$state",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 11,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 39,
+    "kind": "typedef",
+    "name": "EntityCommands",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~EntityCommands",
+    "access": null,
+    "description": "an object pointing to the commands relevant to a specific entity",
+    "type": {
+      "types": [
+        "{\n    origin: (Command_new | Command_load),\n    edit: Object<string, Array<Command_edit>>,\n    delete: Command_delete?,\n    relationships: Object<string, Map<Entity, Array<Command_link | Command_unlink>>>\n}"
+      ],
+      "optional": false,
+      "name": "EntityCommands"
+    }
+  },
+  {
+    "__docId__": 40,
+    "kind": "typedef",
+    "name": "CommandState",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~CommandState",
+    "access": null,
+    "description": "one of three possible states a command can be in",
+    "type": {
+      "types": [
+        "'pre-run'",
+        "'post-run'",
+        "'post-commit'"
+      ],
+      "optional": false,
+      "name": "CommandState"
+    }
+  },
+  {
+    "__docId__": 41,
+    "kind": "class",
+    "name": "Command",
+    "memberof": "src/commands/Command.js",
+    "static": true,
+    "longname": "src/commands/Command.js~Command",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/Command.js",
+    "importStyle": "Command",
+    "description": "The main class of the command design-pattern used in this project.\nThere are commands for creating new entities, loading them from\nan asynchronous source, editing them and deleting them; and for\nlinking or unlinking entities through specific relationships.\nA command can be run, rolled back and committed asynchronously.\nCommands have prerequisite commands. For example, a command for\nediting a lyph (e.g., changing its name) has to be preceded by\na command for creating or loading that lyph.",
+    "lineNumber": 41,
+    "interface": false,
+    "extends": [
+      "utilities~ValueTracker"
+    ]
+  },
+  {
+    "__docId__": 42,
+    "kind": "method",
+    "name": "registerEntity",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.registerEntity",
+    "access": null,
+    "description": "an array of commands that have been run, in the order that they were run",
+    "lineNumber": 54,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "type": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 43,
+    "kind": "method",
+    "name": "registerEntityProperty",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.registerEntityProperty",
+    "access": null,
+    "description": "the graph containing the currently relevant commands,\npartially ordered by command prerequisites",
+    "lineNumber": 89,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "key",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "type": {
+      "nullable": null,
+      "types": [
+        "Graph"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 44,
+    "kind": "method",
+    "name": "registerRelationship",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.registerRelationship",
+    "access": null,
+    "description": "register a specific relationship between two specific entities so we can start tracking related commands",
+    "lineNumber": 104,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity1",
+        "description": "the entity on the left-hand side"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "key",
+        "description": "the key of the relationship field; this should always be prefixed with '-->' or '<--'"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity2",
+        "description": "the entity on the right-hand side"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Array<Command_link|Command_unlink>"
+      ],
+      "spread": false,
+      "description": "the array tracking the relevant link and unlink commands"
+    }
+  },
+  {
+    "__docId__": 45,
+    "kind": "method",
+    "name": "_getDependencies",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command._getDependencies",
+    "access": "private",
+    "description": "a method with common code used by `Command.getEditDependencies`,\n`Command.getLinkUnlinkDependencies` and `Command.getDeleteDependencies`",
+    "lineNumber": 134,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "arrays",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 46,
+    "kind": "method",
+    "name": "getEditDependencies",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.getEditDependencies",
+    "access": null,
+    "description": "Get the direct dependencies for a new edit-command for specific property fields on a specific entity,\nand deregister any currently rolled back commands that would now be in conflict.",
+    "lineNumber": 181,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "the entity for which to track edit commands"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<string>"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "keys",
+        "description": "the keys of the property fields in the edit command"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Set<Command>"
+      ],
+      "spread": false,
+      "description": "the requested command dependencies"
+    }
+  },
+  {
+    "__docId__": 47,
+    "kind": "method",
+    "name": "getLinkUnlinkDependencies",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.getLinkUnlinkDependencies",
+    "access": null,
+    "description": "Get the direct dependencies for a new link- or unlink-command for a specific relationship between two specific entities,\nand deregister any currently rolled back commands that would now be in conflict.",
+    "lineNumber": 194,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity1",
+        "description": "the entity on the left-hand side"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "key",
+        "description": "the key of the relationship field; this should always be prefixed with '-->' or '<--'"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity2",
+        "description": "the entity on the right-hand side"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Set<Command>"
+      ],
+      "spread": false,
+      "description": "the requested command dependencies"
+    }
+  },
+  {
+    "__docId__": 48,
+    "kind": "method",
+    "name": "getDeleteDependencies",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.getDeleteDependencies",
+    "access": null,
+    "description": "Get the direct dependencies for a new delete-command for a specific entity,\nand deregister any currently rolled back commands that would now be in conflict.",
+    "lineNumber": 212,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "the entity for which to track delete commands"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Set<Command>"
+      ],
+      "spread": false,
+      "description": "the requested command dependencies"
+    }
+  },
+  {
+    "__docId__": 49,
+    "kind": "method",
+    "name": "_fringe",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command._fringe",
+    "access": "private",
+    "description": "a method with common code used by `Command.earliest` and `Command.latest`",
+    "lineNumber": 223,
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 50,
+    "kind": "method",
+    "name": "earliest",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.earliest",
+    "access": null,
+    "description": "Get all commands that have no dependencies, optionally filtered by entity or command state.",
+    "lineNumber": 258,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<Entity>"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options.entities",
+        "description": "if given, limits the result to commands related to the given entities"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<CommandState>"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options.states",
+        "description": "if given, limits the result to commands in one of the given states"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Set<Command>"
+      ],
+      "spread": false,
+      "description": "the requested commands"
+    }
+  },
+  {
+    "__docId__": 51,
+    "kind": "method",
+    "name": "latest",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/Command.js~Command.latest",
+    "access": null,
+    "description": "Get all commands that are not dependencies, optionally filtered by entity or command state.",
+    "lineNumber": 271,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<Entity>?"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options.entities",
+        "description": "if given, limits the result to commands related to the given entities"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<CommandState>"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options.states",
+        "description": "if given, limits the result to commands in one of the given states"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Set<Command>"
+      ],
+      "spread": false,
+      "description": "the requested commands"
+    }
+  },
+  {
+    "__docId__": 52,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#constructor",
+    "access": "protected",
+    "description": null,
+    "lineNumber": 298,
+    "params": [
+      {
+        "name": "objectPattern",
+        "optional": true,
+        "types": [
+          "{\"state\": *, \"dependencies\": *}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ]
+  },
+  {
+    "__docId__": 53,
+    "kind": "member",
+    "name": "[$$running]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$running]",
+    "access": null,
+    "description": null,
+    "lineNumber": 309,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 54,
+    "kind": "member",
+    "name": "[$$committing]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$committing]",
+    "access": null,
+    "description": null,
+    "lineNumber": 310,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 55,
+    "kind": "member",
+    "name": "[$$rollingBack]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$rollingBack]",
+    "access": null,
+    "description": null,
+    "lineNumber": 311,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 56,
+    "kind": "get",
+    "name": "associatedEntities",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#associatedEntities",
+    "access": null,
+    "description": "Get a set of entities associated with this command.\nThis should be implemented by subclasses.",
+    "lineNumber": 322,
+    "abstract": true
+  },
+  {
+    "__docId__": 57,
+    "kind": "method",
+    "name": "localRun",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#localRun",
+    "access": "protected",
+    "description": "Run this command, and only this command (i.e., not its dependencies).\nAssumes that this command has not already run.\nThis should be implemented by subclasses to bring about the effect of the command.",
+    "lineNumber": 333,
+    "params": [],
+    "abstract": true
+  },
+  {
+    "__docId__": 58,
+    "kind": "method",
+    "name": "localCommit",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#localCommit",
+    "access": "protected",
+    "description": "Commit this command, and only this command (i.e., not its dependencies).\nAssumes that this command has run, but has not yet committed.\nThis should be implemented by subclasses.",
+    "lineNumber": 344,
+    "params": [],
+    "abstract": true
+  },
+  {
+    "__docId__": 59,
+    "kind": "method",
+    "name": "localRollback",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#localRollback",
+    "access": "protected",
+    "description": "Roll back this command, and only this command (i.e., not its dependencies).\nAssumes that this command has run, but has not yet committed.\nThis should be implemented by subclasses.",
+    "lineNumber": 355,
+    "params": [],
+    "abstract": true
+  },
+  {
+    "__docId__": 60,
+    "kind": "method",
+    "name": "toJSON",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#toJSON",
+    "access": null,
+    "description": "Get a JSON (plain data) representation of this command.\nThis should be implemented by subclasses.",
+    "lineNumber": 364,
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "abstract": true
+  },
+  {
+    "__docId__": 61,
+    "kind": "method",
+    "name": "run",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#run",
+    "access": null,
+    "description": "Run this command now.",
+    "lineNumber": 373,
+    "params": []
+  },
+  {
+    "__docId__": 62,
+    "kind": "member",
+    "name": "[$$running]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$running]",
+    "access": null,
+    "description": null,
+    "lineNumber": 377,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 63,
+    "kind": "member",
+    "name": "[$$running]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$running]",
+    "access": null,
+    "description": null,
+    "lineNumber": 388,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 64,
+    "kind": "method",
+    "name": "commit",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#commit",
+    "access": null,
+    "description": "Commit this command now.",
+    "lineNumber": 396,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Promise} a promise that resolves when the command is confirmed to be committed"
+      }
+    ],
+    "params": [],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": "a promise that resolves when the command is confirmed to be committed"
+    }
+  },
+  {
+    "__docId__": 65,
+    "kind": "member",
+    "name": "[$$committing]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$committing]",
+    "access": null,
+    "description": null,
+    "lineNumber": 401,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 66,
+    "kind": "member",
+    "name": "[$$committing]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$committing]",
+    "access": null,
+    "description": "",
+    "lineNumber": 412,
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 67,
+    "kind": "method",
+    "name": "rollback",
+    "memberof": "src/commands/Command.js~Command",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command.js~Command#rollback",
+    "access": null,
+    "description": "Roll this command back now.",
+    "lineNumber": 420,
+    "params": [],
+    "throws": [
+      {
+        "types": [
+          "AssertionError"
+        ],
+        "description": "if this command was, or is being, committed"
+      }
+    ]
+  },
+  {
+    "__docId__": 68,
+    "kind": "member",
+    "name": "[$$rollingBack]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$rollingBack]",
+    "access": null,
+    "description": null,
+    "lineNumber": 426,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 69,
+    "kind": "member",
+    "name": "[$$rollingBack]",
+    "memberof": "src/commands/Command.js~Command",
+    "static": false,
+    "longname": "src/commands/Command.js~Command#[$$rollingBack]",
+    "access": null,
+    "description": null,
+    "lineNumber": 438,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 70,
+    "kind": "file",
+    "name": "src/commands/Command_delete.js",
+    "content": "import {humanMsg} from 'utilities';\nimport deepFreeze from 'deep-freeze-strict';\nimport {pick} from 'lodash-bound';\n\nimport Command_factory from './Command.js';\n\n\n/** @wrapper */\nexport default (env) => {\n\t\n\tconst {backend, registerCommandClass} = env;\n\t\n\tconst Command = Command_factory(env);\n\n\t/**\n\t * Commands for deleting entities.\n\t */\n\tclass Command_delete extends Command {\n\t\n\t\t/**\n\t\t * the entity to delete\n\t\t * @type {Entity}\n\t\t */\n\t\tentity;\n\t\t\n\t\t/**\n\t\t * Create an entity-deleting command.\n\t\t * @param {Entity}  entity - the entity to delete\n\t\t * @param {Object} [options]\n\t\t */\n\t\tconstructor(entity, options = {}) {\n\t\t\tsuper({\n\t\t\t\t...options,\n\t\t\t\tdependencies: [\n\t\t\t\t\t...(options.dependencies || []),\n\t\t\t\t\t...Command.getDeleteDependencies(entity)\n\t\t\t\t]\n\t\t\t});\n\t\t\tthis.entity = entity;\n\t\t\tCommand.registerEntity(entity).delete = this;\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a set that contains the entity created by this command,\n\t\t *          or an empty set if this command hasn't run\n\t\t */\n\t\tget associatedEntities() {\n\t\t\treturn new Set([this.entity]);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a JSON (plain data) representation of this command\n\t\t */\n\t\ttoJSON(options = {}) {\n\t\t\treturn {\n\t\t\t\tcommandType: 'delete',\n\t\t\t\taddress: this.entity::pick('class', 'id')\n\t\t\t};\n\t\t}\n\t\t\n\t\t/**\n\t\t * Run this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has not already run.\n\t\t * @protected\n\t\t */\n\t\tlocalRun() {\n\t\t\t/* sanity checks */\n\t\t\tassert(!this.entity.isPlaceholder, humanMsg`\n\t\t\t\tCannot delete a placeholder.\n\t\t\t\tLoad the entity fully before editing.\n\t\t\t`);\n\t\t\t/* delete the entity */\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tthis.entity.delete();\n\t\t\t});\n\t\t}\n\t\t\n\t\t/**\n\t\t * Commit this command, and only this command (i.e., not its dependencies),\n\t\t * by calling `commit_delete` on the backend object and silencing\n\t\t * the entity permanently (stopping all `ValueTracker` signals).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tasync localCommit() {\n\t\t\tthis.entity.silence();\n\t\t\treturn await env.backend.commit_delete(\n\t\t\t\tthis.entity::pick('class', 'id')\n\t\t\t);\n\t\t}\n\t\t\n\t\t/**\n\t\t * Roll back this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tlocalRollback() {\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tthis.entity.undelete();\n\t\t\t});\n\t\t}\n\t}\n\t\n\treturn registerCommandClass('Command_delete', Command_delete);\n\t\n};\n",
+    "static": true,
+    "longname": "src/commands/Command_delete.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 71,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/commands/Command_delete.js",
+    "static": true,
+    "longname": "src/commands/Command_delete.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command_delete.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 72,
+    "kind": "class",
+    "name": "Command_delete",
+    "memberof": "src/commands/Command_delete.js",
+    "static": true,
+    "longname": "src/commands/Command_delete.js~Command_delete",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/Command_delete.js",
+    "importStyle": "Command_delete",
+    "description": "Commands for deleting entities.",
+    "lineNumber": 15,
+    "interface": false,
+    "extends": [
+      "Command"
+    ]
+  },
+  {
+    "__docId__": 73,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/commands/Command_delete.js~Command_delete",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_delete.js~Command_delete#constructor",
+    "access": null,
+    "description": "Create an entity-deleting command.",
+    "lineNumber": 22,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "the entity to delete"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 74,
+    "kind": "member",
+    "name": "entity",
+    "memberof": "src/commands/Command_delete.js~Command_delete",
+    "static": false,
+    "longname": "src/commands/Command_delete.js~Command_delete#entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 26,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 75,
+    "kind": "get",
+    "name": "associatedEntities",
+    "memberof": "src/commands/Command_delete.js~Command_delete",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_delete.js~Command_delete#associatedEntities",
+    "access": null,
+    "description": "the entity to delete",
+    "lineNumber": 40,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 76,
+    "kind": "method",
+    "name": "toJSON",
+    "memberof": "src/commands/Command_delete.js~Command_delete",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_delete.js~Command_delete#toJSON",
+    "access": null,
+    "description": "",
+    "lineNumber": 47,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "a JSON (plain data) representation of this command"
+      }
+    ],
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "a JSON (plain data) representation of this command"
+    }
+  },
+  {
+    "__docId__": 77,
+    "kind": "method",
+    "name": "localRun",
+    "memberof": "src/commands/Command_delete.js~Command_delete",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_delete.js~Command_delete#localRun",
+    "access": "protected",
+    "description": "Run this command, and only this command (i.e., not its dependencies).\nAssumes that this command has not already run.",
+    "lineNumber": 61,
+    "params": []
+  },
+  {
+    "__docId__": 78,
+    "kind": "method",
+    "name": "localCommit",
+    "memberof": "src/commands/Command_delete.js~Command_delete",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command_delete.js~Command_delete#localCommit",
+    "access": "protected",
+    "description": "Commit this command, and only this command (i.e., not its dependencies),\nby calling `commit_delete` on the backend object and silencing\nthe entity permanently (stopping all `ValueTracker` signals).\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 80,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 79,
+    "kind": "method",
+    "name": "localRollback",
+    "memberof": "src/commands/Command_delete.js~Command_delete",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_delete.js~Command_delete#localRollback",
+    "access": "protected",
+    "description": "Roll back this command, and only this command (i.e., not its dependencies).\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 92,
+    "params": []
+  },
+  {
+    "__docId__": 80,
+    "kind": "file",
+    "name": "src/commands/Command_edit.js",
+    "content": "import {humanMsg} from 'utilities';\n\nimport assert from 'power-assert';\nimport {mapValues, keys, pick, entries, omit} from 'lodash-bound';\n\nimport deepFreeze from 'deep-freeze-strict';\n\nimport Command_factory from './Command.js';\n\n\n\n/** @wrapper */\nexport default (env) => {\n\t\n\tconst Command = Command_factory(env);\n\n\t/**\n\t * Commands for editing property fields on an existing entity.\n\t */\n\tclass Command_edit extends Command {\n\t\t\n\t\t/**\n\t\t * the entity to edit\n\t\t * @type {Entity}\n\t\t */\n\t\tentity;\n\t\t\n\t\t/**\n\t\t * the property values before this command is/was run,\n\t\t * stored so that the command can be rolled back;\n\t\t * might be undefined if this command has never run\n\t\t * @type {Object}\n\t\t */\n\t\toldValues;\n\t\t\n\t\t/**\n\t\t * the property values after this command is/was run;\n         * might be undefined if this command started out 'post-run' and has never been rolled back\n\t\t * @type {Object}\n\t\t */\n\t\tnewValues;\n\t\t\n\t\t/**\n\t\t * Create an entity-editing command.\n\t\t * @param {Entity} entity      - the entity to edit\n\t\t * @param {Object} [newValues] - the new values for the entity (if given, start in 'pre-run' state)\n\t\t * @param {Object} [oldValues] - the old values of the entity  (if given, start in 'post-run' state)\n\t\t * @param {Object} [options]\n\t\t */\n\t\tconstructor(entity, newValues = null, oldValues = null, options = {}) {\n\t\t\tsuper({\n\t\t\t\t...options,\n\t\t\t\tstate: options.state || (newValues ? 'pre-run' : 'post-run'),\n\t\t\t\tdependencies: [\n\t\t\t\t\t...(options.dependencies || []),\n\t\t\t\t\t...Command.getEditDependencies(\n\t\t\t\t\t\tentity,\n\t\t\t\t\t\t(oldValues || newValues)::keys()\n\t\t\t\t\t)\n\t\t\t\t]\n\t\t\t});\n\t\t\tthis.entity    = entity;\n\t\t\tthis.oldValues = oldValues;\n\t\t\tthis.newValues = newValues;\n\t\t\t\n\t\t\t/* add to command-tracking data-structures */\n\t\t\tfor (let key of (oldValues || newValues)::keys()) {\n\t\t\t\tCommand.registerEntityProperty(entity, key).push(this);\n\t\t\t}\n\n\t\t\tassert(options.state !== 'pre-run'  || newValues);\n\t\t\tassert(options.state !== 'post-run' || oldValues);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a set that contains the entity to be edited\n\t\t */\n\t\tget associatedEntities() {\n\t\t\treturn new Set([this.entity]);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a JSON (plain data) representation of this command\n\t\t */\n\t\ttoJSON(options = {}) {\n\t\t\treturn {\n\t\t\t\tcommandType: 'edit',\n\t\t\t\taddress:     this.entity::pick('class', 'id'),\n\t\t\t\tnewValues:   deepFreeze(this.newValues)\n\t\t\t};\n\t\t}\n\t\t\n\t\t/**\n\t\t * Run this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has not already run.\n\t\t * @protected\n\t\t */\n\t\tlocalRun() {\n\t\t\t/* sanity checks */\n\t\t\tassert(!this.entity.isPlaceholder, humanMsg`\n\t\t\t\tCannot edit a placeholder.\n\t\t\t\tLoad the entity fully before editing.\n\t\t\t`);\n\t\t\t\n\t\t\t/* store old values so we have the ability to roll back */\n\t\t\tif (!this.oldValues) {\n\t\t\t\tthis.oldValues = this.newValues::mapValues((val,key) => this.entity.fields[key].get());\n\t\t\t}\n\t\t\t\n\t\t\t/* set the new values */\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tfor (let [key, newValue] of this.newValues::entries()) {\n\t\t\t\t\tthis.entity.fields[key].set(newValue);\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t\t\n\t\t/**\n\t\t * Commit this command, and only this command (i.e., not its dependencies),\n\t\t * by calling `commit_edit` on the backend object.\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tasync localCommit() {\n\t\t\treturn await env.backend.commit_edit(\n\t\t\t\tthis.entity::pick('class', 'id'),\n\t\t\t\tdeepFreeze(this.newValues)\n\t\t\t);\n\t\t}\n\t\t\n\t\t/**\n\t\t * Roll back this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tlocalRollback() {\n\t\t\t/* store new values so we have the ability to re-run */\n\t\t\tif (!this.newValues) {\n\t\t\t\tthis.newValues = this.oldValues::mapValues((val,key) => entity.fields[key].get());\n\t\t\t}\n\t\t\t/* set the old values back */\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tfor (let [key, oldValue] of this.oldValues::omit('id', 'class')::entries()) {\n\t\t\t\t\tthis.entity.fields[key].set(oldValue);\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t\t\n\t}\n\t\n\treturn env.registerCommandClass('Command_edit', Command_edit);\n\t\n};\n",
+    "static": true,
+    "longname": "src/commands/Command_edit.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 81,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/commands/Command_edit.js",
+    "static": true,
+    "longname": "src/commands/Command_edit.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command_edit.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 82,
+    "kind": "class",
+    "name": "Command_edit",
+    "memberof": "src/commands/Command_edit.js",
+    "static": true,
+    "longname": "src/commands/Command_edit.js~Command_edit",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/Command_edit.js",
+    "importStyle": "Command_edit",
+    "description": "Commands for editing property fields on an existing entity.",
+    "lineNumber": 18,
+    "interface": false,
+    "extends": [
+      "Command"
+    ]
+  },
+  {
+    "__docId__": 83,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#constructor",
+    "access": null,
+    "description": "the property values before this command is/was run,\nstored so that the command can be rolled back;\nmight be undefined if this command has never run",
+    "lineNumber": 35,
+    "params": [
+      {
+        "name": "entity",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "newValues",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      },
+      {
+        "name": "oldValues",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      },
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "Object"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 84,
+    "kind": "member",
+    "name": "entity",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 42,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 85,
+    "kind": "member",
+    "name": "oldValues",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#oldValues",
+    "access": null,
+    "description": null,
+    "lineNumber": 43,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 86,
+    "kind": "member",
+    "name": "newValues",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#newValues",
+    "access": null,
+    "description": null,
+    "lineNumber": 44,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 87,
+    "kind": "get",
+    "name": "associatedEntities",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#associatedEntities",
+    "access": null,
+    "description": "the entity to edit",
+    "lineNumber": 73,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 88,
+    "kind": "method",
+    "name": "toJSON",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#toJSON",
+    "access": null,
+    "description": "",
+    "lineNumber": 80,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "a JSON (plain data) representation of this command"
+      }
+    ],
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "a JSON (plain data) representation of this command"
+    }
+  },
+  {
+    "__docId__": 89,
+    "kind": "method",
+    "name": "localRun",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#localRun",
+    "access": "protected",
+    "description": "Run this command, and only this command (i.e., not its dependencies).\nAssumes that this command has not already run.",
+    "lineNumber": 95,
+    "params": []
+  },
+  {
+    "__docId__": 90,
+    "kind": "member",
+    "name": "oldValues",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#oldValues",
+    "access": null,
+    "description": null,
+    "lineNumber": 106,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 91,
+    "kind": "method",
+    "name": "localCommit",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#localCommit",
+    "access": "protected",
+    "description": "Commit this command, and only this command (i.e., not its dependencies),\nby calling `commit_edit` on the backend object.\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 125,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "method",
+    "name": "localRollback",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#localRollback",
+    "access": "protected",
+    "description": "Roll back this command, and only this command (i.e., not its dependencies).\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 136,
+    "params": []
+  },
+  {
+    "__docId__": 93,
+    "kind": "member",
+    "name": "newValues",
+    "memberof": "src/commands/Command_edit.js~Command_edit",
+    "static": false,
+    "longname": "src/commands/Command_edit.js~Command_edit#newValues",
+    "access": null,
+    "description": null,
+    "lineNumber": 141,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 94,
+    "kind": "file",
+    "name": "src/commands/Command_link.js",
+    "content": "import deepFreeze from 'deep-freeze-strict';\nimport {pick} from 'lodash-bound';\nimport Command_factory from './Command.js';\n\n/** @wrapper */\nexport default (env) => {\n\t\n\tconst {backend, registerCommandClass} = env;\n\t\n\tconst Command = Command_factory(env);\n\n\t/**\n\t * Commands for relating two specific entities through some specific relationship class.\n\t */\n\tclass Command_link extends Command {\n\t\t\n\t\t/**\n\t\t * the left-hand side entity to the relationship to link\n\t\t * @type {Entity}\n\t\t */\n\t\tentity1;\n\t\t\n\t\t/**\n\t\t * the key (including '-->' or '<--') of the relationship to link\n\t\t * @type {Entity}\n\t\t */\n\t\tkey;\n\t\t\n\t\t/**\n\t\t * the right-hand side entity to the relationship to link\n\t\t * @type {Entity}\n\t\t */\n\t\tentity2;\n\t\t\n\t\t/**\n\t\t * Create a relationship-linking command.\n\t\t * @param {Entity}  entity1 - the left-hand side entity to the relationship to link\n\t\t * @param {string}  key     - the key (including '-->' or '<--') of the relationship to link\n\t\t * @param {Entity}  entity2 - the right-hand side entity to the relationship to link\n\t\t * @param {Object} [options]\n\t\t */\n\t\tconstructor(entity1, key, entity2, options = {}) {\n\t\t\tsuper({\n\t\t\t\t...options,\n\t\t\t\tdependencies: [\n\t\t\t\t\t...(options.dependencies || []),\n\t\t\t\t\t...Command.getLinkUnlinkDependencies(entity1, key, entity2)\n\t\t\t\t]\n\t\t\t});\n\t\t\tthis.entity1 = entity1;\n\t\t\tthis.key     = key;\n\t\t\tthis.entity2 = entity2;\n\t\t\t\n\t\t\t/* add to command-tracking data-structures */\n\t\t\tCommand.registerRelationship(entity1, key, entity2).push(this);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a set that contains the two entities involved in the relationship\n\t\t */\n\t\tget associatedEntities() {\n\t\t\treturn new Set([this.entity1, this.entity2]);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a JSON (plain data) representation of this command\n\t\t */\n\t\ttoJSON(options = {}) {\n\t\t\treturn {\n\t\t\t\tcommandType: 'link',\n\t\t\t\taddress1:    this.entity1::pick('class', 'id'),\n\t\t\t\tkey:         this.key,\n\t\t\t\taddress2:    this.entity2::pick('class', 'id')\n\t\t\t};\n\t\t}\n\t\t\n\t\t/**\n\t\t * Run this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has not already run.\n\t\t * @protected\n\t\t */\n\t\tlocalRun() {\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tthis.entity1.fields[this.key].add(this.entity2);\n\t\t\t});\n\t\t}\n\t\t\n\t\t/**\n\t\t * Commit this command, and only this command (i.e., not its dependencies),\n\t\t * by calling `commit_link` on the backend object.\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tasync localCommit() {\n\t\t\treturn await env.backend.commit_link(\n\t\t\t\tthis.entity1::pick('class', 'id'),\n\t\t\t\tthis.key,\n\t\t\t\tthis.entity2::pick('class', 'id')\n\t\t\t);\n\t\t}\n\t\t\n\t\t/**\n\t\t * Roll back this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tlocalRollback() {\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tthis.entity1.fields[this.key].delete(this.entity2);\n\t\t\t});\n\t\t}\n\t\t\n\t}\n\t\n\treturn registerCommandClass('Command_link', Command_link);\n\t\n};\n",
+    "static": true,
+    "longname": "src/commands/Command_link.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 95,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/commands/Command_link.js",
+    "static": true,
+    "longname": "src/commands/Command_link.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command_link.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "class",
+    "name": "Command_link",
+    "memberof": "src/commands/Command_link.js",
+    "static": true,
+    "longname": "src/commands/Command_link.js~Command_link",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/Command_link.js",
+    "importStyle": "Command_link",
+    "description": "Commands for relating two specific entities through some specific relationship class.",
+    "lineNumber": 13,
+    "interface": false,
+    "extends": [
+      "Command"
+    ]
+  },
+  {
+    "__docId__": 97,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#constructor",
+    "access": null,
+    "description": "the key (including '-->' or '<--') of the relationship to link",
+    "lineNumber": 28,
+    "params": [
+      {
+        "name": "entity1",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "key",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "entity2",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 98,
+    "kind": "member",
+    "name": "entity1",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#entity1",
+    "access": null,
+    "description": null,
+    "lineNumber": 32,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 99,
+    "kind": "member",
+    "name": "key",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#key",
+    "access": null,
+    "description": null,
+    "lineNumber": 33,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 100,
+    "kind": "member",
+    "name": "entity2",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#entity2",
+    "access": null,
+    "description": null,
+    "lineNumber": 34,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 101,
+    "kind": "get",
+    "name": "associatedEntities",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#associatedEntities",
+    "access": null,
+    "description": "the left-hand side entity to the relationship to link",
+    "lineNumber": 55,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 102,
+    "kind": "method",
+    "name": "toJSON",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#toJSON",
+    "access": null,
+    "description": "",
+    "lineNumber": 62,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "a JSON (plain data) representation of this command"
+      }
+    ],
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "a JSON (plain data) representation of this command"
+    }
+  },
+  {
+    "__docId__": 103,
+    "kind": "method",
+    "name": "localRun",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#localRun",
+    "access": "protected",
+    "description": "Run this command, and only this command (i.e., not its dependencies).\nAssumes that this command has not already run.",
+    "lineNumber": 78,
+    "params": []
+  },
+  {
+    "__docId__": 104,
+    "kind": "method",
+    "name": "localCommit",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#localCommit",
+    "access": "protected",
+    "description": "Commit this command, and only this command (i.e., not its dependencies),\nby calling `commit_link` on the backend object.\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 90,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 105,
+    "kind": "method",
+    "name": "localRollback",
+    "memberof": "src/commands/Command_link.js~Command_link",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_link.js~Command_link#localRollback",
+    "access": "protected",
+    "description": "Roll back this command, and only this command (i.e., not its dependencies).\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 101,
+    "params": []
+  },
+  {
+    "__docId__": 106,
+    "kind": "file",
+    "name": "src/commands/Command_load.js",
+    "content": "import {entries, isUndefined, pick, omit} from 'lodash-bound';\nimport assert from 'power-assert';\n\nimport {humanMsg} from 'utilities';\n\nimport Command_factory from './Command.js';\n\n\n\n/** @wrapper */\nexport default (env) => {\n\t\n\tconst Command = Command_factory(env);\n\n\t/**\n\t * Commands for loading a specific entity (for which we have an address)\n\t * from an asynchronous source.\n\t */\n\tclass Command_load extends Command {\n\t\t\n\t\tentity;\n\t\tresponse;\n\t\t\n\t\t/**\n\t\t * Create an entity-loading command. It expects an already existing\n\t\t * entity placeholder to load the values into.\n\t\t * @param {Entity}  entity - an existing entity with `entity.isPlaceholder === true`\n\t\t * @param {Object} [options]\n\t\t */\n\t\tconstructor(entity, options = {}) {\n\t\t\tsuper({\n\t\t\t\t...options,\n\t\t\t\tstate: 'post-commit'\n\t\t\t});\n\t\t\tassert(entity instanceof env.entityClasses.Entity, humanMsg`\n\t\t\t\tA Command_load must be constructed with the entity that\n\t\t\t\twas or should be loaded. It can be a placeholder entity\n\t\t\t\tto be filled in later.\n\t\t\t`);\n\t\t\tthis.entity = entity;\n\t\t\t\n\t\t\t/* add to command-tracking data-structures */\n\t\t\tCommand.registerEntity(this.entity).origin = this;\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a set that contains the (to be) loaded entity\n\t\t */\n\t\tget associatedEntities() {\n\t\t\treturn new Set([this.entity]);\n\t\t}\n\t\t\n\t\t/**\n\t\t * Synchronously load the entity with values already available in JSON form.\n\t\t * @param {Object} values - the values to put into the entity\n\t\t * @return {Entity} the loaded entity\n\t\t */\n\t\tsyncLoad(values) {\n\n\t\t\t/* add to command-tracking data-structures */\n\t\t\tCommand.registerEntity(this.entity).origin = this;\n\n\t\t\t/* fill in the fields */\n\t\t\tthis.response = values;\n\t\t\t\n\t\t\tif (this.entity.isPlaceholder) {\n\t\t\t\t/* sanity check */\n\t\t\t\tassert(values.class === this.entity.constructor.name);\n\n\t\t\t\t/* make the entity not be a placeholder anymore */\n\t\t\t\tthis.entity.pSubject('isPlaceholder').next(false);\n\t\t\t}\n\n\t\t\treturn this.entity;\n\t\t}\n\t\t\n\t\t/**\n\t\t * Asynchronously load the entity by calling `commit_edit` on the backend object.\n\t\t * @return {Promise<Entity>} a promise that resolves as the entity after it is loaded\n\t\t */\n\t\tasync load() {\n\t\t\tif (this.entity.isPlaceholder) {\n\t\t\t\tconst [response] = await env.backend.load([this.entity::pick('class', 'id')]);\n\t\t\t\tif (response) {\n\t\t\t\t\tthis.syncLoad(response);\n\t\t\t\t} else {\n\t\t\t\t\treturn null;\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn this.entity;\n\t\t}\n\t\t\n\t\t/**\n\t\t * This is not supposed to be called, as a load command starts out in 'post-commit'.\n\t\t * (TODO: Put this class elsewhere in the class hierarchy?)\n\t\t */\n\t\tlocalRun() {\n\t\t\tassert(false, humanMsg`\n\t\t\t\tCommand_load#localRun should never be called,\n\t\t\t\tbecause a load command starts out as being committed.\n\t\t\t\tCall Command_load#load instead.\n\t\t\t`);\n\t\t}\n\t\t\n\t\t/**\n\t\t * This is not supposed to be called, as a load command starts out in 'post-commit'.\n\t\t * (TODO: Put this class elsewhere in the class hierarchy?)\n\t\t */\n\t\ttoJSON() {\n\t\t\tassert(false, humanMsg`\n\t\t\t\tCommand_load#toJSON should never be called,\n\t\t\t\tbecause a load command starts out as being committed.\n\t\t\t`);\n\t\t}\n\t\t\n\t\t/**\n\t\t * This is not supposed to be called, as a load command starts out in 'post-commit'.\n\t\t * (TODO: Put this class elsewhere in the class hierarchy?)\n\t\t */\n\t\tlocalCommit() {\n\t\t\tassert(false, humanMsg`\n\t\t\t\tCommand_load#localCommit should never be called,\n\t\t\t\tbecause a load command starts out as being committed.\n\t\t\t`);\n\t\t}\n\t\t\n\t\t/**\n\t\t * This is not supposed to be called, as a load command starts out in 'post-commit'.\n\t\t * (TODO: Put this class elsewhere in the class hierarchy?)\n\t\t */\n\t\tlocalRollback() {\n\t\t\tassert(false, humanMsg`\n\t\t\t\tCommand_load#localRollback should never be called,\n\t\t\t\tbecause a load command starts out as being committed.\n\t\t\t`);\n\t\t}\n\t\t\n\t}\n\t\n\treturn env.registerCommandClass('Command_load', Command_load);\n\t\n};\n",
+    "static": true,
+    "longname": "src/commands/Command_load.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 107,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/commands/Command_load.js",
+    "static": true,
+    "longname": "src/commands/Command_load.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command_load.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 108,
+    "kind": "class",
+    "name": "Command_load",
+    "memberof": "src/commands/Command_load.js",
+    "static": true,
+    "longname": "src/commands/Command_load.js~Command_load",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/Command_load.js",
+    "importStyle": "Command_load",
+    "description": "Commands for loading a specific entity (for which we have an address)\nfrom an asynchronous source.",
+    "lineNumber": 17,
+    "interface": false,
+    "extends": [
+      "Command"
+    ]
+  },
+  {
+    "__docId__": 109,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#constructor",
+    "access": null,
+    "description": "Create an entity-loading command. It expects an already existing\nentity placeholder to load the values into.",
+    "lineNumber": 25,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Entity"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "an existing entity with `entity.isPlaceholder === true`"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "options",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 110,
+    "kind": "member",
+    "name": "entity",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 34,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 111,
+    "kind": "get",
+    "name": "associatedEntities",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#associatedEntities",
+    "access": null,
+    "description": "",
+    "lineNumber": 43,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "a set that contains the (to be) loaded entity"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "a set that contains the (to be) loaded entity"
+    },
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 112,
+    "kind": "method",
+    "name": "syncLoad",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#syncLoad",
+    "access": null,
+    "description": "Synchronously load the entity with values already available in JSON form.",
+    "lineNumber": 52,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "values",
+        "description": "the values to put into the entity"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": "the loaded entity"
+    }
+  },
+  {
+    "__docId__": 113,
+    "kind": "member",
+    "name": "response",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#response",
+    "access": null,
+    "description": null,
+    "lineNumber": 58,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 114,
+    "kind": "method",
+    "name": "load",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#load",
+    "access": null,
+    "description": "Asynchronously load the entity by calling `commit_edit` on the backend object.",
+    "lineNumber": 75,
+    "params": [],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise<Entity>"
+      ],
+      "spread": false,
+      "description": "a promise that resolves as the entity after it is loaded"
+    }
+  },
+  {
+    "__docId__": 115,
+    "kind": "method",
+    "name": "localRun",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#localRun",
+    "access": null,
+    "description": "This is not supposed to be called, as a load command starts out in 'post-commit'.\n(TODO: Put this class elsewhere in the class hierarchy?)",
+    "lineNumber": 93,
+    "params": []
+  },
+  {
+    "__docId__": 116,
+    "kind": "method",
+    "name": "toJSON",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#toJSON",
+    "access": null,
+    "description": "This is not supposed to be called, as a load command starts out in 'post-commit'.\n(TODO: Put this class elsewhere in the class hierarchy?)",
+    "lineNumber": 105,
+    "params": []
+  },
+  {
+    "__docId__": 117,
+    "kind": "method",
+    "name": "localCommit",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#localCommit",
+    "access": null,
+    "description": "This is not supposed to be called, as a load command starts out in 'post-commit'.\n(TODO: Put this class elsewhere in the class hierarchy?)",
+    "lineNumber": 116,
+    "params": []
+  },
+  {
+    "__docId__": 118,
+    "kind": "method",
+    "name": "localRollback",
+    "memberof": "src/commands/Command_load.js~Command_load",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_load.js~Command_load#localRollback",
+    "access": null,
+    "description": "This is not supposed to be called, as a load command starts out in 'post-commit'.\n(TODO: Put this class elsewhere in the class hierarchy?)",
+    "lineNumber": 127,
+    "params": []
+  },
+  {
+    "__docId__": 119,
+    "kind": "file",
+    "name": "src/commands/Command_new.js",
+    "content": "import {entries, pick} from 'lodash-bound';\nimport assert     from 'power-assert';\nimport deepFreeze from 'deep-freeze-strict';\n\nimport {humanMsg} from 'utilities';\n\nimport Command_factory from './Command.js';\n\n\n\n/** @wrapper */\nexport default (env) => {\n\t\n\tconst Command = Command_factory(env);\n\n\t/**\n\t * Commands for creating a new entity of a specific class.\n\t */\n\tclass Command_new extends Command {\n\t\t\n\t\t/**\n\t\t * the name of the class of entity to create\n\t\t * @type {string}\n\t\t */\n\t\tclass;\n\t\t\n\t\t/**\n\t\t * the created entity, if it has been created\n\t\t * @type {?Entity}\n\t\t */\n\t\tentity;\n\t\t\n\t\t/**\n\t\t * Create an entity-creation command that's either pre-run or post-run.\n\t\t * @param {Entity|string} entityOrClass -\n\t\t *        either a string to represent the class of the entity to be created,\n\t\t *        or an entity that already exists (putting the command in post-run state)\n\t\t * @param {Object} options\n\t\t */\n\t\tconstructor(entityOrClass, options = {}) {\n\t\t\tsuper({\n\t\t\t\t...options,\n\t\t\t\tstate: entityOrClass instanceof env.entityClasses.Entity\n\t\t\t\t\t       ? 'post-run'\n\t\t\t\t\t       : 'pre-run'\n\t\t\t});\n\n\t\t\tif (entityOrClass instanceof env.entityClasses.Entity) {\n\t\t\t\t\n\t\t\t\tthis.entity = entityOrClass;\n\t\t\t\tthis.class  = entityOrClass.class;\n\t\t\t\t\n\t\t\t\t/* add to command-tracking data-structures */\n\t\t\t\tCommand.registerEntity(this.entity).origin = this;\n\t\t\t\t\n\t\t\t\t/* record initial values */\n\t\t\t\tthis.initialValues = {};\n\t\t\t\tfor (let [key, field] of this.entity.fields::entries()) {\n\t\t\t\t\tif (field instanceof env.PropertyField) {\n\t\t\t\t\t\tthis.initialValues[key] = field.get();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\t\n\t\t\t} else {\n\t\t\t\t\n\t\t\t\tassert(typeof entityOrClass === 'string');\n\t\t\t\tthis.class = entityOrClass;\n\t\t\t\t\n\t\t\t}\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a set that contains the entity created by this command,\n\t\t *          or an empty set if this command hasn't run\n\t\t */\n\t\tget associatedEntities() {\n\t\t\treturn new Set(this.entity ? [this.entity] : []);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a JSON (plain data) representation of this command\n\t\t */\n\t\ttoJSON(options = {}) {\n\t\t\treturn {\n\t\t\t\tcommandType: 'new',\n\t\t\t\tclass: this.class\n\t\t\t};\n\t\t}\n\t\t\n\t\t/**\n\t\t * Run this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has not already run.\n\t\t * @protected\n\t\t */\n\t\tlocalRun() {\n\t\t\t/* create entity for the first time */\n\t\t\tthis.entity = env.entityClasses[this.class].new();\n\t\t\t\n\t\t\t// TODO: register with the module, probably?\n\t\t\t//     : We haven't yet tried to roll back Command_new,\n\t\t\t//     : so this method has never yet been called.\n\t\t\t\n\t\t\t/* add to command-tracking data-structures */\n\t\t\tCommand.registerEntity(this.entity).origin = this;\n\t\t}\n\t\t\n\t\t/**\n\t\t * Commit this command, and only this command (i.e., not its dependencies),\n\t\t * by calling `commit_new` on the backend object.\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tasync localCommit() {\n\t\t\t/* commit through the backend and wait for the response */\n\t\t\tlet response = await env.backend.commit_new(\n\t\t\t\tthis::pick('class')\n\t\t\t);\n\t\t\t\n\t\t\t/* assign the new id to the entity */\n\t\t\tassert(typeof response.id === 'number', humanMsg`\n\t\t\t\tThe backend function commit_new needs to\n\t\t\t\treturn an object with an id property.\n\t\t\t`);\n\t\t\tthis.entity.fields['id'].set(response.id, { ignoreReadonly: true });\n\t\t\t\n\t\t\t/***/\n\t\t\treturn response;\n\t\t}\n\t\n\t\t/**\n\t\t * Roll back this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tlocalRollback() {\n\t\t\t/* delete the entity */\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tthis.entity.delete();\n\t\t\t});\n\t\t\t\n\t\t\t/* remove from command-tracking data-structures */\n\t\t\tCommand.registerEntity(this.entity).origin = null;\n\t\t\t\n\t\t\t/* forget about created entity */\n\t\t\tthis.entity = null;\n\t\t}\n\t}\n\t\n\treturn env.registerCommandClass('Command_new', Command_new);\n\t\n};\n",
+    "static": true,
+    "longname": "src/commands/Command_new.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 120,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/commands/Command_new.js",
+    "static": true,
+    "longname": "src/commands/Command_new.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command_new.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 121,
+    "kind": "class",
+    "name": "Command_new",
+    "memberof": "src/commands/Command_new.js",
+    "static": true,
+    "longname": "src/commands/Command_new.js~Command_new",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/Command_new.js",
+    "importStyle": "Command_new",
+    "description": "Commands for creating a new entity of a specific class.",
+    "lineNumber": 17,
+    "interface": false,
+    "extends": [
+      "Command"
+    ]
+  },
+  {
+    "__docId__": 122,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#constructor",
+    "access": null,
+    "description": "the name of the class of entity to create",
+    "lineNumber": 32,
+    "params": [
+      {
+        "name": "entityOrClass",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 123,
+    "kind": "member",
+    "name": "entity",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 39,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 124,
+    "kind": "member",
+    "name": "class",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#class",
+    "access": null,
+    "description": null,
+    "lineNumber": 40,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 125,
+    "kind": "member",
+    "name": "initialValues",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#initialValues",
+    "access": null,
+    "description": null,
+    "lineNumber": 46,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "{}"
+      ]
+    }
+  },
+  {
+    "__docId__": 126,
+    "kind": "member",
+    "name": "class",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#class",
+    "access": null,
+    "description": null,
+    "lineNumber": 57,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 127,
+    "kind": "get",
+    "name": "associatedEntities",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#associatedEntities",
+    "access": null,
+    "description": "the created entity, if it has been created",
+    "lineNumber": 71,
+    "type": {
+      "nullable": true,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 128,
+    "kind": "method",
+    "name": "toJSON",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#toJSON",
+    "access": null,
+    "description": "",
+    "lineNumber": 78,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "a JSON (plain data) representation of this command"
+      }
+    ],
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "a JSON (plain data) representation of this command"
+    }
+  },
+  {
+    "__docId__": 129,
+    "kind": "method",
+    "name": "localRun",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#localRun",
+    "access": "protected",
+    "description": "Run this command, and only this command (i.e., not its dependencies).\nAssumes that this command has not already run.",
+    "lineNumber": 90,
+    "params": []
+  },
+  {
+    "__docId__": 130,
+    "kind": "member",
+    "name": "entity",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 92,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 131,
+    "kind": "method",
+    "name": "localCommit",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#localCommit",
+    "access": "protected",
+    "description": "Commit this command, and only this command (i.e., not its dependencies),\nby calling `commit_new` on the backend object.\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 108,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 132,
+    "kind": "method",
+    "name": "localRollback",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#localRollback",
+    "access": "protected",
+    "description": "Roll back this command, and only this command (i.e., not its dependencies).\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 128,
+    "params": []
+  },
+  {
+    "__docId__": 133,
+    "kind": "member",
+    "name": "entity",
+    "memberof": "src/commands/Command_new.js~Command_new",
+    "static": false,
+    "longname": "src/commands/Command_new.js~Command_new#entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 138,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 134,
+    "kind": "file",
+    "name": "src/commands/Command_unlink.js",
+    "content": "import {pick} from 'lodash-bound';\nimport Command_factory from './Command.js';\n\n\n/** @wrapper */\nexport default (env) => {\n\t\n\tconst {backend, registerCommandClass} = env;\n\t\n\tconst Command = Command_factory(env);\n\t\n\t/**\n\t * Commands for removing a specific relationship between two specific entities.\n\t */\n\tclass Command_unlink extends Command {\n\t\t\n\t\t/**\n\t\t * the left-hand side entity to the relationship to unlink\n\t\t * @type {Entity}\n\t\t */\n\t\tentity1;\n\t\t\n\t\t/**\n\t\t * the key (including '-->' or '<--') of the relationship to unlink\n\t\t * @type {Entity}\n\t\t */\n\t\tkey;\n\t\t\n\t\t/**\n\t\t * the right-hand side entity to the relationship to unlink\n\t\t * @type {Entity}\n\t\t */\n\t\tentity2;\n\t\t\n\t\t/**\n\t\t * Create a relationship-unlinking command.\n\t\t * @param {Entity}  entity1 - the left-hand side entity to the relationship to unlink\n\t\t * @param {string}  key     - the key (including '-->' or '<--') of the relationship to unlink\n\t\t * @param {Entity}  entity2 - the right-hand side entity to the relationship to unlink\n\t\t * @param {Object} [options]\n\t\t */\n\t\tconstructor(entity1, key, entity2, options = {}) {\n\t\t\tsuper({\n\t\t\t\t...options,\n\t\t\t\tdependencies: [\n\t\t\t\t\t...(options.dependencies || []),\n\t\t\t\t\t...Command.getLinkUnlinkDependencies(entity1, key, entity2)\n\t\t\t\t]\n\t\t\t});\n\t\t\tthis.entity1 = entity1;\n\t\t\tthis.key     = key;\n\t\t\tthis.entity2 = entity2;\n\t\t\t\n\t\t\t/* add to command-tracking data-structures */\n\t\t\tCommand.registerRelationship(entity1, key, entity2).push(this);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a set that contains the two entities involved in the relationship\n\t\t */\n\t\tget associatedEntities() {\n\t\t\treturn new Set([this.entity1, this.entity2]);\n\t\t}\n\t\t\n\t\t/**\n\t\t * @returns a JSON (plain data) representation of this command\n\t\t */\n\t\ttoJSON(options = {}) {\n\t\t\treturn {\n\t\t\t\tcommandType: 'unlink',\n\t\t\t\taddress1:    this.entity1::pick('class', 'id'),\n\t\t\t\tkey:         this.key,\n\t\t\t\taddress2:    this.entity2::pick('class', 'id')\n\t\t\t};\n\t\t}\n\t\t\n\t\t/**\n\t\t * Run this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has not already run.\n\t\t * @protected\n\t\t */\n\t\tlocalRun() {\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tthis.entity1.fields[this.key].delete(this.entity2);\n\t\t\t});\n\t\t}\n\t\t\n\t\t/**\n\t\t * Commit this command, and only this command (i.e., not its dependencies),\n\t\t * by calling `commit_unlink` on the backend object.\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tasync localCommit() {\n\t\t\treturn await env.backend.commit_unlink(\n\t\t\t\tthis.entity1::pick('class', 'id'),\n\t\t\t\tthis.key,\n\t\t\t\tthis.entity2::pick('class', 'id')\n\t\t\t);\n\t\t}\n\t\t\n\t\t/**\n\t\t * Roll back this command, and only this command (i.e., not its dependencies).\n\t\t * Assumes that this command has run, but has not yet committed.\n\t\t * @protected\n\t\t */\n\t\tlocalRollback() {\n\t\t\tenv.internalOperation(() => {\n\t\t\t\tthis.entity1.fields[this.key].add(this.entity2);\n\t\t\t});\n\t\t}\n\t\t\n\t}\n\t\n\treturn registerCommandClass('Command_unlink', Command_unlink);\n\t\n};\n",
+    "static": true,
+    "longname": "src/commands/Command_unlink.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 135,
+    "kind": "variable",
+    "name": "_extends",
+    "memberof": "src/commands/Command_unlink.js",
+    "static": true,
+    "longname": "src/commands/Command_unlink.js~_extends",
+    "access": null,
+    "export": false,
+    "importPath": "open-physiology-model/src/commands/Command_unlink.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 136,
+    "kind": "class",
+    "name": "Command_unlink",
+    "memberof": "src/commands/Command_unlink.js",
+    "static": true,
+    "longname": "src/commands/Command_unlink.js~Command_unlink",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/Command_unlink.js",
+    "importStyle": "Command_unlink",
+    "description": "Commands for removing a specific relationship between two specific entities.",
+    "lineNumber": 12,
+    "interface": false,
+    "extends": [
+      "Command"
+    ]
+  },
+  {
+    "__docId__": 137,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#constructor",
+    "access": null,
+    "description": "the key (including '-->' or '<--') of the relationship to unlink",
+    "lineNumber": 27,
+    "params": [
+      {
+        "name": "entity1",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "key",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "entity2",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 138,
+    "kind": "member",
+    "name": "entity1",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#entity1",
+    "access": null,
+    "description": null,
+    "lineNumber": 31,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 139,
+    "kind": "member",
+    "name": "key",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#key",
+    "access": null,
+    "description": null,
+    "lineNumber": 32,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 140,
+    "kind": "member",
+    "name": "entity2",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#entity2",
+    "access": null,
+    "description": null,
+    "lineNumber": 33,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 141,
+    "kind": "get",
+    "name": "associatedEntities",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#associatedEntities",
+    "access": null,
+    "description": "the left-hand side entity to the relationship to unlink",
+    "lineNumber": 54,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Entity"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 142,
+    "kind": "method",
+    "name": "toJSON",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#toJSON",
+    "access": null,
+    "description": "",
+    "lineNumber": 61,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "a JSON (plain data) representation of this command"
+      }
+    ],
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "a JSON (plain data) representation of this command"
+    }
+  },
+  {
+    "__docId__": 143,
+    "kind": "method",
+    "name": "localRun",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#localRun",
+    "access": "protected",
+    "description": "Run this command, and only this command (i.e., not its dependencies).\nAssumes that this command has not already run.",
+    "lineNumber": 77,
+    "params": []
+  },
+  {
+    "__docId__": 144,
+    "kind": "method",
+    "name": "localCommit",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#localCommit",
+    "access": "protected",
+    "description": "Commit this command, and only this command (i.e., not its dependencies),\nby calling `commit_unlink` on the backend object.\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 89,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 145,
+    "kind": "method",
+    "name": "localRollback",
+    "memberof": "src/commands/Command_unlink.js~Command_unlink",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/commands/Command_unlink.js~Command_unlink#localRollback",
+    "access": "protected",
+    "description": "Roll back this command, and only this command (i.e., not its dependencies).\nAssumes that this command has run, but has not yet committed.",
+    "lineNumber": 100,
+    "params": []
+  },
+  {
+    "__docId__": 146,
+    "kind": "file",
+    "name": "src/commands/commandClasses.js",
+    "content": "import Command_factory        from './Command.js';\nimport Command_delete_factory from './Command_delete.js';\nimport Command_edit_factory   from './Command_edit.js';\nimport Command_load_factory   from './Command_load.js';\nimport Command_new_factory    from './Command_new.js';\nimport Command_link_factory   from './Command_link.js';\nimport Command_unlink_factory from './Command_unlink.js';\n\n/** @ignore */\nexport default (env) => {\n\tenv.commandClasses = {};\n\tenv.registerCommandClass = (name, CommandClass) => {\n\t\tif (!env.commandClasses[name]) {\n\t\t\tenv.commandClasses[name] = CommandClass;\n\t\t}\n\t\treturn env.commandClasses[name];\n\t};\n\n\treturn {\n\t\tCommand       : Command_factory       (env),\n\t\tCommand_delete: Command_delete_factory(env),\n\t\tCommand_edit  : Command_edit_factory  (env),\n\t\tCommand_load  : Command_load_factory  (env),\n\t\tCommand_new   : Command_new_factory   (env),\n\t\tCommand_link  : Command_link_factory  (env),\n\t\tCommand_unlink: Command_unlink_factory(env)\n\t};\n};\n",
+    "static": true,
+    "longname": "src/commands/commandClasses.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 147,
+    "kind": "function",
+    "name": "commandClasses",
+    "memberof": "src/commands/commandClasses.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/commands/commandClasses.js~commandClasses",
+    "access": null,
+    "export": true,
+    "importPath": "open-physiology-model/src/commands/commandClasses.js",
+    "importStyle": "commandClasses",
+    "description": null,
+    "lineNumber": 10,
+    "ignore": true,
+    "params": [
+      {
+        "name": "env",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"Command\": *, \"Command_delete\": *, \"Command_edit\": *, \"Command_load\": *, \"Command_new\": *, \"Command_link\": *, \"Command_unlink\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 148,
+    "kind": "file",
+    "name": "src/index.js",
+    "content": "export {Module} from './Module.js';\nexport {default as ajaxBackend} from './ajaxBackend.js';\n",
+    "static": true,
+    "longname": "src/index.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 150,
+    "kind": "external",
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Infinity",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 151,
+    "kind": "external",
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~NaN",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 152,
+    "kind": "external",
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~undefined",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 153,
+    "kind": "external",
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~null",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 154,
+    "kind": "external",
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 155,
+    "kind": "external",
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 156,
+    "kind": "external",
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 157,
+    "kind": "external",
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 158,
+    "kind": "external",
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 159,
+    "kind": "external",
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 160,
+    "kind": "external",
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Symbol",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 161,
+    "kind": "external",
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Error",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 162,
+    "kind": "external",
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~EvalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 163,
+    "kind": "external",
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~InternalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 164,
+    "kind": "external",
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RangeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 165,
+    "kind": "external",
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ReferenceError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 166,
+    "kind": "external",
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~SyntaxError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 167,
+    "kind": "external",
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~TypeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 168,
+    "kind": "external",
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~URIError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 169,
+    "kind": "external",
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 170,
+    "kind": "external",
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 171,
+    "kind": "external",
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Date",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 172,
+    "kind": "external",
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~String",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 173,
+    "kind": "external",
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~string",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 174,
+    "kind": "external",
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RegExp",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 175,
+    "kind": "external",
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 176,
+    "kind": "external",
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 177,
+    "kind": "external",
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 178,
+    "kind": "external",
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8ClampedArray",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 179,
+    "kind": "external",
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 180,
+    "kind": "external",
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 181,
+    "kind": "external",
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 182,
+    "kind": "external",
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 183,
+    "kind": "external",
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 184,
+    "kind": "external",
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float64Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 185,
+    "kind": "external",
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Map",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 186,
+    "kind": "external",
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Set",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 187,
+    "kind": "external",
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakMap",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 188,
+    "kind": "external",
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakSet",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 189,
+    "kind": "external",
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ArrayBuffer",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 190,
+    "kind": "external",
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~DataView",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 191,
+    "kind": "external",
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~JSON",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 192,
+    "kind": "external",
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Promise",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 193,
+    "kind": "external",
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Generator",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 194,
+    "kind": "external",
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~GeneratorFunction",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 195,
+    "kind": "external",
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Reflect",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 196,
+    "kind": "external",
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Proxy",
+    "access": null,
+    "description": "",
+    "lineNumber": 193,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 198,
+    "kind": "external",
+    "name": "CanvasRenderingContext2D",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~CanvasRenderingContext2D",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 199,
+    "kind": "external",
+    "name": "DocumentFragment",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~DocumentFragment",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 200,
+    "kind": "external",
+    "name": "Element",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Element",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 201,
+    "kind": "external",
+    "name": "Event",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Event",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Event",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 202,
+    "kind": "external",
+    "name": "Node",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Node",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 203,
+    "kind": "external",
+    "name": "NodeList",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/NodeList",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~NodeList",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 204,
+    "kind": "external",
+    "name": "XMLHttpRequest",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~XMLHttpRequest",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 205,
+    "kind": "external",
+    "name": "AudioContext",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/AudioContext",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~AudioContext",
+    "access": null,
+    "description": "",
+    "lineNumber": 34,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 206,
+    "kind": "testFile",
+    "name": "test/ajaxBackend.spec.js",
+    "content": "import {describe, it, expect} from './test.helper';\nimport {Module}               from '../src/index';\nimport manifestFactory        from 'open-physiology-manifest';\n\nimport {pick} from 'lodash-bound';\n\nimport ajaxBackend from '../src/ajaxBackend';\nimport najax from 'najax';\n\nconst ajax = (...args) => Promise.resolve(najax(...args));\n\n\nconst BASE_URL = 'http://localhost:8888';\n\ndescribe(\"ajaxBackend\", () => {\n    \n    let backend, module, classes;\n   \tbeforeEach(() => {\n   \t\tlet manifest = manifestFactory();\n   \t\t({backend} = ajaxBackend({\n            baseURL: BASE_URL,\n            ajax:    najax\n        }));\n   \t\tmodule = new Module({manifest, backend});\n   \t\tclasses = module.entityClasses;\n   \t});\n   \t\n    // NOTE: These tests only work if there's a server running on BASE_URL\n   \t\n    it(\"can commit to the server\", async () => {\n        \n        let blood = module.new({\n            class: 'Material',\n            name:   \"Blood\"\n        });\n        \n        await module.commit();\n        \n        let response = JSON.parse(await ajax({\n            url:         `${BASE_URL}/Material/${blood.id}`,\n            method:      'GET',\n            contentType: 'application/json'\n        }));\n        \n        expect(response).to.have.a.lengthOf(1);\n        \n        let bloodResponse = response[0];\n        \n        expect(bloodResponse).to.have.property('id',     blood.id );\n        expect(bloodResponse).to.have.property('class', 'Material');\n        expect(bloodResponse).to.have.property('name',  \"Blood\"   );\n    });\n    \n    it(\"can load from the server\", async () => {\n        \n        const {Material} = classes;\n        \n        let address = JSON.parse(await ajax({\n            url:         `${BASE_URL}/Material`,\n            method:      'POST',\n            contentType: 'application/json',\n            data: {\n                name: \"Water\"\n            }\n        }))[0]::pick('class', 'id');\n        \n        let water = await module.get(address);\n        \n        expect(water).to.be.an.instanceOf(Material);\n        expect(water.name).to.equal(\"Water\");\n        \n    });\n    \n});\n",
+    "static": true,
+    "longname": "test/ajaxBackend.spec.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 207,
+    "kind": "testDescribe",
+    "name": "describe0",
+    "testId": 0,
+    "memberof": "test/ajaxBackend.spec.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/ajaxBackend.spec.js~describe0",
+    "access": null,
+    "description": "ajaxBackend",
+    "lineNumber": 14
+  },
+  {
+    "__docId__": 208,
+    "kind": "testIt",
+    "name": "it1",
+    "testId": 1,
+    "memberof": "test/ajaxBackend.spec.js~describe0",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/ajaxBackend.spec.js~describe0.it1",
+    "access": null,
+    "description": "can commit to the server",
+    "lineNumber": 29
+  },
+  {
+    "__docId__": 209,
+    "kind": "testIt",
+    "name": "it2",
+    "testId": 2,
+    "memberof": "test/ajaxBackend.spec.js~describe0",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/ajaxBackend.spec.js~describe0.it2",
+    "access": null,
+    "description": "can load from the server",
+    "lineNumber": 53
+  },
+  {
+    "__docId__": 210,
+    "kind": "testFile",
+    "name": "test/simple.spec.js",
+    "content": "import {describe, it, expect} from './test.helper';\nimport {Module}               from '../src/index';\nimport manifestFactory        from 'open-physiology-manifest';\nimport {simpleMockHandlers}   from './mock-handlers.helper';\n\n\ndescribe(\"Module instance\", () => {\n\t\n\tlet storage, backend, module, classes;\n\tbeforeEach(() => {\n\t\tlet manifest = manifestFactory();\n\t\t({storage, backend} = simpleMockHandlers());\n\t\tmodule = new Module({manifest, backend});\n\t\tclasses = module.entityClasses;\n\t});\n\t\n\t\n\tit(\"has resource classes from the manifest in it\", () => {\n\t\t\n\t\texpect(classes).to.be.an('Object');\n\t\t\n\t\tconst {Entity, Material, Lyph} = classes;\n\t\t\n\t\texpect(Material).to.be.subclassOf(Entity);\n\t\texpect(Lyph).to.be.subclassOf(Entity, Material);\n\t\t\n\t});\n\t\n\tit(\"can create new resources and track them (uncommitted)\", async () => {\n\t\t\n\t\tconst {Entity, Material, Lyph} = classes;\n\t\t\n\t\tlet water = module.new({ class: 'Material', name: \"Water\" });\n\t\t\n\t\texpect(water).to.be.instanceOf(Material);\n\t\t\n\t\tlet waterRetrieved = await module.get({ class: 'Material', id: water.id });\n\t\t\n\t\texpect(waterRetrieved).to.equal(water);\n\t\t\n\t});\n\t\n\tit(\"can commit, giving resources new ids\", async () => {\n\t\t\n\t\tconst {Entity, Material, Lyph} = classes;\n\t\t\n\t\tlet water = module.new({ class: 'Material', name: \"Water\" });\n\t\t\n\t\texpect(water.id).to.be.lessThan(0);\n\t\t\n\t\tawait module.commit();\n\t\t\n\t\texpect(water.id).to.be.greaterThan(0);\n\t\t\n\t\tlet storedJSON = storage.readAll();\n\t\texpect(storedJSON).to.eql([{\n\t\t\tclass: 'Material',\n\t\t\tid: water.id,\n\t\t\tname: \"Water\"\n\t\t}]);\n\t\t\n\t\tlet [waterRetrieved] = await module.get([{ class: 'Material', id: water.id }]);\n\t\texpect(waterRetrieved).to.equal(water);\n\t\t\n\t});\n\t\n\tit(\"can rollback, making resources un-exist\", async () => {\n\t\t\n\t\tconst {Entity, Material, Lyph} = classes;\n\t\t\n\t\tlet water = module.new({ class: 'Material', name: \"Water\" });\n\t\t\n\t\texpect(water.deleted).to.be.false;\n\t\t\n\t\tmodule.rollback();\n\t\t\n\t\texpect(water.deleted).to.be.true;\n\t\t\n\t\tlet [waterRetrieved] = await module.get([{ class: 'Material', id: water.id }]);\n\t\t\n\t\texpect(waterRetrieved).to.be.null;\n\t\t\n\t});\n\t\n\tit(\"can delete resources (uncommitted)\", async () => {\n\t\t\n\t\tconst {Entity, Material, Lyph} = classes;\n\t\t\n\t\tlet water = module.new({ class: 'Material', name: \"Water\" });\n\t\t\n\t\twater.delete();\n\t\t\n\t\tlet [waterRetrieved] = await module.get([{ class: 'Material', id: water.id }]);\n\t\t\n\t\texpect(waterRetrieved).to.be.null;\n\t\t\n\t});\n\t\n\tit(\"can delete resources and commit deletion\", async () => {\n\t\t\n\t\tconst {Entity, Material, Lyph} = classes;\n\t\t\n\t\tlet water = module.new({ class: 'Material', name: \"Water\" });\n\t\t\n\t\twater.delete();\n\t\t\n\t\tmodule.commit();\n\t\t\n\t\tlet [waterRetrieved] = await module.get([{ class: 'Material', id: water.id }]);\n\t\t\n\t\texpect(waterRetrieved).to.be.null;\n\t\t\n\t});\n\t\n\tit(\"can commit relationships\", async () => {\n\t\t\n\t\tconst {Entity, Material, Lyph, Type} = classes;\n\t\t\n\t\tlet water = module.new({ class: 'Material', name: \"Water\" });\n\t\t\n\t\tlet waterType = module.new({ class: 'Type', definition: water });\n\t\t\n\t\texpect(water.id)    .to.be.lessThan(0);\n\t\texpect(waterType.id).to.be.lessThan(0);\n\t\texpect(water.id).to.not.equal(waterType.id);\n\t\t\n\t\tawait module.commit();\n\t\t\n\t\texpect(water.id)    .to.be.greaterThan(0);\n\t\texpect(waterType.id).to.be.greaterThan(0);\n\t\texpect(water.id).to.not.equal(waterType.id);\n\t\t\n\t\tlet storedJSON = storage.readAll();\n\t\t\n\t\texpect(storedJSON).to.have.lengthOf(2);\n\t\texpect(storedJSON.filter(o=>o.id === water.id)[0]).to.eql({\n\t\t\tclass: 'Material',\n\t\t    id: water.id,\n\t\t    name: 'Water',\n\t\t    '-->HasType':     [ { class: 'Type', id: waterType.id } ],\n\t\t    '-->DefinesType':   { class: 'Type', id: waterType.id }\n\t\t});\n\t\texpect(storedJSON.filter(o=>o.id === waterType.id)[0]).to.eql({\n\t\t\tclass: 'Type',\n\t\t    id: waterType.id,\n\t\t    '<--HasType':     [ { class: 'Material', id: water.id } ],\n\t\t    '<--DefinesType':   { class: 'Material', id: water.id }\n\t\t});\n\n\t\tlet [waterRetrieved] = await module.get([{ class: 'Material', id: water.id }]);\n\t\texpect(waterRetrieved).to.equal(water);\n\t\t\n\t\tlet [waterTypeRetrieved] = await module.get([{ class: 'Type', id: waterType.id }]);\n\t\texpect(waterTypeRetrieved).to.equal(waterType);\n\t\t\n\t});\n\t\n\tit(\"can load entities from the backend\", async () => {\n\t\t\n\t\tconst {Entity, Material, Lyph, Type} = classes;\n\t\t\n\t\tstorage.create({\n\t\t\tclass: 'Material',\n\t\t    id: 1,\n\t\t    name: 'Water',\n\t\t    '-->HasType':     [ { class: 'Type', id: 2 } ],\n\t\t    '-->DefinesType':   { class: 'Type', id: 2 }\n\t\t});\n\t\tstorage.create({\n\t\t\tclass: 'Type',\n\t\t    id: 2,\n\t\t    '<--HasType':     [ { class: 'Material', id: 1 } ],\n\t\t    '<--DefinesType':   { class: 'Material', id: 1 }\n\t\t});\n\t\t\n\t\tlet [waterTypeRetrieved] = await module.getAll({ class: 'Type' });\n\t\texpect(waterTypeRetrieved).to.be.instanceof(Type);\n\t\t\n\t\tlet water = waterTypeRetrieved.definition;\n\t\texpect(water).to.be.instanceof(Material);\n\t\texpect(water.isPlaceholder).to.be.true;\n\t\t\n\t\t// let [waterRetrieved] = await module.get([{ class: water.class, id: water.id }]);\n\t\t// expect(waterRetrieved).to.equal(water);\n\t\t// expect(water.isPlaceholder).to.be.false;\n\t\t\n\t});\n\t\n\tit(\"responds with null when asked for a resource that doesn't exist\", async () => {\n\t\t\n\t\tconst {Entity, Material, ExternalResource, Type} = classes;\n\t\t\n\t\tlet blood = await module.get({ class: 'Material', id: 12345 });\n\t\t\n\t\texpect(blood).to.be.null;\n\t\t\n\t\tlet fmaThing = await module.get({ class: 'ExternalResource', id: 12345 });\n\t\t\n\t\texpect(fmaThing).to.be.null;\n\t\t\n\t});\n\t\n});\n",
+    "static": true,
+    "longname": "test/simple.spec.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 211,
+    "kind": "testDescribe",
+    "name": "describe3",
+    "testId": 3,
+    "memberof": "test/simple.spec.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3",
+    "access": null,
+    "description": "Module instance",
+    "lineNumber": 6
+  },
+  {
+    "__docId__": 212,
+    "kind": "testIt",
+    "name": "it4",
+    "testId": 4,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it4",
+    "access": null,
+    "description": "has resource classes from the manifest in it",
+    "lineNumber": 16
+  },
+  {
+    "__docId__": 213,
+    "kind": "testIt",
+    "name": "it5",
+    "testId": 5,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it5",
+    "access": null,
+    "description": "can create new resources and track them (uncommitted)",
+    "lineNumber": 26
+  },
+  {
+    "__docId__": 214,
+    "kind": "testIt",
+    "name": "it6",
+    "testId": 6,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it6",
+    "access": null,
+    "description": "can commit, giving resources new ids",
+    "lineNumber": 39
+  },
+  {
+    "__docId__": 215,
+    "kind": "testIt",
+    "name": "it7",
+    "testId": 7,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it7",
+    "access": null,
+    "description": "can rollback, making resources un-exist",
+    "lineNumber": 62
+  },
+  {
+    "__docId__": 216,
+    "kind": "testIt",
+    "name": "it8",
+    "testId": 8,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it8",
+    "access": null,
+    "description": "can delete resources (uncommitted)",
+    "lineNumber": 79
+  },
+  {
+    "__docId__": 217,
+    "kind": "testIt",
+    "name": "it9",
+    "testId": 9,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it9",
+    "access": null,
+    "description": "can delete resources and commit deletion",
+    "lineNumber": 92
+  },
+  {
+    "__docId__": 218,
+    "kind": "testIt",
+    "name": "it10",
+    "testId": 10,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it10",
+    "access": null,
+    "description": "can commit relationships",
+    "lineNumber": 107
+  },
+  {
+    "__docId__": 219,
+    "kind": "testIt",
+    "name": "it11",
+    "testId": 11,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it11",
+    "access": null,
+    "description": "can load entities from the backend",
+    "lineNumber": 149
+  },
+  {
+    "__docId__": 220,
+    "kind": "testIt",
+    "name": "it12",
+    "testId": 12,
+    "memberof": "test/simple.spec.js~describe3",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/simple.spec.js~describe3.it12",
+    "access": null,
+    "description": "responds with null when asked for a resource that doesn't exist",
+    "lineNumber": 179
+  }
+]

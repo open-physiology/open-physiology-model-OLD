@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/commands/Command.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/mhelvens/open-physiology-model" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Module.js~Module.html">Module</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajaxBackend">ajaxBackend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Address">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Backend">Backend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Entity">Entity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-opmModule">opmModule</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">commands</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_delete.js~Command_delete.html">Command_delete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_edit.js~Command_edit.html">Command_edit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_link.js~Command_link.html">Command_link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_load.js~Command_load.html">Command_load</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_new.js~Command_new.html">Command_new</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/commands/Command_unlink.js~Command_unlink.html">Command_unlink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CommandState">CommandState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-EntityCommands">EntityCommands</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/commands/Command.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Graph from &apos;graph.js/dist/graph&apos;;
+import assert from &apos;power-assert&apos;;
+import {last, values, flatten} from &apos;lodash-bound&apos;;
+import {event, ValueTracker, property} from &apos;utilities&apos;;
+
+const $$running      = Symbol(&apos;$$running&apos;);
+const $$committing   = Symbol(&apos;$$committing&apos;);
+const $$rollingBack  = Symbol(&apos;$$rollingBack&apos;);
+const $$state        = Symbol(&apos;$$state&apos;);
+
+/** @wrapper */
+export default (env) =&gt; {
+	
+	/**
+	 * an object pointing to the commands relevant to a specific entity
+	 * @typedef {{
+	 *     origin: (Command_new | Command_load),
+	 *     edit: Object&lt;string, Array&lt;Command_edit&gt;&gt;,
+	 *     delete: Command_delete?,
+	 *     relationships: Object&lt;string, Map&lt;Entity, Array&lt;Command_link | Command_unlink&gt;&gt;&gt;
+	 * }} EntityCommands
+	 */
+	
+	/**
+	 * one of three possible states a command can be in
+	 * @typedef {&apos;pre-run&apos;|&apos;post-run&apos;|&apos;post-commit&apos;} CommandState
+	 */
+	
+	/**
+	 * The main class of the command design-pattern used in this project.
+	 * There are commands for creating new entities, loading them from
+	 * an asynchronous source, editing them and deleting them; and for
+	 * linking or unlinking entities through specific relationships.
+	 * A command can be run, rolled back and committed asynchronously.
+	 * Commands have prerequisite commands. For example, a command for
+	 * editing a lyph (e.g., changing its name) has to be preceded by
+	 * a command for creating or loading that lyph.
+	 */
+	class Command extends ValueTracker {
+	
+		///// command tracking /////
+		
+		/**
+		 * the graph containing the currently relevant commands,
+		 * partially ordered by command prerequisites
+		 * @type {Graph}
+		 */
+		static commandGraph    = new Graph;
+		
+		/**
+		 * an array of commands that have been run, in the order that they were run
+		 * @type {Array}
+		 */
+		static commandHistory  = new Array;
+		
+		/**
+		 * mapping each entity to the commands relevant to it, categorized by command class
+		 * @type {
+		 *     WeakMap&lt;Entity, EntityCommands&gt;
+		 * }
+		 */
+		static entityToCommand = new WeakMap;
+		
+		/**
+		 * register an entity, so we can start keeping track of related commands
+		 * @param {Entity} entity - the entity to register
+		 * @return {EntityCommands} the object tracking the entity&apos;s commands
+		 */
+		static registerEntity(entity) {
+			if (!Command.entityToCommand.has(entity)) {
+				Command.entityToCommand.set(entity, {
+					origin: null,
+					edit:   {},
+					delete: null,
+					relationships: {}
+				});
+			}
+			return Command.entityToCommand.get(entity);
+		}
+		
+		/**
+		 * Register a property field of an entity so we can start tracking related commands.
+		 * @param {Entity} entity - the entity to track property commands for
+		 * @param {string} key    - the key of the property field
+		 * @return {Array&lt;Command_edit&gt;} the array tracking the relevant edit commands
+		 */
+		static registerEntityProperty(entity, key) {
+			const e = Command.registerEntity(entity);
+			if (!e.edit[key]) { e.edit[key] = [] }
+			return e.edit[key];
+		}
+		
+		/**
+		 * register a specific relationship between two specific entities so we can start tracking related commands
+		 * @param {Entity} entity1 - the entity on the left-hand side
+		 * @param {string} key     - the key of the relationship field; this should always be prefixed with &apos;--&gt;&apos; or &apos;&lt;--&apos;
+		 * @param {Entity} entity2 - the entity on the right-hand side
+		 * @return {Array&lt;Command_link|Command_unlink&gt;} the array tracking the relevant link and unlink commands
+		 */
+		static registerRelationship(entity1, key, entity2) {
+			const e1 = Command.registerEntity(entity1);
+			const e2 = Command.registerEntity(entity2);
+			
+			/* reverse key */
+			// e.g., &apos;--&gt;HasLayer&apos; into &apos;&lt;--HasLayer&apos;
+			const rKey = key.replace(/^(--&gt;|&lt;--)/, m =&gt; m[0] === &apos;&lt;&apos; ? &apos;--&gt;&apos; : &apos;&lt;--&apos;);
+			
+			/* prime the data-structures */
+			if (!e1.relationships[key])  { e1.relationships[key]  = new Map }
+			if (!e2.relationships[rKey]) { e2.relationships[rKey] = new Map }
+			if (!e1.relationships[key].has(entity2)) {
+				let linkUnlinkCommands = [];
+				e1.relationships[key] .set(entity2, linkUnlinkCommands);
+				e2.relationships[rKey].set(entity1, linkUnlinkCommands);
+			}
+			
+			/* return the shared array of link/unlink commands */
+			return e1.relationships[key].get(entity2);
+		}
+		
+		/**
+		 * a method with common code used by `Command.getEditDependencies`,
+		 * `Command.getLinkUnlinkDependencies` and `Command.getDeleteDependencies`
+		 * @private
+		 */
+		static _getDependencies(entity, arrays) {
+			let result = new Set;
+			let commandsToDelete = new Set;
+			let e = Command.registerEntity(entity);
+			/* check out the edit and link/unlink commands */
+			for (let arr of arrays) {
+				let cmdToDelete = null;
+				while (arr::last() &amp;&amp; arr::last().state === &apos;pre-run&apos;) {
+					cmdToDelete = arr.pop();
+				}
+				if (cmdToDelete) {
+					commandsToDelete.add(cmdToDelete);
+				}
+				if (arr.length &gt; 0) {
+					result.add(arr::last());
+				}
+			}
+			/* if necessary, use the origin command */
+			if (result.size === 0) {
+				assert(!!e.origin);
+				result.add(e.origin);
+			}
+			/* delete commands that are pre-run and would conflict with a new delete command */
+			let finalCommandsToDelete = new Set(commandsToDelete);
+			for (let cmdI of commandsToDelete) {
+				for (let cmdJ of Command.commandGraph.verticesWithPathFrom(cmdI)) {
+					finalCommandsToDelete.add(cmdJ);
+				}
+			}
+			for (let cmd of finalCommandsToDelete) {
+				Command.commandGraph.destroyVertex(cmd);
+			}
+			if (e.delete) {
+				assert(e.delete.state === &apos;pre-run&apos;);
+				Command.commandGraph.destroyVertex(e.delete);
+			}
+			/***/
+			return result;
+		}
+		
+		/**
+		 * Get the direct dependencies for a new edit-command for specific property fields on a specific entity,
+		 * and deregister any currently rolled back commands that would now be in conflict.
+		 * @param {Entity} entity      - the entity for which to track edit commands
+		 * @param {Array&lt;string&gt;} keys - the keys of the property fields in the edit command
+		 * @return {Set&lt;Command&gt;} the requested command dependencies
+		 */
+		static getEditDependencies(entity, keys) {
+			let e = Command.registerEntity(entity);
+			return Command._getDependencies(entity, keys.map(key=&gt;e.edit[key]).filter(v=&gt;!!v));
+		}
+		
+		/**
+		 * Get the direct dependencies for a new link- or unlink-command for a specific relationship between two specific entities,
+		 * and deregister any currently rolled back commands that would now be in conflict.
+		 * @param {Entity} entity1 - the entity on the left-hand side
+		 * @param {string} key     - the key of the relationship field; this should always be prefixed with &apos;--&gt;&apos; or &apos;&lt;--&apos;
+		 * @param {Entity} entity2 - the entity on the right-hand side
+		 * @return {Set&lt;Command&gt;} the requested command dependencies
+		 */
+		static getLinkUnlinkDependencies(entity1, key, entity2) {
+			let e1e2 = Command.registerRelationship(entity1, key, entity2);
+			
+			let dep1 = [...Command._getDependencies(entity1, [e1e2])];
+			let dep2 = [...Command._getDependencies(entity2, [e1e2])];
+			
+			assert(dep1.length &gt; 0 &amp;&amp; !!dep1[0]);
+			assert(dep2.length &gt; 0 &amp;&amp; !!dep2[0]);
+			
+			return new Set([...dep1, ...dep2]);
+		}
+		
+		/**
+		 * Get the direct dependencies for a new delete-command for a specific entity,
+		 * and deregister any currently rolled back commands that would now be in conflict.
+		 * @param {Entity} entity - the entity for which to track delete commands
+		 * @return {Set&lt;Command&gt;} the requested command dependencies
+		 */
+		static getDeleteDependencies(entity) {
+			let e = Command.registerEntity(entity);
+			return Command._getDependencies(entity, [
+				...e.edit::values(),
+				...e.relationships::values().map(m=&gt;[...m.values()])::flatten()
+			]);
+		}
+		
+		/**
+		 * a method with common code used by `Command.earliest` and `Command.latest`
+		 * @private
+		 */
+		static _fringe(options = {}) {
+			const {direction, entities = null, states = [&apos;pre-run&apos;, &apos;post-run&apos;, &apos;post-commit&apos;]} = options;
+			
+			/* distinguish between earliest and latest */
+			const [sourceSinks, verticesFromTo] = (direction === &apos;earliest&apos;)
+				? [&apos;sources&apos;, &apos;verticesFrom&apos;]
+				: [&apos;sinks&apos;  , &apos;verticesTo&apos;  ];
+			
+			/* fringe commands filtered by entity */
+			let fringe = new Set([...Command.commandGraph[sourceSinks]()]
+					.filter(([,cmd]) =&gt; !entities || entities.some(e =&gt; cmd.associatedEntities.has(e)))
+					.map(([,cmd]) =&gt; cmd));
+
+			/* filtering by state */
+			let result = new Set;
+			function process(cmd) {
+				if (states.includes(cmd.state)) {
+					result.add(cmd);
+				} else {
+					for (let [,prevCmd] of Command.commandGraph[verticesFromTo](cmd)) {
+						process(prevCmd);
+					}
+				}
+			}
+			for (let cmd of fringe) { process(cmd) }
+			
+			/***/
+			return result;
+		}
+		
+		/**
+		 * Get all commands that have no dependencies, optionally filtered by entity or command state.
+		 * @param {Object}               options
+		 * @param {Array&lt;Entity&gt;}       [options.entities] - if given, limits the result to commands related to the given entities
+		 * @param {Array&lt;CommandState&gt;} [options.states]   - if given, limits the result to commands in one of the given states
+		 * @return {Set&lt;Command&gt;} the requested commands
+		 */
+		static earliest(options = {}) {
+			return Command._fringe({
+				...options,
+				direction: &apos;earliest&apos;
+			});
+		}
+		
+		/**
+		 * Get all commands that are not dependencies, optionally filtered by entity or command state.
+		 * @param {Object}               options
+		 * @param {Array&lt;Entity&gt;?}      [options.entities] - if given, limits the result to commands related to the given entities
+		 * @param {Array&lt;CommandState&gt;} [options.states]   - if given, limits the result to commands in one of the given states
+		 * @return {Set&lt;Command&gt;} the requested commands
+		 */
+		static latest(options = {}) {
+			return Command._fringe({
+				...options,
+				direction: &apos;latest&apos;
+			});
+		}
+		
+		
+		/// /// /// /// /// Instances /// /// /// /// ///
+		
+		/**
+		 * Emits an event when this command is committed.
+		 * @type {Observable}
+		 */
+		@event() commitEvent;
+		
+		/**
+		 * Emits an event when this command is rolled back.
+		 * @type {Observable}
+		 */
+		@event() rollbackEvent;
+	
+		
+		/**
+		 * Emits an event when this command is committed.
+		 * @type {CommandState}
+		 */
+		@property({ readonly: true }) state: &apos;pre-run&apos; | &apos;post-run&apos; | &apos;post-commit&apos;;
+		
+		/** @protected */
+		constructor({state, dependencies = []} = {}) {
+			super();
+			
+			/* register in the command graph and history */
+			Command.commandGraph.addVertex(this, this);
+			for (let dep of dependencies) {
+				Command.commandGraph.addEdge(dep, this);
+			}
+			Command.commandHistory.push(this);
+
+			/* handle state */
+			this[$$running]     = false;
+			this[$$committing]  = false;
+			this[$$rollingBack] = false;
+			this.pSubject(&apos;state&apos;).next(state);
+		}
+		
+		
+		/// /// /// /// /// Basic methods /// /// /// /// ///
+		
+		/**
+		 * Get a set of entities associated with this command.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 */
+		get associatedEntities() { assert(false, `The ${this.constructor.name}#associatedEntities accessor is not implemented.`) }
+		
+		/**
+		 * Run this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has not already run.
+		 * This should be implemented by subclasses to bring about the effect of the command.
+		 * @abstract
+		 * @protected
+		 */
+		localRun() { assert(false, &quot;Command subclass must override &apos;localRun&apos;.&quot;)                                   }
+		
+		/**
+		 * Commit this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has run, but has not yet committed.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 * @protected
+		 */
+		async localCommit() { assert(false, &quot;Command subclass must override &apos;localCommit&apos;.&quot;)                                }
+		
+		/**
+		 * Roll back this command, and only this command (i.e., not its dependencies).
+		 * Assumes that this command has run, but has not yet committed.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 * @protected
+		 */
+		localRollback() { assert(false, &quot;Command subclass must override &apos;localRollback&apos;.&quot;)                              }
+		
+		/**
+		 * Get a JSON (plain data) representation of this command.
+		 * This should be implemented by subclasses.
+		 * @abstract
+		 */
+		toJSON(options = {}) { assert(false, &quot;Command subclass must override &apos;toJSON&apos;.&quot;) }
+		
+		/// /// /// /// /// Smart run, commit, rollback /// /// /// /// ///
+		
+		/**
+		 * Run this command now.
+		 */
+		run() {
+			if (this[$$running] || this.state !== &apos;pre-run&apos;) { return }
+			this[$$running] = true;
+
+			/* scheduling runs that need to happen before this one */
+			// NOTE: We always have to ensure that the graph has no cycles.
+			for (let [dep] of Command.commandGraph.verticesTo(this)) { dep.run() }
+
+			/* then run this command */
+			this.localRun();
+			Command.commandHistory.push(this);
+			this[$$running] = false;
+			this.pSubject(&apos;state&apos;).next(&apos;post-run&apos;);
+		}
+		
+		/**
+		 * Commit this command now.
+		 * @returns {Promise} a promise that resolves when the command is confirmed to be committed
+		 */
+		async commit() {
+			assert(this.state !== &apos;pre-run&apos;, &quot;Cannot commit a command that hasn&apos;t yet run.&quot;);
+			if (this[$$committing] || this.state === &apos;post-commit&apos;) { return }
+			this[$$committing] = true;
+
+			/* run commits that need to happen before this one */
+			for (let [cmd] of Command.commandGraph.verticesTo(this)) {
+				await cmd.commit();
+			}
+
+			/* then commit this command */
+			await this.localCommit();
+			
+			/***/
+			this[$$committing] = false;
+			this.pSubject(&apos;state&apos;).next(&apos;post-commit&apos;);
+		}
+		
+		/**
+		 * Roll this command back now.
+		 * @throws {AssertionError} if this command was, or is being, committed
+		 */
+		rollback() {
+			assert(this.state !== &apos;post-commit&apos;, &quot;Can only roll back a command that has been run but not committed.&quot;);
+			assert(!this[$$committing], &quot;Cannot roll back a command that&apos;s in the process of being committed.&quot;);
+			if (this[$$rollingBack] || this.state === &apos;pre-run&apos;) { return }
+			this[$$rollingBack] = true;
+
+			/* rollbacks that need to happen before this one */
+			for (let [rdep] of Command.commandGraph.verticesFrom(this)) { rdep.rollback() }
+
+			/* then roll back this command */
+			this.localRollback();
+			
+			/***/
+			Command.commandHistory.splice(Command.commandHistory.indexOf(this), 1);
+			this[$$rollingBack] =  false;
+			this.pSubject(&apos;state&apos;).next(&apos;pre-run&apos;);
+		}
+		
+	}
+	
+	/* debugging output for command dependencies */
+	// commands.on(&apos;vertex-added&apos;, ([k, v]) =&gt; {
+	// 	switch (k.commandType) {
+	// 		case &apos;new&apos;:    console.log(&apos;+   NEW &apos;, k.entityClass.name, k.initialValues.name); break;
+	// 		case &apos;edit&apos;:   console.log(&apos;+   EDIT&apos;, k.entityClass.name, k.entity.name);        break;
+	// 		case &apos;delete&apos;: console.log(&apos;+   DEL &apos;, k.entityClass.name, k.entity.name);        break;
+	// 	}
+	// });
+	// commands.on(&apos;edge-added&apos;, ([[f, t], e]) =&gt; {
+	// 	let fromCmd, toCmd;
+	// 	switch (f.commandType) {
+	// 		case &apos;new&apos;:    fromCmd = (&apos;NEW  &apos; + f.entityClass.name + &apos; &apos; + f.initialValues.name); break;
+	// 		case &apos;edit&apos;:   fromCmd = (&apos;EDIT &apos; + f.entityClass.name + &apos; &apos; + f.entity.name);        break;
+	// 		case &apos;delete&apos;: fromCmd = (&apos;DEL  &apos; + f.entityClass.name + &apos; &apos; + f.entity.name);        break;
+	// 	}
+	// 	switch (t.commandType) {
+	// 		case &apos;new&apos;:    toCmd = (&apos;NEW  &apos; + t.entityClass.name + &apos; &apos; + t.initialValues.name); break;
+	// 		case &apos;edit&apos;:   toCmd = (&apos;EDIT &apos; + t.entityClass.name + &apos; &apos; + t.entity.name);        break;
+	// 		case &apos;delete&apos;: toCmd = (&apos;DEL  &apos; + t.entityClass.name + &apos; &apos; + t.entity.name);        break;
+	// 	}
+	// 	console.log(`+  (${fromCmd}) --&gt; (${toCmd})`, e);
+	// });
+	// commands.on(&apos;vertex-removed&apos;, (k) =&gt; {
+	// 	switch (k.commandType) {
+	// 		case &apos;new&apos;:    console.log(&apos;-   NEW &apos;, k.entityClass.name, k.initialValues.name); break;
+	// 		case &apos;edit&apos;:   console.log(&apos;-   EDIT&apos;, k.entityClass.name, k.entity.name);        break;
+	// 		case &apos;delete&apos;: console.log(&apos;-   DEL &apos;, k.entityClass.name, k.entity.name);        break;
+	// 	}
+	// });
+	// commands.on(&apos;edge-removed&apos;, ([f, t]) =&gt; {
+	// 	let fromCmd, toCmd;
+	// 	switch (f.commandType) {
+	// 		case &apos;new&apos;:    fromCmd = (&apos;NEW  &apos; + f.entityClass.name + &apos; &apos; + f.initialValues.name); break;
+	// 		case &apos;edit&apos;:   fromCmd = (&apos;EDIT &apos; + f.entityClass.name + &apos; &apos; + f.entity.name);        break;
+	// 		case &apos;delete&apos;: fromCmd = (&apos;DEL  &apos; + f.entityClass.name + &apos; &apos; + f.entity.name);        break;
+	// 	}
+	// 	switch (t.commandType) {
+	// 		case &apos;new&apos;:    toCmd = (&apos;NEW  &apos; + t.entityClass.name + &apos; &apos; + t.initialValues.name); break;
+	// 		case &apos;edit&apos;:   toCmd = (&apos;EDIT &apos; + t.entityClass.name + &apos; &apos; + t.entity.name);        break;
+	// 		case &apos;delete&apos;: toCmd = (&apos;DEL  &apos; + t.entityClass.name + &apos; &apos; + t.entity.name);        break;
+	// 	}
+	// 	console.log(`-  (${fromCmd}) --&gt; (${toCmd})`);
+	// });
+	
+	/***/
+	return env.registerCommandClass(&apos;Command&apos;, Command);
+	
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

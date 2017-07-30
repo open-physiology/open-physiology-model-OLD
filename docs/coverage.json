@@ -1,0 +1,81 @@
+{
+  "coverage": "77.65%",
+  "expectCount": 94,
+  "actualCount": 73,
+  "files": {
+    "src/commands/Command.js": {
+      "expectCount": 21,
+      "actualCount": 18,
+      "undocumentLines": [
+        310,
+        311,
+        309
+      ]
+    },
+    "src/commands/Command_delete.js": {
+      "expectCount": 8,
+      "actualCount": 7,
+      "undocumentLines": [
+        26
+      ]
+    },
+    "src/commands/Command_edit.js": {
+      "expectCount": 10,
+      "actualCount": 7,
+      "undocumentLines": [
+        42,
+        44,
+        43
+      ]
+    },
+    "src/commands/Command_link.js": {
+      "expectCount": 10,
+      "actualCount": 7,
+      "undocumentLines": [
+        32,
+        34,
+        33
+      ]
+    },
+    "src/commands/Command_load.js": {
+      "expectCount": 11,
+      "actualCount": 9,
+      "undocumentLines": [
+        34,
+        58
+      ]
+    },
+    "src/commands/Command_new.js": {
+      "expectCount": 10,
+      "actualCount": 7,
+      "undocumentLines": [
+        40,
+        39,
+        46
+      ]
+    },
+    "src/commands/Command_unlink.js": {
+      "expectCount": 10,
+      "actualCount": 7,
+      "undocumentLines": [
+        31,
+        33,
+        32
+      ]
+    },
+    "src/Module.js": {
+      "expectCount": 13,
+      "actualCount": 10,
+      "undocumentLines": [
+        77,
+        75,
+        76
+      ]
+    },
+    "src/ajaxBackend.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    }
+  }
+}

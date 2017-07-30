@@ -4,6 +4,7 @@
       <w>addr</w>
       <w>advection</w>
       <w>arrayify</w>
+      <w>cmds</w>
       <w>coalescences</w>
       <w>coalescense</w>
       <w>codomain</w>
@@ -33,6 +34,7 @@
       <w>typecheck</w>
       <w>unassert</w>
       <w>undelete</w>
+      <w>unlinking</w>
       <w>wujs</w>
       <w>xdescribe</w>
     </words>
