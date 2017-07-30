@@ -1,6 +1,6 @@
 {
   "name": "open-physiology-model",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "tracking and syncing entities from open-physiology-manifest",
   "main": "src/index.js",
   "scripts": {
